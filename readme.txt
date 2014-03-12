@@ -38,7 +38,7 @@ ExpressCurate solves that problem by bringing all key elements for content curat
 
 **How To Get Started**
 
-**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate-wordpress-plugin.1.1.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate-wordpress-plugin.1.1.zip)**. It's simple. It's free.
+**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.1.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.1.zip)**. It's simple. It's free.
 
 You can also **[download](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")** a **free [ExpressCurate WordPress theme](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")**. It will give your curated content a modern online news look.  
 
