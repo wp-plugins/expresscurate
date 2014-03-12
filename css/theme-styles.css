@@ -1,0 +1,106 @@
+.annotate:before
+{
+  position: absolute;
+  height: 12px;
+  width: 12px;
+  top: -7px;
+  right: 50px;
+  transform: rotate(45deg) skew(10deg, 10deg);
+  -webkit-transform: rotate(45deg) skew(10deg, 10deg);
+  -ms-transform: rotate(45deg) skew(10deg, 10deg);
+  background-color: #f8f8f8;
+  border-left: 1px solid #e6e6e6;
+  border-top: 1px solid #e6e6e6;
+}
+/*blockquote {
+  background-image: url(images/open.png);
+  background-position: top left;
+  background-repeat: no-repeat;
+  text-indent: 15px;
+}
+blockquote p:last-child {
+  display: block;
+  background-image: url(images/close.png);
+  background-repeat: no-repeat;
+  background-position: bottom right;
+}*/
+.annotate:before {
+  content: "";
+  right: 20%;
+}
+
+/*
+.annotate:before {
+    content: "";
+  background-size: 17px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url('images/upArrow.png');
+    display: block;
+    width: 17px;
+  height: 15px;
+    position: absolute;
+    top: -15px;
+    right: 30%;
+}
+*/
+.annotate {
+  padding: 20px 27px;
+  border: 1px solid #e6e6e6;
+  position: relative;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-family:"OpenSans-LightItalic";
+  font-size:15px;
+  line-height:24px;
+  color:#181818;
+  background-color:#f8f8f8;
+}
+
+blockquote ul, ol {
+  padding-left: 40px;
+}
+
+blockquote {
+  position: relative;
+  padding: 0 20px;
+  margin: 0px 0px 30px 10px;
+  /*    text-indent: 10px;*/
+}
+
+blockquote > * {
+  margin-left: 10px;
+}
+
+blockquote > *:first-child {
+  padding-top: 20px;
+}
+
+blockquote:before {
+  left: 0px;
+  width: 12px;
+  height: 23px;
+  position: absolute;
+  display: inline-block;
+  background-size:12px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url('images/openQuote.png');
+  content: "";
+  /*   text-indent: 0px;*/
+}
+
+blockquote:after {
+  right: 10px;
+  width: 12px;
+  height: 27px;
+  text-align: right;
+  position: absolute;
+  display: inline-block;
+  background-size:12px;
+  /* -moz-background-size:10px; */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url('images/closeQuote.png');
+  content: "";
+}

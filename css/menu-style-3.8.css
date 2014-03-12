@@ -1,0 +1,18 @@
+#adminmenu #toplevel_page_expresscurate div.wp-menu-image:before {
+  content: "";
+}
+.wp-not-current-submenu#toplevel_page_expresscurate div.wp-menu-image{
+  content: "";
+  background: url("../images/adminFlatInactive.png") no-repeat scroll center rgba(0, 0, 0, 0) !important;
+}
+
+.wp-not-current-submenu#toplevel_page_expresscurate:hover div.wp-menu-image {
+  background: url("../images/adminFlatHover.png") no-repeat scroll center rgba(0, 0, 0, 0) !important;
+}
+
+.wp-menu-open#toplevel_page_expresscurate div.wp-menu-image{
+  content: "";
+  background: url("../images/adminFlat.png") no-repeat scroll center rgba(0, 0, 0, 0) !important;
+}
+
+
