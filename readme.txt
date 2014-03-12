@@ -1,6 +1,6 @@
 === ExpressCurate ===
 Contributors: expresscurate
-Tags: content curation, content marketing
+Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing 
 Donate link: http://www.expresscurate.com/
 Requires at least: 3.6
 Tested up to: 3.8
