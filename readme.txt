@@ -73,6 +73,7 @@ e.g.
 * New text box tools for better blog styling
 * Image selection from original page enhanced
 * Paragraph selection from original page enhanced
+* Optional Auto-Hashtagging
 
 = 1.1 =
 * Miscellaneous bug fixing and improvements.
