@@ -306,14 +306,14 @@ jQuery(document).ready(function($) {
     $("#expresscurate_dialog").fadeIn();
     var error_html = '';
     var notif_html = '';
-    $.post('http://' + blog_domain + '/wp-admin/admin-ajax.php?action=expresscurate_get_article&check=1', $('#curate_post_form input').serialize(), function(res) {
+    $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_get_article&check=1', $('#curate_post_form input').serialize(), function(res) {
       var data = $.parseJSON(res);
       if (data.status == 'notification') {
         notif_html = '<div class="updated">' + data.msg + '</div>';
         $('#curate_post_form').before(notif_html);
       }
     });
-    $.post('http://' + blog_domain + '/wp-admin/admin-ajax.php?action=expresscurate_get_article', $('#curate_post_form input').serialize(), function(res) {
+    $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_get_article', $('#curate_post_form input').serialize(), function(res) {
       var data = $.parseJSON(res);
       if (data.status == 'error') {
         error_html = '<div class="error">' + data.error + '</div>';
@@ -358,4 +358,52 @@ jQuery(document).ready(function($) {
     }
 
   });
+
+  if ($('input[name=expresscurate_post_status]:checked').val() == 'draft') {
+    $('#expresscurate_publish_div').show();
+  }
+  $('input[name=expresscurate_post_status]').change(function() {
+    if ($('input[name=expresscurate_post_status]:checked').val() == 'draft') {
+      $('#expresscurate_publish_div').slideDown('slow');
+    } else {
+      $('#expresscurate_publish_no').attr('checked', true);
+      $('#expresscurate_publish_div').slideUp('slow');
+    }
+
+  });
+  
+  $('input[name=expresscurate_publisher]').bind("change paste keyup", function() {
+	var href=$(this).next('span').children('a').attr('href');
+	var rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
+	$(this).next('span').children('a').attr('href',rest+ $(this).val());
+	console.log($(this).next('span').children('a').attr('href'));
+  });
+  
+  // $('textarea[name=expresscurate_defined_tags]').on("keyup", function(e) {
+	// var textarea=$(this);
+	// if(e.keyCode==188 || e.keyCode==13){
+		// text=textarea.val().replace(',', '');
+		// $.each($('.keywords'), function( key, value ) {
+		  // if(justtext($( this )) ==text){
+			// setTimeout(function(){
+				// console.log($(this));
+			  // $(this).css({'background':'#e1e1e1'});
+			// }, 2000);
+			// text='';
+			// }
+		// });	
+		// if (!/^\s+$/.test(text) && text.length>1){
+			// var keyword = '<div class="keywords">'+text+'<span>×</span></div>' ;
+		// }
+		// textarea.before(keyword);
+		// textarea.val('');
+	// }
+  // });
+  function justtext(elem) {
+		return elem.clone().children().remove().end().text(); 
+  };
+  // $('.keywords span').live('click',function(){
+	// $(this).parent('div').remove();
+  // });
 });
+

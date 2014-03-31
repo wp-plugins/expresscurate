@@ -57,6 +57,8 @@ class ExpressCurate_Settings {
 
     remove_filter('the_content', 'wpautop');
     //remove_filter( 'the_excerpt', 'wpautop' );
+    // Above and below content filters
+    add_filter('the_content', array(&$this, 'expresscurate_the_content'));
   }
 
 // END public function init()
@@ -73,19 +75,22 @@ class ExpressCurate_Settings {
     register_setting('expresscurate-group', 'expresscurate_curated_text');
     register_setting('expresscurate-group', 'expresscurate_featured');
     register_setting('expresscurate-group', 'expresscurate_seo');
+    register_setting('expresscurate-group', 'expresscurate_publisher');
     register_setting('expresscurate-group', 'expresscurate_autosummary');
     register_setting('expresscurate-group', 'expresscurate_share');
+    register_setting('expresscurate-group', 'expresscurate_publish');
+    register_setting('expresscurate-group', 'expresscurate_smart_tagging');
+    register_setting('expresscurate-group', 'expresscurate_hours_interval');
     add_action('admin_footer', array(&$this, 'add_inline_popup_content'));
     add_action('wp_ajax_expresscurate_export_api_get_terms', array($this->exportAPI, 'get_terms'));
     add_action('wp_ajax_expresscurate_export_api_check_auth', array($this->exportAPI, 'check_auth'));
     add_action('wp_ajax_expresscurate_export_api_save_post', array($this->exportAPI, 'save_post'));
+    add_action('wp_ajax_expresscurate_export_api_check_source', array($this->exportAPI, 'check_source'));
     add_action('wp_ajax_expresscurate_get_article', array($this->contentManager, 'get_article'));
+    add_filter('user_contactmethods', array(&$this, 'add_user_profile_metas'));
     if ($pagenow == 'post.php' || $pagenow == 'post-new.php') {
       add_action('media_buttons_context', array(&$this, 'add_expresscurate_custom_button'), 11);
     }
-
-    // Above and below content filters
-    //add_filter('the_content', array(&$this, 'expresscurate_the_content'));
   }
 
   function expresscurate_continue_reading_link() {
@@ -134,8 +139,13 @@ class ExpressCurate_Settings {
 			</div>';
       $text = $attachment_img . $text;
     }
-
+    $text .= '<div class="clear"></div>';
     return $text;
+  }
+
+  public function expresscurate_the_content($content) {
+    $content .= '<div class="expresscurate_clear"></div>';
+    return $content;
   }
 
   public function truncateHtml($text, $length = 100, $ending = '...', $exact = true, $considerHtml = true) {
@@ -243,7 +253,10 @@ class ExpressCurate_Settings {
   }
 
   public function expresscurate_register_buttons($buttons) {
-    array_push($buttons, 'annotate');
+    array_push($buttons, 'annotation');
+    array_push($buttons, 'lefttextbox');
+    array_push($buttons, 'justifytextbox');
+    array_push($buttons, 'righttextbox');
     return $buttons;
   }
 
@@ -272,7 +285,7 @@ class ExpressCurate_Settings {
 
   public function add_inline_popup_content() {
     ?>
-    <div id="expresscurate_dialog" class="expresscurate_dialog" title="<?php echo self::PLUGIN_NAME ?>">  
+    <div id="expresscurate_dialog" class="expresscurate_dialog" title="<?php echo self::PLUGIN_NAME ?>">
       <?php include(sprintf("%s/templates/metabox.php", dirname(__FILE__))); ?>
     </div>
     <?php
@@ -357,8 +370,7 @@ class ExpressCurate_Settings {
     $the_post = get_post($post_id);
 // get the content of the post
     $post_content = $the_post->post_content;
-
-    $tags = get_the_tags();
+    $tags = get_the_tags($post_id);
     if ($tags) {
       foreach ($tags as $tag) {
         $post_tags[$tag->term_id] = $tag->name;
@@ -372,7 +384,7 @@ class ExpressCurate_Settings {
       $content_tag_insert = str_replace("#", "", trim($content_tag));
 //adding content tag to post tags if not exists
       if (!in_array($content_tag_insert, $post_tags)) {
-        wp_set_post_tags($post_id, $content_tag_insert, true);
+        wp_set_post_tags($post_id, strtolower($content_tag_insert), true);
       }
     }
     if ($defined_tags && count($defined_tags)) {
@@ -385,21 +397,21 @@ class ExpressCurate_Settings {
         }
       }
     }
-    $tags = get_the_tags();
+    $tags = get_the_tags($post_id);
     if ($tags && count($tags)) {
       foreach ($tags as $tag) {
         preg_match("/(?<!\w)(?=[^>]*(<|$))#" . $tag->name . "/i", $post_content, $tag_in_content);
         if (isset($tag_in_content[0])) {
           preg_match("/>#" . $tag->name . '(<\/a>)/', $post_content, $tag_in_a);
           if (!isset($tag_in_a[0])) {
-            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag->name . "/i", '<a href="' . get_tag_link($tag->term_id) . '">#' . $tag->name . '</a>', $post_content, 1);
+            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag->name . "/i", '<a href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
           }
         } else {
           preg_match("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "/i", $post_content, $tag_in_content);
           if (isset($tag_in_content[0])) {
             preg_match("/>" . $tag->name . '(<\/a>)/i', $post_content, $tag_in_a);
             if (!isset($tag_in_a[0])) {
-              $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "/i ", '<a href="' . get_tag_link($tag->term_id) . '">#' . $tag->name . '</a>', $post_content, 1);
+              $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "/i ", '<a href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
             }
           }
         }
@@ -410,6 +422,7 @@ class ExpressCurate_Settings {
 
   public function get_metas($post_id = '', $type = 'post', $status = 'publish') {
     global $wpdb;
+    $metas = array();
     if (empty($post_id))
       return;
     $r = $wpdb->get_results($wpdb->prepare("
@@ -417,7 +430,7 @@ class ExpressCurate_Settings {
         LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
         WHERE pm.meta_key LIKE 'expresscurate_link_%'
         AND pm.post_id = '%s'
-        AND p.post_status = '%s' 
+        AND p.post_status = '%s'
         AND p.post_type = '%s'
     ", $post_id, $status, $type));
 
@@ -435,7 +448,7 @@ class ExpressCurate_Settings {
    */
   public function save_post($post_id) {
 
-// verify if this is an auto save routine. 
+// verify if this is an auto save routine.
 // If it is our form has not been submitted, so we dont want to do anything
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
       return;
@@ -444,7 +457,12 @@ class ExpressCurate_Settings {
       return;
 
 // get the content of the post
-    $post_content = $this->generate_tags($post_id);
+    if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
+      $post_content = $this->generate_tags($post_id);
+    } else {
+      $the_post = get_post($post_id);
+      $post_content = $the_post->post_content;
+    }
     //Seo part
     if (get_option('expresscurate_seo', '') == 1) {
       $expresscurate_keywords = isset($_POST['expresscurate_keywords']) ? $_POST['expresscurate_keywords'] : '';
@@ -600,7 +618,7 @@ class ExpressCurate_Settings {
     add_submenu_page('expresscurate', 'Top Curated websites', 'Top Curated websites', 'edit_posts', 'expresscurate_websites', array(&$this, 'show_expresscurate_websites'), '');
   }
 
-  //Add widget 
+  //Add widget
   public function expresscurate_add_widget() {
     if (get_option('expresscurate_seo', '') == 1) {
       add_meta_box('expresscurate', self::PLUGIN_NAME . ' SEO Control Center', array(&$this, 'expresscurate_meta_box'), 'post', 'side', 'high');
@@ -611,7 +629,7 @@ class ExpressCurate_Settings {
   public function expresscurate_meta_box() {
     global $post;
     ?>
-    <div id="expresscurate_widget" class="expresscurate_widget" title="<?php echo self::PLUGIN_NAME ?>">  
+    <div id="expresscurate_widget" class="expresscurate_widget" title="<?php echo self::PLUGIN_NAME ?>">
       <?php include(sprintf("%s/templates/widget.php", dirname(__FILE__))); ?>
     </div>
 
@@ -619,16 +637,20 @@ class ExpressCurate_Settings {
     <?php
   }
 
-  public function add_expresscurate_seo() {
+  public function add_expresscurate_seo($post) {
     global $post;
-    $post_id = $post->ID;
-    if (is_feed())
+    if (is_feed() || is_search() || is_404())
       return;
+    $post_id = $post->ID;
     $meta_string = '';
-    if (is_single() || is_page() && (get_option('expresscurate_seo', '') == 1)) {
+    //(is_home() || is_page() || is_search() || is_category())
+    if (!is_feed() && (get_option('expresscurate_seo', '')) == 1 && (get_option('expresscurate_publisher', ''))) {
+      $meta_string .= '<link href="' . get_option('expresscurate_publisher', '') . '" rel="publisher" />';
+    }
+    if ((is_single() || is_page() || is_author()) && (get_option('expresscurate_seo', '') == 1)) {
       $keywords = get_post_meta($post_id, '_expresscurate_keywords', true);
       $description = get_post_meta($post_id, '_expresscurate_description', true);
-      if ($description) {
+      if ($description && !is_author()) {
         $meta_string .= sprintf("<meta name=\"description\" content=\"%s\" />\n", $description);
       }
       $tags = get_the_tags();
@@ -642,17 +664,23 @@ class ExpressCurate_Settings {
         }
       }
 
-      if ($keywords) {
+      if ($keywords && !is_author()) {
         $keword_arr = array_map('trim', explode(',', $keywords));
         $keword_arr = array_unique($keword_arr);
         $keywords = wp_filter_nohtml_kses(str_replace('"', '', implode(',', $keword_arr)));
         $meta_string .= sprintf("<meta name=\"keywords\" content=\"%s\" />\n", $keywords);
       }
-      if ($meta_string != null) {
-        echo "\n<!-- ExpressCurate SEO-->\n";
-        echo "$meta_string\n";
-        echo "<!-- /ExpressCurate SEO -->\n";
+
+      $author_gplus = get_user_meta($post->post_author, 'expresscurate_gplus', true);
+
+      if (strlen($author_gplus) > 1) {
+        $meta_string .= '<link rel="author" href="' . $author_gplus . '"/>';
       }
+    }
+    if ($meta_string != null) {
+      echo "\n<!-- ExpressCurate SEO-->\n";
+      echo "$meta_string\n";
+      echo "<!-- /ExpressCurate SEO -->\n";
     }
   }
 
@@ -728,9 +756,60 @@ class ExpressCurate_Settings {
     return $feed;
   }
 
+  public function add_user_profile_metas() {
+    // Add new fields
+    $profile_fields['expresscurate_twitter'] = 'Twitter Username';
+    $profile_fields['expresscurate_facebook'] = 'Facebook URL';
+    $profile_fields['expresscurate_gplus'] = 'Google+ URL';
+    return $profile_fields;
+  }
+
+  //publish posts curated by chrome extension
+  public function publish_event() {
+    if (get_option('expresscurate_post_status', '') !== 'draft' || !get_option('expresscurate_publish', '') || get_option('expresscurate_publish', '') === 0) {
+      return;
+    }
+    $args = array(
+        'posts_per_page' => 1,
+        'post_type' => 'post',
+        'post_status' => 'draft',
+        'orderby' => 'post_date',
+        'order' => 'ASC',
+        'meta_query' => array(
+            array(
+                'key' => 'expresscurate_chrome',
+                'value' => '1'
+            )
+        )
+    );
+    $posts = new WP_Query($args);
+    $recentargs = array(
+        'numberposts' => 1,
+        'offset' => 0,
+        'orderby' => 'post_date',
+        'order' => 'DESC',
+        'post_type' => 'post',
+        'post_status' => 'publish',
+        'suppress_filters' => true);
+
+    $recent_posts = wp_get_recent_posts($recentargs, ARRAY_A);
+    $now = date('Y-m-d h:i:s');
+    $hourdiff = round((strtotime($recent_posts[0]['post_date']) - strtotime($now)) / (60 * 60));
+    if ($hourdiff >= get_option("expresscurate_hours_interval") && $posts->have_posts()) {
+      wp_update_post(array('ID' => $posts->posts[0]->ID, 'post_status' => 'publish'));
+    } elseif (!$posts->have_posts() && get_settings('admin_email')) {
+      $subject = "ExpressCurate Smart Publishing Status";
+      $message = "There is no curated posts to publish \n";
+      wp_mail(get_settings('admin_email'), $subject, $message
+      );
+    }
+  }
+
   private function get_match($regex, $content) {
     preg_match($regex, $content, $matches);
-    return $matches[1];
+    return $matches[1]
+
+    ;
   }
 
   private function pluginUrl() {

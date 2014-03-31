@@ -1,3 +1,6 @@
+ #expresscurate_defined_tags{
+		width:100%;
+	 }
 .topCuratedHeader{
 	width:60%;
 	cursor:pointer;
@@ -528,9 +531,13 @@
   width: 100%;
   max-width: 670px;
 }
+.express_curate_table td {
+  vertical-align: top;
+}
 .form-table .width-for-td{
   width: 285px;
   text-align: right;
+  
 }
 .gray-italic{
   color: #afafaf;

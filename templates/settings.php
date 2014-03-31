@@ -1,11 +1,11 @@
 <div class="wrap">
   <h2><?php echo ExpressCurate_Settings::PLUGIN_NAME ?> Settings</h2>
-  <form method="post" action="options.php"> 
+  <form method="post" action="options.php">
     <?php @settings_fields('expresscurate-group'); ?>
     <?php @do_settings_fields('expresscurate-group'); ?>
 
     <?php //do_settings_sections('expresscurate'); ?>
-    <table class="form-table">
+    <table class="form-table express_curate_table">
 
       <tr valign="top">
         <th scope="row" colspan="2">
@@ -14,6 +14,7 @@
           <span class="gray-italic">Please pick a default category for your curated posts from the list below. This will prevent a default "Uncategorized" being assigned to your post automatically.</span>
         </th>
       </tr>
+      
       <tr valign="top">
         <td class="with-padding" colspan="2">
           <table>
@@ -28,7 +29,7 @@
                   if (get_option('expresscurate_def_cat') == $category->term_id) {
                     echo 'checked="checked"';
                   }
-                  ?>>					
+                  ?>>
                   <label for="expresscurate_cat_<?php echo $category->term_id; ?>"> <?php echo $category->name; ?> </label><br />
                   <?php if ($cat_i % 6 == 0 && count($categories) != $cat_i) {
                     ?>
@@ -46,6 +47,31 @@
           </table>
         </td>
       </tr>
+
+      <tr valign="top" class="width-bottom-border">
+        <td scope="row" class="width-for-td">
+          <strong>Auto Hashtagging:</strong>
+          <br>
+          <span scope="row" class="gray-italic">
+            When enabled words starting with # will be transformed into tags and tags will be transformed into words starting with #.
+          </span>
+        </td>
+        <td>
+          <input type="radio" id="smart_tags" value="1" name="expresscurate_smart_tagging" <?php
+          if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
+            echo 'checked="checked"';
+          }
+          ?> />
+          <label for="smart_tags"> Yes </label>
+          <input type="radio" id="smart_tags_no" value="0" name="expresscurate_smart_tagging" <?php
+          if (get_option('expresscurate_smart_tagging', '') == "0") {
+            echo 'checked="checked"';
+          }
+          ?> />
+          <label for="smart_tags_no"> No </label>
+        </td>
+      </tr>
+
       <tr valign="top">
         <th scope="row" colspan="2">
           <strong>Attribution Text For Original Article Link</strong>
@@ -87,7 +113,61 @@
       </tr>
       <tr class="width-bottom-border">
         <td colspan="2">
-          &nbsp;
+          <div id="expresscurate_publish_div" class="hidden">
+            <table>
+              <tr valign="top" >
+                <td>
+                  <b>Smart publishing</b>
+                  <br /><br />
+                  <input type="radio" id="expresscurate_publish_yes" value="1" name="expresscurate_publish" <?php
+                  if (get_option('expresscurate_publish') == "1") {
+                    echo 'checked="checked"';
+                  }
+                  ?> />
+                  <label for="expresscurate_publish_yes"> Yes </label>
+                  <input type="radio" id="expresscurate_publish_no" value="0" name="expresscurate_publish" <?php
+                  if (get_option('expresscurate_publish', '') == "0" || !get_option('expresscurate_publish', '')) {
+                    echo 'checked="checked"';
+                  }
+                  ?> />
+                  <label for="expresscurate_publish_no"> No </label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="hours_interval">Publish draft articles</label>
+                  <select name="expresscurate_hours_interval">
+                    <?php for ($i = 1; $i < 14; $i++) { ?>
+                      <?php if ($i == 1) { ?>
+                        <option value="<?php echo $i; ?>" <?php
+                        if (get_option('expresscurate_hours_interval') == $i) {
+                          echo 'selected="selected"';
+                        }
+                        ?>>Every hour</option>
+
+                      <?php } elseif ($i == 13) { ?>
+                        <option value="<?php echo $i; ?>" <?php
+                        if (get_option('expresscurate_hours_interval') == $i) {
+                          echo 'selected="selected"';
+                        }
+                        ?>>Once a day</option>
+
+                      <?php } else { ?>
+                        <option value="<?php echo $i; ?>" <?php
+                        if (get_option('expresscurate_hours_interval') == $i) {
+                          echo 'selected="selected"';
+                        }
+                        ?>>Every <?php echo $i; ?> hours</option>
+
+                        <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+            </table>
+          </div>
         </td>
       </tr>
       <tr valign="top" class="width-bottom-border">
@@ -173,19 +253,31 @@
           <label for="expresscurate_seo_no"> No </label>
         </td>
       </tr>
+      <tr valign="top" class="width-bottom-border">
+        <th scope="row" class="width-for-td">
+          <strong>Publisher</strong>
+          <br>
+          <span class="gray-italic">You can link content you publish on this blog to your company or personal Google+ profile.<a href="https://plus.google.com/authorship" target="_blank">More Info</a>.</span>
+        </th>
+        <td>
+          <input type="text" id="expresscurate_publusher" size="50" value="<?php
+          if (get_option('expresscurate_publisher')) {
+            echo get_option('expresscurate_publisher');
+          } else {
+            echo '';
+          }
+          ?>" name="expresscurate_publisher"  /><span class="gray-italic">&nbsp;&nbsp;<a href="http://www.google.com/webmasters/tools/richsnippets?url=<?php echo bloginfo('url') ?>&user_profile=<?php echo get_option('expresscurate_publisher'); ?>" target="_blank">Verify publisher</a></span>
+        </td>
+      </tr>
       <tr valign="top">
         <th scope="row" colspan="2">
           <strong>Your Keyword Tags:</strong>
           <br>
           <span class="gray-italic">
-            Enter your target keywords that you want to be tagged in the post.  Multiple keywords need to be separated by commas.  
+            Enter your target keywords that you want to be tagged in the post.  Multiple keywords need to be separated by commas.
             <br/>When this list is defined, ExpressCurate will look for these words in curated content and try to tag them in the article, as well as create links from these keywords that show up on tag's page.</span>
         </th>
       </tr>
-
-
-
-
       <tr valign="top">
         <td  colspan="2">
           <textarea id="expresscurate_defined_tags" class="with-max-width" name="expresscurate_defined_tags" cols="20" rows="3" /><?php
@@ -196,9 +288,7 @@
           }
           ?></textarea>
         </td>
-      <tr>  
-
-
+      <tr>
     </table>
     <?php @submit_button(); ?>
   </form>

@@ -1,10 +1,12 @@
 <?php
+
 /*
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
   License: GPLv3 or later
   License URI: http://www.gnu.org/licenses/gpl.html
  */
+
 class ExpressCurate_ContentManager {
 
   public function get_article() {
@@ -188,12 +190,7 @@ class ExpressCurate_HtmlParser {
     $result_h3 = '';
     $xpath = new DOMXPath($this->dom);
 //get images
-//    $imgTags = $xpath->query("//img[@width > 150 or substring-before(@width, 'px') > 150 or substring-before(@max-width, 'px') > 150 or substring-before(@max-height, 'px') > 150
-//    or @height > 150 or substring-before(@height, 'px') > 150 ]");
-    $imgTags = $xpath->query("//img[(not(@width) and not(@height)) or 
-    ((@width > 150 or substring-before(@width, 'px') > 150 or substring-before(@max-width, 'px') > 150) 
-    or (substring-before(@max-height, 'px') > 100 or @height > 100 or substring-before(@height, 'px') > 100 ))]");
-//$imgTags = $xpath->query("//img");
+    $imgTags = $xpath->query("//img");
     foreach ($imgTags as $t) {
       $src = $t->getAttribute('src');
       if (strpos($src, '//') !== false) {
@@ -204,21 +201,30 @@ class ExpressCurate_HtmlParser {
         $src = $this->domain . $src;
       }
       $src = preg_replace('%([^:])([/]{2,})%', '\\1/', $src);
-//$src = strtok($src, '?');
-//$image = '<img src="' .$src . '"/>';
       if (!in_array($src, $result_images)) {
         $result_images[] = $src;
       }
     }
 //get text
-    $pTags = $xpath->query('//text()');
+    $pTags = $xpath->query('//p');
     $pi = 0;
     foreach ($pTags as $t) {
-      if (strlen($t->nodeValue) > 50 && $pi < 150) {
-        $result_paragraphs[] = $t->nodeValue;
+      if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
+        $result_paragraphs[] = trim($t->nodeValue);
+        $pi++;
+      }
+      $t->parentNode->removeChild($t);
+    }
+
+    $textTags = $xpath->query('//text()');
+    $pi = 0;
+    foreach ($textTags as $t) {
+      if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
+        $result_paragraphs[] = trim($t->nodeValue);
         $pi++;
       }
     }
+
 
 //get H1
     $h1Tag = $xpath->query('//h1');

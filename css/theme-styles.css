@@ -1,3 +1,18 @@
+
+@font-face
+{
+  font-family: OpenSans-Light;
+  src: url('fonts/open-sans/OpenSans-Light.eot?#iefix') format('embedded-opentype'),
+    url('fonts/open-sans/OpenSans-Light.ttf') format('truetype');
+}
+.mceContentBody{
+  font-size:15px;
+  line-height:24px;
+  color:#181818;
+  max-width:100%;
+  text-align: justify;
+}
+
 .annotate:before
 {
   position: absolute;
@@ -8,7 +23,7 @@
   transform: rotate(45deg) skew(10deg, 10deg);
   -webkit-transform: rotate(45deg) skew(10deg, 10deg);
   -ms-transform: rotate(45deg) skew(10deg, 10deg);
-  background-color: #f8f8f8;
+  background-color: #F3F3F3;
   border-left: 1px solid #e6e6e6;
   border-top: 1px solid #e6e6e6;
 }
@@ -50,11 +65,14 @@ blockquote p:last-child {
   position: relative;
   margin-top: 20px;
   margin-bottom: 10px;
-  font-family:"OpenSans-LightItalic";
-  font-size:15px;
+  font-style: italic;
   line-height:24px;
-  color:#181818;
-  background-color:#f8f8f8;
+  background-color:#F3F3F3;
+  clear:both;
+  font-size: 16px;
+  color: #A39E9E;
+  font-family:"OpenSans-Light";
+
 }
 
 blockquote ul, ol {
@@ -76,7 +94,7 @@ blockquote > *:first-child {
   padding-top: 20px;
 }
 
-blockquote:before {
+blockquote:before{
   left: 0px;
   width: 12px;
   height: 23px;
@@ -104,3 +122,52 @@ blockquote:after {
   background-image: url('images/closeQuote.png');
   content: "";
 }
+
+/*Text boxes*/
+.expresscurate_fl_text_box , .expresscurate_fr_text_box , .expresscurate_justify_text_box{
+	height: auto;
+	border-style: none;
+	overflow: hidden;
+	background-color:#F3F3F3;
+	word-break: break-all;
+	text-align:justify;
+	resize:both;
+	font-style: italic;
+	font-size: 16px;
+	color: #A39E9E;
+	font-family:"OpenSans-Light";
+
+}
+.expresscurate_fl_text_box , .expresscurate_fr_text_box{
+	width: auto;
+	max-width: 200px;
+	padding: 25px;
+}
+.expresscurate_fl_text_box {
+	float: left;
+	margin:20px 20px 20px 0;
+}
+
+.expresscurate_fr_text_box {
+	float: right;
+	margin:20px 0px 20px 20px;
+}
+.expresscurate_justify_text_box{
+	width:96%;
+	max-width:92%;
+	min-width:92%;
+	margin: 10px 0 10px 0;
+	min-height:25px;
+	padding: 4%;
+}
+.entry-summary .expresscurate_fl_text_box ,
+.entry-summary .expresscurate_fr_text_box , 
+.entry-summary .expresscurate_justify_text_box,
+.entry-content  .expresscurate_fl_text_box ,
+.entry-content  .expresscurate_fr_text_box , 
+.entry-content  .expresscurate_justify_text_box{
+	resize:none !important;
+ }
+ .expresscurate_clear{
+	clear: both;
+ }

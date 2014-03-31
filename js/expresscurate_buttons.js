@@ -9,45 +9,61 @@
         return (prefix || '') + '-' + uniqueId;
     };
 
-    function getAnnotation(node) {
-        if (node && node.className && !! ~node.className.indexOf('annotate')) {
+
+	
+	 function getElem(node,cssClass) {
+        if (node && node.className && !! ~node.className.indexOf(cssClass)) {
             return node;
         }
 
         if (node.parentNode) {
-            return getAnnotation(node.parentNode);
+            return getElem(node.parentNode,cssClass);
         }
 
         return false;
     };
 
-    function findAnnotation(node) {
-        var annotation = getAnnotation(node);
+	
+	function textboxCommand(ed,elem,cssClass){
+		var isActiveTextbox = ed.controlManager.get(elem).active;
 
-        if (!annotation) {
-            annotation = !! node.getElementsByClassName('annotate')[0];
-        }
+		if (isActiveTextbox ) {
+			var texbox = getElem(ed.selection.getNode(),cssClass);
 
-        return annotation;
-    };
-
-    function removeAnnotations(node) {
-        var containsAnnotation = findAnnotation(node);
-
-        if (containsAnnotation) {
-            var annotations = node.getElementsByClassName('annotate');
-
-            if (annotations) {
-                var length = annotations.length;
-
-                while (length--) {
-                    annotations[length].remove();
-                }
-            }
-        }
-
-        return node;
-    };
+			if (texbox) {
+				ed.execCommand('mceRemoveNode', texbox.id);
+				ed.controlManager.get(elem).setActive(false);
+			}
+		} else {
+			var node=ed.selection.getNode(),
+				selectedClass=jQuery(node).attr('class');
+			if(selectedClass!=cssClass){
+			
+				var content='';
+				if (node.nodeName!='DIV') {
+					content=ed.selection.getContent()
+				}else {
+					content=ed.selection.getNode().innerHTML;
+					//node.innerHTML ='';
+					jQuery(node).remove();
+				}
+				if(selectedClass && node.nodeName=='DIV'){
+					ed.execCommand('mceRemoveNode', 0, node.id);
+				}
+				if(node.nodeName=='P' && jQuery(node).html()=='&nbsp;'){
+					jQuery(node).remove();
+				}
+				var id = elem + getId(),
+				    texboxElem = ed.getDoc().createElement('DIV');
+				
+				texboxElem.id = id;
+				texboxElem.className =cssClass;
+				texboxElem.innerHTML = content;
+				ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
+				ed.controlManager.get(elem).setActive(true);
+			}
+		}
+	};
     tinymce.create('tinymce.plugins.expresscurate', {
         /**
          * Initializes the plugin, this will be executed after the plugin has been created.
@@ -57,103 +73,100 @@
          * @param {tinymce.Editor} ed Editor instance that the plugin is initialized in.
          * @param {string} url Absolute URL to where the plugin is located.
          */
+		
         init: function(ed, url) {
-          
-            ed.addButton('annotate', {
-                title: 'Add annotation',
-                cmd: 'annotate',
+		
+            ed.addButton('annotation', {
+                title: 'Add Annotation (Ctrl + Up)',
+                cmd: 'annotation',
                 image: url + '/../images/annotate.png'
             });
-
-            ed.addCommand('annotate', function(force) {
-                //debugger;
-                var isActiveAnnotate = ed.controlManager.get('annotate').active;
-
-                if (isActiveAnnotate && !force) {
-                    var annotation = getAnnotation(ed.selection.getNode());
-
-                    if (annotation) {
-                        ed.execCommand('mceRemoveNode', 0, annotation.id);
-                        ed.controlManager.get('annotate').setActive(false);
-                    }
-                } else {
-                    var id = 'annotation' + getId(),
-                        annotationElem = ed.getDoc().createElement('DIV'),
-                        content = ed.selection.getContent({
-                            'format': 'text'
-                        }),
-                        htmlContent = '&nbsp;';
-
-                    annotationElem.id = id;
-                    annotationElem.className = 'annotate';
-
-                    if (content) {
-                        var selectionNode = removeAnnotations(ed.selection.getNode());
-                        htmlContent = selectionNode.innerHTML ? selectionNode.innerHTML : '&nbsp;';
-                    }
-
-                    annotationElem.innerHTML = htmlContent;
-
-                    ed.execCommand('mceInsertRawHTML', true, annotationElem.outerHTML);
-                    // ed.execCommand('mceInsertContent', true, annotationElem.outerHTML);
-                    // ed.selection.setContent(annotationElem.outerHTML);
-                    // ed.selection.setCursorLocation(ed., 0);
-
-                    ed.controlManager.get('annotate').setActive(true);
-                    // ed.selection.setNode(annotationElem);
-                }
+			ed.addButton('righttextbox', {
+                title: 'Add Right-Box (Ctrl + R | Ctrl + Right)',
+                cmd: 'righttextbox',
+                image: url + '/../images/rightBox.png',
             });
-
-            ed.onClick.add(function(ed) {
-                var annotation = getAnnotation(ed.selection.getNode());
-
-                if (annotation) {
-                    ed.controlManager.get('annotate').setActive(true);
-                } else {
-                    ed.controlManager.get('annotate').setActive(false);
-                }
+			ed.addButton('justifytextbox', {
+                title: 'Add Center-Box (Ctrl + J | Ctrl + Down)',
+                cmd: 'justifytextbox',
+                image: url + '/../images/justifyBox.png'
             });
+			ed.addButton('lefttextbox', {
+                title: 'Add Left-Box (Ctrl + L | Ctrl + Left)',
+                cmd: 'lefttextbox',
+                image: url + '/../images/leftBox.png'
+            });
+			
+			
+          
 
+           
             ed.onKeyDown.add(function(ed, e) {
-                var isInAnnotation = getAnnotation(ed.selection.getNode());
-
-                if (isInAnnotation && e.keyCode == 13 && !e.shiftKey) {
-                    e.preventDefault();
-
-                    var current = ed.selection.getNode();
-
-                    if (current && current.parentNode) {
-                        var temp = document.createDocumentFragment();
-                        current.parentNode.insertBefore(temp);
-
-                        var range = ed.dom.createRng();
-                        range.setStart(temp, 0);
-                        range.setEnd(temp, 0);
-                        ed.selection.setRng(range);
-
-                        ed.execCommand('annotate', true);
-                        ed.selection.setRng(range);
-                    }
-                }
-
-                setTimeout(function() {
-                    var containsAnnotation = findAnnotation(ed.dom.getRoot());
-
-                    if (!containsAnnotation) {
-                        ed.controlManager.get('annotate').setActive(false);
-                    }
-                }, 0);
+				//console.log('Key down event: ' + e.keyCode);
+				if (e.ctrlKey && (e.keyCode == 76 || e.keyCode == 37)) {     // ctrl+l|ctrl+left
+					 e.returnValue = false;
+					 textboxCommand(ed,'lefttextbox','expresscurate_fl_text_box');
+					 e.preventDefault();
+					 return false;
+					}else if (e.ctrlKey && (e.keyCode == 82 || e.keyCode == 39)) {     // ctrl+r|ctrl+right
+						 e.returnValue = false;
+						 textboxCommand(ed,'righttextbox','expresscurate_fr_text_box');
+						 e.preventDefault();
+						 return false;
+						}else if (e.ctrlKey && (e.keyCode == 74 || e.keyCode == 40)) {     // ctrl+j|ctrl+down
+							 e.returnValue = false;
+							 textboxCommand(ed,'justifytextbox','expresscurate_justify_text_box');
+							 e.preventDefault();
+							 return false;
+							}else if (e.ctrlKey && e.keyCode == 38) {     // ctrl+up
+								 e.returnValue = false;
+								 textboxCommand(ed,'annotation','annotate');
+								 e.preventDefault();
+								 return false;
+							}
+				
+               
             });
 
-            ed.onChange.add(function(ed, e) {
-                var containsAnnotation = findAnnotation(ed.dom.getRoot());
-
-                if (!containsAnnotation) {
-                    ed.controlManager.get('annotate').setActive(false);
-                }
+           
+			ed.onNodeChange.add(function(ed) {
+				var node = ed.selection.getNode(),
+					cssClass=jQuery(node).attr('class'),
+					activeButton=' ';
+					  if (cssClass == 'expresscurate_fl_text_box')
+							activeButton='lefttextbox';
+						else if(cssClass == 'expresscurate_fr_text_box')
+								activeButton='righttextbox';
+							else if(cssClass == 'expresscurate_justify_text_box')
+									activeButton='justifytextbox';
+								else if(cssClass == 'annotate')
+										activeButton='annotation';
+				ed.controlManager.get('lefttextbox').setActive(false);
+				ed.controlManager.get('righttextbox').setActive(false);
+				ed.controlManager.get('justifytextbox').setActive(false);
+				ed.controlManager.get('annotation').setActive(false);
+				if(activeButton!=' ')
+					ed.controlManager.get(activeButton).setActive(true);
+			});
+			
+			//lefttextbox
+			 ed.addCommand('lefttextbox',  function() {
+				textboxCommand(ed,'lefttextbox','expresscurate_fl_text_box');
+			});
+			//righttextbox
+			 ed.addCommand('righttextbox', function() {
+				textboxCommand(ed,'righttextbox','expresscurate_fr_text_box');
+            });
+			//justifytextbox
+			 ed.addCommand('justifytextbox', function() {
+				textboxCommand(ed,'justifytextbox','expresscurate_justify_text_box');
+            });
+			//annotation
+			 ed.addCommand('annotation', function() {
+				textboxCommand(ed,'annotation','annotate');
             });
         },
-
+		
         /**
          * Creates control instances based in the incomming name. This method is normally not
          * needed since the addButton method of the tinymce.Editor class is a more easy way of adding buttons
@@ -177,12 +190,11 @@
         getInfo: function() {
             return {
                 longname: 'Express curate Buttons',
-                author: 'Karlen',
+                author: 'ExpressCurate',
                 version: "0.1"
             };
         }
     });
-
     // Register plugin
     tinymce.PluginManager.add('expresscurate', tinymce.plugins.expresscurate);
 })();

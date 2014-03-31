@@ -4,6 +4,7 @@
       <div class="header">
         <div class="addressbar">
           <input type="text" placeholder="<?php echo __('Insert source URL to start', ExpressCurate_Settings::PLUGIN_FOLDER) ?>" id="expresscurate_source" name="expresscurate_source" value="<?php echo @get_post_meta($post->ID, 'expresscurate_source', true); ?>">
+          <input type="hidden" id="expresscurate_admin_url" value="<?php echo admin_url(); ?>" />
           <button class="load"  id="expresscurate_submit">Load</button>
         </div>
         <div class="title">
@@ -34,7 +35,7 @@
       <div class="clear"></div>
       <div class="controls hidden">
         <ul class="tags" id="expresscurate_special">
-         
+
         </ul>
         <div class="clear"></div>
         <div id="expresscurate_slider" class="jcarousel-container">
@@ -48,8 +49,8 @@
     <div class="footer">
       <div class="annotate">
         <textarea id="insight_editor" class="insight_editor" placeholder="Your annotation here..."></textarea>
-        <input type="hidden" value="<?php echo get_option('expresscurate_curated_text', 'Curated from');?>" id="expresscurate_from" name="expresscurate_from"/>
-        <input type="hidden" value="<?php echo get_option('expresscurate_autosummary', 5);?>" id="expresscurate_autosummary" name="expresscurate_autosummary"/>
+        <input type="hidden" value="<?php echo get_option('expresscurate_curated_text', 'Curated from'); ?>" id="expresscurate_from" name="expresscurate_from"/>
+        <input type="hidden" value="<?php echo get_option('expresscurate_autosummary', 5); ?>" id="expresscurate_autosummary" name="expresscurate_autosummary"/>
       </div>
       <div class="clear"></div>
       <ul class="labels" id="curated_tags">

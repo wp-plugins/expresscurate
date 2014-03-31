@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: http://www.expresscurate.com/
 Requires at least: 3.6
 Tested up to: 3.8
-Stable tag: 1.1
+Stable tag: 1.1.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -60,10 +60,19 @@ e.g.
 2. Load the source page and get auto-summary.
 3. Curate into post adds the curated content in your post.
 4. Enhance your post with SEO keywords and description.
-5. Style all your posts with brand new quotation and annotation boxes.
+5. Style all your posts with brand new quotation, annotation, as well as left, right or center aligned text boxes.
 6. Customize.
 
 == Changelog ==
+
+= 1.1.1 =
+* Authorship for posts
+* Publisher for website
+* Social profile attributes for users (visible with ExpressCurate Theme, author page)
+* Smart publishing, available for curated draft posts
+* New text box tools for better blog styling
+* Image selection from original page enhanced
+* Paragraph selection from original page enhanced
 
 = 1.1 =
 * Miscellaneous bug fixing and improvements.
