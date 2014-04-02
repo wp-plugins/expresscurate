@@ -15,7 +15,6 @@ function display_curated_images(images) {
     jQuery('.content .img').removeClass("noimage");
   }
   jQuery.each(images, function(index, value) {
-    //alert(value);
     var img = new Image();
     img.onload = function() {
       var height = this.height,
@@ -183,6 +182,7 @@ function clear_expresscurate_form(insight) {
 
 // setup everything when document is ready
 jQuery(document).ready(function($) {
+  $('textarea[name=expresscurate_add_tags]').val('');
   if (jQuery.ui) {
     if (jQuery("#expresscurate_dialog").length) {
       var $dialog = jQuery("#expresscurate_dialog");
@@ -325,7 +325,27 @@ jQuery(document).ready(function($) {
           $("#curated_title").val(data.result.title);
         }
         if (data.result.images.length > 0) {
-          display_curated_images(data.result.images);
+          $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_check_images', {img_url: data.result.images[data.result.images.length - 1]}, function(res) {
+            var data_check = $.parseJSON(res);
+            if (data_check.status === 'success' && data_check.statusCode === 200) {
+              display_curated_images(data.result.images);
+              $("#expresscurate_loading").fadeOut('fast');
+            } else if (data_check.status === 'fail' && data_check.statusCode === 403) {
+              $('.content .img').css('background-image', $("#expresscurate_loading img").attr('src'));
+              $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_download_images', {images: data.result.images, post_id: $('#post_ID').val()}, function(res) {
+                var data_images = $.parseJSON(res);
+                if (data_images.status == 'error') {
+                  error_html = '<div class="error">' + data_images.error + '</div>';
+                  $('#curate_post_form').before(error_html);
+                } else if (data_images.status == 'success') {
+                  display_curated_images(data_images.images);
+                }
+                $("#expresscurate_loading").fadeOut('fast');
+              });
+            }
+          });
+        } else {
+          $("#expresscurate_loading").fadeOut('fast');
         }
         if (data.result.metas.keywords !== null && data.result.metas.keywords.length > 0) {
           display_curated_tags(data.result.metas.keywords);
@@ -336,10 +356,10 @@ jQuery(document).ready(function($) {
         if (data.result.paragraphs.length > 0) {
           display_curated_paragraphs(data.result.paragraphs, $("#expresscurate_autosummary").val());
         }
-
       }
-      $("#expresscurate_loading").fadeOut('fast');
+
     });
+
 
     return;
   }
@@ -348,6 +368,10 @@ jQuery(document).ready(function($) {
   $('#expresscurate_submit').click(function() {
     $("#expresscurate_loading").show();
     submit_expresscurate_form();
+    $(document).ajaxComplete(function() {
+
+    });
+
   });
 
   // check for ENTER or ArrowDown keys
@@ -371,39 +395,62 @@ jQuery(document).ready(function($) {
     }
 
   });
-  
-  $('input[name=expresscurate_publisher]').bind("change paste keyup", function() {
-	var href=$(this).next('span').children('a').attr('href');
-	var rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
-	$(this).next('span').children('a').attr('href',rest+ $(this).val());
-	console.log($(this).next('span').children('a').attr('href'));
+
+  $('input[name=expresscurate_seo]').change(function() {
+    if ($('input[name=expresscurate_seo]:checked').val() == '1') {
+      $('#tryyy').slideDown('slow');
+    } else {
+      $('#tryyy').slideUp('slow');
+    }
   });
-  
-  // $('textarea[name=expresscurate_defined_tags]').on("keyup", function(e) {
-	// var textarea=$(this);
-	// if(e.keyCode==188 || e.keyCode==13){
-		// text=textarea.val().replace(',', '');
-		// $.each($('.keywords'), function( key, value ) {
-		  // if(justtext($( this )) ==text){
-			// setTimeout(function(){
-				// console.log($(this));
-			  // $(this).css({'background':'#e1e1e1'});
-			// }, 2000);
-			// text='';
-			// }
-		// });	
-		// if (!/^\s+$/.test(text) && text.length>1){
-			// var keyword = '<div class="keywords">'+text+'<span>×</span></div>' ;
-		// }
-		// textarea.before(keyword);
-		// textarea.val('');
-	// }
-  // });
+
+  $('input[name=expresscurate_publisher]').bind("change paste keyup", function() {
+    var href = $(this).next('span').children('a').attr('href');
+    var rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
+    $(this).next('span').children('a').attr('href', rest + $(this).val());
+    console.log($(this).next('span').children('a').attr('href'));
+  });
+
+  $('textarea[name=expresscurate_add_tags]').on("keyup", function(e) {
+    if (e.keyCode == 188 || e.keyCode == 13) {
+      addKeyWord($(this));
+    }
+  });
+
+  $('.expresscurate_addKeyword').on("click", function(e) {
+    var textarea = $('textarea[name=expresscurate_add_tags]');
+    addKeyWord(textarea);
+    textarea.focus();
+  });
+
+  function addKeyWord(textarea) {
+    text = textarea.val().replace(',', '');
+    text = text.replace(/[,.;:?!\s]+/g, '');
+    $.each($('.expresscurate_keywords'), function(key, value) {
+      if (justtext($(this)) == text) {
+        text = '';
+      }
+    });
+    if (!/^\s+$/.test(text) && text.length > 1) {
+      var keyword = '<div class="expresscurate_keywords">' + text + '<span>×</span></div>';
+      textarea.parent('div').before(keyword);
+      var defTags = $('textarea[name=expresscurate_defined_tags]');
+      var defVal = defTags.val();
+      var s = defVal + ', ' + text;
+      defTags.val(s);
+    }
+    textarea.val('');
+  }
+
   function justtext(elem) {
-		return elem.clone().children().remove().end().text(); 
-  };
-  // $('.keywords span').live('click',function(){
-	// $(this).parent('div').remove();
-  // });
+    return elem.clone().children().remove().end().text();
+  }
+
+  $('.expresscurate_keywords span').live('click', function() {
+    var defTags = $('textarea[name=expresscurate_defined_tags]');
+    defTags.val(defTags.val().replace(', ' + justtext($(this).parent('div')), ''));
+    $(this).parent('div').remove();
+  });
+
 });
 

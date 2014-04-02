@@ -120,7 +120,7 @@
 							 return false;
 							}else if (e.ctrlKey && e.keyCode == 38) {     // ctrl+up
 								 e.returnValue = false;
-								 textboxCommand(ed,'annotation','annotate');
+								 textboxCommand(ed,'annotation','expresscurate_annotate');
 								 e.preventDefault();
 								 return false;
 							}
@@ -139,7 +139,7 @@
 								activeButton='righttextbox';
 							else if(cssClass == 'expresscurate_justify_text_box')
 									activeButton='justifytextbox';
-								else if(cssClass == 'annotate')
+								else if(cssClass == 'expresscurate_annotate')
 										activeButton='annotation';
 				ed.controlManager.get('lefttextbox').setActive(false);
 				ed.controlManager.get('righttextbox').setActive(false);
@@ -163,7 +163,7 @@
             });
 			//annotation
 			 ed.addCommand('annotation', function() {
-				textboxCommand(ed,'annotation','annotate');
+				textboxCommand(ed,'annotation','expresscurate_annotate');
             });
         },
 		

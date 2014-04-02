@@ -80,10 +80,13 @@ class ExpressCurate_Settings {
     register_setting('expresscurate-group', 'expresscurate_share');
     register_setting('expresscurate-group', 'expresscurate_publish');
     register_setting('expresscurate-group', 'expresscurate_smart_tagging');
+    register_setting('expresscurate-group', 'expresscurate_quotes_style');
     register_setting('expresscurate-group', 'expresscurate_hours_interval');
     add_action('admin_footer', array(&$this, 'add_inline_popup_content'));
     add_action('wp_ajax_expresscurate_export_api_get_terms', array($this->exportAPI, 'get_terms'));
     add_action('wp_ajax_expresscurate_export_api_check_auth', array($this->exportAPI, 'check_auth'));
+    add_action('wp_ajax_expresscurate_export_api_check_images', array($this->exportAPI, 'check_images'));
+    add_action('wp_ajax_expresscurate_export_api_download_images', array($this->exportAPI, 'download_images'));
     add_action('wp_ajax_expresscurate_export_api_save_post', array($this->exportAPI, 'save_post'));
     add_action('wp_ajax_expresscurate_export_api_check_source', array($this->exportAPI, 'check_source'));
     add_action('wp_ajax_expresscurate_get_article', array($this->contentManager, 'get_article'));
@@ -262,7 +265,15 @@ class ExpressCurate_Settings {
 
   public function add_expresscurate_editor_style($mce_css) {
     $pluginUrl = plugin_dir_url(__FILE__);
-    return $pluginUrl . 'css/theme-styles.css';
+    if ( ! empty( $mce_css ) )
+		$mce_css .= ',';
+   
+    if (get_option('expresscurate_quotes_style') == "1" || get_option('expresscurate_quotes_style', '') == '') {
+     $mce_css .= $pluginUrl . 'css/quotes-style.css,';
+    }
+    $mce_css .= $pluginUrl . 'css/theme-styles.css';
+    //echo $mce_css;
+    return $mce_css;
   }
 
   public function add_expresscurate_custom_button($context) {
@@ -455,7 +466,7 @@ class ExpressCurate_Settings {
     }
     if (wp_is_post_revision($post_id))
       return;
-
+    $upload_dir = wp_upload_dir();
 // get the content of the post
     if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
       $post_content = $this->generate_tags($post_id);
@@ -479,17 +490,17 @@ class ExpressCurate_Settings {
 //download images
       $images = array();
       preg_match_all("/\< *[img][^\>]*[src] *= *[\"\']{0,1}([^\"\']*)/i", $post_content, $images);
-      $upload_dir = wp_upload_dir();
       require_once(ABSPATH . 'wp-admin/includes/image.php');
       $siteDomain = parse_url(get_site_url(), PHP_URL_HOST);
       if (count($images) > 0 && is_writable($upload_dir['path'])) {
         foreach ($images[1] as $i => $image) {
           $image = strtok($image, '?');
           $domain = parse_url($image, PHP_URL_HOST);
-          if ($siteDomain != $domain) {
-            $image_data = file_get_contents($image);
+          if ($siteDomain != $domain || strpos($image, 'expresscurate_tmp')) {
+            $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
+            $context = stream_context_create($options);
+            $image_data = file_get_contents($image, false, $context);
             $filename[$i] = basename($image);
-
 
             if (wp_mkdir_p($upload_dir['path'])) {
               $file[$i] = $upload_dir['path'] . '/' . $filename[$i];
@@ -570,6 +581,11 @@ class ExpressCurate_Settings {
       wp_update_post($curated_post);
       add_action('save_post', array(&$this, 'save_post'));
       return;
+    }
+    if (wp_mkdir_p($upload_dir['path'])) {
+      $this->exportAPI->delete_dir($upload_dir['path'] . '/expresscurate_tmp/' . $post_id);
+    } else {
+      $this->exportAPI->delete_dir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id);
     }
   }
 
@@ -735,6 +751,9 @@ class ExpressCurate_Settings {
   public function expresscurate_theme_styles() {
     $plaugunUrl = plugin_dir_url(__FILE__);
     wp_enqueue_style('texpresscurate', $plaugunUrl . 'css/theme-styles.css');
+    if (get_option('expresscurate_quotes_style') == "1" || get_option('expresscurate_quotes_style', '') == '') {
+      wp_enqueue_style('quotesexpresscurate', $plaugunUrl . 'css/quotes-style.css');
+    }
   }
 
   private static function getCurationNews($url = self::NEWS_FEED_URL) {

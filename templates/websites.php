@@ -34,8 +34,8 @@ $curated_posts = array();
       <ul>
         <?php foreach ($top_links as $key => $top_link) { ?>
 			<li>
-				<h3 class="topCuratedHeader"><?php echo $key ?> (<?php echo $top_link ?>)<div></div></h3> 
-				<ul class="topCuratedLink">
+				<h3 class="expresscurate_topCuratedHeader"><?php echo $key ?> (<?php echo $top_link ?>)<div></div></h3>
+				<ul class="expresscurate_topCuratedLink">
 					<?php foreach ($curated_posts[$key] as $i => $curated_post) { ?>
 					 <li><?php echo $curated_post ?></li>
 					<?php 
@@ -54,7 +54,7 @@ $curated_posts = array();
 </div>
 <script>
 	jQuery(document).ready(function(){
-		jQuery('.topCuratedHeader').on('click', function () {
+		jQuery('.expresscurate_topCuratedHeader').on('click', function () {
 			var header=jQuery(this);
 			var ul=header.parent().find('ul');
 			var div=header.find('div');
@@ -62,11 +62,11 @@ $curated_posts = array();
 			if(ul.css('display')==='none'){
 				ul.slideDown(300);
 				header.css('color','#25bfa1');
-				div.addClass('rotatedArrow');
+				div.addClass('expresscurate_rotatedArrow');
 			}else{
 					ul.slideUp(300);
 					header.css('color','#5c5c5c');
-					div.removeClass('rotatedArrow');
+					div.removeClass('expresscurate_rotatedArrow');
 				}
 		 });
 	});

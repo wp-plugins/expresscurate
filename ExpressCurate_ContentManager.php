@@ -189,7 +189,6 @@ class ExpressCurate_HtmlParser {
     $result_h2 = '';
     $result_h3 = '';
     $xpath = new DOMXPath($this->dom);
-//get images
     $imgTags = $xpath->query("//img");
     foreach ($imgTags as $t) {
       $src = $t->getAttribute('src');
@@ -276,7 +275,9 @@ class ExpressCurate_HtmlParser {
   }
 
   private function file_get_contents_utf8($url) {
-    $content = file_get_contents($url);
+    $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
+    $context = stream_context_create($options);
+    $content = file_get_contents($url, false, $context);
     return $content;
   }
 

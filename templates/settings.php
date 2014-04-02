@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="expresscurate wrap">
   <h2><?php echo ExpressCurate_Settings::PLUGIN_NAME ?> Settings</h2>
   <form method="post" action="options.php">
     <?php @settings_fields('expresscurate-group'); ?>
@@ -14,7 +14,7 @@
           <span class="gray-italic">Please pick a default category for your curated posts from the list below. This will prevent a default "Uncategorized" being assigned to your post automatically.</span>
         </th>
       </tr>
-      
+
       <tr valign="top">
         <td class="with-padding" colspan="2">
           <table>
@@ -71,7 +71,29 @@
           <label for="smart_tags_no"> No </label>
         </td>
       </tr>
-
+      <tr valign="top" class="width-bottom-border">
+        <td scope="row" class="width-for-td">
+          <strong>Activate blockquote style:</strong>
+          <br>
+          <span scope="row" class="gray-italic">
+            Activate special ExpressCurate blockquote style.
+          </span>
+        </td>
+        <td>
+          <input type="radio" id="quotes_style" value="1" name="expresscurate_quotes_style" <?php
+          if (get_option('expresscurate_quotes_style') == "1" || get_option('expresscurate_quotes_style', '') == '') {
+            echo 'checked="checked"';
+          }
+          ?> />
+          <label for="quotes_style"> Yes </label>
+          <input type="radio" id="quotes_style_no" value="0" name="expresscurate_quotes_style" <?php
+          if (get_option('expresscurate_quotes_style', '') == "0") {
+            echo 'checked="checked"';
+          }
+          ?> />
+          <label for="quotes_style_no"> No </label>
+        </td>
+      </tr>
       <tr valign="top">
         <th scope="row" colspan="2">
           <strong>Attribution Text For Original Article Link</strong>
@@ -137,7 +159,9 @@
                 <td>
                   <label for="hours_interval">Publish draft articles</label>
                   <select name="expresscurate_hours_interval">
-                    <?php for ($i = 1; $i < 14; $i++) { ?>
+                    <?php
+                    for ($i = 1; $i < 14; $i++) {
+                      ?>
                       <?php if ($i == 1) { ?>
                         <option value="<?php echo $i; ?>" <?php
                         if (get_option('expresscurate_hours_interval') == $i) {
@@ -253,21 +277,29 @@
           <label for="expresscurate_seo_no"> No </label>
         </td>
       </tr>
-      <tr valign="top" class="width-bottom-border">
-        <th scope="row" class="width-for-td">
-          <strong>Publisher</strong>
-          <br>
-          <span class="gray-italic">You can link content you publish on this blog to your company or personal Google+ profile.<a href="https://plus.google.com/authorship" target="_blank">More Info</a>.</span>
-        </th>
-        <td>
-          <input type="text" id="expresscurate_publusher" size="50" value="<?php
-          if (get_option('expresscurate_publisher')) {
-            echo get_option('expresscurate_publisher');
-          } else {
-            echo '';
-          }
-          ?>" name="expresscurate_publisher"  /><span class="gray-italic">&nbsp;&nbsp;<a href="http://www.google.com/webmasters/tools/richsnippets?url=<?php echo bloginfo('url') ?>&user_profile=<?php echo get_option('expresscurate_publisher'); ?>" target="_blank">Verify publisher</a></span>
-        </td>
+      <tr valign="top">
+        <th scope="row" colspan="2">
+      <div id="tryyy">
+        <table class="width-bottom-border">
+          <tr>
+            <th scope="row" class="width-for-td">
+              <strong>Publisher</strong>
+              <br>
+              <span class="gray-italic">You can link content you publish on this blog to your company or personal Google+ profile.<a href="https://plus.google.com/authorship" target="_blank">More Info</a>.</span>
+            </th>
+            <td>
+              <input type="text" id="expresscurate_publusher" size="50" value="<?php
+              if (get_option('expresscurate_publisher')) {
+                echo get_option('expresscurate_publisher');
+              } else {
+                echo '';
+              }
+              ?>" name="expresscurate_publisher"  /><span class="gray-italic">&nbsp;&nbsp;<a href="http://www.google.com/webmasters/tools/richsnippets?url=<?php echo bloginfo('url') ?>&user_profile=<?php echo get_option('expresscurate_publisher'); ?>" target="_blank">Verify publisher</a></span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      </th>
       </tr>
       <tr valign="top">
         <th scope="row" colspan="2">
@@ -280,13 +312,29 @@
       </tr>
       <tr valign="top">
         <td  colspan="2">
-          <textarea id="expresscurate_defined_tags" class="with-max-width" name="expresscurate_defined_tags" cols="20" rows="3" /><?php
+          <textarea id="expresscurate_defined_tags" class="expresscurate_displayNone" name="expresscurate_defined_tags" cols="20" rows="3" /><?php
           if (get_option('expresscurate_defined_tags')) {
             echo get_option('expresscurate_defined_tags');
           } else {
             echo '';
           }
           ?></textarea>
+          <?php
+          $defined_tags = get_option("expresscurate_defined_tags", '');
+          if ($defined_tags) {
+            $defined_tags = explode(",", $defined_tags);
+            foreach ($defined_tags as $tag) {
+              $tag = trim($tag);
+              ?>
+              <div class="expresscurate_keywords"><?php echo $tag;?><span>×</span></div>
+              <?php
+            }
+          }
+          ?>
+          <div>
+            <textarea  class="expresscurate_add_tags" name="expresscurate_add_tags" cols="20" rows="3"></textarea>
+            <span class="expresscurate_addKeyword">+</span>
+          </div>
         </td>
       <tr>
     </table>

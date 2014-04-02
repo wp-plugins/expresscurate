@@ -40,6 +40,70 @@ class ExpressCurate_ExportAPI {
     die();
   }
 
+  public function check_images() {
+    $data = $_REQUEST;
+    if (!$data['img_url']) {
+      $data_check = array('status' => "error", 'msg' => "Data is empty!");
+    } else {
+      $img = file_get_contents($data['img_url']);
+      if ($http_response_header[0] == "HTTP/1.1 200 OK") {
+        $data_check = array('status' => 'success', 'statusCode' => 200);
+      } else if ($http_response_header[0] == "HTTP/1.1 403 Forbidden") {
+        $data_check = array('status' => 'fail', 'statusCode' => 403);
+      } else {
+        $data_check = array('status' => 'fail', 'statusCode' => $http_response_header[0]);
+      }
+    }
+    echo json_encode($data_check);
+    die();
+  }
+
+  public function download_images() {
+    $data = $_REQUEST;
+
+    if (!$data['images']) {
+      $result = array('status' => "error", 'error' => "Data is empty!");
+    } else {
+      $downloaded_images = array();
+      $upload_dir = wp_upload_dir();
+      $images = $data['images'];
+      $post_id = $data['post_id'];
+
+      if (wp_mkdir_p($upload_dir['path'])) {
+        $this->delete_dir($upload_dir['path'] . '/expresscurate_tmp/');
+        mkdir($upload_dir['path'] . '/expresscurate_tmp/', 0777);
+        mkdir($upload_dir['path'] . '/expresscurate_tmp/' . $post_id, 0777);
+      } else {
+        $this->delete_dir($upload_dir['basedir'] . '/expresscurate_tmp/');
+        mkdir($upload_dir['basedir'] . '/expresscurate_tmp/', 0777);
+        mkdir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id, 0777);
+      }
+      $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
+      $context = stream_context_create($options);
+      if (count($images) > 0 && is_writable($upload_dir['path'])) {
+        for ($i = 0; $i < count($images); $i++) {
+          $image = strtok($images[$i], '?');
+          $image_data = file_get_contents($images[$i], false, $context);
+          $filename[$i] = basename($image);
+          if (wp_mkdir_p($upload_dir['path'])) {
+            $file[$i] = $upload_dir['path'] . '/expresscurate_tmp/' . $post_id . '/' . $filename[$i];
+          } else {
+            $file[$i] = $upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id . '/' . $filename[$i];
+          }
+          if (file_put_contents($file[$i], $image_data)) {
+            $file[$i] = substr($file[$i], ($pos = strpos($file[$i], '/wp-content')) !== false ? $pos + 1 : 0);
+            $downloaded_images[] = site_url().'/'.$file[$i];
+          }
+        }
+        $result = array('status' => 'success', 'images' => $downloaded_images);
+      } else {
+        $result = array('status' => 'error', 'error' => 'Upload dir is not writable');
+      }
+    }
+    echo json_encode($result);
+    die();
+  }
+
   public function check_source() {
     $data_check = array();
     $data = $_REQUEST;
@@ -132,6 +196,23 @@ class ExpressCurate_ExportAPI {
     return $metas;
   }
 
-}
+  public function delete_dir($dirPath) {
+    if (!is_dir($dirPath)) {
+      return;
+    }
+    if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
+      $dirPath .= '/';
+    }
+    $files = glob($dirPath . '*', GLOB_MARK);
+    foreach ($files as $file) {
+      if (is_dir($file)) {
+        $this->delete_dir($file);
+      } else {
+        unlink($file);
+      }
+    }
+    rmdir($dirPath);
+  }
 
+}
 ?>
