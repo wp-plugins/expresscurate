@@ -53,7 +53,7 @@
           <strong>Auto Hashtagging:</strong>
           <br>
           <span scope="row" class="gray-italic">
-            When enabled words starting with # will be transformed into tags and tags will be transformed into words starting with #.
+            Transform words starting with # into tags and add # to the words previously defined as tags.
           </span>
         </td>
         <td>
@@ -73,10 +73,10 @@
       </tr>
       <tr valign="top" class="width-bottom-border">
         <td scope="row" class="width-for-td">
-          <strong>Activate blockquote style:</strong>
+          <strong>Enable ExpressCurate Blockquote:</strong>
           <br>
           <span scope="row" class="gray-italic">
-            Activate special ExpressCurate blockquote style.
+            Select "Yes" to use ExpressCurate blockquote for marking the original content quote. Select "No" if you are already using a theme that has a good enough quote style and ExpressCurate won't override it.
           </span>
         </td>
         <td>

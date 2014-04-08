@@ -171,18 +171,22 @@ class ExpressCurate_HtmlParser {
     $this->html = preg_replace('/<--[\S\s]*?-->/msi', '', $this->html);
     $this->html = preg_replace('/<noscript[^>]*>[\S\s]*?' .
             '<\/noscript>/msi', '', $this->html);
-    $this->html = preg_replace('/<script[^>]*>(\S|\s)*?<\/script>/msi', '', $this->html);
-    $this->html = preg_replace('/<script.*\/>/msi', '', $this->html);
-//$this->html = preg_replace('/(<[^>]+) style=".*?"/i', '', $this->html);
-    $this->html = preg_replace('/<style[^>]*>(\S|\s)*?<\/style>/msi', '', $this->html);
+    $this->html = preg_replace('~>\s+<~', '><', $this->html);
+    $this->html = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $this->html);
     $this->html = mb_convert_encoding($this->html, 'HTML-ENTITIES', "UTF-8");
   }
 
   public function getElementsByTagsName() {
     $this->html = preg_replace('/^.*(?=<html>)/i', '', $this->html);
+
     $this->dom = new DOMDocument();
     @$this->dom->loadHTML($this->html);
 
+    $this->removeElementsByTagName('script', $this->dom);
+    $this->removeElementsByTagName('style', $this->dom);
+    $this->removeElementsByTagName('link', $this->dom);
+
+    $this->dom->saveHtml();
     $result_images = array();
     $result_paragraphs = array();
     $result_h1 = '';
@@ -190,6 +194,7 @@ class ExpressCurate_HtmlParser {
     $result_h3 = '';
     $xpath = new DOMXPath($this->dom);
     $imgTags = $xpath->query("//img");
+    $i = 0;
     foreach ($imgTags as $t) {
       $src = $t->getAttribute('src');
       if (strpos($src, '//') !== false) {
@@ -200,12 +205,17 @@ class ExpressCurate_HtmlParser {
         $src = $this->domain . $src;
       }
       $src = preg_replace('%([^:])([/]{2,})%', '\\1/', $src);
+//$src = strtok($src, '?');
+//$image = '<img src="' .$src . '"/>';
       if (!in_array($src, $result_images)) {
-        $result_images[] = $src;
+        $result_images[] = ($src);
       }
+      $i++;
     }
+
 //get text
     $pTags = $xpath->query('//p');
+
     $pi = 0;
     foreach ($pTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
@@ -216,15 +226,13 @@ class ExpressCurate_HtmlParser {
     }
 
     $textTags = $xpath->query('//text()');
-    $pi = 0;
+
     foreach ($textTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
         $result_paragraphs[] = trim($t->nodeValue);
         $pi++;
       }
     }
-
-
 //get H1
     $h1Tag = $xpath->query('//h1');
     foreach ($h1Tag as $h1) {
@@ -250,6 +258,7 @@ class ExpressCurate_HtmlParser {
 //smart tags
     $max_count = get_option("expresscurate_max_tags", 3);
     $smart_tags = array();
+
     if (count($this->keywords)) {
 //$keywords = array_flip($this->keywords);
       foreach ($this->keywords as $key => $keyword) {
@@ -259,8 +268,10 @@ class ExpressCurate_HtmlParser {
       $smart_tags = array_slice(array_keys(array_reverse($smart_tags)), 0, $max_count);
     }
 
-    $data = array('status' => 'success', 'result' => array('title' => $this->title, 'headings' => array('h1' => $result_h1, 'h2' => $result_h2, 'h3' => $result_h3), 'metas' => array('description' => $this->description, 'keywords' => $smart_tags), 'images' => $result_images, 'paragraphs' => $result_paragraphs));
-    echo json_encode($data);
+    $result = array('title' => $this->title, 'headings' => array('h1' => $result_h1, 'h2' => $result_h2, 'h3' => $result_h3), 'metas' => array('description' => $this->description, 'keywords' => $smart_tags), 'images' => $result_images, 'paragraphs' => $result_paragraphs);
+
+    $data = array('status' => 'success', 'result' => $result);
+    echo json_encode($data, JSON_HEX_QUOT & JSON_HEX_TAG & JSON_HEX_AMP & JSON_HEX_APOS & JSON_NUMERIC_CHECK & JSON_PRETTY_PRINT & JSON_UNESCAPED_SLASHES & JSON_FORCE_OBJECT & JSON_UNESCAPED_UNICODE);
     die();
   }
 
@@ -278,7 +289,34 @@ class ExpressCurate_HtmlParser {
     $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
     $context = stream_context_create($options);
     $content = file_get_contents($url, false, $context);
+    $charset = '';
+    $utf8 = false;
+    foreach ($http_response_header as $header) {
+      if (substr(strtolower($header), 0, 13) == "content-type:") {
+        list($contentType, $charset) = explode(";", $header);
+      }
+    }
+
+    if ($charset && strpos(strtolower($charset), 'utf-8')) {
+      $utf8 = true;
+    } else {
+      $charset = mb_detect_encoding($content);
+      if (strpos(strtolower($charset), 'utf-8')) {
+        $utf8 = true;
+      }
+    }
+    if (!$utf8) {
+      $content = utf8_encode($content);
+    }
     return $content;
+  }
+
+  private function removeElementsByTagName($tagName, $document) {
+    $nodeList = $document->getElementsByTagName($tagName);
+    for ($nodeIdx = $nodeList->length; --$nodeIdx >= 0;) {
+      $node = $nodeList->item($nodeIdx);
+      $node->parentNode->removeChild($node);
+    }
   }
 
 }

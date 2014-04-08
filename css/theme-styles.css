@@ -23,11 +23,9 @@
   position: relative;
   margin-top: 20px;
   margin-bottom: 10px;
-  /* font-style: italic; */
   line-height:24px;
   background-color:#F3F3F3;
   clear:both;
-  /* font-size: 16px; */
   color: #A39E9E;
 }
 
@@ -40,8 +38,6 @@
 	background-color:#F3F3F3;
 	word-break: break-all;
 	text-align:justify;
-	/* font-style: italic; */
-	/* font-size: 16px; */
 	color: #A39E9E;
 }
 

@@ -12,7 +12,8 @@ class ExpressCurate_ExportAPI {
   public function get_terms() {
     $data = array();
     $data["categories"] = array();
-
+    $data["keywords"] = array();
+    $data["featured_image"] = 0;
     if (current_user_can('edit_posts')) {
       $categories = get_categories(array("hide_empty" => 0));
       foreach ($categories as $i => $category) {
@@ -21,6 +22,17 @@ class ExpressCurate_ExportAPI {
           $data["categories"][$i]["name"] = $category->name;
         }
       }
+      $defined_tags = get_option("expresscurate_defined_tags", '');
+          if ($defined_tags) {
+            $defined_tags = explode(",", $defined_tags);
+            foreach ($defined_tags as $tag) {
+              $data["keywords"][] = trim($tag);
+            }
+          }
+          if(get_option('expresscurate_featured', '')){
+            $data["featured_image"] = get_option('expresscurate_featured', '');
+          }
+          
     }
 
     //return $data;
@@ -140,7 +152,7 @@ class ExpressCurate_ExportAPI {
           $data['terms'][$i] = $term_id;
         }
       }
-      //var_dump($data['terms']); die;
+
       $post_id = $this->insert_post($data, $post_status);
       if ($post_id) {
         $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'msg' => "Post saved as " . $post_status . "."));

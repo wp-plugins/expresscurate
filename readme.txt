@@ -1,10 +1,10 @@
 === ExpressCurate ===
 Contributors: expresscurate
-Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing 
+Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating  
 Donate link: http://www.expresscurate.com/
 Requires at least: 3.6
 Tested up to: 3.8
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -65,7 +65,11 @@ e.g.
 
 == Changelog ==
 
+= 1.1.3 =
+* Miscellaneous bug fixing and improvements.
+
 = 1.1.2 =
+* Optional ExpressCurate Blockquote
 * Miscellaneous bug fixing and improvements.
 
 = 1.1.1 =

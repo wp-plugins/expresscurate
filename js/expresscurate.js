@@ -315,47 +315,57 @@ jQuery(document).ready(function($) {
     });
     $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_get_article', $('#curate_post_form input').serialize(), function(res) {
       var data = $.parseJSON(res);
-      if (data.status == 'error') {
-        error_html = '<div class="error">' + data.error + '</div>';
-        $('#curate_post_form').before(error_html);
-      } else if (data.status == 'success') {
-        clear_expresscurate_form(true);
-        $(".controls").show();
-        if (data.result.title !== null && data.result.title.length > 0) {
-          $("#curated_title").val(data.result.title);
-        }
-        if (data.result.images.length > 0) {
-          $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_check_images', {img_url: data.result.images[data.result.images.length - 1]}, function(res) {
-            var data_check = $.parseJSON(res);
-            if (data_check.status === 'success' && data_check.statusCode === 200) {
-              display_curated_images(data.result.images);
-              $("#expresscurate_loading").fadeOut('fast');
-            } else if (data_check.status === 'fail' && data_check.statusCode === 403) {
-              $('.content .img').css('background-image', $("#expresscurate_loading img").attr('src'));
-              $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_download_images', {images: data.result.images, post_id: $('#post_ID').val()}, function(res) {
-                var data_images = $.parseJSON(res);
-                if (data_images.status == 'error') {
-                  error_html = '<div class="error">' + data_images.error + '</div>';
-                  $('#curate_post_form').before(error_html);
-                } else if (data_images.status == 'success') {
-                  display_curated_images(data_images.images);
-                }
-                $("#expresscurate_loading").fadeOut('fast');
-              });
-            }
-          });
-        } else {
+      if (data) {
+        if (data.status == 'error') {
+          error_html = '<div class="error">' + data.error + '</div>';
+          $('#curate_post_form').before(error_html);
           $("#expresscurate_loading").fadeOut('fast');
-        }
-        if (data.result.metas.keywords !== null && data.result.metas.keywords.length > 0) {
-          display_curated_tags(data.result.metas.keywords);
-        }
-        keywords = data.result.metas.keywords;
-        display_specials(data.result);
+        } else if (data.status == 'success') {
+          clear_expresscurate_form(true);
+          $(".controls").show();
+          if (data.result.title !== null && data.result.title.length > 0) {
+            $("#curated_title").val(data.result.title);
+          }
+          if (data.result.images.length > 0) {
+            $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_check_images', {img_url: data.result.images[data.result.images.length - 1]}, function(res) {
+              var data_check = $.parseJSON(res);
+              if (data_check.status === 'success' && data_check.statusCode === 200) {
+                display_curated_images(data.result.images);
+                $("#expresscurate_loading").fadeOut('fast');
+              } else if (data_check.status === 'fail' && data_check.statusCode === 403) {
+                $('.content .img').css('background-image', $("#expresscurate_loading img").attr('src'));
+                $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_download_images', {images: data.result.images, post_id: $('#post_ID').val()}, function(res) {
+                  var data_images = $.parseJSON(res);
+                  if (data_images.status == 'error') {
+                    error_html = '<div class="error">' + data_images.error + '</div>';
+                    $('#curate_post_form').before(error_html);
+                  } else if (data_images.status == 'success') {
+                    display_curated_images(data_images.images);
+                  }
+                  $("#expresscurate_loading").fadeOut('fast');
+                });
+              } else {
+                display_curated_images(data.result.images);
+                $("#expresscurate_loading").fadeOut('fast');
+              }
+            });
+          } else {
+            $("#expresscurate_loading").fadeOut('fast');
+          }
+          if (data.result.metas.keywords !== null && data.result.metas.keywords.length > 0) {
+            display_curated_tags(data.result.metas.keywords);
+          }
+          keywords = data.result.metas.keywords;
+          display_specials(data.result);
 
-        if (data.result.paragraphs.length > 0) {
-          display_curated_paragraphs(data.result.paragraphs, $("#expresscurate_autosummary").val());
+          if (data.result.paragraphs.length > 0) {
+            display_curated_paragraphs(data.result.paragraphs, $("#expresscurate_autosummary").val());
+          }
         }
+      } else {
+        error_html = '<div class="error">Can\'t curate from this page</div>';
+        $('#curate_post_form').before(error_html);
+        $("#expresscurate_loading").fadeOut('fast');
       }
 
     });
@@ -408,7 +418,6 @@ jQuery(document).ready(function($) {
     var href = $(this).next('span').children('a').attr('href');
     var rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
     $(this).next('span').children('a').attr('href', rest + $(this).val());
-    console.log($(this).next('span').children('a').attr('href'));
   });
 
   $('textarea[name=expresscurate_add_tags]').on("keyup", function(e) {

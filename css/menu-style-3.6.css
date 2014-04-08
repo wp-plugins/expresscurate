@@ -1,9 +1,11 @@
 #adminmenu .toplevel_page_expresscurate div.wp-menu-image,  #adminmenu .toplevel_page_expresscurate:hover div.wp-menu-image {
-  background: url("../images/19x19.png") no-repeat scroll center rgba(0, 0, 0, 0) !important;
+  background-image: url("../images/expresscurate_sprite.png")  !important;
+  background-position: 5px 5px;
   float: left;
   height: 28px;
   width: 28px;
 }
 #adminmenu .toplevel_page_expresscurate:hover div.wp-menu-image {
-  background: url("../images/19x19_hover.png") no-repeat scroll center rgba(0, 0, 0, 0) !important;
+  background-image: url("../images/expresscurate_sprite.png")  !important;
+  background-position: 5px -93px;
 }

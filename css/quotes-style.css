@@ -2,36 +2,29 @@
 blockquote ul, ol {
   padding-left: 40px;
 }
-
 blockquote {
   position: relative;
   padding: 0 20px;
   margin: 0px 0px 30px 10px;
-  /*    text-indent: 10px;*/
 }
-
 blockquote > * {
   margin-left: 10px;
 }
-
 blockquote > *:first-child {
   padding-top: 20px;
 }
-
 blockquote:before{
   left: 0px;
   width: 12px;
   height: 23px;
   position: absolute;
   display: inline-block;
-  background-size:12px;
+  background-size: 14px auto;
   background-repeat: no-repeat;
-  background-position: center;
-  background-image: url('images/openQuote.png');
+  background-position: 0 -429px;
+  background-image: url('../images/expresscurate_sprite.png');
   content: "";
-  /*   text-indent: 0px;*/
 }
-
 blockquote:after {
   right: 10px;
   width: 12px;
@@ -39,10 +32,9 @@ blockquote:after {
   text-align: right;
   position: absolute;
   display: inline-block;
-  background-size:12px;
-  /* -moz-background-size:10px; */
+  background-size: 14px auto;
   background-repeat: no-repeat;
-  background-position: center;
-  background-image: url('images/closeQuote.png');
+  background-position: 0 -233px;
+  background-image: url('../images/expresscurate_sprite.png');
   content: "";
 }

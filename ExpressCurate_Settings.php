@@ -402,7 +402,7 @@ class ExpressCurate_Settings {
       foreach ($defined_tags as $defined_tag) {
         $defined_tag_insert = trim($defined_tag);
 //adding defined tag to post tags if tag exists in posttitle or post content and not exists
-        preg_match("/(?<!\w)(?=[^>]*(<|$))#" . $tag->name . "/i", $post_content, $tag_in_content);
+        preg_match("/(?<!\w)(?=[^>]*(<|$))" . $defined_tag_insert . "/i", $post_content, $tag_in_content);
         if ((isset($tag_in_content[0]) || strpos($the_post->title, $defined_tag_insert)) && !in_array($defined_tag_insert, $post_tags)) {
           wp_set_post_tags($post_id, $defined_tag_insert, true);
         }
