@@ -23,16 +23,15 @@ class ExpressCurate_ExportAPI {
         }
       }
       $defined_tags = get_option("expresscurate_defined_tags", '');
-          if ($defined_tags) {
-            $defined_tags = explode(",", $defined_tags);
-            foreach ($defined_tags as $tag) {
-              $data["keywords"][] = trim($tag);
-            }
-          }
-          if(get_option('expresscurate_featured', '')){
-            $data["featured_image"] = get_option('expresscurate_featured', '');
-          }
-          
+      if ($defined_tags) {
+        $defined_tags = explode(",", $defined_tags);
+        foreach ($defined_tags as $tag) {
+          $data["keywords"][] = trim($tag);
+        }
+      }
+      if (get_option('expresscurate_featured', '')) {
+        $data["featured_image"] = get_option('expresscurate_featured', '');
+      }
     }
 
     //return $data;
@@ -54,16 +53,25 @@ class ExpressCurate_ExportAPI {
 
   public function check_images() {
     $data = $_REQUEST;
-    if (!$data['img_url']) {
+    $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
+    $context = stream_context_create($options);
+    if (!$data['img_url'] && !$data['img_url2']) {
       $data_check = array('status' => "error", 'msg' => "Data is empty!");
     } else {
-      $img = file_get_contents($data['img_url']);
-      if ($http_response_header[0] == "HTTP/1.1 200 OK") {
-        $data_check = array('status' => 'success', 'statusCode' => 200);
-      } else if ($http_response_header[0] == "HTTP/1.1 403 Forbidden") {
-        $data_check = array('status' => 'fail', 'statusCode' => 403);
+      $img = @file_get_contents($data['img_url'], false, $context);
+      if(!$img){
+        $img = @file_get_contents($data['img_url2'], false, $context);
+      }
+      if ($img) {
+        if ($http_response_header[0] == "HTTP/1.1 200 OK") {
+          $data_check = array('status' => 'success', 'statusCode' => 200);
+        } else if ($http_response_header[0] == "HTTP/1.1 403 Forbidden") {
+          $data_check = array('status' => 'fail', 'statusCode' => 403);
+        } else {
+          $data_check = array('status' => 'fail', 'statusCode' => $http_response_header[0]);
+        }
       } else {
-        $data_check = array('status' => 'fail', 'statusCode' => $http_response_header[0]);
+        $data_check = array('status' => "error", 'msg' => "Images not found!");
       }
     }
     echo json_encode($data_check);
@@ -104,7 +112,7 @@ class ExpressCurate_ExportAPI {
           }
           if (file_put_contents($file[$i], $image_data)) {
             $file[$i] = substr($file[$i], ($pos = strpos($file[$i], '/wp-content')) !== false ? $pos + 1 : 0);
-            $downloaded_images[] = site_url().'/'.$file[$i];
+            $downloaded_images[] = site_url() . '/' . $file[$i];
           }
         }
         $result = array('status' => 'success', 'images' => $downloaded_images);
@@ -227,4 +235,5 @@ class ExpressCurate_ExportAPI {
   }
 
 }
+
 ?>

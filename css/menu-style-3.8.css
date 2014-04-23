@@ -21,4 +21,16 @@
   margin-top: 2px;
 }
 
-
+#toplevel_page_expresscurate > ul > li.wp-first-item { 
+  display: none; 
+}
+#expresscurate_keywords, #expresscurate_description
+{
+	background-color:#fdfdfd;
+	border-style:solid;
+	border-width:1px;
+	border-color:#dfdfdf;
+}
+ .dashicons-before{
+	clear:both;
+}

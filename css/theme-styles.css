@@ -31,8 +31,7 @@
 
 /*Text boxes*/
 .expresscurate_fl_text_box , .expresscurate_fr_text_box , .expresscurate_justify_text_box{
-	height: auto;
-	min-height:40px !important;
+	min-height:25px !important;
 	border-style: none;
 	overflow: hidden;
 	background-color:#F3F3F3;
@@ -63,12 +62,18 @@
 	min-height:25px;
 	padding: 4%;
 }
+.entry-content .expresscurate_fl_text_box,
+ .entry-content .expresscurate_fr_text_box ,
+ .entry-content .expresscurate_justify_text_box,
+ .entry-summary .expresscurate_fl_text_box,
+ .entry-summary .expresscurate_fr_text_box,
+ .entry-summary  .expresscurate_justify_text_box{
+	height: auto !important;
+}
 .mceContentBody .expresscurate_fl_text_box ,
 .mceContentBody .expresscurate_fr_text_box , 
 .mceContentBody .expresscurate_justify_text_box
 {
 	resize:both;
 }
- .expresscurate_clear{
-	clear: both;
- }
+ 

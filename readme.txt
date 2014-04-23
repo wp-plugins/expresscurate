@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: http://www.expresscurate.com/
 Requires at least: 3.6
 Tested up to: 3.8
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -56,21 +56,29 @@ e.g.
 
 
 == Screenshots ==
-1. Curate Content button opens a dialog to start curation.
-2. Load the source page and get auto-summary.
-3. Curate into post adds the curated content in your post.
-4. Enhance your post with SEO keywords and description.
-5. Style all your posts with brand new quotation, annotation, as well as left, right or center aligned text boxes.
-6. Customize.
+1. Curate Content Button. Curate Content quickstart button is available for posts and pages. Dialog will open to curate and edit content from original posts.
+2. Curation Dialog: Original Page. Type the original article URL and load the content. Have image and content automatically summarized and prefilled for you.
+3. Curation Dialog: Fields. Fixed structure for a curated post. You can edit title, image, content, and add annotation.
+4. Curation Dialog: Prefilled Content. Load the original post. Title, image and content will be prefilled and ready for editing.
+5. Curation Dialog: Content Suggestions. Original page metadata as well as text paragraphs are available for curation. Add one or more item into your content.
+6. Curation Dialog: Curate Into Post. Edit your content and curate into the post.
+7. Styling boxes. Annotation as well as left, right and center aligned text boxes. These elements allow to give more structure to your blog post.
+8. SEO Control Center. Enter key page attributes and SEO enhancements from a single page. It is recommended to have the short description always defined.
+9. Customization. Customize the plugin with 10+ settings.
+10. Top Curated Websites. Visit the top curated websites and pages.
+
 
 == Changelog ==
 
+= 1.1.4 =
+* Miscellaneous bug fixes and improvements.
+
 = 1.1.3 =
-* Miscellaneous bug fixing and improvements.
+* Miscellaneous bug fixes and improvements.
 
 = 1.1.2 =
 * Optional ExpressCurate Blockquote
-* Miscellaneous bug fixing and improvements.
+* Miscellaneous bug fixes and improvements.
 
 = 1.1.1 =
 * Authorship for posts
@@ -83,7 +91,7 @@ e.g.
 * Optional Auto-Hashtagging
 
 = 1.1 =
-* Miscellaneous bug fixing and improvements.
+* Miscellaneous bug fixes and improvements.
 
 = 1.0 =
 * Initial release.

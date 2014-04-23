@@ -5,16 +5,17 @@ blockquote ul, ol {
 blockquote {
   position: relative;
   padding: 0 20px;
-  margin: 0px 0px 30px 10px;
+  margin: 0px 0px 20px 10px;
 }
 blockquote > * {
   margin-left: 10px;
 }
 blockquote > *:first-child {
-  padding-top: 20px;
+  /* padding-top: 20px; */
 }
 blockquote:before{
   left: 0px;
+  top: 0px;
   width: 12px;
   height: 23px;
   position: absolute;
@@ -26,7 +27,8 @@ blockquote:before{
   content: "";
 }
 blockquote:after {
-  right: 10px;
+  right: 0px;
+  bottom: -13px;
   width: 12px;
   height: 27px;
   text-align: right;

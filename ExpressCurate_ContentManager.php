@@ -72,6 +72,8 @@ class ExpressCurate_HtmlParser {
   private $dom;
   private $url;
   private $domain;
+  private $fragment;
+  private $path;
   private $html;
   private $title = null;
   private $keywords = null;
@@ -79,7 +81,12 @@ class ExpressCurate_HtmlParser {
 
   public function __construct($url) {
     $this->url = $url;
+    $path = parse_url($this->url, PHP_URL_PATH);
+    $lastof = strrpos($path, "/");
+    $path = substr($path, 0, $lastof);
     $this->domain = 'http://' . parse_url($this->url, PHP_URL_HOST);
+    $this->path = 'http://' . parse_url($this->url, PHP_URL_HOST) . "/" . $path . "/";
+    $this->fragment = parse_url($this->url, PHP_URL_FRAGMENT);
   }
 
   public function doRequest() {
@@ -197,20 +204,23 @@ class ExpressCurate_HtmlParser {
     $i = 0;
     foreach ($imgTags as $t) {
       $src = $t->getAttribute('src');
-      if (strpos($src, '//') !== false) {
-        
-      } elseif (strpos($src, '/') !== false) {
-        $src = $this->domain . "/" . $src;
-      } else {
-        $src = $this->domain . $src;
+      if (strlen($src) > 3) {
+        if (strpos($src, 'http://') !== false || strpos($src, 'https://') !== false) {
+          $src = $src;
+        } else if (strpos($src, '//') === 0) {
+          $src = $this->fragment . $src;
+        } elseif (strpos($src, '/') === 0) {
+          $src = $this->domain . $src;
+        } else {
+          $src = $this->path . $src;
+        }
+        $src = preg_replace('%([^:])([/]{2,})%', '\\1/', $src);
+
+        if (!in_array($src, $result_images)) {
+          $result_images[] = ($src);
+        }
+        $i++;
       }
-      $src = preg_replace('%([^:])([/]{2,})%', '\\1/', $src);
-//$src = strtok($src, '?');
-//$image = '<img src="' .$src . '"/>';
-      if (!in_array($src, $result_images)) {
-        $result_images[] = ($src);
-      }
-      $i++;
     }
 
 //get text
@@ -293,7 +303,9 @@ class ExpressCurate_HtmlParser {
     $utf8 = false;
     foreach ($http_response_header as $header) {
       if (substr(strtolower($header), 0, 13) == "content-type:") {
-        list($contentType, $charset) = explode(";", $header);
+        if (count(explode(";", $header)) > 1) {
+          list($contentType, $charset) = explode(";", $header);
+        }
       }
     }
 
