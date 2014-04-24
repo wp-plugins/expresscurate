@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="editor right">
-          <textarea id="editor_area" ></textarea>
+          <textarea id="expresscurate_content_editor" ></textarea>
           <div class="clear"></div>
         </div>
       </div>
@@ -48,7 +48,7 @@
     </div>
     <div class="footer">
       <div class="annotate">
-        <textarea id="insight_editor" class="insight_editor" placeholder="Your annotation here..."></textarea>
+        <textarea id="expresscurate_insight_editor" placeholder="Your annotation here..."></textarea>
         <input type="hidden" value="<?php echo get_option('expresscurate_curated_text', 'Curated from'); ?>" id="expresscurate_from" name="expresscurate_from"/>
         <input type="hidden" value="<?php echo get_option('expresscurate_autosummary', 5); ?>" id="expresscurate_autosummary" name="expresscurate_autosummary"/>
       </div>

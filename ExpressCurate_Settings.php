@@ -735,6 +735,7 @@ class ExpressCurate_Settings {
     wp_enqueue_script('expresscurate', $plaugunUrl . 'js/expresscurate.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
     wp_enqueue_script('expresscurate_slider', $plaugunUrl . 'js/plugins/jquery.jcarousel.min.js', array('jquery'));
     wp_enqueue_style('texpresscurate', $plaugunUrl . 'css/expresscurate.css');
+    wp_enqueue_style('wp-jquery-ui-dialog');
     if (get_bloginfo('version') < 3.8) {
       wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.6.css');
     } else {
