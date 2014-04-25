@@ -56,15 +56,15 @@ e.g.
 
 
 == Screenshots ==
-1. Curate Content Button. Curate Content quickstart button is available for posts and pages. Dialog will open to curate and edit content from original posts.
-2. Curation Dialog: Original Page. Type the original article URL and load the content. Have image and content automatically summarized and prefilled for you.
-3. Curation Dialog: Fields. Fixed structure for a curated post. You can edit title, image, content, and add annotation.
-4. Curation Dialog: Prefilled Content. Load the original post. Title, image and content will be prefilled and ready for editing.
-5. Curation Dialog: Content Suggestions. Original page metadata as well as text paragraphs are available for curation. Add one or more item into your content.
-6. Curation Dialog: Curate Into Post. Edit your content and curate into the post.
-7. Styling boxes. Annotation as well as left, right and center aligned text boxes. These elements allow to give more structure to your blog post.
-8. SEO Control Center. Enter key page attributes and SEO enhancements from a single page. It is recommended to have the short description always defined.
-9. Customization. Customize the plugin with 10+ settings.
+01. Curate Content Button. Curate Content quickstart button is available for posts and pages. Dialog will open to curate and edit content from original posts.
+02. Curation Dialog: Original Page. Type the original article URL and load the content. Have image and content automatically summarized and prefilled for you.
+03. Curation Dialog: Fields. Fixed structure for a curated post. You can edit title, image, content, and add annotation.
+04. Curation Dialog: Prefilled Content. Load the original post. Title, image and content will be prefilled and ready for editing.
+05. Curation Dialog: Content Suggestions. Original page metadata as well as text paragraphs are available for curation. Add one or more item into your content.
+06. Curation Dialog: Curate Into Post. Edit your content and curate into the post.
+07. Styling boxes. Annotation as well as left, right and center aligned text boxes. These elements allow to give more structure to your blog post.
+08. SEO Control Center. Enter key page attributes and SEO enhancements from a single page. It is recommended to have the short description always defined.
+09. Customization. Customize the plugin with 10+ settings.
 10. Top Curated Websites. Visit the top curated websites and pages.
 
 
