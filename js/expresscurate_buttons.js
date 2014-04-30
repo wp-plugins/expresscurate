@@ -1,3 +1,4 @@
+
 (function() { 
     var getId = function(prefix) {
         var uniqueId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -36,10 +37,10 @@
 				}else{
 					var unwrapElem=jQuery(ed.selection.getNode());
 					unWrap(unwrapElem);
-					ed.selection.setCursorLocation(ed.selection.getNode(), 0);
+					
 				}
 				ed.controlManager.setActive(elem,false);
-				
+				ed.selection.setCursorLocation(ed.selection.getNode(), 0);
 			}
 		} else {
 			var content='';
@@ -76,7 +77,7 @@
 	
 	function unWrap(elem){
 		if(elem.is('span')) elem=elem.parent('p');
-		if(elem.parent().is('blockquote')) {elem=elem.parent('blockquote');}
+		if(elem.parents().is('blockquote')) {elem=elem.parents('blockquote');}
 		if(elem.index()==0){
 				elem.parents('div').before(elem);
 			}else if(elem.parents('div').children().length==elem.index()+1){
@@ -85,9 +86,10 @@
 					var divhtml= jQuery(elem).parents('div').html();
 					var myps = divhtml.split(elem.html());
 					elem.parents('div').after(elem.parent('div').clone().html(myps[1])).html(myps[0]).after(elem);
+					if(elem.prev().children('blockquote').html()=='') elem.prev().children('blockquote').remove();
 				}
-		if(elem.next().children().text()=='') elem.next().remove();
-		if(elem.prev().children().text()=='') elem.prev().remove();
+		if(elem.next().text()=='') elem.next().remove();
+		if(elem.prev().text()=='') elem.prev().remove();
 		
 	}
 	
@@ -150,7 +152,12 @@
                
             });
 
-           
+            ed.onLoadContent.add(function(ed, o) {
+				var dom = tinymce.activeEditor.dom;
+				var divElements = dom.select('div[class*=expresscurate]');
+				dom.setStyle(divElements, 'height', 'auto');
+		    });
+			
 			ed.onNodeChange.add(function(ed) {	
 				var node,elem=jQuery(ed.selection.getNode());
 				if(elem.is('div')){
@@ -255,7 +262,6 @@
 		var isActiveTextbox = ed.controlManager.get(elem).active;
 		if (isActiveTextbox ) {
 			var texbox = getElem(ed.selection.getNode(),cssClass);
-
 			if (texbox) {
 				if(jQuery(texbox).html()=='<p>&nbsp;</p>'){
 					jQuery(texbox).html('');

@@ -1,0 +1,42 @@
+.ui-dialog .ui-dialog-titlebar{
+	padding: 0 1em;
+	background-color: #444;
+	font-size: 13px;
+	line-height: 24px;
+	color: #fff;
+	height: auto;
+	border:none;
+}
+.wp-dialog .ui-dialog-title{
+	display: block;
+	text-align: center;
+	padding: 0;
+}
+.ui-dialog-titlebar-close:before{
+	line-height: 13px;
+}
+.ui-button.ui-dialog-titlebar-close{
+	padding: 7px 0 0 0;
+}
+.ui-dialog .ui-dialog-title{
+	float: left;
+	margin: .1em 0;
+	white-space: nowrap;
+	width: 90%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.ui-button.ui-dialog-titlebar-close{
+	width: 30px;
+	height: 20px;
+}
+.wp-dialog .ui-dialog-content {
+	padding: 0;
+	border:none;
+}
+#wp-fullscreen-buttons .mce-btn, .mce-toolbar .mce-btn-group .mce-btn, .qt-fullscreen{
+	margin: 1px !important;
+}
+.ui-widget-overlay{
+	opacity:.6 !important;
+}

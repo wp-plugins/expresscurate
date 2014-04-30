@@ -4,7 +4,26 @@ var plugin_folder = 'expresscurate';
 
 function send_wp_editor(html) {
 	var editor = tinyMCE.get('content');
-	editor.execCommand("mceInsertContent", false, html);
+	if (editor) {
+		editor.execCommand("mceInsertContent", false, html);
+	} else {
+		editor = jQuery('#content');
+		
+		var oldValue = editor.val();
+		var selectionStart = editor[0].selectionStart;
+		var selectionEnd = editor[0].selectionEnd;
+		
+		var newValue = oldValue.substring(0,selectionStart) + html + oldValue.substring(selectionEnd);
+		editor.val(newValue);
+	}
+	//editor.setContent(editor.getContent() + html);
+//  var win = window.dialogArguments || opener || parent || top;
+//  if (win.send_to_editor) {
+//	  win.send_to_editor(html);
+//  }
+
+  // alternativ
+  // tinyMCE.execCommand("mceInsertContent", false, html);
 }
 
 function display_curated_images(images) {

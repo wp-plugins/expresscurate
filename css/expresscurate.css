@@ -637,3 +637,18 @@
 .expresscurate .verifyPublisher{
   margin-top: 45px;
 }
+.fullscreen-overlay{
+	z-index: 100105 !important;
+}
+#fullscreen-topbar{
+	z-index: 100120 !important;
+}
+.wp-fullscreen-wrap{
+	z-index: 100115 !important;
+}
+#wp-fullscreen-body, .mce-fullscreen{
+	z-index: 100110 !important;
+}
+#wp-fullscreen-statusbar{
+	z-index: 100120 !important;
+}

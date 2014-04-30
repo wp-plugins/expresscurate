@@ -409,14 +409,14 @@ class ExpressCurate_Settings {
           if (isset($tag_in_content[0])) {
             preg_match("/>#" . $tag->name . '(<\/a>)/', $post_content, $tag_in_a);
             if (!isset($tag_in_a[0])) {
-              $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag->name . "/i", '<a href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
+              $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag->name . "/i", '<a class="contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
             }
           } else {
             preg_match("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "/i", $post_content, $tag_in_content);
             if (isset($tag_in_content[0])) {
               preg_match("/>" . $tag->name . '(<\/a>)/i', $post_content, $tag_in_a);
               if (!isset($tag_in_a[0])) {
-                $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "/i ", '<a href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
+                $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "/i ", '<a class="contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
               }
             }
           }
@@ -738,9 +738,12 @@ class ExpressCurate_Settings {
     wp_enqueue_style('wp-jquery-ui-dialog');
     if (get_bloginfo('version') < 3.8) {
       wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.6.css');
-    } else {
+    } else{
       wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.8.css');
-    }
+	}
+	if (get_bloginfo('version') >3.8) {
+	  wp_enqueue_style('expresscurate', $plaugunUrl . 'css/dialog-style-3.9.css');
+	}
   }
 
   public function expresscurate_theme_styles() {
