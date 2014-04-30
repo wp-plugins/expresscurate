@@ -465,7 +465,7 @@ jQuery(document).ready(function($) {
 
   function addKeyWord(textarea) {
     text = textarea.val().replace(',', '');
-    text = text.replace(/[,.;:?!\s]+/g, '');
+    text = text.replace(/[,.;:?!]+/g, '').trim();
     $.each($('.expresscurate_keywords'), function(key, value) {
       if (justtext($(this)) == text) {
         text = '';

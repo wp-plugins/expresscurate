@@ -269,11 +269,28 @@ class ExpressCurate_HtmlParser {
     $max_count = get_option("expresscurate_max_tags", 3);
     $smart_tags = array();
 
-    if (count($this->keywords)) {
-//$keywords = array_flip($this->keywords);
-      foreach ($this->keywords as $key => $keyword) {
-        $smart_tags[$keyword] = $this->countMathes($key);
+    $defined_tags = get_option("expresscurate_defined_tags", '');
+    if ($defined_tags) {
+      $defined_tags = explode(",", $defined_tags);
+      foreach ($defined_tags as $tag) {
+        $tag = trim($tag);
+        $count = $this->countMathes($tag);
+        if ($count > 0) {
+          $smart_tags[$tag] = $count;
+        }
       }
+    }
+
+    if (count($this->keywords)) {
+      foreach ($this->keywords as $key => $keyword) {
+        $count = $this->countMathes($key);
+        if ($count > 0) {
+          $smart_tags[$keyword] = $count;
+        }
+      }
+    }
+    
+    if(count($smart_tags) > 0) {
       arsort($smart_tags);
       $smart_tags = array_slice(array_keys(array_reverse($smart_tags)), 0, $max_count);
     }
