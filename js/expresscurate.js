@@ -8,13 +8,19 @@ function send_wp_editor(html) {
 		editor.execCommand("mceInsertContent", false, html);
 	} else {
 		editor = jQuery('#content');
-		
-		var oldValue = editor.val();
-		var selectionStart = editor[0].selectionStart;
-		var selectionEnd = editor[0].selectionEnd;
-		
-		var newValue = oldValue.substring(0,selectionStart) + html + oldValue.substring(selectionEnd);
-		editor.val(newValue);
+    if(editor.length == 0){
+      if (tinyMCE.editors.length > 0) {
+        editor = tinyMCE.editors[0];
+        editor.execCommand("mceInsertContent", false, html);
+      }
+    } else {
+		  var oldValue = editor.val();
+		  var selectionStart = editor[0].selectionStart;
+		  var selectionEnd = editor[0].selectionEnd;
+
+		  var newValue = oldValue.substring(0,selectionStart) + html + oldValue.substring(selectionEnd);
+		  editor.val(newValue);
+    }
 	}
 	//editor.setContent(editor.getContent() + html);
 //  var win = window.dialogArguments || opener || parent || top;

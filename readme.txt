@@ -71,6 +71,7 @@ e.g.
 == Changelog ==
 
 = 1.1.7 =
+* NOTICE: Don't use Curate Content when cursor is in annotation box, it will wipe the whole post content out.
 * Problems with automatic hashtagging are fixed.
 * Problems with Curate Into Post button are fixed.
 * Miscellaneous bug fixes and improvements.
