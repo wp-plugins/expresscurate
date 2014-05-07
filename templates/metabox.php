@@ -1,5 +1,8 @@
-<div class="expresscurate_dialog">
-  <div class="content_editor" id ="curate_post_form">
+<?php
+$settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true, 'tinymce' => true, 'quicktags' => false);
+?>
+<div>
+  <div class="content_editor" id ="expresscurate_post_form">
     <div class="main">
       <div class="header">
         <div class="addressbar">
@@ -28,7 +31,8 @@
           </div>
         </div>
         <div class="editor right">
-          <textarea id="expresscurate_content_editor" ></textarea>
+          <?php wp_editor('', 'expresscurate_content_editor', $settings); ?>
+
           <div class="clear"></div>
         </div>
       </div>
@@ -47,12 +51,8 @@
       </div>
     </div>
     <div class="footer">
-      <div class="annotate">
-        <textarea id="expresscurate_insight_editor" placeholder="Your annotation here..."></textarea>
-        <input type="hidden" value="<?php echo get_option('expresscurate_curated_text', 'Curated from'); ?>" id="expresscurate_from" name="expresscurate_from"/>
-        <input type="hidden" value="<?php echo get_option('expresscurate_autosummary', 5); ?>" id="expresscurate_autosummary" name="expresscurate_autosummary"/>
-      </div>
-      <div class="clear"></div>
+      <input type="hidden" value="<?php echo get_option('expresscurate_curated_text', 'Curated from'); ?>" id="expresscurate_from" name="expresscurate_from"/>
+      <input type="hidden" value="<?php echo get_option('expresscurate_autosummary', 5); ?>" id="expresscurate_autosummary" name="expresscurate_autosummary"/>
       <ul class="labels" id="curated_tags">
       </ul>
       <div class="clear"></div>
@@ -64,5 +64,5 @@
 <div id="expresscurate_loading">
   <img src="<?php echo plugin_dir_url(__FILE__); ?>../images/loading.gif" id="img-load" />
 </div>
-</div>
+
 

@@ -46,7 +46,7 @@ function display_curated_images(images) {
       jQuery('.content .img').css('background-image', jQuery('ul#curated_images li').first().css('background-image'))
     } else {
       error_html = '<div class="error">No image found for specified size</div>';
-      jQuery('#curate_post_form').before(error_html);
+      jQuery('#expresscurate_post_form').before(error_html);
     }
   }, 300);
 }
@@ -173,37 +173,25 @@ function insert_delete_image(index) {
 
 }
 
-function clear_expresscurate_form(insight) {
+function clear_expresscurate_form() {
   jQuery('#expresscurate_dialog div.error').remove();
   jQuery('#expresscurate_dialog div.updated').remove();
   jQuery("#expresscurate_dialog").find('ul').html('');
   //jQuery("#expresscurate_dialog").find('input[type=text]').val('');
   jQuery("#expresscurate_content_editor").val('');
-  if (insight !== true) {
-    //jQuery("#wp_curation_dialog").find('input[type=text]').val('');
-    jQuery("#expresscurate_insight_editor").val('');
-  }
   jQuery('.content .img').attr('style', '');
   jQuery('.content .img').addClass("noimage");
   jQuery('.controls').hide();
   jQuery("#expresscurate_slider").html('').html('<ul class="preview left jcarousel-skin-tango" id="expresscurate_paragraphs"></ul>');
   if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
     tinyMCE.get('expresscurate_content_editor').setContent('');
-    if (insight !== true) {
-      tinyMCE.get('expresscurate_insight_editor').setContent('');
-      if(!tinyMCE.execCommand("mceRemoveControl", true, "expresscurate_content_editor")) {
-    	  tinyMCE.execCommand("mceRemoveEditor", true, "expresscurate_content_editor");
-      }
-      if(!tinyMCE.execCommand("mceRemoveControl", true, "expresscurate_insight_editor")) {
-    	  tinyMCE.execCommand("mceRemoveEditor", true, "expresscurate_insight_editor");
-      }
-    }
   }
+  jQuery('#expresscurate_source').focus();
 }
 
 // setup everything when document is ready
 jQuery(document).ready(function($) {
-  $('textarea[name=expresscurate_add_tags]').val('');
+  jQuery('textarea[name=expresscurate_add_tags]').val('');
   if (jQuery.ui) {
     if (jQuery("#expresscurate_dialog").length) {
       var $dialog = jQuery("#expresscurate_dialog");
@@ -230,74 +218,67 @@ jQuery(document).ready(function($) {
       });
     }
 
-    jQuery("#expresscurate_content_editor, #expresscurate_insight_editor").addClass("mceEditor");
+    jQuery("#expresscurate_content_editor").addClass("mceEditor");
 
     var currentImage = 0;
     var numberOfImages = 0;
 
-    $('.content .img').on('click', '.prev, .next', function() {
-      numberOfImages = $('ul#curated_images li').length;
-      if ($(this).hasClass('next')) {
+    jQuery('.content .img').on('click', '.prev, .next', function() {
+      numberOfImages = jQuery('ul#curated_images li').length;
+      if (jQuery(this).hasClass('next')) {
         currentImage = (++currentImage > numberOfImages) ? numberOfImages : currentImage;
-      } else if ($(this).hasClass('prev')) {
+      } else if (jQuery(this).hasClass('prev')) {
         currentImage = (--currentImage < 0) ? 0 : currentImage;
       }
-      var img = $('ul#curated_images li:eq(' + currentImage + ')').css('background-image');
+      var img = jQuery('ul#curated_images li:eq(' + currentImage + ')').css('background-image');
       if (img) {
-        $('.content .img').css('background-image', img);
+        jQuery('.content .img').css('background-image', img);
       }
     }).on('mouseenter', function() {
-      numberOfImages = $('ul#curated_images li').length;
+      numberOfImages = jQuery('ul#curated_images li').length;
       if (numberOfImages > 1) {
-        $('.nav a').stop().animate({
+        jQuery('.nav a').stop().animate({
           width: 17
         }, 200);
       }
     }).on('mouseleave', function() {
-      $('.nav a').stop().animate({
+      jQuery('.nav a').stop().animate({
         width: 0
       }, 200);
     });
 
-    $("#expresscurate_open-modal").click(function(event) {
+    jQuery("#expresscurate_open-modal").click(function(event) {
       event.preventDefault();
 
       if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
         if(!tinyMCE.execCommand("mceAddControl", true, "expresscurate_content_editor")) {
         	tinyMCE.execCommand("mceAddEditor", true, "expresscurate_content_editor");
         }
-        if(!tinyMCE.execCommand("mceAddControl", true, "expresscurate_insight_editor")) {
-        	tinyMCE.execCommand("mceAddEditor", true, "expresscurate_insight_editor");
-        }
+        
       }
-      //$("#expresscurate_content_editor_resize").trigger('click');
-      //$("#expresscurate_insight_editor_resize").trigger('click');
+      
+      //jQuery("#expresscurate_content_editor_resize").trigger('click');
       //clear_expresscurate_form();
       $dialog.dialog('open');
     });
 
-    $("#expresscurate_insert").click(function() {
+    jQuery("#expresscurate_insert").click(function() {
       var tags_html = '';
-      var inserted_tags = $("#post_tag .tagchecklist span").length;
+      var inserted_tags = jQuery("#post_tag .tagchecklist span").length;
       var inserted_tags_textarea = "";
-      inserted_tags_textarea = $("#tax-input-post_tag").val();
-      $('#curated_tags li').each(function(i) {
-        inserted_tags_textarea += "," + $(this).find('span').text();
+      inserted_tags_textarea = jQuery("#tax-input-post_tag").val();
+      jQuery('#curated_tags li').each(function(i) {
+        inserted_tags_textarea += "," + jQuery(this).find('span').text();
       });
-      $("#tax-input-post_tag").val(inserted_tags_textarea);
-      $(".tagadd").trigger('click');
+      jQuery("#tax-input-post_tag").val(inserted_tags_textarea);
+      jQuery(".tagadd").trigger('click');
       var html = "";
       var insite_html = '';
-
-      if (tinyMCE.get('expresscurate_insight_editor').getContent().length > 0) {
-        insite_html += '<div class="expresscurate_annotate">' + tinyMCE.get('expresscurate_insight_editor').getContent() + '</div>';
-      }
-
-      var bg = $('.img').css('background-image');
+      var bg = jQuery('.img').css('background-image');
 
       bg = bg.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
       if (bg.indexOf('images/noimage.png') === -1 && bg.length > 5) {
-        ///html += $("#curated_content_selected_img li").html();
+        ///html += jQuery("#curated_content_selected_img li").html();
         html += '<img src="' + bg + '">';
       }
       if (tinyMCE.get('expresscurate_content_editor').getContent().length > 0) {
@@ -305,14 +286,14 @@ jQuery(document).ready(function($) {
       }
       html += insite_html;
       if (html.length > 0) {
-        if ($("#expresscurate_source").val().length > 0) {
-          var matches = $("#expresscurate_source").val().match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+        if (jQuery("#expresscurate_source").val().length > 0) {
+          var matches = jQuery("#expresscurate_source").val().match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
           var domain = matches && matches[1];
-          html += '<div class="expresscurate_source"><p>' + $("#expresscurate_from").val() + ' <a class="expresscurated" data-curated-url="' + $("#expresscurate_source").val() + '"  href = "' + $("#expresscurate_source").val() + '">' + domain + '</a></p></div>';
+          html += '<div class="expresscurate_source"><p>' + jQuery("#expresscurate_from").val() + ' <a class="expresscurated" data-curated-url="' + jQuery("#expresscurate_source").val() + '"  href = "' + jQuery("#expresscurate_source").val() + '">' + domain + '</a></p></div><br/>';
         }
-        if ($("#titlewrap #title").val().length == 0) {
-          $("#titlewrap #title").trigger('focus');
-          $("#titlewrap #title").val($("#curated_title").val());
+        if (jQuery("#titlewrap #title").val().length == 0) {
+          jQuery("#titlewrap #title").trigger('focus');
+          jQuery("#titlewrap #title").val(jQuery("#curated_title").val());
         }
         send_wp_editor(html);
         $dialog.dialog('close');
@@ -320,68 +301,70 @@ jQuery(document).ready(function($) {
       } else {
         return false;
       }
+
+      tinyMCE.activeEditor.execCommand('annotation', undefined, true);
     });
   }
 
   function submit_expresscurate_form() {
     var blog_domain = document.domain;
     //remove error divs
-    $('#expresscurate_dialog div.error').remove();
-    $('#expresscurate_dialog div.updated').remove();
-    $("#expresscurate_dialog").fadeIn();
+    jQuery('#expresscurate_dialog div.error').remove();
+    jQuery('#expresscurate_dialog div.updated').remove();
+    jQuery("#expresscurate_dialog").fadeIn();
     var error_html = '';
     var notif_html = '';
-    $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_get_article&check=1', $('#curate_post_form input').serialize(), function(res) {
+    $.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_get_article&check=1', jQuery('#expresscurate_post_form input').serialize(), function(res) {
       var data = $.parseJSON(res);
       if (data.status == 'notification') {
         notif_html = '<div class="updated">' + data.msg + '</div>';
-        $('#curate_post_form').before(notif_html);
+        jQuery('#expresscurate_post_form').before(notif_html);
       }
     });
-    $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_get_article', $('#curate_post_form input').serialize(), function(res) {
+    $.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_get_article', jQuery('#expresscurate_post_form input').serialize(), function(res) {
       var data = $.parseJSON(res);
       if (data) {
         if (data.status == 'error') {
           error_html = '<div class="error">' + data.error + '</div>';
-          $('#curate_post_form').before(error_html);
-          $("#expresscurate_loading").fadeOut('fast');
+          jQuery('#expresscurate_post_form').before(error_html);
+          jQuery("#expresscurate_loading").fadeOut('fast');
         } else if (data.status == 'success') {
-          clear_expresscurate_form(true);
-          $(".controls").show();
+          clear_expresscurate_form();
+          jQuery(".controls").show();
           if (data.result.title !== null && data.result.title.length > 0) {
-            $("#curated_title").val(data.result.title);
+            jQuery("#curated_title").val(data.result.title);
           }
           if (data.result.images.length > 0) {
-            $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_check_images', {img_url: data.result.images[data.result.images.length - 1], img_url2: data.result.images[data.result.images.length - 2]}, function(res) {
+            $.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_check_images', {img_url: data.result.images[data.result.images.length - 1], img_url2: data.result.images[data.result.images.length - 2]}, function(res) {
               var data_check = $.parseJSON(res);
               if (data_check.status === 'success' && data_check.statusCode === 200) {
                 display_curated_images(data.result.images);
-                $("#expresscurate_loading").fadeOut('fast');
+                jQuery("#expresscurate_loading").fadeOut('fast');
               } else if (data_check.status === 'fail' && data_check.statusCode === 403) {
-                $('.content .img').css('background-image', $("#expresscurate_loading img").attr('src'));
-                $.post($('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_download_images', {images: data.result.images, post_id: $('#post_ID').val()}, function(res) {
+                jQuery('.content .img').css('background-image', jQuery("#expresscurate_loading img").attr('src'));
+                $.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_download_images', {images: data.result.images, post_id: jQuery('#post_ID').val()}, function(res) {
                   var data_images = $.parseJSON(res);
                   if (data_images.status == 'error') {
                     error_html = '<div class="error">' + data_images.error + '</div>';
-                    $('#curate_post_form').before(error_html);
+                    jQuery('#expresscurate_post_form').before(error_html);
                   } else if (data_images.status == 'success') {
                     display_curated_images(data_images.images);
                   }
-                  $("#expresscurate_loading").fadeOut('fast');
+                  jQuery("#expresscurate_loading").fadeOut('fast');
                 });
               }
               else if (data_check.status === 'error') {
                 error_html = '<div class="error">' + data_check.msg + '</div>';
-                $('#curate_post_form').before(error_html);
-                $("#expresscurate_loading").fadeOut('fast');
+                jQuery('#expresscurate_post_form').before(error_html);
+                jQuery("#expresscurate_loading").fadeOut('fast');
               }
               else {
                 display_curated_images(data.result.images);
-                $("#expresscurate_loading").fadeOut('fast');
+                jQuery("#expresscurate_loading").fadeOut('fast');
               }
             });
           } else {
-            $("#expresscurate_loading").fadeOut('fast');
+            jQuery("#expresscurate_loading").fadeOut('fast');
           }
           if (data.result.metas.keywords !== null && data.result.metas.keywords.length > 0) {
             display_curated_tags(data.result.metas.keywords);
@@ -390,33 +373,31 @@ jQuery(document).ready(function($) {
           display_specials(data.result);
 
           if (data.result.paragraphs.length > 0) {
-            display_curated_paragraphs(data.result.paragraphs, $("#expresscurate_autosummary").val());
+            display_curated_paragraphs(data.result.paragraphs, jQuery("#expresscurate_autosummary").val());
           }
         }
       } else {
         error_html = '<div class="error">Can\'t curate from this page</div>';
-        $('#curate_post_form').before(error_html);
-        $("#expresscurate_loading").fadeOut('fast');
+        jQuery('#expresscurate_post_form').before(error_html);
+        jQuery("#expresscurate_loading").fadeOut('fast');
       }
 
     });
-
-
     return;
   }
 
   // onClick action
-  $('#expresscurate_submit').click(function() {
-    $("#expresscurate_loading").show();
+  jQuery('#expresscurate_submit').click(function() {
+    jQuery("#expresscurate_loading").show();
     submit_expresscurate_form();
-    $(document).ajaxComplete(function() {
+    jQuery(document).ajaxComplete(function() {
 
     });
 
   });
 
   // check for ENTER or ArrowDown keys
-  $('#expresscurate_source').keypress(function(e) {
+  jQuery('#expresscurate_source').keypress(function(e) {
     if (e.keyCode == 13 || e.keyCode == 40) {
       submit_expresscurate_form();
       return false;
@@ -424,41 +405,41 @@ jQuery(document).ready(function($) {
 
   });
 
-  if ($('input[name=expresscurate_post_status]:checked').val() == 'draft') {
-    $('#expresscurate_publish_div').show();
+  if (jQuery('input[name=expresscurate_post_status]:checked').val() == 'draft') {
+    jQuery('#expresscurate_publish_div').show();
   }
-  $('input[name=expresscurate_post_status]').change(function() {
-    if ($('input[name=expresscurate_post_status]:checked').val() == 'draft') {
-      $('#expresscurate_publish_div').slideDown('slow');
+  jQuery('input[name=expresscurate_post_status]').change(function() {
+    if (jQuery('input[name=expresscurate_post_status]:checked').val() == 'draft') {
+      jQuery('#expresscurate_publish_div').slideDown('slow');
     } else {
-      $('#expresscurate_publish_no').attr('checked', true);
-      $('#expresscurate_publish_div').slideUp('slow');
+      jQuery('#expresscurate_publish_no').attr('checked', true);
+      jQuery('#expresscurate_publish_div').slideUp('slow');
     }
 
   });
 
-  $('input[name=expresscurate_seo]').change(function() {
-    if ($('input[name=expresscurate_seo]:checked').val() == '1') {
-      $('#tryyy').slideDown('slow');
+  jQuery('input[name=expresscurate_seo]').change(function() {
+    if (jQuery('input[name=expresscurate_seo]:checked').val() == '1') {
+      jQuery('#tryyy').slideDown('slow');
     } else {
-      $('#tryyy').slideUp('slow');
+      jQuery('#tryyy').slideUp('slow');
     }
   });
 
-  $('input[name=expresscurate_publisher]').bind("change paste keyup", function() {
-    var href = $(this).next('span').children('a').attr('href');
+  jQuery('input[name=expresscurate_publisher]').bind("change paste keyup", function() {
+    var href = jQuery(this).next('span').children('a').attr('href');
     var rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
-    $(this).next('span').children('a').attr('href', rest + $(this).val());
+    jQuery(this).next('span').children('a').attr('href', rest + jQuery(this).val());
   });
 
-  $('textarea[name=expresscurate_add_tags]').on("keyup", function(e) {
+  jQuery('textarea[name=expresscurate_add_tags]').on("keyup", function(e) {
     if (e.keyCode == 188 || e.keyCode == 13) {
-      addKeyWord($(this));
+      addKeyWord(jQuery(this));
     }
   });
 
-  $('.expresscurate_addKeyword').on("click", function(e) {
-    var textarea = $('textarea[name=expresscurate_add_tags]');
+  jQuery('.expresscurate_addKeyword').on("click", function(e) {
+    var textarea = jQuery('textarea[name=expresscurate_add_tags]');
     addKeyWord(textarea);
     textarea.focus();
   });
@@ -466,15 +447,15 @@ jQuery(document).ready(function($) {
   function addKeyWord(textarea) {
     text = textarea.val().replace(',', '');
     text = text.replace(/[,.;:?!]+/g, '').trim();
-    $.each($('.expresscurate_keywords'), function(key, value) {
-      if (justtext($(this)) == text) {
+    $.each(jQuery('.expresscurate_keywords'), function(key, value) {
+      if (justtext(jQuery(this)) == text) {
         text = '';
       }
     });
     if (!/^\s+$/.test(text) && text.length > 1) {
       var keyword = '<div class="expresscurate_keywords">' + text + '<span>×</span></div>';
       textarea.parent('div').before(keyword);
-      var defTags = $('textarea[name=expresscurate_defined_tags]');
+      var defTags = jQuery('textarea[name=expresscurate_defined_tags]');
       var defVal = defTags.val();
       var s ;
 	  if(defVal=='') s=text;
@@ -488,12 +469,12 @@ jQuery(document).ready(function($) {
     return elem.clone().children().remove().end().text();
   }
 
-  $('.expresscurate_keywords span').live('click', function() {
-    var defTags = $('textarea[name=expresscurate_defined_tags]');
-    defTags.val(defTags.val().replace(justtext($(this).parent('div')), ''));
+  jQuery('.expresscurate_keywords span').live('click', function() {
+    var defTags = jQuery('textarea[name=expresscurate_defined_tags]');
+    defTags.val(defTags.val().replace(justtext(jQuery(this).parent('div')), ''));
 	defTags.val(defTags.val().replace(', ,', ','));
 	if(defTags.val().match(/^, /)) defTags.val(defTags.val().slice(2));
-    $(this).parent('div').remove();
+    jQuery(this).parent('div').remove();
   });
 
 });

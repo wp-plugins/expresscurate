@@ -50,29 +50,6 @@
 
       <tr valign="top" class="width-bottom-border">
         <td scope="row" class="width-for-td">
-          <strong>Auto Hashtagging:</strong>
-          <br>
-          <span scope="row" class="gray-italic">
-            Transform words starting with # into tags and add # to the words previously defined as tags.
-          </span>
-        </td>
-        <td>
-          <input type="radio" id="smart_tags" value="1" name="expresscurate_smart_tagging" <?php
-          if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="smart_tags"> Yes </label>
-          <input type="radio" id="smart_tags_no" value="0" name="expresscurate_smart_tagging" <?php
-          if (get_option('expresscurate_smart_tagging', '') == "0") {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="smart_tags_no"> No </label>
-        </td>
-      </tr>
-      <tr valign="top" class="width-bottom-border">
-        <td scope="row" class="width-for-td">
           <strong>Enable ExpressCurate Blockquote:</strong>
           <br>
           <span scope="row" class="gray-italic">
@@ -300,6 +277,30 @@
         </table>
       </div>
       </th>
+      </tr>
+
+      <tr valign="top" class="width-bottom-border">
+        <td scope="row" class="width-for-td">
+          <strong>Auto Hashtagging:</strong>
+          <br>
+          <span scope="row" class="gray-italic">
+            Transform words starting with # into tags and add # to the words previously defined as tags.
+          </span>
+        </td>
+        <td>
+          <input type="radio" id="smart_tags" value="1" name="expresscurate_smart_tagging" <?php
+          if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
+            echo 'checked="checked"';
+          }
+          ?> />
+          <label for="smart_tags"> Yes </label>
+          <input type="radio" id="smart_tags_no" value="0" name="expresscurate_smart_tagging" <?php
+          if (get_option('expresscurate_smart_tagging', '') == "0") {
+            echo 'checked="checked"';
+          }
+          ?> />
+          <label for="smart_tags_no"> No </label>
+        </td>
       </tr>
       <tr valign="top">
         <th scope="row" colspan="2">

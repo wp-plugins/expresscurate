@@ -229,7 +229,7 @@ class ExpressCurate_HtmlParser {
     $pi = 0;
     foreach ($pTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
-        $result_paragraphs[] = trim($t->nodeValue);
+        $result_paragraphs[] = strip_tags(trim($t->nodeValue));
         $pi++;
       }
       $t->parentNode->removeChild($t);
@@ -239,7 +239,7 @@ class ExpressCurate_HtmlParser {
 
     foreach ($textTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
-        $result_paragraphs[] = trim($t->nodeValue);
+        $result_paragraphs[] = strip_tags(trim($t->nodeValue));
         $pi++;
       }
     }

@@ -159,7 +159,7 @@
 }
 .expresscurate_dialog {
   width: 827px;
-  min-height: 525px;
+  min-height: 372px;
   border: 1px solid #999999;
   background: #f5f5f5;
   font-family: Verdana, arial;
@@ -318,7 +318,7 @@
 }
 .expresscurate_dialog .editor textarea{
   width: 610px; 
-  height: 176px;
+  height: 100px;
 }
 
 .expresscurate_dialog .controls {
@@ -651,4 +651,9 @@
 }
 #wp-fullscreen-statusbar{
 	z-index: 100120 !important;
+}
+.jcarousel-container, .jcarousel-container-horizontal {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
