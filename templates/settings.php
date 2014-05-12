@@ -47,48 +47,49 @@
           </table>
         </td>
       </tr>
-
-      <tr valign="top" class="width-bottom-border">
-        <td scope="row" class="width-for-td">
-          <strong>Enable ExpressCurate Blockquote:</strong>
-          <br>
-          <span scope="row" class="gray-italic">
-            Select "Yes" to use ExpressCurate blockquote for marking the original content quote. Select "No" if you are already using a theme that has a good enough quote style and ExpressCurate won't override it.
-          </span>
-        </td>
-        <td>
-          <input type="radio" id="quotes_style" value="1" name="expresscurate_quotes_style" <?php
-          if (get_option('expresscurate_quotes_style') == "1" || get_option('expresscurate_quotes_style', '') == '') {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="quotes_style"> Yes </label>
-          <input type="radio" id="quotes_style_no" value="0" name="expresscurate_quotes_style" <?php
-          if (get_option('expresscurate_quotes_style', '') == "0") {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="quotes_style_no"> No </label>
-        </td>
-      </tr>
       <tr valign="top">
         <th scope="row" colspan="2">
-          <strong>Attribution Text For Original Article Link</strong>
+          <strong>Post type for ExpressCurate Chrome Extension:</strong>
           <br>
-          <span scope="row" colspan="2" class="gray-italic">Type in the prefix text for attributing the original article link.  It will show up at the bottom of your curated post.  For example, if you type "Curated from" in the box below and you curate from google.com, "Curated from google.com" will appear at the bottom of your post.</span>
+          <span class="gray-italic">Please pick a post type for your curated posts from the list below. This will allow custom post types when curating with ExpressCurate Chrome Extension.</span>
         </th>
       </tr>
+
       <tr valign="top">
-        <td colspan="2">
-          <input type="text" class="wide-input with-max-width" id="expresscurate_curated_text" value="<?php
-          if (get_option('expresscurate_curated_text')) {
-            echo get_option('expresscurate_curated_text');
-          } else {
-            echo 'Curated from';
-          }
-          ?>" name="expresscurate_curated_text" size="50" />
+        <td class="with-padding" colspan="2">
+          <table>
+            <tr valign="top">
+              <?php
+              $post_types = array('post');
+              $post_types = array_merge($post_types, get_post_types( array('_builtin' => false ,'public' => true), 'names'));
+              $posts_i = 1;
+              ?><td><?php
+                foreach ($post_types as $post_type) {
+                  ?>
+                  <input type="radio" id="expresscurate_post_type_<?php echo $post_type; ?>" value="<?php echo $post_type; ?>" name="expresscurate_def_post_type" <?php
+                  if (get_option('expresscurate_def_post_type', 'post') == $post_type) {
+                    echo 'checked="checked"';
+                  }
+                  ?>>
+                  <label for="expresscurate_post_type_<?php echo $post_type; ?>"> <?php echo $post_type; ?> </label><br />
+                  <?php if ($posts_i % 2 == 0 && count($post_types) != $posts_i) {
+                    ?>
+                  </td>
+                  <td>
+                  <?php }
+                  ?>
+                  <?php
+                  $cat_i++;
+                  ?><?php
+                }
+                ?>
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
+
+      
       <tr valign="top">
         <td scope="row" rowspan="2" class="width-for-td">
           <strong>Publishing Directly from ExpressCurate Chrome Extension:</strong>
@@ -197,6 +198,24 @@
           ?> />
           <label for="expresscurate_featured_no"> Standard </label>
         </td>
+      </tr>      
+      <tr valign="top">
+        <th scope="row" colspan="2">
+          <strong>Attribution Text For Original Article Link</strong>
+          <br>
+          <span scope="row" colspan="2" class="gray-italic">Type in the prefix text for attributing the original article link.  It will show up at the bottom of your curated post.  For example, if you type "Curated from" in the box below and you curate from google.com, "Curated from google.com" will appear at the bottom of your post.</span>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td colspan="2">
+          <input type="text" class="wide-input with-max-width" id="expresscurate_curated_text" value="<?php
+          if (get_option('expresscurate_curated_text')) {
+            echo get_option('expresscurate_curated_text');
+          } else {
+            echo 'Curated from';
+          }
+          ?>" name="expresscurate_curated_text" size="50" />
+        </td>
       </tr>
       <tr valign="top" class="width-bottom-border">
         <th scope="row" class="width-for-td">
@@ -229,6 +248,29 @@
             echo '5';
           }
           ?>" name="expresscurate_autosummary" size="1" /><span class="gray-italic">&nbsp;&nbsp; The default value is 5</span>
+        </td>
+      </tr>
+      <tr valign="top" class="width-bottom-border">
+        <td scope="row" class="width-for-td">
+          <strong>Enable ExpressCurate Blockquote:</strong>
+          <br>
+          <span scope="row" class="gray-italic">
+            Select "Yes" to use ExpressCurate blockquote for marking the original content quote. Select "No" if you are already using a theme that has a good enough quote style and ExpressCurate won't override it.
+          </span>
+        </td>
+        <td>
+          <input type="radio" id="quotes_style" value="1" name="expresscurate_quotes_style" <?php
+          if (get_option('expresscurate_quotes_style') == "1" || get_option('expresscurate_quotes_style', '') == '') {
+            echo 'checked="checked"';
+          }
+          ?> />
+          <label for="quotes_style"> Yes </label>
+          <input type="radio" id="quotes_style_no" value="0" name="expresscurate_quotes_style" <?php
+          if (get_option('expresscurate_quotes_style', '') == "0") {
+            echo 'checked="checked"';
+          }
+          ?> />
+          <label for="quotes_style_no"> No </label>
         </td>
       </tr>
       <tr valign="top" class="width-bottom-border">

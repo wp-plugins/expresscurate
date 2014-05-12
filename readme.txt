@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: http://www.expresscurate.com/
 Requires at least: 3.6
 Tested up to: 3.9
-Stable tag: 1.1.7
+Stable tag: 1.1.8
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -70,8 +70,11 @@ e.g.
 
 == Changelog ==
 
+= 1.1.8 =
+* New setting to specify post type for posts curated from Chrome Extension
+* Miscellaneous bug fixes and improvements.
+
 = 1.1.7 =
-* NOTICE: Don't use Curate Content when cursor is in annotation box, it will wipe the whole post content out.
 * Problems with automatic hashtagging are fixed.
 * Problems with Curate Into Post button are fixed.
 * Miscellaneous bug fixes and improvements.

@@ -161,7 +161,7 @@
   width: 827px;
   min-height: 372px;
   border: 1px solid #999999;
-  background: #f5f5f5;
+  background: #f1f1f1;
   font-family: Verdana, arial;
 }
 
@@ -214,11 +214,13 @@
 
 .expresscurate_dialog .content {
   border: 1px solid #dcdcdc;
-  border-radius: 3px;
+  border-radius: 0;
   margin: 10px 0;
   float: left;
 }
-
+.ui-dialog .ui-dialog-titlebar{
+    background-color: #222222 !important;
+}
 .expresscurate_dialog .addressbar {
   margin-bottom: 8px;
   height: 41px;
@@ -238,17 +240,21 @@
 .expresscurate_dialog .addressbar input {
   height: 39px;
   border: 1px solid #dcdcdc;
-  border-radius: 3px;
-  width: 696px;
+  border-radius: 0;
+  width: 590px;
   font-size: 17px;
   padding: 0px 10px;
   color: #595959;
   float: left;
 }
-
+.expresscurate_inputLable{
+    float: left;
+    font-size: 14px;
+    color: #444444;
+    margin-right: 20px;
+}
 .expresscurate_dialog .addressbar button.load {
-  background: url("../images/expresscurate_sprite_bg.png") repeat-x scroll 0 0 rgba(0, 0, 0, 0);
-  background-position: 0 -169px;
+  background-color: #f8f8f8;
   border: 1px solid #BBBBBB;
   border-radius: 3px 3px 3px 3px;
   color: #444444;
@@ -258,6 +264,7 @@
   font-size: 14px;
   height: 39px;
   margin-top: 1px;
+  margin-right: 4px;
   width: 83px;
 }
 .expresscurate_dialog .addressbar button.load:after {
@@ -266,12 +273,12 @@
 
 .expresscurate_dialog .title input {
   border: 1px solid #dcdcdc;
-  border-radius: 3px;
+  border-radius: 0;
   padding: 0px 10px;
   width: 785px;
-  font-size: 17px;
+  font-size: 20px;
   padding: 0px 10px;
-  color: #595959;
+  color: #303030;
   height: 39px;
 }
 
@@ -309,8 +316,13 @@
   -webkit-transform: rotate(180deg);
   -moz-transform: rotate(180deg);
   -o-transform: rotate(180deg);
+  width:4px;
+  height:auto;
 }
-
+.expresscurate_dialog .img .nav .prev img, .controls .nav.prev img{
+    width:4px;
+    height:auto;
+}
 .expresscurate_dialog .editor {
   background: #ffffff;
   /*height: 176px;*/
@@ -332,8 +344,8 @@
 
 .expresscurate_dialog .controls li {
   float: left;
-  border-left: 1px solid #f9f9f9;
-  border-right: 1px solid #d8d8d8;
+  border-left: 1px solid #dbdbdb;
+  border-right: 1px solid #c6c6c6;
   text-overflow: ellipsis;
   overflow: hidden;
   cursor: pointer;
@@ -357,8 +369,7 @@
 }
 
 .expresscurate_dialog .controls .tags, .controls .nav {
-  background-color: #f5f5f5;
-  background-image: url(../images/expresscurate_sprite_bg.png);
+  background-color: #dbdbdb;
   background-repeat: repeat;
   background-position: 0 0;
   margin: 0;
@@ -390,7 +401,7 @@
 
 .expresscurate_dialog .controls .preview li:hover {
   width: 72px;
-  background-color: #bdbdbd; 
+  background-color: #dbdbdb;
   color: #555555;
   font-size: 9px;
   line-height: 13px;
@@ -419,7 +430,9 @@
 .expresscurate_dialog .footer {
   padding: 0 10px;
 }
-
+#expresscurate_dialog div.mce-toolbar-grp{
+    background-color: #dbdbdb !important;
+}
 .expresscurate_dialog .footer .annotate {
   /*height: 96px;*/    
   background: #ffffff;
@@ -438,8 +451,8 @@
 }
 
 .expresscurate_dialog .footer .labels li {
-  background: none repeat scroll 0 0 #E1E1E1;
-  border-radius: 3px 3px 3px 3px;
+  background: none repeat scroll 0 0 #ffffff;
+  border-radius:0;
   color: #474747;
   float: left;
   font-size: 14px;
@@ -465,9 +478,7 @@
   line-height: 0;
 }
 
-.expresscurate_dialog .footer .labels a.remove:hover {
-  background-position: 0 -589px;
-}
+
 
 .expresscurate_dialog .footer button.curate {
   margin-top: 10px;
@@ -513,8 +524,7 @@
 
 /*Paragraphs Slider*/
 .expresscurate_dialog .jcarousel-container{
-  background-color: #f5f5f5;
-  background-image: url(../images/expresscurate_sprite_bg.png);
+  background-color: #f7f7f7;
   background-repeat: repeat-x;
   background-position: 0 0;
   background-size: auto 408px;
@@ -525,17 +535,18 @@
 .expresscurate_dialog .jcarousel-clip-horizontal {
   height: 66px;
   width: 720px;
-  left: -8px;
+  left: -7px;
   overflow: hidden;
 }
 .expresscurate_dialog .jcarousel-next-horizontal {
   background: url("../images/expresscurate_sprite.png") no-repeat center center;
+  background-color:#c6c6c6 ;
   background-position: 0 -1011px;
   border-left: 1px solid #F9F9F9;
   cursor: pointer;
   height: 66px;
   position: absolute;
-  right: 0px;
+  right: -2px;
   top: 0px;
   width: 32px;
   margin: 0;
@@ -544,6 +555,7 @@
 .expresscurate_dialog .jcarousel-skin-tango .jcarousel-prev-horizontal {
   background: url("../images/expresscurate_sprite.png") no-repeat center center;
   background-position: 0 -751px;
+  background-color:#c6c6c6;
   margin: 0;
   border-right: 1px solid #d8d8d8;
   cursor: pointer;

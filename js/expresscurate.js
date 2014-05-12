@@ -3,26 +3,26 @@ var plugin_folder = 'expresscurate';
 // Curation Plugin for WordPress JS
 
 function send_wp_editor(html) {
-	var editor = tinyMCE.get('content');
-	if (editor) {
-		editor.execCommand("mceInsertContent", false, html);
-	} else {
-		editor = jQuery('#content');
-    if(editor.length == 0){
+  var editor = tinyMCE.get('content');
+  if (editor) {
+    editor.execCommand("mceInsertContent", true, html);
+  } else {
+    editor = jQuery('#content');
+    if (editor.length == 0) {
       if (tinyMCE.editors.length > 0) {
         editor = tinyMCE.editors[0];
         editor.execCommand("mceInsertContent", false, html);
       }
     } else {
-		  var oldValue = editor.val();
-		  var selectionStart = editor[0].selectionStart;
-		  var selectionEnd = editor[0].selectionEnd;
+      var oldValue = editor.val();
+      var selectionStart = editor[0].selectionStart;
+      var selectionEnd = editor[0].selectionEnd;
 
-		  var newValue = oldValue.substring(0,selectionStart) + html + oldValue.substring(selectionEnd);
-		  editor.val(newValue);
+      var newValue = oldValue.substring(0, selectionStart) + html + oldValue.substring(selectionEnd);
+      editor.val(newValue);
     }
-	}
-	//editor.setContent(editor.getContent() + html);
+  }
+  //editor.setContent(editor.getContent() + html);
 //  var win = window.dialogArguments || opener || parent || top;
 //  if (win.send_to_editor) {
 //	  win.send_to_editor(html);
@@ -255,14 +255,28 @@ jQuery(document).ready(function($) {
 
     jQuery("#expresscurate_open-modal").click(function(event) {
       event.preventDefault();
+      //tinyMCE.activeEditor.focus(false);
+      var editor = tinyMCE.get('content');
+      if (!editor) {
+        editor = jQuery('#content');
+        if (editor.length == 0) {
+          if (tinyMCE.editors.length > 0) {
+            editor = tinyMCE.editors[0];
+          }
+        }
+      }
+
+      var body = tinyMCE.activeEditor.dom.select('body.mce-content-body');
+      jQuery(body).append('<span class="cursourHolder"> </span>');
+      var sp = tinyMCE.activeEditor.dom.select('span.cursourHolder');
+      tinyMCE.activeEditor.selection.select(sp[sp.length - 1]);
 
       if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
-        if(!tinyMCE.execCommand("mceAddControl", true, "expresscurate_content_editor")) {
-        	tinyMCE.execCommand("mceAddEditor", true, "expresscurate_content_editor");
+        if (!tinyMCE.execCommand("mceAddControl", true, "expresscurate_content_editor")) {
+          tinyMCE.execCommand("mceAddEditor", true, "expresscurate_content_editor");
         }
-        
       }
-      
+
       //jQuery("#expresscurate_content_editor_resize").trigger('click');
       //clear_expresscurate_form();
       $dialog.dialog('open');
@@ -288,14 +302,16 @@ jQuery(document).ready(function($) {
         html += '<img src="' + bg + '">';
       }
       if (tinyMCE.get('expresscurate_content_editor').getContent().length > 0) {
-        html += "<blockquote>" + tinyMCE.get('expresscurate_content_editor').getContent() + "</blockquote>";
+        html += "<blockquote>" + tinyMCE.get('expresscurate_content_editor').getContent() + "</blockquote><br />";
       }
       html += insite_html;
       if (html.length > 0) {
         if (jQuery("#expresscurate_source").val().length > 0) {
           var matches = jQuery("#expresscurate_source").val().match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
           var domain = matches && matches[1];
-          html += '<div class="expresscurate_source"><p>' + jQuery("#expresscurate_from").val() + ' <a class="expresscurated" data-curated-url="' + jQuery("#expresscurate_source").val() + '"  href = "' + jQuery("#expresscurate_source").val() + '">' + domain + '</a></p></div><br/>';
+          if (domain) {
+            html += '<div class="expresscurate_source"><p>' + jQuery("#expresscurate_from").val() + ' <a class="expresscurated" data-curated-url="' + jQuery("#expresscurate_source").val() + '"  href = "' + jQuery("#expresscurate_source").val() + '">' + domain + '</a></p></div><br/>';
+          }
         }
         if (jQuery("#titlewrap #title").val().length == 0) {
           jQuery("#titlewrap #title").trigger('focus');
@@ -381,6 +397,7 @@ jQuery(document).ready(function($) {
           if (data.result.paragraphs.length > 0) {
             display_curated_paragraphs(data.result.paragraphs, jQuery("#expresscurate_autosummary").val());
           }
+          jQuery('#expresscurate_source').focus();
         }
       } else {
         error_html = '<div class="error">Can\'t curate from this page</div>';
@@ -389,7 +406,7 @@ jQuery(document).ready(function($) {
       }
 
     });
-    return;
+
   }
 
   // onClick action
@@ -463,9 +480,11 @@ jQuery(document).ready(function($) {
       textarea.parent('div').before(keyword);
       var defTags = jQuery('textarea[name=expresscurate_defined_tags]');
       var defVal = defTags.val();
-      var s ;
-	  if(defVal=='') s=text;
-		else  s=defVal + ', ' + text;
+      var s;
+      if (defVal == '')
+        s = text;
+      else
+        s = defVal + ', ' + text;
       defTags.val(s);
     }
     textarea.val('');
@@ -478,8 +497,9 @@ jQuery(document).ready(function($) {
   jQuery('.expresscurate_keywords span').live('click', function() {
     var defTags = jQuery('textarea[name=expresscurate_defined_tags]');
     defTags.val(defTags.val().replace(justtext(jQuery(this).parent('div')), ''));
-	defTags.val(defTags.val().replace(', ,', ','));
-	if(defTags.val().match(/^, /)) defTags.val(defTags.val().slice(2));
+    defTags.val(defTags.val().replace(', ,', ','));
+    if (defTags.val().match(/^, /))
+      defTags.val(defTags.val().slice(2));
     jQuery(this).parent('div').remove();
   });
 

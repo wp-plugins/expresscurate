@@ -30,6 +30,25 @@
     var node = jQuery(ed.selection.getNode()).parents('div'),
             selectedClass = jQuery(node).attr('class'),
             isbox;
+
+    if(isVal){
+
+        var id = elem + getId(),
+            texboxElem = ed.getDoc().createElement('DIV');
+
+        texboxElem.id = id;
+        texboxElem.className = cssClass;
+        texboxElem.innerHTML = '<p class="placeholder">Add your annotation</p>';
+
+        ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
+        var activeElem = jQuery(ed.selection.getNode()).parents('div').attr('id');
+        activeElem = activeElem.substring(0, activeElem.indexOf('-'));
+        ed.controlManager.setActive(activeElem, true);
+        var placeholders = tinyMCE.activeEditor.dom.select('p.placeholder');
+        ed.selection.select(placeholders[placeholders.length-1]);
+
+    }else{
+
     if(selectedClass)isbox=selectedClass.indexOf('text_box') >= 0 || selectedClass.indexOf('annotate') >= 0;
     if (selectedClass == cssClass) {
       var texbox = getElem(ed.selection.getNode(), cssClass);
@@ -40,12 +59,12 @@
         } else {
           var unwrapElem = jQuery(ed.selection.getNode());
           unWrap(unwrapElem);
-
         }
         ed.controlManager.setActive(elem, false);
         ed.selection.setCursorLocation(ed.selection.getNode(), 0);
       }
     } else {
+
       var content = '';
       if (!node.is('div')) {
         content = ed.selection.getContent();
@@ -67,18 +86,14 @@
 
       texboxElem.id = id;
       texboxElem.className = cssClass;
-      texboxElem.innerHTML = isVal ? '<p class="placeholder">Add your annotation</p>' : content;
+      texboxElem.innerHTML = content;
       ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
 
       var activeElem = jQuery(ed.selection.getNode()).parents('div').attr('id');
       activeElem = activeElem.substring(0, activeElem.indexOf('-'));
       ed.controlManager.setActive(activeElem, true);
-      if(isVal){
-        var placeholders = tinyMCE.activeEditor.dom.select('p.placeholder');
-        ed.selection.select(placeholders[placeholders.length-1]);
-      }
     }
-
+    }
   }
   ;
 
@@ -181,7 +196,9 @@
       });
 
       ed.onNodeChange.add(function(ed) {
+
         var node, elem = jQuery(ed.selection.getNode());
+
         if (elem.is('div')) {
           node = elem;
         } else {

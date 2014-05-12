@@ -160,7 +160,6 @@ class ExpressCurate_ExportAPI {
           $data['terms'][$i] = $term_id;
         }
       }
-
       $post_id = $this->insert_post($data, $post_status);
       if ($post_id) {
         $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'msg' => "Post saved as " . $post_status . "."));
@@ -187,7 +186,8 @@ class ExpressCurate_ExportAPI {
         'post_author' => get_current_user_id(),
         'post_title' => $data['title'],
         'post_status' => $post_status,
-        'post_category' => $post_cats
+        'post_category' => $post_cats,
+        'post_type' => get_option('expresscurate_def_post_type', 'post')
     );
 
     $post_id = wp_insert_post($details);

@@ -69,6 +69,7 @@ class ExpressCurate_Settings {
 // register plugin's settings
     register_setting('expresscurate-group', 'expresscurate_post_status');
     register_setting('expresscurate-group', 'expresscurate_def_cat');
+    register_setting('expresscurate-group', 'expresscurate_def_post_type');
     register_setting('expresscurate-group', 'expresscurate_max_tags');
     register_setting('expresscurate-group', 'expresscurate_defined_tags');
     register_setting('expresscurate-group', 'expresscurate_curated_text');
