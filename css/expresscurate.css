@@ -241,18 +241,13 @@
   height: 39px;
   border: 1px solid #dcdcdc;
   border-radius: 0;
-  width: 590px;
+  width: 695px;
   font-size: 17px;
   padding: 0px 10px;
   color: #595959;
   float: left;
 }
-.expresscurate_inputLable{
-    float: left;
-    font-size: 14px;
-    color: #444444;
-    margin-right: 20px;
-}
+
 .expresscurate_dialog .addressbar button.load {
   background-color: #f8f8f8;
   border: 1px solid #BBBBBB;
