@@ -1,8 +1,8 @@
 === ExpressCurate ===
 Contributors: expresscurate
 Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating  
-Donate link: http://www.expresscurate.com/
-Requires at least: 3.6
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
+Requires at least: 3.9
 Tested up to: 3.9
 Stable tag: 1.1.8
 License: GPLv3 or later
