@@ -106,14 +106,14 @@ function display_specials(data) {
 }
 function display_curated_headings(headings) {
   var headings_html = '';
-  if (headings.h1.length > 0) {
+  if (headings.h1 && headings.h1.length > 0) {
 
     headings_html += '<li id="curated_heading_h1" onclick="insert_text(\'curated_heading_h1\', \'p\');" data-tag="h1" title="' + headings.h1 + '">H1</li>';
   }
-  if (headings.h2.length > 0) {
+  if (headings.h2 && headings.h2.length > 0) {
     headings_html += '<li id="curated_heading_h2" onclick="insert_text(\'curated_heading_h2\', \'li\');" data-tag="h2" title="' + headings.h2 + '">H2</li>';
   }
-  if (headings.h3.length > 0) {
+  if (headings.h3 && headings.h3.length > 0) {
     headings_html += '<li id="curated_heading_h3" onclick="insert_text(\'curated_heading_h3\', \'li\');" data-tag="h3" title="' + headings.h3 + '">H3</li>';
   }
   return headings_html;
