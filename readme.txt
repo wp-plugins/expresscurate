@@ -73,7 +73,7 @@ e.g.
 = 1.1.9 =
 * Problems with older PHP versions fixed
 * Smart Publishing Status added
-Like ExpressCurate tools and want to support us? You can now Donate!
+* Like ExpressCurate tools and want to support us? You can now Donate!
 
 = 1.1.8 =
 * New setting to specify post type for posts curated from Chrome Extension
