@@ -93,7 +93,18 @@ class ExpressCurate_Settings {
     add_filter('user_contactmethods', array(&$this, 'add_user_profile_metas'));
     if ($pagenow == 'post.php' || $pagenow == 'post-new.php') {
       add_action('media_buttons_context', array(&$this, 'add_expresscurate_custom_button'), 11);
+      if (get_option('expresscurate_publish', '') == 1) {
+        add_action('post_submitbox_misc_actions', array($this, 'expresscurate_publish_box'));
+      }
     }
+  }
+
+  public function expresscurate_publish_box() {
+    $smart_publishing = '';
+    if ($GLOBALS['post']->post_status !== 'publish') {
+      $smart_publishing = '<div class="misc-pub-section expresscurate_smart_puplish"><input type="checkbox" name="expresscurate_smart_publish_status" id="expresscurate_smart_publish_status" value="1" /><span><label for="expresscurate_smart_publish_status">&nbsp;&nbsp;Smart Publish</label></span></div>';
+    }
+    echo $smart_publishing;
   }
 
   function expresscurate_continue_reading_link() {
@@ -340,7 +351,7 @@ class ExpressCurate_Settings {
    */
   public function add_meta_boxes() {
 // Add this metabox to every selected post
-    
+
     add_meta_box(
             sprintf('expresscurate_%s_section', self::POST_TYPE), sprintf('%s ' . self::PLUGIN_NAME, ucwords(str_replace("_", " ", self::POST_TYPE))), array(&$this, 'add_inner_meta_boxes'), self::POST_TYPE
     );
@@ -394,9 +405,12 @@ class ExpressCurate_Settings {
     if ($defined_tags && count($defined_tags)) {
       foreach ($defined_tags as $defined_tag) {
         $defined_tag_insert = trim($defined_tag);
-//adding defined tag to post tags if tag exists in posttitle or post content and not exists
-        preg_match("/(?<!\w)(?=[^>]*(<|$))" . $defined_tag_insert . "/i", $post_content, $tag_in_content);
+        $defined_tag_insert = str_replace('/\s+/', '[ ]', $defined_tag_insert);
+        //$defined_tag_insert = preg_replace('/\s+/', '|', $defined_tag_insert);
+//adding defined tag to post tags if tag exists in posttitle or post content
+        preg_match("/(?<!\w)(?=[^>]*(<|$))" . $defined_tag_insert . "(\W|$)/i", $post_content, $tag_in_content);
         if ((isset($tag_in_content[0]) || strpos($the_post->title, $defined_tag_insert)) && !in_array($defined_tag_insert, $post_tags)) {
+
           wp_set_post_tags($post_id, $defined_tag_insert, true);
         }
       }
@@ -404,18 +418,19 @@ class ExpressCurate_Settings {
     $tags = get_the_tags($post_id);
     if ($tags && count($tags)) {
       foreach ($tags as $tag) {
-        preg_match("/(?<!\w)(?=[^>]*(<|$))#" . $tag->name . "/i", $post_content, $tag_in_content);
+        $tag_name = str_replace('/\s+/', '[ ]', $tag->name);
+        preg_match("/(?<!\w)(?=[^>]*(<|$))#" . $tag_name . "(\W|$)/i", $post_content, $tag_in_content);
         if (isset($tag_in_content[0])) {
-          preg_match("/>#" . $tag->name . '(<\/a>)/', $post_content, $tag_in_a);
+          preg_match("/>#" . $tag_name . '(<\/a>)/', $post_content, $tag_in_a);
           if (!isset($tag_in_a[0])) {
-            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag->name . "/i", '<a class="contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
+            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag_name . "(\W|$)/i", '<a class="contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
           }
         } else {
-          preg_match("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "/i", $post_content, $tag_in_content);
+          preg_match("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "(\W|$)/i", $post_content, $tag_in_content);
           if (isset($tag_in_content[0])) {
-            preg_match("/>" . $tag->name . '(<\/a>)/i', $post_content, $tag_in_a);
+            preg_match("/>" . $tag_name . '(<\/a>)/i', $post_content, $tag_in_a);
             if (!isset($tag_in_a[0])) {
-              $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))" . $tag->name . "/i ", '<a class="contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>', $post_content, 1);
+              $post_content = preg_replace("/(\W|^)" . $tag_name . "(\W|$)/i", '$1<a class="contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag->name) . '</a>$2', $post_content, 1);
             }
           }
         }
@@ -466,6 +481,13 @@ class ExpressCurate_Settings {
     } else {
       $the_post = get_post($post_id);
       $post_content = $the_post->post_content;
+    }
+
+    //Smart publishing
+    if (get_option('expresscurate_publish', '') == 1) {
+      if(isset($_POST['expresscurate_smart_publish_status']) && $_POST['expresscurate_smart_publish_status']==1){
+        update_post_meta($post_id, '_expresscurate_smart_publish', 1);
+      }
     }
 
     //Seo part
@@ -742,14 +764,8 @@ class ExpressCurate_Settings {
     wp_enqueue_script('expresscurate_slider', $plaugunUrl . 'js/plugins/jquery.jcarousel.min.js', array('jquery'));
     wp_enqueue_style('texpresscurate', $plaugunUrl . 'css/expresscurate.css');
     wp_enqueue_style('wp-jquery-ui-dialog');
-    if (get_bloginfo('version') < 3.8) {
-      wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.6.css');
-    } else {
-      wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.8.css');
-    }
-    if (get_bloginfo('version') > 3.8) {
-      wp_enqueue_style('expresscurate', $plaugunUrl . 'css/dialog-style-3.9.css');
-    }
+    wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.8.css');
+    wp_enqueue_style('expresscurate', $plaugunUrl . 'css/dialog-style-3.9.css');
   }
 
   public function expresscurate_theme_styles() {
@@ -794,13 +810,17 @@ class ExpressCurate_Settings {
     }
     $args = array(
         'posts_per_page' => 1,
-        'post_type' => 'post',
+        'post_type' => get_option('expresscurate_def_post_type', 'post'),
         'post_status' => 'draft',
         'orderby' => 'post_date',
         'order' => 'ASC',
         'meta_query' => array(
             array(
                 'key' => 'expresscurate_chrome',
+                'value' => '1'
+            ),
+            array(
+                'key' => '_expresscurate_smart_publish',
                 'value' => '1'
             )
         )

@@ -27,8 +27,11 @@
 
 
   function textboxCommand(ed, elem, cssClass, isVal) {
-    var node = jQuery(ed.selection.getNode()).parents('div'),
-            selectedClass = jQuery(node).attr('class'),
+    var node=jQuery(ed.selection.getNode());
+      if(!node.is('div')){
+            node= node.parents('div');
+      }
+          var  selectedClass = jQuery(node).attr('class'),
             isbox;
 
     if(isVal){
@@ -61,7 +64,7 @@
           unWrap(unwrapElem);
         }
         ed.controlManager.setActive(elem, false);
-        ed.selection.setCursorLocation(ed.selection.getNode(), 0);
+        ed.selection.setCursorLocation(0);
       }
     } else {
 
@@ -108,7 +111,11 @@
     } else if (elem.parents('div').children().length == elem.index() + 1) {
       elem.parents('div').after(elem);
     } else {
-      var divhtml = jQuery(elem).parents('div').html();
+      var divhtml=jQuery(elem).html(),
+          divElem=jQuery(elem);
+        if(!divElem.is('div')){
+            divhtml =divElem.parents('div').html() ;
+        }
       var myps = divhtml.split(elem.html());
       elem.parents('div').after(elem.parent('div').clone().html(myps[1])).html(myps[0]).after(elem);
       if (elem.prev().children('blockquote').html() == '')
@@ -270,6 +277,12 @@
       };
     }
   });
+    QTags.addButton( 'annotation', 'Annotation','<div id="annotation'+getId()+'" class="expresscurate_annotate"><p>&nbsp;', '</p></div>', '','Add Annotation' );
+    QTags.addButton( 'lefttextbox', 'Left-Box','<div id="lefttextbox'+getId()+'" class="expresscurate_fl_text_box"><p>&nbsp;', '</p></div>', '' ,'Add Left-Box');
+    QTags.addButton( 'justifytextbox', 'Center-Box','<div id="justifytextbox'+getId()+'" class="expresscurate_justify_text_box"><p>&nbsp;', '</p></div>', '','Add Center-Box' );
+    QTags.addButton( 'righttextbox', 'Right-Box','<div id="righttextbox'+getId()+'" class="expresscurate_fr_text_box"><p>&nbsp;', '</p></div>', '','Add Right-Box' );
+
+
   // Register plugin
   tinymce.PluginManager.add('expresscurate', tinymce.plugins.expresscurate);
 })();

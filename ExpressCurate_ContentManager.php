@@ -229,7 +229,8 @@ class ExpressCurate_HtmlParser {
     $pi = 0;
     foreach ($pTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
-        $result_paragraphs[] = strip_tags(trim($t->nodeValue));
+        //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
+        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue),ENT_QUOTES));
         $pi++;
       }
       $t->parentNode->removeChild($t);
@@ -239,7 +240,8 @@ class ExpressCurate_HtmlParser {
 
     foreach ($textTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
-        $result_paragraphs[] = strip_tags(trim($t->nodeValue));
+        //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
+        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue),ENT_QUOTES));
         $pi++;
       }
     }
@@ -247,21 +249,21 @@ class ExpressCurate_HtmlParser {
     $h1Tag = $xpath->query('//h1');
     foreach ($h1Tag as $h1) {
       if (strlen($h1->nodeValue) > 3) {
-        $result_h1 .= $h1->nodeValue . "\n";
+        $result_h1 .= htmlentities($h1->nodeValue, ENT_QUOTES) . "\n";
       }
     }
 //get H2
     $h2Tag = $xpath->query('//h2');
     foreach ($h2Tag as $h2) {
       if (strlen($h2->nodeValue) > 3) {
-        $result_h2 .= $h2->nodeValue . "\n";
+        $result_h2 .= htmlentities($h2->nodeValue, ENT_QUOTES) . "\n";
       }
     }
 //get H3
     $h3Tag = $xpath->query('//h3');
     foreach ($h3Tag as $h3) {
       if (strlen($h3->nodeValue) > 3) {
-        $result_h3 .= $h3->nodeValue . "\n";
+        $result_h3 .= htmlentities($h3->nodeValue, ENT_QUOTES) . "\n";
       }
     }
 
@@ -289,8 +291,8 @@ class ExpressCurate_HtmlParser {
         }
       }
     }
-    
-    if(count($smart_tags) > 0) {
+
+    if (count($smart_tags) > 0) {
       arsort($smart_tags);
       $smart_tags = array_slice(array_keys(array_reverse($smart_tags)), 0, $max_count);
     }
@@ -298,7 +300,7 @@ class ExpressCurate_HtmlParser {
     $result = array('title' => $this->title, 'headings' => array('h1' => $result_h1, 'h2' => $result_h2, 'h3' => $result_h3), 'metas' => array('description' => $this->description, 'keywords' => $smart_tags), 'images' => $result_images, 'paragraphs' => $result_paragraphs);
 
     $data = array('status' => 'success', 'result' => $result);
-    echo json_encode($data, JSON_HEX_QUOT & JSON_HEX_TAG & JSON_HEX_AMP & JSON_HEX_APOS & JSON_NUMERIC_CHECK & JSON_PRETTY_PRINT & JSON_UNESCAPED_SLASHES & JSON_FORCE_OBJECT & JSON_UNESCAPED_UNICODE);
+    echo json_encode($data);
     die();
   }
 

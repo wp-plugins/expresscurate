@@ -68,7 +68,7 @@ if (class_exists('ExpressCurate')) {
 
     // Add the settings link to the plugins page
     function expresscurate_settings_link($links) {
-      $settings_link = '<a href="options-general.php?page=expresscurate">Settings</a>';
+      $settings_link = '<a href="options-general.php?page=expresscurate">Settings</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL" target="_blank">Donate</a>';
       array_unshift($links, $settings_link);
       return $links;
     }
