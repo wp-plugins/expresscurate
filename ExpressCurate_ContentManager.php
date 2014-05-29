@@ -230,7 +230,7 @@ class ExpressCurate_HtmlParser {
     foreach ($pTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
         //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
-        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue),ENT_QUOTES));
+        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue),ENT_QUOTES, "UTF-8"));
         $pi++;
       }
       $t->parentNode->removeChild($t);
@@ -241,7 +241,7 @@ class ExpressCurate_HtmlParser {
     foreach ($textTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
         //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
-        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue),ENT_QUOTES));
+        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue),ENT_QUOTES, "UTF-8"));
         $pi++;
       }
     }
@@ -249,21 +249,21 @@ class ExpressCurate_HtmlParser {
     $h1Tag = $xpath->query('//h1');
     foreach ($h1Tag as $h1) {
       if (strlen($h1->nodeValue) > 3) {
-        $result_h1 .= htmlentities($h1->nodeValue, ENT_QUOTES) . "\n";
+        $result_h1 .= htmlentities($h1->nodeValue, ENT_QUOTES, "UTF-8") . "\n";
       }
     }
 //get H2
     $h2Tag = $xpath->query('//h2');
     foreach ($h2Tag as $h2) {
       if (strlen($h2->nodeValue) > 3) {
-        $result_h2 .= htmlentities($h2->nodeValue, ENT_QUOTES) . "\n";
+        $result_h2 .= htmlentities($h2->nodeValue, ENT_QUOTES, "UTF-8") . "\n";
       }
     }
 //get H3
     $h3Tag = $xpath->query('//h3');
     foreach ($h3Tag as $h3) {
       if (strlen($h3->nodeValue) > 3) {
-        $result_h3 .= htmlentities($h3->nodeValue, ENT_QUOTES) . "\n";
+        $result_h3 .= htmlentities($h3->nodeValue, ENT_QUOTES, "UTF-8") . "\n";
       }
     }
 
