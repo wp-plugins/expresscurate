@@ -306,7 +306,7 @@
   overflow: hidden;
 }
 
-.expresscurate_dialog .img .nav .next img, .controls .nav.next img {
+/*.expresscurate_dialog .img .nav .next img,*/ .controls .nav.next img {
   transform: rotate(180deg);
   -webkit-transform: rotate(180deg);
   -moz-transform: rotate(180deg);
@@ -314,12 +314,14 @@
   width:4px;
   height:auto;
 }
-.expresscurate_dialog .img .nav .prev img, .controls .nav.prev img{
+/*
+.expresscurate_dialog .img .nav .prev img,*/ .controls .nav.prev img{
     width:4px;
     height:auto;
 }
 .expresscurate_dialog .editor {
   background: #ffffff;
+  height: 190px;
   /*height: 176px;*/
   width: 610px;
 }
@@ -514,7 +516,7 @@
 }
 
 .expresscurate_dialog iframe {
-  min-height: 100px !important;
+  min-height: 134px !important;
 }
 
 /*Paragraphs Slider*/
@@ -581,6 +583,79 @@
 .expresscurate_dialog .right {
   float: right;
 }
+
+/*new added*/
+.imgContainer{
+}
+
+.imgIcons{
+    position: relative;
+    height: 28px;
+    padding: 3px;
+    background-color: #dbdbdb;
+    border: 1px solid #e5e5e5;
+    border-bottom: 1px solid #dedede;
+}
+.prevImg, .nextImg{
+    position: absolute;
+    bottom: 9px;
+    width: 11px;
+    height: 13px;
+    background: url("../images/changeImg.png") no-repeat;
+    cursor: pointer;
+}
+.prevImg{
+    left: 63px;
+    background-position: left;
+}
+.nextImg{
+    right: 82px;
+    background-position: right;
+}
+.sizeS, .sizeM, .sizeX{
+    position: absolute;
+    background-color: #777777;
+    bottom: 10px;
+    cursor: pointer;
+}
+.sizeX{
+    width: 11px;
+    height: 11px;
+    left: 7px;
+    background-color: #27cfae;
+}
+.sizeM{
+    width: 8px;
+    height: 8px;
+    left: 21px;
+}
+.sizeS{
+    width: 6px;
+    height: 6px;
+    left: 32px;
+}
+.alignL, .alignNone, .alignR{
+    position: absolute;
+    width: 14px;
+    height: 10px;
+    background: url("../images/alignImg.png") no-repeat;
+    bottom: 10px;
+    cursor: pointer;
+}
+.alignL{
+    background-position: right top;
+    right: 45px;
+}
+.alignNone{
+    background-position: center bottom;
+    right: 26px;
+}
+.alignR{
+    background-position: left top;
+    right: 7px;
+}
+
+/**/
 
 .expresscurate_dialog .clear , .expresscurate_widget_wrapper .clear {
   float: none !important;

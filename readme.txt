@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
 Requires at least: 3.9
 Tested up to: 3.9
-Stable tag: 1.1.9
+Stable tag: 1.2.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -70,13 +70,20 @@ e.g.
 
 == Changelog ==
 
+= 1.2.0 =
+* Keywords Summary widget.
+* Keywords Dashboard.
+* SEO Control Center improvements with Keywords Analytics.
+* Image placement and size options added to the curation dialog.
+* Miscellaneous bug fixes and improvements.
+
 = 1.1.9 =
-* Problems with older PHP versions fixed
-* Smart Publishing Status added
+* Problems with older PHP versions fixed.
+* Smart Publishing Status added.
 * Like ExpressCurate tools and want to support us? You can now Donate!
 
 = 1.1.8 =
-* New setting to specify post type for posts curated from Chrome Extension
+* New setting to specify post type for posts curated from Chrome Extension.
 * Miscellaneous bug fixes and improvements.
 
 = 1.1.7 =

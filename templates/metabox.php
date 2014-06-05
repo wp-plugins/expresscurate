@@ -19,16 +19,32 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
           <ul id="curated_images">
           </ul>
         </div>
-        <div class="img left noimage">
-          <div class="nav">
-            <a href="#" class="prev left" onclick="return false;">
-              <img src="<?php echo plugin_dir_url(__FILE__); ?>../images/arrow_small.png">
-            </a>
-            <a href="#" class="next right" onclick="return false;">
-              <img src="<?php echo plugin_dir_url(__FILE__); ?>../images/arrow_small.png">
-            </a>
-            <div class="clear"></div>
-          </div>
+        <div class="left imgContainer">
+            <div class="imgIcons">
+                <div class="sizeX"></div>
+                <div class="sizeM"></div>
+                <div class="sizeS"></div>
+
+                <div class="prevImg prev"></div>
+                <div class="nextImg next"></div>
+
+                <div class="alignL"></div>
+                <div class="alignNone"></div>
+                <div class="alignR"></div>
+            </div>
+            <div class="img noimage">
+                <!--
+              <div class="nav">
+                <a href="#" class="prev left" onclick="return false;">
+                  <img src="<?php echo plugin_dir_url(__FILE__); ?>../images/arrow_small.png">
+                </a>
+                <a href="#" class="next right" onclick="return false;">
+                  <img src="<?php echo plugin_dir_url(__FILE__); ?>../images/arrow_small.png">
+                </a>
+                <div class="clear"></div>
+              </div>
+              -->
+            </div>
         </div>
         <div class="editor right">
           <?php wp_editor('', 'expresscurate_content_editor', $settings); ?>
