@@ -8,11 +8,11 @@ Stable tag: 1.2.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
-ExpressCurate simplifies and expedites your content curation in WordPress.
+ExpressCurate simplifies and expedites your content curation in WordPress. It consists of three modules: curated post composer, keywords monitoring dashboard, and SEO control center.
 
 == Description ==
 
-ExpressCurate simplifies and expedites your content curation in WordPress.
+ExpressCurate simplifies and expedites your content curation in WordPress. It consists of three modules: curated post composer, keywords monitoring dashboard, and SEO control center.
 
 While there are many tools for finding content, the process of curation in WordPress is still convoluted and confusing, requiring multiple steps and manual switching back and forth between screens and programs.
  
