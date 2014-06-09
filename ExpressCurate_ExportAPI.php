@@ -59,7 +59,7 @@ class ExpressCurate_ExportAPI {
       $data_check = array('status' => "error", 'msg' => "Data is empty!");
     } else {
       $img = @file_get_contents($data['img_url'], false, $context);
-      if (!$img) {
+      if(!$img){
         $img = @file_get_contents($data['img_url2'], false, $context);
       }
       if ($img) {
