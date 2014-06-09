@@ -300,15 +300,20 @@ jQuery(document).ready(function($) {
               });
           });
       });
-      jQuery('.alignL, .alignNone, .alignR').each(function (i, el){
-          $(this).click(function (e){
-              jQuery('.alignL, .alignNone, .alignR').css({
-                  'background-position-y': 'top'
-              });
-              $(this).css({
-                  'background-position-y': 'bottom'
-              });
-          });
+      jQuery('.alignL').click(function (e){
+          jQuery(this).css('background-position', 'right bottom');
+          jQuery('.alignNone').css('background-position', 'center top');
+          jQuery('.alignR').css('background-position', 'left top');
+      });
+      jQuery('.alignR').click(function (e){
+          jQuery('.alignL').css('background-position', 'right top');
+          jQuery('.alignNone').css('background-position', 'center top');
+          jQuery(this).css('background-position', 'left bottom');
+      });
+      jQuery('.alignNone').click(function (e){
+          jQuery('.alignL').css('background-position', 'right top');
+          jQuery(this).css('background-position', 'center bottom');
+          jQuery('.alignR').css('background-position', 'left top');
       });
       /**/
 

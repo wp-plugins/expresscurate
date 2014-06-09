@@ -354,30 +354,11 @@
         </th>
       </tr>
       <tr valign="top">
-        <td  colspan="2">
-          <textarea id="expresscurate_defined_tags" class="expresscurate_displayNone" name="expresscurate_defined_tags" cols="20" rows="3" /><?php
-          if (get_option('expresscurate_defined_tags')) {
-            echo get_option('expresscurate_defined_tags');
-          } else {
-            echo '';
-          }
-          ?></textarea>
-          <?php
-          $defined_tags = get_option("expresscurate_defined_tags", '');
-          if ($defined_tags) {
-            $defined_tags = explode(",", $defined_tags);
-            foreach ($defined_tags as $tag) {
-              $tag = trim($tag);
-              ?>
-              <div class="expresscurate_keywords"><?php echo $tag;?><span>×</span></div>
-              <?php
-            }
-          }
-          ?>
-          <div>
-            <textarea  class="expresscurate_add_tags" name="expresscurate_add_tags" cols="20" rows="3"></textarea>
-            <span class="expresscurate_addKeyword">+</span>
-          </div>
+        <th scope="row" class="width-for-td">
+          <strong>Your Keyword Tags:</strong>
+        </th>
+        <td class="expresscurate_paddingTop20">
+          <a class="blue-italic vAlignBaseline" href="admin.php?page=expresscurate_keywords">Keywords Dashboard</a>
         </td>
       <tr>
     </table>
