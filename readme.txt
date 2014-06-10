@@ -23,19 +23,8 @@ ExpressCurate solves this problem by bringing all the key elements for content c
 1. **SEO Control Center** for streamlining the creation of important SEO components associated with your posts, such as meta descriptions, keywords, and tags.
 
 
-= How To Get Started =
 
-**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.1.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.1.zip)**. It's simple. It's free.
-
-You can also **[download](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")** a **free [ExpressCurate WordPress theme](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")**. It will give your curated content a modern online news look.  
-
-Make the content curation process even faster with [ExpressCurate Chrome Extension](http://www.expresscurate.com/products/chrome-extension "Your favorite Chrome Extension").
-
-
-
-== Features ==
-
-= Curated Post Composer and Editor =
+= Curated Post Composer and Editor Features =
 
 1. **Quickstart Button.** Start a curated post with a single click of the Curate Content Button next to the standard Add Media.
 1. **Original Content Preloading.** Just specify the target URL of an article that you want to curate, and ExpressCurate will auto-populate the content into your post, making it easier and faster for you to edit and post an article.
@@ -48,7 +37,7 @@ Make the content curation process even faster with [ExpressCurate Chrome Extensi
 
  
  
-= Keywords Summary and Dashboard =
+= Keywords Summary and Dashboard Features =
 
 1. **Keywords Summary.** Get a content-effectiveness summary for the keywords you are targeting, including how often they show up in your titles and text and the number of posts containing them.
 1. **Most Frequently Used Words.** Use the ExpressCurate Keywords Dashboard to find out the most frequently used words on your blog. This can give you new keyword directions or ideas on how to optimize your content for better results with the current keywords.
@@ -58,13 +47,24 @@ Make the content curation process even faster with [ExpressCurate Chrome Extensi
  
  
  
-= SEO Control Center =
+= SEO Control Center Features =
 
 1. **SEO Control Center.** Enter all SEO-related information for your new post on the same page you are composing/editing your curated post.
 1. **Key page attributes and SEO enhancements** on a single page
 1. **Keywords**
 1. **Meta descriptions**
 1. **h1/h2/h3 tags**
+
+
+
+= How To Get Started =
+
+**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.1.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.1.zip)**. It's simple. It's free.
+
+You can also **[download](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")** a **free [ExpressCurate WordPress theme](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")**. It will give your curated content a modern online news look.  
+
+Make the content curation process even faster with [ExpressCurate Chrome Extension](http://www.expresscurate.com/products/chrome-extension "Your favorite Chrome Extension").
+
 
 
 
