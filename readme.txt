@@ -16,7 +16,8 @@ The ExpressCurate content curation plugin is a WordPress platform for creating, 
 
 While there are many content discovery tools, the process of curation in WordPress is still convoluted and confusing, requiring multiple steps and manually switching back and forth between screens, plug-ins, and programs.
 
-ExpressCurate solves this problem by bringing all the key elements for content curation onto a single screen, making content curation in WordPress intuitive and quick! It combines the three essential content curation components -- content, keywords, and SEO -- in a single plugin. It includes
+ExpressCurate solves this problem by bringing all the key elements for content curation onto a single screen, making content curation in WordPress intuitive and quick! It combines the three essential content curation components -- content, keywords, and SEO -- in a single plugin. It includes 
+
 
 1. **Composer/Editor** to streamline the process of writing a curated post
 1. **Keyword Dashboard** for centrally storing and updating your keywords as well as for monitoring their usage within your blog/site content
