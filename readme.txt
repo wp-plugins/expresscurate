@@ -32,38 +32,40 @@ You can also **[download](http://www.expresscurate.com/products/wordpress-theme 
 Make the content curation process even faster with [ExpressCurate Chrome Extension](http://www.expresscurate.com/products/chrome-extension "Your favorite Chrome Extension").
 
 
-== Modules and Features ==
 
-= Curated Post Composer and Editor Features =
+== Features ==
+
+= Curated Post Composer and Editor =
 
 1. **Quickstart Button.** Start a curated post with a single click of the Curate Content Button next to the standard Add Media.
 1. **Original Content Preloading.** Just specify the target URL of an article that you want to curate, and ExpressCurate will auto-populate the content into your post, making it easier and faster for you to edit and post an article.
 1. **Image Slider.** ExpressCurate can pick up images from the original post, making it easy to add a graphical element to your curated content.
 1. **Duplicate Content Check.** ExpressCurate provides a warning if the same URL has been used in a prior article in your blog, helping you to prevent a potential double-curation.
-
-**Additional Features**:
-
+1. **Multi-source Curation --** curate content from multiple sources and web pages in a single article.
 1. **Content-aware tag suggestions based on the keywords and tags defined in your prior WordPress blogs.**
 1. **Automatic hashtagging whenever # is used**
-1. **Top sites for curated content, including a number of articles curated from each site**
-1. **Customizable attribution text for the original article link**
-1. **Multi-source Curation --** curate content from multiple sources and web pages in a single article.**
+1. **Google Authorship/Publisher**
 
-= Keywords Summary and Dashboard Features =
+ 
+ 
+= Keywords Summary and Dashboard =
 
 1. **Keywords Summary.** Get a content-effectiveness summary for the keywords you are targeting, including how often they show up in your titles and text and the number of posts containing them.
 1. **Most Frequently Used Words.** Use the ExpressCurate Keywords Dashboard to find out the most frequently used words on your blog. This can give you new keyword directions or ideas on how to optimize your content for better results with the current keywords.
 1. **Keywords Center.** A centralized place to keep your keywords and keyphrases.  
-1. **Keyword Discovery.** Add new keywords/keyphrases and see their occurrence frequency in your blog content. You can also click on the “+” icon next to the words from the “most frequently used words” list to add to your target keywords list.
-1. **Keyword-targeted Posts.** Should you decide to create a post that is focused around a certain keyword/keyphrase from the keyword center, just click on the “add post” icon next to it. This will start a new post with hints focused around the usage of your target keywords in the post.  
-
-= SEO Control Center Features =
+1. **Keyword Discovery.** Add new keywords/keyphrases and see their occurrence frequency in your blog content. You can also click on the "+" icon next to the words from the "most frequently used words" list to add to your target keywords list.
+1. **Keyword-targeted Posts.** Should you decide to create a post that is focused around a certain keyword/keyphrase from the keyword center, just click on the "add post" icon next to it. This will start a new post with hints focused around the usage of your target keywords in the post.  
+ 
+ 
+ 
+= SEO Control Center =
 
 1. **SEO Control Center.** Enter all SEO-related information for your new post on the same page you are composing/editing your curated post.
 1. **Key page attributes and SEO enhancements** on a single page
 1. **Keywords**
 1. **Meta descriptions**
-1. **h1/h2/h3 tags **
+1. **h1/h2/h3 tags**
+
 
 
 == Installation ==
@@ -74,6 +76,7 @@ e.g.
 1. Upload *expresscurate* folder to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 3. Curate using *Quickstart Button*.
+
 
 
 == Screenshots ==
@@ -87,6 +90,7 @@ e.g.
 08. SEO Control Center. Enter key page attributes and SEO enhancements from a single page. It is recommended to have the short description always defined.
 09. Customization. Customize the plugin with 10+ settings.
 10. Top Curated Websites. Visit the top curated websites and pages.
+
 
 
 == Changelog ==
