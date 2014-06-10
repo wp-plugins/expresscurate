@@ -1,6 +1,6 @@
 === ExpressCurate ===
 Contributors: expresscurate
-Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating  
+Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, keywords summary, keywords dashboard, seo control center, keyword, seo
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
 Requires at least: 3.9
 Tested up to: 3.9
@@ -17,7 +17,6 @@ The ExpressCurate content curation plugin is a WordPress platform for creating, 
 While there are many content discovery tools, the process of curation in WordPress is still convoluted and confusing, requiring multiple steps and manually switching back and forth between screens, plug-ins, and programs.
 
 ExpressCurate solves this problem by bringing all the key elements for content curation onto a single screen, making content curation in WordPress intuitive and quick! It combines the three essential content curation components -- content, keywords, and SEO -- in a single plugin. It includes
-
 1. **Composer/Editor** to streamline the process of writing a curated post
 1. **Keyword Dashboard** for centrally storing and updating your keywords as well as for monitoring their usage within your blog/site content
 1. **SEO Control Center** for streamlining the creation of important SEO components associated with your posts, such as meta descriptions, keywords, and tags.
@@ -33,7 +32,7 @@ ExpressCurate solves this problem by bringing all the key elements for content c
 1. **Multi-source Curation --** curate content from multiple sources and web pages in a single article.
 1. **Content-aware tag suggestions based on the keywords and tags defined in your prior WordPress blogs.**
 1. **Automatic hashtagging whenever # is used**
-1. **Google Authorship/Publisher**
+1. **Google Authorship**
 
  
  
