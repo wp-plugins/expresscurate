@@ -19,10 +19,10 @@ $keywords_stats = $keywords->get_stats(false, false, $post_content, true);
         <div  class="center">title <br /><span><?php echo $stat['title']; ?>%</span></div>
       </div>
       <div title="Occurance in Content: <?php echo $stat['percent']; ?>%" class="statistics borderRight">
-        <div  class="center">content<span><?php echo $stat['percent']; ?>%</span></div>
+        <div>content<span><?php echo $stat['percent']; ?>%</span></div>
       </div>
       <div title="<?php echo $stat['posts_count']; ?> post(s) with <?php echo $word ?> keyword" class="statistics">
-        <div  class="center">posts<span><?php echo $stat['posts_count']; ?></span></div>
+        <div>posts<span><?php echo $stat['posts_count']; ?></span></div>
       </div>
     </div>
   <?php } ?>

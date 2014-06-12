@@ -3,13 +3,18 @@ $keywords = new ExpressCurate_Keywords();
 $post_content = $keywords->get_words();
 $keywords_stats = $keywords->get_stats(false, false, $post_content, true);
 ?>
-<div class="expresscurate_keywords_settings">
+<div class="expresscurate_keywords_settings wrap">
+    <div class="expresscurate_menu">
+        <?php
+        include(sprintf("%s/menu.php", dirname(__FILE__)));?>
+    </div>
     <input type="hidden" id="expresscurate_admin_url" value="<?php echo admin_url(); ?>"/>
     <input type="hidden" id="expresscurate_plugin_dir" value="<?php echo plugin_dir_url(__FILE__); ?>"/>
     <label>Keywords Dashboard<sup>beta</sup></label>
     <a href="mailto:support@expresscurate.com" class="writeUs">Suggestions? <span>Submit here!</span></a>
     <div class="expresscurate_clear"></div>
     <div class="keywordsPart">
+        <div class="keywordsWrap">
         <label class="blockTitle expresscurate_color_lightGreen">Keywords</label>
         <label class="colTitle expresscurate_margin10 expresscurate_floatRight"># of posts</label>
         <label class="colTitle expresscurate_margin15 expresscurate_floatRight">in content</label>
@@ -35,6 +40,7 @@ $keywords_stats = $keywords->get_stats(false, false, $post_content, true);
                 </li>
             <?php } ?>
         </ul>
+        </div>
         <div class="legend">
             <span id="blue" class="expresscurate_blue"></span>
             <label for="blue"><3%<span>Usage is low</span></label>

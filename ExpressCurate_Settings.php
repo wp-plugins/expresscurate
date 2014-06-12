@@ -291,9 +291,6 @@ class ExpressCurate_Settings {
   }
 
   public function add_expresscurate_custom_button($context) {
-//path to icon
-    $img = plugins_url('images/19x19.png', __FILE__);
-
 //the id of the container to be shown show in the popup
     $container_id = 'popup_container';
 
@@ -444,29 +441,28 @@ class ExpressCurate_Settings {
 //      krsort($sorted_tags);
 //      array_reverse($sorted_tags);
 //      $tags = $sorted_tags;
+      echo $post_content;
       foreach ($tags as $tag) {
 
-
         $tag_name = str_replace('/\s+/', '[ ]', $tag->name);
-        preg_match("/(?<!\w)(?=[^>]*(<|$))#" . $tag_name . "(\W|$)/i", $post_content, $tag_in_content);
-        if (isset($tag_in_content[0])) {
+        //preg_match("/(?<!\[a-zA-Z])(?=[^>]*(<|$))#" . $tag_name . "/b(\W|$)/i", $post_content, $tag_in_content);
+        $tag_in_content = strpos($post_content, "#" . $tag_name);
+        if ($tag_in_content) {
           preg_match("/>#" . $tag_name . '(\W|$<\/a>)/i', $post_content, $tag_in_a);
           if (!isset($tag_in_a[0])) {
-            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag_name . "(\W|$)/i", '<a class="expresscurate_contentTags" href="' . get_tag_link($tag->id) . '">#' . strtolower($tag_name) . '</a>', $post_content, 1);
+            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag_name . "(\W|$)/i", '<a class="expresscurate_contentTags" href="' . get_tag_link($tag->id) . '">#' . strtolower($tag_name) . '</a> ', $post_content, 1);
           }
         } else {
           preg_match("/(?<!\w)(?=[^>]*(<|$))" . $tag_name . "(\W|$)/i", $post_content, $tag_in_content);
-          //var_dump($tag_in_content);
           if (isset($tag_in_content[0])) {
             preg_match("/>" . $tag_name . '(\W|$<\/a>)/i', $post_content, $tag_in_a);
             if (!isset($tag_in_a[0])) {
-              $post_content = preg_replace("/(\W|^)" . $tag_name . "(\W|$)/i", '$1<a class="expresscurate_contentTags" href="' . get_tag_link($tag->id) . '">#' . strtolower($tag_name) . '</a>$2', $post_content, 1);
+              $post_content = preg_replace("/(\W|^)" . $tag_name . "(\W|$)/i", '$1<a class="expresscurate_contentTags" href="' . get_tag_link($tag->id) . '">#' . strtolower($tag_name) . '</a>$2 ', $post_content, 1);
             }
           }
         }
       }//end tags
     }
-
     return $post_content;
   }
 
@@ -682,12 +678,14 @@ class ExpressCurate_Settings {
     add_options_page(
             self::PLUGIN_NAME . ' Settings', self::PLUGIN_NAME, 'manage_options', 'expresscurate', array(&$this, 'plugin_settings_page')
     );
-    add_menu_page(self::PLUGIN_NAME, self::PLUGIN_NAME, 'manage_options', 'expresscurate', array(&$this, 'plugin_settings_page'), '', 6);
-    add_submenu_page('expresscurate', self::PLUGIN_NAME, '', 'manage_options', 'expresscurate', array(&$this, 'plugin_settings_page'), '');
+    add_menu_page(self::PLUGIN_NAME, self::PLUGIN_NAME, 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '', 6);
+    add_submenu_page('expresscurate', self::PLUGIN_NAME, '', 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '');
     add_submenu_page('expresscurate', 'Keywords', 'Keywords', 'edit_posts', 'expresscurate_keywords', array(&$this, 'show_expresscurate_keywords'), '');
-    add_submenu_page('expresscurate', 'Settings', 'Settings', 'manage_options', 'expresscurate_settings', array(&$this, 'plugin_settings_page'), '');
     add_submenu_page('expresscurate', 'News', 'News', 'edit_posts', 'expresscurate_news', array(&$this, 'show_expresscurate_news'), '');
-    add_submenu_page('expresscurate', 'Top Curated websites', 'Top Curated websites', 'edit_posts', 'expresscurate_websites', array(&$this, 'show_expresscurate_websites'), '');
+    add_submenu_page('expresscurate', 'Top Sources', 'Top Sources', 'edit_posts', 'expresscurate_websites', array(&$this, 'show_expresscurate_websites'), '');
+    add_submenu_page('expresscurate', 'FAQ', 'FAQ', 'edit_posts', 'expresscurate_faq', array(&$this, 'show_expresscurate_faq_page'), '');
+    add_submenu_page('expresscurate', 'Support', 'Support', 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '');
+    add_submenu_page('expresscurate', 'Settings', 'Settings', 'manage_options', 'expresscurate_settings', array(&$this, 'plugin_settings_page'), '');
   }
 
   //Add widget
@@ -803,13 +801,25 @@ class ExpressCurate_Settings {
     include(sprintf("%s/templates/keywords.php", dirname(__FILE__)));
   }
 
+  public function show_expresscurate_support_page() {
+    if (!current_user_can('edit_posts')) {
+      wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+// Render the support template
+    include(sprintf("%s/templates/support.php", dirname(__FILE__)));
+  }
+  public function show_expresscurate_faq_page() {
+    if (!current_user_can('edit_posts')) {
+      wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+// Render the support template
+    include(sprintf("%s/templates/faq.php", dirname(__FILE__)));
+  }
+ 
   public function expresscurate_admin_print_styles() {
     $plaugunUrl = plugin_dir_url(__FILE__);
     wp_enqueue_script('expresscurate', $plaugunUrl . 'js/expresscurate.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
-    if (get_option('expresscurate_seo', '') == 1) {
-      wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
-    }
-    wp_enqueue_script('expresscurate_slider', $plaugunUrl . 'js/plugins/jquery.jcarousel.min.js', array('jquery'));
+    wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
     wp_enqueue_style('texpresscurate', $plaugunUrl . 'css/expresscurate.css');
     wp_enqueue_style('wp-jquery-ui-dialog');
     wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.8.css');
@@ -910,12 +920,21 @@ class ExpressCurate_Settings {
   //Dashboard
   public function add_dashboard_widgets() {
     add_meta_box('dashboard_widget_exck', 'Keywords Summary', array(&$this, 'keywords_widget'), get_current_screen(), 'side', 'high');
+    //add_meta_box('dashboard_widget_excs', 'ExpressCurate Search', array(&$this, 'search_widget'), get_current_screen(), 'side', 'high');
   }
 
   public function keywords_widget() {
     ?>
     <div id="expresscurate_keywords_widget" class="expresscurate_keywords_widget" title="<?php echo self::PLUGIN_NAME ?>">
       <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
+    </div>
+    <?php
+  }
+
+  public function search_widget() {
+    ?>
+    <div id="expresscurate_search_widget" class="expresscurate_search_widget  " title="<?php echo self::PLUGIN_NAME ?>">
+      <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }

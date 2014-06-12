@@ -21,16 +21,48 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
         </div>
         <div class="left imgContainer">
             <div class="imgIcons">
-                <div class="sizeX"></div>
-                <div class="sizeM"></div>
-                <div class="sizeS"></div>
+                <div class="sizeX">
+                    <div class="tooltipWrap">
+                        <span>Large size</span>
+                    </div>
+                </div>
+                <div class="sizeM">
+                    <div class="tooltipWrap">
+                        <span>Middle size</span>
+                    </div>
+                </div>
+                <div class="sizeS">
+                    <div class="tooltipWrap">
+                        <span>Small size</span>
+                    </div>
+                </div>
 
-                <div class="prevImg prev"></div>
-                <div class="nextImg next"></div>
+                <div class="prevImg prev">
+                    <div class="tooltipWrap">
+                        <span>Previous</span>
+                    </div>
+                </div>
+                <div class="nextImg next">
+                    <div class="tooltipWrap">
+                        <span>Next</span>
+                    </div>
+                </div>
 
-                <div class="alignL"></div>
-                <div class="alignNone"></div>
-                <div class="alignR"></div>
+                <div class="alignL">
+                    <div class="tooltipWrap">
+                        <span>Align left</span>
+                    </div>
+                </div>
+                <div class="alignNone">
+                    <div class="tooltipWrap">
+                        <span>Fit to center</span>
+                    </div>
+                </div>
+                <div class="alignR">
+                    <div class="tooltipWrap">
+                        <span>Align right</span>
+                    </div>
+                </div>
             </div>
             <div class="img noimage">
             </div>
@@ -47,11 +79,14 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
 
         </ul>
         <div class="clear"></div>
-        <div id="expresscurate_slider" class="jcarousel-container">
-          <ul class="preview left jcarousel-skin-tango" id="curated_paragraphs">
-          </ul>
-          <div class="clear"></div>
-        </div>
+          <div id="expresscurate_slider" class="slide_container">
+              <div class="slider">
+                  <ul class="paragraphs_preview" id="curated_paragraphs">
+                  </ul>
+              </div>
+              <div class="prevSlide inactiveButton"></div>
+              <div class="nextSlide inactiveButton"></div>
+          </div>
         <div class="clear"></div>
       </div>
     </div>

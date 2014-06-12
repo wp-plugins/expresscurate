@@ -1,6 +1,11 @@
 <div class="expresscurate wrap">
-  <h2><?php echo ExpressCurate_Settings::PLUGIN_NAME ?> Settings</h2>
-  <form method="post" action="options.php">
+<div class="expresscurate_menu">
+    <?php
+    include(sprintf("%s/menu.php", dirname(__FILE__)));?>
+</div>
+  <h2 class="expresscurate_displayNone">Settings</h2>
+
+  <form class="expresscurate_marginTop30" method="post" action="options.php">
     <?php @settings_fields('expresscurate-group'); ?>
     <?php @do_settings_fields('expresscurate-group'); ?>
 
@@ -22,20 +27,24 @@
               <?php
               $categories = get_categories(array("hide_empty" => 0));
               $cat_i = 1;
-              ?><td><?php
+              ?>
+              <td><?php
                 foreach ($categories as $category) {
                   ?>
-                  <input type="radio" id="expresscurate_cat_<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>" name="expresscurate_def_cat" <?php
-                  if (get_option('expresscurate_def_cat') == $category->term_id) {
-                    echo 'checked="checked"';
-                  }
-                  ?>>
-                  <label for="expresscurate_cat_<?php echo $category->term_id; ?>"> <?php echo $category->name; ?> </label><br />
-                  <?php if ($cat_i % 6 == 0 && count($categories) != $cat_i) {
-                    ?>
+                  <input class="expresscurate_cat" type="radio" id="expresscurate_cat_<?php echo $category->term_id; ?>"
+                         value="<?php echo $category->term_id; ?>" name="expresscurate_def_cat" <?php
+                         if (get_option('expresscurate_def_cat') == $category->term_id) {
+                           echo 'checked="checked"';
+                         }
+                         ?>>
+                  <label class="expresscurate_radioLabel"
+                    for="expresscurate_cat_<?php echo $category->term_id; ?>"> <?php echo $category->name; ?> </label><br/>
+                    <?php if ($cat_i % 6 == 0 && count($categories) != $cat_i) {
+                      ?>
                   </td>
                   <td>
-                  <?php }
+                    <?php
+                  }
                   ?>
                   <?php
                   $cat_i++;
@@ -61,22 +70,26 @@
             <tr valign="top">
               <?php
               $post_types = array('post');
-              $post_types = array_merge($post_types, get_post_types( array('_builtin' => false ,'public' => true), 'names'));
+              $post_types = array_merge($post_types, get_post_types(array('_builtin' => false, 'public' => true), 'names'));
               $posts_i = 1;
-              ?><td><?php
+              ?>
+              <td><?php
                 foreach ($post_types as $post_type) {
                   ?>
-                  <input type="radio" id="expresscurate_post_type_<?php echo $post_type; ?>" value="<?php echo $post_type; ?>" name="expresscurate_def_post_type" <?php
-                  if (get_option('expresscurate_def_post_type', 'post') == $post_type) {
-                    echo 'checked="checked"';
-                  }
-                  ?>>
-                  <label for="expresscurate_post_type_<?php echo $post_type; ?>"> <?php echo $post_type; ?> </label><br />
-                  <?php if ($posts_i % 2 == 0 && count($post_types) != $posts_i) {
-                    ?>
+                  <input class="expresscurate_post_type" type="radio" id="expresscurate_post_type_<?php echo $post_type; ?>"
+                         value="<?php echo $post_type; ?>" name="expresscurate_def_post_type" <?php
+                         if (get_option('expresscurate_def_post_type', 'post') == $post_type) {
+                           echo 'checked="checked"';
+                         }
+                         ?>>
+                  <label class="expresscurate_radioLabel"
+                    for="expresscurate_post_type_<?php echo $post_type; ?>"> <?php echo $post_type; ?> </label><br/>
+                    <?php if ($posts_i % 2 == 0 && count($post_types) != $posts_i) {
+                      ?>
                   </td>
                   <td>
-                  <?php }
+                    <?php
+                  }
                   ?>
                   <?php
                   $cat_i++;
@@ -89,7 +102,7 @@
         </td>
       </tr>
 
-      
+
       <tr valign="top">
         <td scope="row" rowspan="2" class="width-for-td">
           <strong>Publishing Directly from ExpressCurate Chrome Extension:</strong>
@@ -97,40 +110,51 @@
           <span scope="row" class="gray-italic">This setting gives you an option to save your curated post as a draft or publish it when you click on the "Curate" button on ExpressCurate Chrome extension.</span>
         </td>
         <td>
-          <input type="radio" id="expresscurate_post_published" value="publish" name="expresscurate_post_status" <?php
+
+          <input class="expresscurate_post_draft" type="radio" id="expresscurate_post_published" value="publish" name="expresscurate_post_status" <?php
           if (get_option('expresscurate_post_status', '') == "publish") {
             echo 'checked="checked"';
           }
           ?> />
-          <label for="expresscurate_post_published"> Published </label>
-          <input type="radio" id="expresscurate_post_draft" value="draft" name="expresscurate_post_status" <?php
+          <label class="expresscurate_radioLabel" for="expresscurate_post_published"> Published </label>
+          <input class="expresscurate_post_draft" type="radio" id="expresscurate_post_draft" value="draft" name="expresscurate_post_status" <?php
           if (get_option('expresscurate_post_status', '') == "draft" || get_option('expresscurate_post_status', '') == '') {
             echo 'checked="checked"';
           }
           ?> />
-          <label for="expresscurate_post_draft"> Draft </label><br>
+          <label class="expresscurate_radioLabel" for="expresscurate_post_draft"> Draft </label><br>
         </td>
       </tr>
       <tr class="width-bottom-border">
         <td colspan="2">
           <div id="expresscurate_publish_div" class="hidden">
             <table>
-              <tr valign="top" >
+              <tr valign="top">
                 <td>
                   <b>Smart publishing</b>
-                  <br /><br />
-                  <input type="radio" id="expresscurate_publish_yes" value="1" name="expresscurate_publish" <?php
-                  if (get_option('expresscurate_publish') == "1") {
-                    echo 'checked="checked"';
-                  }
-                  ?> />
-                  <label for="expresscurate_publish_yes"> Yes </label>
-                  <input type="radio" id="expresscurate_publish_no" value="0" name="expresscurate_publish" <?php
-                  if (get_option('expresscurate_publish', '') == "0" || !get_option('expresscurate_publish', '')) {
-                    echo 'checked="checked"';
-                  }
-                  ?> />
-                  <label for="expresscurate_publish_no"> No </label>
+                  <!--try on/off expresscurate_publish-->
+                  <?php
+                  $expresscurate_publish = get_option('expresscurate_publish', '') == "1" ? 'On' : 'Off';
+                  ?>
+                  <div class="switch switch<?php echo $expresscurate_publish; ?>" id="expresscurate_publish">
+                    <p class="switchText">yes<span class="">no</span></p>
+                    <span class="slider slider<?php echo $expresscurate_publish; ?>Back"></span>
+                  </div>
+                  <!---->
+                  <div class="hidden">
+                    <input type="radio" id="expresscurate_publish_yes" value="1" name="expresscurate_publish" <?php
+                    if (get_option('expresscurate_publish') == "1") {
+                      echo 'checked="checked"';
+                    }
+                    ?> />
+                    <label for="expresscurate_publish_yes"> Yes </label>
+                    <input type="radio" id="expresscurate_publish_no" value="0" name="expresscurate_publish" <?php
+                    if (get_option('expresscurate_publish', '') == "0" || !get_option('expresscurate_publish', '')) {
+                      echo 'checked="checked"';
+                    }
+                    ?> />
+                    <label for="expresscurate_publish_no"> No </label>
+                  </div>
                 </td>
               </tr>
               <tr>
@@ -145,21 +169,24 @@
                         if (get_option('expresscurate_hours_interval') == $i) {
                           echo 'selected="selected"';
                         }
-                        ?>>Every hour</option>
+                        ?>>Every hour
+                        </option>
 
                       <?php } elseif ($i == 13) { ?>
                         <option value="<?php echo $i; ?>" <?php
                         if (get_option('expresscurate_hours_interval') == $i) {
                           echo 'selected="selected"';
                         }
-                        ?>>Once a day</option>
+                        ?>>Once a day
+                        </option>
 
                       <?php } else { ?>
                         <option value="<?php echo $i; ?>" <?php
                         if (get_option('expresscurate_hours_interval') == $i) {
                           echo 'selected="selected"';
                         }
-                        ?>>Every <?php echo $i; ?> hours</option>
+                        ?>>Every <?php echo $i; ?> hours
+                        </option>
 
                         <?php
                       }
@@ -179,26 +206,28 @@
           <span scope="row" class="gray-italic">
             There are two options for placing the images (picked from the original article) in your curated post:<br/>
             <ol>
-              <li>Featured. The image will be placed above the title, at the very top of your post. This will give your image a more prominent look.
-              <li>Standard. The image will be placed below the title and category. This option will focus your viewer's attention more on the title and less on the image.
+              <li>Featured. The image will be placed above the title, at the very top of your post. This will give
+                your image a more prominent look.
+              <li>Standard. The image will be placed below the title and category. This option will focus your
+                viewer's attention more on the title and less on the image.
             </ol>
           </span>
         </td>
         <td>
-          <input type="radio" id="expresscurate_featured" value="1" name="expresscurate_featured" <?php
+          <input class="expresscurate_featured" type="radio" id="expresscurate_featured" value="1" name="expresscurate_featured" <?php
           if (get_option('expresscurate_featured', '') == "1" || get_option('expresscurate_featured', '') == '') {
             echo 'checked="checked"';
           }
           ?> />
-          <label for="expresscurate_featured"> Featured </label>
-          <input type="radio" id="expresscurate_featured_no" value="0" name="expresscurate_featured" <?php
+          <label class="expresscurate_radioLabel" for="expresscurate_featured"> Featured </label>
+          <input class="expresscurate_featured" type="radio" id="expresscurate_featured_no" value="0" name="expresscurate_featured" <?php
           if (get_option('expresscurate_featured', '') == "0") {
             echo 'checked="checked"';
           }
           ?> />
-          <label for="expresscurate_featured_no"> Standard </label>
+          <label class="expresscurate_radioLabel" for="expresscurate_featured_no"> Standard </label>
         </td>
-      </tr>      
+      </tr>
       <tr valign="top">
         <th scope="row" colspan="2">
           <strong>Attribution Text For Original Article Link</strong>
@@ -214,7 +243,7 @@
           } else {
             echo 'Curated from';
           }
-          ?>" name="expresscurate_curated_text" size="50" />
+          ?>" name="expresscurate_curated_text" size="50"/>
         </td>
       </tr>
       <tr valign="top" class="width-bottom-border">
@@ -230,7 +259,7 @@
           } else {
             echo '3';
           }
-          ?>" name="expresscurate_max_tags" size="1" />
+          ?>" name="expresscurate_max_tags" size="1"/>
           <span class="gray-italic">&nbsp;&nbsp; The recommended value is 3</span>
         </td>
       </tr>
@@ -238,7 +267,8 @@
         <th scope="row" class="width-for-td">
           <strong>Number of Curated Paragraphs:</strong>
           <br>
-          <span class="gray-italic">Pick the number of paragraphs to be inserted from the original article into your post.</span>
+          <span
+            class="gray-italic">Pick the number of paragraphs to be inserted from the original article into your post.</span>
         </th>
         <td>
           <input type="text" id="expresscurate_autosummary" class="centered-text" value="<?php
@@ -247,7 +277,8 @@
           } else {
             echo '5';
           }
-          ?>" name="expresscurate_autosummary" size="1" /><span class="gray-italic">&nbsp;&nbsp; The default value is 5</span>
+          ?>" name="expresscurate_autosummary" size="1"/><span
+                 class="gray-italic">&nbsp;&nbsp; The default value is 5</span>
         </td>
       </tr>
       <tr valign="top" class="width-bottom-border">
@@ -259,18 +290,29 @@
           </span>
         </td>
         <td>
-          <input type="radio" id="quotes_style" value="1" name="expresscurate_quotes_style" <?php
-          if (get_option('expresscurate_quotes_style') == "1" || get_option('expresscurate_quotes_style', '') == '') {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="quotes_style"> Yes </label>
-          <input type="radio" id="quotes_style_no" value="0" name="expresscurate_quotes_style" <?php
-          if (get_option('expresscurate_quotes_style', '') == "0") {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="quotes_style_no"> No </label>
+          <!--try on/off quotes_style-->
+          <?php
+          $expresscurate_quotes_style = get_option('expresscurate_quotes_style', '') == "1" ? 'On' : 'Off';
+          ?>
+          <div class="switch switch<?php echo $expresscurate_quotes_style; ?>" id="quotes_style">
+            <p class="switchText">yes<span class="">no</span></p>
+            <span class="slider slider<?php echo $expresscurate_quotes_style; ?>Back"></span>
+          </div>
+          <!---->
+          <div class="hidden">
+            <input type="radio" id="quotes_style_yes" value="1" name="expresscurate_quotes_style" <?php
+            if (get_option('expresscurate_quotes_style') == "1" || get_option('expresscurate_quotes_style', '') == '') {
+              echo 'checked="checked"';
+            }
+            ?> />
+            <label for="quotes_style_yes"> Yes </label>
+            <input type="radio" id="quotes_style_no" value="0" name="expresscurate_quotes_style" <?php
+            if (get_option('expresscurate_quotes_style', '') == "0") {
+              echo 'checked="checked"';
+            }
+            ?> />
+            <label for="quotes_style_no"> No </label>
+          </div>
         </td>
       </tr>
       <tr valign="top" class="width-bottom-border">
@@ -282,29 +324,43 @@
           </span>
         </td>
         <td>
-          <input type="radio" id="expresscurate_seo" value="1" name="expresscurate_seo" <?php
-          if (get_option('expresscurate_seo') == "1" || get_option('expresscurate_seo', '') == '') {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="expresscurate_seo"> Yes </label>
-          <input type="radio" id="expresscurate_seo_no" value="0" name="expresscurate_seo" <?php
-          if (get_option('expresscurate_seo', '') == "0") {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="expresscurate_seo_no"> No </label>
+          <!--try on/off expresscurate_seo-->
+          <?php
+          $expresscurate_seo = get_option('expresscurate_seo', '') == "1" ? 'On' : 'Off';
+          ?>
+          <div class="switch switch<?php echo $expresscurate_seo; ?>" id="expresscurate_seo">
+            <p class="switchText">yes<span class="">no</span></p>
+            <span class="slider slider<?php echo $expresscurate_seo; ?>Back"></span>
+          </div>
+          <!---->
+          <div class="hidden">
+            <input type="radio" id="expresscurate_seo_yes" value="1" name="expresscurate_seo" <?php
+            if (get_option('expresscurate_seo') == "1" || get_option('expresscurate_seo', '') == '') {
+              echo 'checked="checked"';
+            }
+            ?> />
+            <label for="expresscurate_seo_yes"> Yes </label>
+            <input type="radio" id="expresscurate_seo_no" value="0" name="expresscurate_seo" <?php
+            if (get_option('expresscurate_seo', '') == "0") {
+              echo 'checked="checked"';
+            }
+            ?> />
+            <label for="expresscurate_seo_no"> No </label>
+          </div>
         </td>
       </tr>
       <tr valign="top">
         <th scope="row" colspan="2">
-      <div id="tryyy">
+      <div id="publisherWrap">
         <table class="width-bottom-border">
           <tr>
             <th scope="row" class="width-for-td">
               <strong>Publisher</strong>
               <br>
-              <span class="gray-italic">You can link content you publish on this blog to your company or personal Google+ profile.<a href="https://plus.google.com/authorship" target="_blank">More Info</a>.</span>
+              <span class="gray-italic">You can link content you publish on this blog to your company or personal Google+ profile.
+                  <br/>
+                  <a
+                  href="https://plus.google.com/authorship" target="_blank">More Info</a>.</span>
             </th>
             <td>
               <input type="text" id="expresscurate_publusher" size="50" value="<?php
@@ -313,14 +369,15 @@
               } else {
                 echo '';
               }
-              ?>" name="expresscurate_publisher"  /><span class="gray-italic">&nbsp;&nbsp;<a href="http://www.google.com/webmasters/tools/richsnippets?url=<?php echo bloginfo('url') ?>&user_profile=<?php echo get_option('expresscurate_publisher'); ?>" target="_blank">Verify publisher</a></span>
+              ?>" name="expresscurate_publisher"/><span class="gray-italic">&nbsp;&nbsp;<a
+                  href="http://www.google.com/webmasters/tools/richsnippets?url=<?php echo bloginfo('url') ?>&user_profile=<?php echo get_option('expresscurate_publisher'); ?>"
+                  target="_blank">Verify publisher</a></span>
             </td>
           </tr>
         </table>
       </div>
       </th>
       </tr>
-
       <tr valign="top" class="width-bottom-border">
         <td scope="row" class="width-for-td">
           <strong>Auto Hashtagging:</strong>
@@ -330,18 +387,29 @@
           </span>
         </td>
         <td>
-          <input type="radio" id="smart_tags" value="1" name="expresscurate_smart_tagging" <?php
-          if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="smart_tags"> Yes </label>
-          <input type="radio" id="smart_tags_no" value="0" name="expresscurate_smart_tagging" <?php
-          if (get_option('expresscurate_smart_tagging', '') == "0") {
-            echo 'checked="checked"';
-          }
-          ?> />
-          <label for="smart_tags_no"> No </label>
+          <!--try on/off smart_tags-->
+          <?php
+          $smart_tags = get_option('expresscurate_smart_tagging', '') == "1" ? 'On' : 'Off';
+          ?>
+          <div class="switch switch<?php echo $smart_tags ?>" id="smart_tags">
+            <p class="switchText">yes<span class="">no</span></p>
+            <span class="slider slider<?php echo $smart_tags ?>Back"></span>
+          </div>
+          <!---->
+          <div class="hidden">
+            <input type="radio" id="smart_tags_yes" value="1" name="expresscurate_smart_tagging" <?php
+            if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
+              echo 'checked="checked"';
+            }
+            ?> />
+            <label for="smart_tags"> Yes </label>
+            <input type="radio" id="smart_tags_no" value="0" name="expresscurate_smart_tagging" <?php
+            if (get_option('expresscurate_smart_tagging', '') == "0") {
+              echo 'checked="checked"';
+            }
+            ?> />
+            <label for="smart_tags_no"> No </label>
+          </div>
         </td>
       </tr>
       <tr valign="top">

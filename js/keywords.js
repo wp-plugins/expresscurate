@@ -64,15 +64,6 @@ function highlight(text) {
             }, 1000);
         }
     });
-    /*jQuery('.expresscurate_background_wrap').each(function () {
-        if (justText(jQuery(this).find('.statisticsTitle span')).toLowerCase().trim() == text.toLowerCase()) {
-            var elem = jQuery(this).find('.statisticsTitle span');
-            elem.css({'background': 'rgba(254, 254, 254, .3)'});
-            setTimeout(function () {
-                elem.css({'background': 'transparent'});
-            }, 800);
-        }
-    });*/
 }
 /*add keywords on new post page*/
 function insertKeyword_Widget(keyword, beforeElem) {
@@ -175,7 +166,9 @@ function updateKeywords(content) {
 
 
 jQuery(document).ready(function ($) {
-    //jQuery('textarea[name=expresscurate_description]').empty();
+    if(jQuery.trim(jQuery('textarea[name=expresscurate_description]').val())==''){
+        jQuery('textarea[name=expresscurate_description]').empty();
+    }
     if (jQuery('.keywordsPart ul li').length > 0) {
         jQuery('.keywordsPart .notDefined').addClass('expresscurate_displayNone');
     }
@@ -236,12 +229,22 @@ jQuery(document).ready(function ($) {
             jQuery('.keywordsPart .notDefined').removeClass('expresscurate_displayNone');
         }
     });
-    $('.description textarea').on('keyup focus', function () {//here
+    $('.description textarea').on('keyup focus', function () {
         var maxVal = 156,
             count = $('.description  textarea').val().length,
             val,
             textarea = $('.description textarea');
-
+        /*keywords in meta description*/
+        var keywords=jQuery('#expresscurate_defined_tags').val().split(', '),
+            metaDesc=$('.description  textarea').val(),
+            includedKeywordsCount=0;
+        for(var i=0;i<keywords.length;i++){
+            if(new RegExp(' '+keywords[i].toLowerCase()+' ').test(' '+metaDesc.toLowerCase())){
+                includedKeywordsCount++;
+            }
+        }
+        jQuery('.usedKeywordsCount').replaceWith('<p class="usedKeywordsCount"><span class="bold">'+includedKeywordsCount+'</span>'+' / '+keywords.length+'</p>');
+         /**/
         if (count > maxVal) {
             textarea.val(textarea.val().substring(0, maxVal));
         } else {
@@ -252,15 +255,24 @@ jQuery(document).ready(function ($) {
     });
 
     $('.description, .description p').click(function () {
-        $('.description  p').removeClass('expresscurate_displayNone');
+
+        $('.description  p , .description div').removeClass('expresscurate_displayNone');
         $('.description').css({'background-color': '#ffc67d'});
+        $('.description  textarea').removeClass('textareaBorder');
         $('.description textarea').focus();
     });
     $('.expresscurate_widget_wrapper').click(function () {
-        $('.description  p').addClass('expresscurate_displayNone');
+        $('.description  textarea').addClass('textareaBorder');
+        $('.description  p , .description div').addClass('expresscurate_displayNone');
         $('.description').css({'background-color': '#ffffff'});
     });
-
+   $(document).click(function(e){
+      if(jQuery('.expresscurate_widget').length>0 && !$(e.target).parents('#expresscurate').is('div')){
+          $('.description  textarea').addClass('textareaBorder');
+          $('.description  p , .description div').addClass('expresscurate_displayNone');
+          $('.description').css({'background-color': '#ffffff'});
+       }
+   });
     $('.expresscurate_keywords_settings ul li').live('hover', function () {
         $(this).find('.hover').removeClass('expresscurate_displayNone');
         $(this).find('.addPost').removeClass('expresscurate_displayNone');
@@ -279,7 +291,12 @@ jQuery(document).ready(function ($) {
         jQuery(this).find('.hover').addClass('expresscurate_displayNone');
 
     });
-
+    jQuery('.expresscurate_widget_wrapper label span').click(function(){
+        var el = jQuery(this).addClass('rotated');
+        setTimeout(function() {
+            el.removeClass('rotated');
+        }, 1000);
+    });
 
     /*reload widget keywords*/
     if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && jQuery('.expresscurate_widget').length > 0) {

@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
 Requires at least: 3.9
 Tested up to: 3.9
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -16,7 +16,7 @@ The ExpressCurate content curation plugin is a WordPress platform for creating, 
 
 While there are many content discovery tools, the process of curation in WordPress is still convoluted and confusing, requiring multiple steps and manually switching back and forth between screens, plug-ins, and programs.
 
-ExpressCurate solves this problem by bringing all the key elements for content curation onto a single screen, making content curation in WordPress intuitive and quick! It combines the three essential content curation components -- content, keywords, and SEO -- in a single plugin. It includes 
+ExpressCurate solves this problem by bringing all the key elements for content curation onto a single screen, making content curation in WordPress intuitive and quick! It combines the three essential content curation components -- content, keywords, and SEO -- in a single plugin. It includes: 
 
 
 1. **Composer/Editor** to streamline the process of writing a curated post
@@ -60,7 +60,7 @@ ExpressCurate solves this problem by bringing all the key elements for content c
 
 = How To Get Started =
 
-**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.1.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.1.zip)**. It's simple. It's free.
+**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.2.1.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.2.1.zip)**. It's simple. It's free.
 
 You can also **[download](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")** a **free [ExpressCurate WordPress theme](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")**. It will give your curated content a modern online news look.  
 
@@ -95,6 +95,11 @@ e.g.
 
 
 == Changelog ==
+
+= 1.2.1 =
+* Support Page.
+* FAQ Page.
+* Miscellaneous bug fixes and improvements.
 
 = 1.2.0 =
 * Keywords Summary widget.

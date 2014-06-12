@@ -1,5 +1,9 @@
 <div class="wrap">
-  <h2><?php echo ExpressCurate_Settings::PLUGIN_NAME ?> News</h2>
+    <div class="expresscurate_menu">
+        <?php
+        include(sprintf("%s/menu.php", dirname(__FILE__)));?>
+    </div>
+  <h2 class="expresscurate_displayNone">News</h2>
   <div class="expresscurate_news_container">
 <?php
 $feed = ExpressCurate_Settings::getCurationNews();

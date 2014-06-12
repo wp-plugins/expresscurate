@@ -150,7 +150,7 @@
         ed.addButton('righttextbox', {
           title: 'Add Right-Box (Ctrl + R | Ctrl + Right)',
           cmd: 'righttextbox',
-          image: url + '/../images/rightBox.png',
+          image: url + '/../images/rightBox.png'
         });
         ed.addButton('justifytextbox', {
           title: 'Add Center-Box (Ctrl + J | Ctrl + Down)',
@@ -201,7 +201,13 @@
           ed.controlManager.controls && ed.controlManager.controls.content_blockquote && ed.controlManager.controls.content_blockquote.remove();
         }
       });
-
+        ed.onClick.add(function(ed, e) {
+         if(jQuery('.expresscurate_widget').length>0){
+             jQuery('.description  textarea').addClass('textareaBorder');
+             jQuery('.description  p , .description div').addClass('expresscurate_displayNone');
+             jQuery('.description').css({'background-color': '#ffffff'});
+             }
+        });
       ed.onNodeChange.add(function(ed) {
 
         var node, elem = jQuery(ed.selection.getNode());

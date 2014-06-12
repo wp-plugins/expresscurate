@@ -4,8 +4,12 @@ $curated_links = array();
 $curated_posts = array();
 ?>
 <div class="wrap">
-  <h2><?php echo ExpressCurate_Settings::PLUGIN_NAME ?> - Top curated websites</h2>
-  <div>
+    <div class="expresscurate_menu">
+        <?php
+        include(sprintf("%s/menu.php", dirname(__FILE__)));?>
+    </div>
+  <h2 class="expresscurate_displayNone">Top curated websites</h2>
+  <div class="expresscurate_marginTop30">
     <?php
     if ($curated_posts_query->have_posts()) {
       while ($curated_posts_query->have_posts()) {

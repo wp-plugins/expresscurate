@@ -1,43 +1,51 @@
 
 blockquote ul, ol {
-  padding-left: 40px;
+    padding-left: 40px;
 }
+
 blockquote {
-  position: relative;
-  padding: 0 20px;
-  margin: 0px 0px 20px 10px;
+    position: relative;
+    padding: 0 20px;
+    margin: 0px 0px 20px 10px;
+    clear: both;
+    border: none !important;
+}
+
+blockquote > * {
+    margin-left: 10px;
+}
+
+blockquote > *:first-child {
+    /* padding-top: 20px; */
+}
+
+blockquote:before {
+    left: 0px;
+    top: 0px;
+    width: 12px;
+    height: 23px;
+    position: absolute;
+    display: inline-block;
+    background-size: 14px auto;
+    background-repeat: no-repeat;
+    background-position: 0 -429px;
+    background-image: url('../images/expresscurate_sprite.png');
+    content: "";
     clear: both;
 }
-blockquote > * {
-  margin-left: 10px;
-}
-blockquote > *:first-child {
-  /* padding-top: 20px; */
-}
-blockquote:before{
-  left: 0px;
-  top: 0px;
-  width: 12px;
-  height: 23px;
-  position: absolute;
-  display: inline-block;
-  background-size: 14px auto;
-  background-repeat: no-repeat;
-  background-position: 0 -429px;
-  background-image: url('../images/expresscurate_sprite.png');
-  content: "";
-}
+
 blockquote:after {
-  right: 0px;
-  bottom: -13px;
-  width: 12px;
-  height: 27px;
-  text-align: right;
-  position: absolute;
-  display: inline-block;
-  background-size: 14px auto;
-  background-repeat: no-repeat;
-  background-position: 0 -233px;
-  background-image: url('../images/expresscurate_sprite.png');
-  content: "";
+    right: 0px;
+    bottom: -13px;
+    width: 12px;
+    height: 27px;
+    text-align: right;
+    position: absolute;
+    display: inline-block;
+    background-size: 14px auto;
+    background-repeat: no-repeat;
+    background-position: 0 -233px;
+    background-image: url('../images/expresscurate_sprite.png');
+    content: "";
+    clear: both;
 }
