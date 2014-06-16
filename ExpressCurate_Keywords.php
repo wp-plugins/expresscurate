@@ -42,7 +42,7 @@ class ExpressCurate_Keywords {
     $post_words = array_map('strtolower', $post_words);
     $post_words = array_change_key_case($post_words, CASE_LOWER);
     $post_words = array_filter($post_words);
-    
+
     unset($post_words[null]);
     unset($post_words['']);
     unset($post_words['\'']);
@@ -50,7 +50,7 @@ class ExpressCurate_Keywords {
     unset($post_words['-']);
     unset($post_words['nbsp']);
     arsort($post_words);
-    
+
     $total = array_sum($post_words);
     $result = array('titles' => $post_titles, 'content' => $post_text, 'posts' => $post_arr, 'words' => $post_words, 'total' => $total);
     return $result;
@@ -68,7 +68,7 @@ class ExpressCurate_Keywords {
       unset($defined_tags_arr['']);
     }
     if (strlen($keyword) > 2) {
-      if (preg_grep("/\b".$keyword."\b\w+/i", $defined_tags_arr)) {
+      if (preg_grep("/\b" . $keyword . "\b\w+/i", $defined_tags_arr)) {
         $result = array('status' => "warning", 'msg' => __($keyword . ' is already defined'));
       } else {
         if ($defined_tags) {
@@ -153,7 +153,7 @@ class ExpressCurate_Keywords {
     if ($keywords) {
       foreach ($keywords as $keyword) {
         $keyword_in[$keyword]['added_count'] = 0;
-        preg_replace('/\b'.$keyword.'\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
+        preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
         //str_ireplace(" ".$keyword." ", '', $post_content['content'], $keyword_in[$keyword]['count']);
         $keyword_in[$keyword]['title'] = 0;
         // $keyword_in[$keyword]['count'] = ((isset($post_content['words'][$keyword]) || isset($post_content['words']["#".$keyword])) ? $post_content['words'][$keyword] : 0);
@@ -162,8 +162,8 @@ class ExpressCurate_Keywords {
           $keyword_in[$keyword]['posts_count'] = 0;
           if ($get_posts_count) {
             foreach ($post_content['posts'] as $post) {
-              preg_match_all('/\b'.$keyword.'\b/iu', $post, $matches, PREG_OFFSET_CAPTURE);
-              if(isset($matches[0][0][0])){
+              preg_match_all('/\b' . $keyword . '\b/iu', $post, $matches, PREG_OFFSET_CAPTURE);
+              if (isset($matches[0][0][0])) {
                 $keyword_in[$keyword]['added_count'] = 1;
                 $keyword_in[$keyword]['posts_count']++;
               }
@@ -183,17 +183,29 @@ class ExpressCurate_Keywords {
         $keyword_in[$keyword]['color'] = $color;
         $count = 0;
         $post_titles = strlen($post_content['titles']);
-        preg_replace('/\b'.$keyword.'\b/iu', '', $post_content['titles'], -1, $count);
+        preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['titles'], -1, $count);
         if ($count > 0) {
           $keyword_in[$keyword]['title'] = round(( $count / $post_titles ) * 100, 2);
-          if($keyword_in[$keyword]['added_count'] == 0){
+          if ($keyword_in[$keyword]['added_count'] == 0) {
             $keyword_in[$keyword]['posts_count']++;
           }
         }
       }
-      $keys = array_map(function($val) {
-                return $val['count'];
-              }, $keyword_in);
+      if (function_exists('array_map')) {
+        $keys = array_map(function($val) {
+                  return $val['count'];
+                }, $keyword_in);
+      } else { 
+        $keys = array();
+        foreach ($keyword_in as $key => $value) {
+          if (array_key_exists($key, $keys)) {
+            $keys[$key] += $value;
+          } else {
+            $keys[$key] = $value;
+          }
+        }
+      }
+
       array_multisort($keys, SORT_DESC, $keyword_in);
     }
     if ($_POST) {
