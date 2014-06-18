@@ -39,7 +39,7 @@ class ExpressCurate_Keywords {
     $post_text = preg_replace('/\b[^\s]{1,2}\b/i', '', $post_text);
     $post_text = preg_replace("/[\",.':;\\-\\=\\+\\)\\?\\!\\&\\(\\}\\{\\[\\]\\@]/", "", $post_text);
     $post_words = array_count_values(str_word_count($post_text, 1));
-    $post_words = array_map('strtolower', $post_words);
+    $post_words = $this->array_map_keys('strtolower', $post_words);
     $post_words = array_change_key_case($post_words, CASE_LOWER);
     $post_words = array_filter($post_words);
 
@@ -59,51 +59,66 @@ class ExpressCurate_Keywords {
   public function add_keyword($keyword, $get_stats = false) {
     $defined_tags_arr = array();
     if ($_REQUEST) {
-      $keyword = trim($_REQUEST['keyword']);
+      $keywords = explode(",",$_REQUEST['keywords']);
       $get_stats = $_REQUEST['get_stats'];
     }
     $defined_tags = get_option("expresscurate_defined_tags", '');
     if ($defined_tags) {
-      $defined_tags_arr = array_map('trim', explode(",", $defined_tags));
+      $defined_tags_arr = $this->array_map('trim', explode(",", $defined_tags));
       unset($defined_tags_arr['']);
     }
-    if (strlen($keyword) > 2) {
-      if (preg_grep("/\b" . $keyword . "\b\w+/i", $defined_tags_arr)) {
-        $result = array('status' => "warning", 'msg' => __($keyword . ' is already defined'));
-      } else {
-        if ($defined_tags) {
+    if(count($keywords)>0){
+        foreach($keywords as $key=>$keyword){
+            $keyword = trim($keyword);
+            if (strlen($keyword) > 2) {
+                if (preg_grep("/\b" . $keyword . "\b\w+/i", $defined_tags_arr)) {
+                    $result = array('status' => "warning", 'msg' => __($keyword . ' is already defined'));
+                } else {
+                    if ($defined_tags) {
 
-          $defined_tags .= ", " . $keyword;
-        } else {
-          $defined_tags = $keyword;
+                        $defined_tags .= ", " . $keyword;
+                    } else {
+                        $defined_tags = $keyword;
+                    }
+                    $defined_tags = str_replace(', ,', ',', $defined_tags);
+                    update_option('expresscurate_defined_tags', $defined_tags);
+                }
+            }else{
+                unset($keywords[$key]);
+            }
         }
-        $defined_tags = str_replace(', ,', ',', $defined_tags);
-        update_option('expresscurate_defined_tags', $defined_tags);
-
         if ($get_stats == true) {
-          $stats = $this->get_stats(array($keyword), false, false, true);
-          $result = array('status' => "success", 'stats' => $stats);
+            $stats = $this->get_stats(array($keywords), false, false, false);
+            $result = array('status' => "success", 'stats' => $stats);
         } else {
-          $result = array('status' => "success");
+            $result = array('status' => "success");
         }
-      }
-    } else {
-      $result = array('status' => "warning", 'msg' => __('Something went wrong'));
+    }else{
+        $result = array('status' => "warning", 'msg' => __('Something went wrong'));
     }
+
     echo json_encode($result);
     die();
   }
 
   public function get_post_keyword_stats($keyword, $post_id = false) {
     $args = false;
+
     if ($_REQUEST) {
       $keyword = $_REQUEST['keyword'];
+        if(strpos($keyword, ",")){
+            $keywords = explode(',', $keyword);
+        }
       $post_id = (isset($_REQUEST['post_id']) ? $_REQUEST['post_id'] : false);
     }
     if ($post_id) {
       $args = array('id' => $post_id);
     }
-    $stats = $this->get_stats(array($keyword), $args);
+      if(count(@$keywords)>0){
+          $stats = $this->get_stats($keywords, $args, false, false);
+      }else{
+          $stats = $this->get_stats(array($keyword), $args, false, false);
+      }
     $result = array('status' => "success", 'stats' => $stats);
     echo json_encode($result);
     die();
@@ -115,7 +130,7 @@ class ExpressCurate_Keywords {
 
       $defined_tags = get_option("expresscurate_defined_tags", '');
       if ($defined_tags) {
-        $defined_tags_arr = array_map('trim', explode(",", $defined_tags));
+        $defined_tags_arr = $this->array_map('trim', explode(",", $defined_tags));
       }
       if (($key = array_search($keyword, $defined_tags_arr)) !== false) {
         unset($defined_tags_arr[$key]);
@@ -132,7 +147,7 @@ class ExpressCurate_Keywords {
 
   public function get_stats($keywords = array(), $args = false, $post_content = false, $get_posts_count = false) {
     if ($_POST && isset($_POST['keywords'])) {
-      $keywords = array_map('trim', explode(",", $_POST['keywords']));
+      $keywords = $this->array_map('trim', explode(",", $_POST['keywords']));
       $post_content = $this->get_words(false, array('title' => $_POST['post_title'], 'content' => $_POST['post_content']));
     } else {
       if (!$post_content) {
@@ -150,7 +165,7 @@ class ExpressCurate_Keywords {
       }
     }
     $keyword_in = array();
-    if ($keywords) {
+    if (count($keywords)>0) {
       foreach ($keywords as $keyword) {
         $keyword_in[$keyword]['added_count'] = 0;
         preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
@@ -191,18 +206,13 @@ class ExpressCurate_Keywords {
           }
         }
       }
-      if (function_exists('array_map')) {
-        $keys = array_map(function($val) {
-                  return $val['count'];
-                }, $keyword_in);
-      } else { 
-        $keys = array();
-        foreach ($keyword_in as $key => $value) {
-          if (array_key_exists($key, $keys)) {
-            $keys[$key] += $value;
-          } else {
-            $keys[$key] = $value;
-          }
+
+      $keys = array();
+      foreach ($keyword_in as $key => $value) {
+        if (array_key_exists($key, $keys)) {
+          $keys[$key] += $value;
+        } else {
+          $keys[$key] = $value;
         }
       }
 
@@ -215,6 +225,22 @@ class ExpressCurate_Keywords {
     } else {
       return $keyword_in;
     }
+  }
+
+  private function array_map($func, $array) {
+    $new_array = array();
+    foreach ($array as $key => $value) {
+      $new_array[$key] = call_user_func($func, $value);
+    }
+    return $new_array;
+  }
+
+  private function array_map_keys($func, $array) {
+    $new_array = array();
+    foreach ($array as $key => $value) {
+      $new_array[call_user_func($func, $key)] = $value;
+    }
+    return $new_array;
   }
 
 }

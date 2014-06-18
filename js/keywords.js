@@ -1,13 +1,7 @@
 /*add keywords*/
 
-function checkKeyword(el) {
-    var text = '';
-    if (el.is('span')) {
-        text = justText(el);
-    } else {
-        text = el.val();
-        el.val('');
-    }
+function checkKeyword(text) {
+
     text = text.replace(/[,.;:?!]+/g, '').trim();
     var defTags = jQuery('textarea[name=expresscurate_defined_tags]');
     var defVal = justText(defTags);
@@ -37,7 +31,24 @@ function checkKeyword(el) {
     }
     return text;
 }
-
+function multipleKeywords(el) {
+    var keywords = '';
+    if (el.is('span')) {
+        keywords = justText(el);
+    } else {
+        keywords = el.val();
+        el.val('');
+    }
+    var arr = keywords.split(',');
+    var result=new Array();
+    for (var i = 0; i < arr.length; i++) {
+        var checked_keyword = checkKeyword(arr[i]);
+        if (checked_keyword.length > 0) {
+            result.push(checked_keyword);
+        }
+    }
+    return result;
+}
 function close(keyword, elemToRemove) {
     var defTags = jQuery('textarea[name=expresscurate_defined_tags]'),
         newVal = '';
@@ -66,52 +77,59 @@ function highlight(text) {
     });
 }
 /*add keywords on new post page*/
-function insertKeyword_Widget(keyword, beforeElem) {
-    if (keyword.length > 0) {
+function insertKeyword_Widget(keywords, beforeElem) {
+    keywords = keywords.join(',');
+    var keywordHtml = '';
+    if (keywords.length > 0) {
         var post_id = jQuery('#expresscurate_post_id').val();
-        jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_keywords_get_post_keyword_stats', {keyword: keyword, post_id: post_id}, function (res) {
-            var data = jQuery.parseJSON(res);
+        jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_keywords_get_post_keyword_stats', {keyword: keywords, post_id: post_id}, function (res) {
+            data = jQuery.parseJSON(res);
             if (data.status === 'success') {
-                var title = (data.stats[keyword].title > 0 ? "yes" : "no");
-                var keywordHtml = '<div class="expresscurate_background_wrap"> \
+                jQuery.each(data.stats, function (key, value) {
+                    var title = (value.title > 0 ? "yes" : "no");
+                     keywordHtml = '<div class="expresscurate_background_wrap"> \
                                    <span class="close">&#215</span>\
-                                   <div title="'+keyword+'" class="statisticsTitle expresscurate_' + data.stats[keyword].color + '"><span>' + keyword + '</span></div> \
-                                   <div title="Occurance in Title: '+title+'" class="statistics borderRight">\
+                                   <div title="' + key + '" class="statisticsTitle expresscurate_' + value.color + '"><span>' + key + '</span></div> \
+                                   <div title="Occurance in Title: ' + title + '" class="statistics borderRight">\
                                         <div class="center">title<img src="' + jQuery('#expresscurate_plugin_dir').val() + '../images/' + title + '.png">\</div> \
                                    </div> \
-                                   <div title="Occurance in Content: ' + data.stats[keyword].percent + '%" class="statistics"> \
-                                        <div class="center">content<span>' + data.stats[keyword].percent + '%</span></div>\
+                                   <div title="Occurance in Content: ' + value.percent + '%" class="statistics"> \
+                                        <div class="center">content<span>' + value.percent + '%</span></div>\
                                    </div> \
                                 </div>';
-                beforeElem.before(keywordHtml);
+                    beforeElem.before(keywordHtml);
+                });
             }
         });
     }
 }
 
 /* keywords settings page*/
-function add_keyword(keyword, beforeElem) {
-    jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_keywords_add_keyword', {keyword: keyword, get_stats: true}, function (res) {
-        var data = jQuery.parseJSON(res);
-        if (data.status === 'success') {
-            var keywordHtml = '<li>\
-                            <span class="color expresscurate_' + data.stats[keyword].color + '"></span>\
-                            <span class="word">' + keyword + '</span>\
-                            <a class="expresscurate_displayNone addPost" href="' + jQuery('#expresscurate_admin_url').val() + 'post-new.php?post_title=' + encodeURIComponent("TODO: define post title using " + keyword) + '&content=' + encodeURIComponent("TODO: write content using " + keyword) + '&expresscurate_keyword=' + keyword + '">+ add post</a>\
-                            <span class="expresscurate_floatRight postCount">' + data.stats[keyword].posts_count + '</span>\
+function add_keyword(keywords, beforeElem) {
+    keywords = keywords.join(',');
+    var keywordHtml = '';
+    if (keywords.length > 0) {
+        jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_keywords_add_keyword', {keywords: keywords, get_stats: true}, function (res) {
+            data = jQuery.parseJSON(res);
+            if (data.status === 'success') {
+                jQuery.each(data.stats, function (key, value) {
+                    keywordHtml = '<li>\
+                            <span class="color expresscurate_' + value.color + '"></span>\
+                            <span class="word">' + key + '</span>\
+                            <a class="expresscurate_displayNone addPost" href="' + jQuery('#expresscurate_admin_url').val() + 'post-new.php?post_title=' + encodeURIComponent("TODO: define post title using " + key) + '&content=' + encodeURIComponent("TODO: write content using " + key) + '&expresscurate_keyword=' + key + '">+ add post</a>\
+                            <span class="expresscurate_floatRight postCount">' + value.posts_count + '</span>\
                             <span class="remove hover expresscurate_floatRight expresscurate_displayNone">&#215</span>\
-                            <span class="count expresscurate_floatRight">' + data.stats[keyword].percent + '%</span>\
-                            <span class="inTitle expresscurate_floatRight">' + data.stats[keyword].title + ' %</span>\
+                            <span class="count expresscurate_floatRight">' + value.percent + '%</span>\
+                            <span class="inTitle expresscurate_floatRight">' + value.title + ' %</span>\
                          </li>';
-            beforeElem.append(keywordHtml);
-            beforeElem.find('li').last().css({'background-color': '#FCFCFC'});
-            setTimeout(function () {
-                beforeElem.find('li').last().css({'background-color': 'transparent'});
-            }, 1000);
-        }
-    });
-}
+                    beforeElem.append(keywordHtml);
+                    highlight(key);
+                });
+            }
+        });
+    }
 
+}
 function insertKeyword_KeywordsSettings(keyword, beforeElem) {
     if (keyword.length > 0) {
         add_keyword(keyword, beforeElem);
@@ -166,7 +184,7 @@ function updateKeywords(content) {
 
 
 jQuery(document).ready(function ($) {
-    if(jQuery.trim(jQuery('textarea[name=expresscurate_description]').val())==''){
+    if (jQuery.trim(jQuery('textarea[name=expresscurate_description]').val()) == '') {
         jQuery('textarea[name=expresscurate_description]').empty();
     }
     if (jQuery('.keywordsPart ul li').length > 0) {
@@ -180,8 +198,8 @@ jQuery(document).ready(function ($) {
     }
     /* post widget*/
     jQuery('.expresscurate_widget_wrapper .addKeywords input').on("keyup", function (e) {
-        if (e.keyCode == 188 || e.keyCode == 13) {
-            insertKeyword_Widget(checkKeyword(jQuery('.addKeywords input')), jQuery('.addKeywords'));
+        if (e.keyCode == 13) {
+            insertKeyword_Widget(multipleKeywords(jQuery('.addKeywords input')), jQuery('.addKeywords'));
         }
     });
 
@@ -193,19 +211,19 @@ jQuery(document).ready(function ($) {
     });
 
     jQuery('.expresscurate_widget_wrapper .addKeywords span').on('click', function () {
-        insertKeyword_Widget(checkKeyword(jQuery('.addKeywords input')), jQuery('.addKeywords'));
+        insertKeyword_Widget(multipleKeywords(jQuery('.addKeywords input')), jQuery('.addKeywords'));
     });
     jQuery('.expresscurate_background_wrap .close').live('click', function () {
         close(jQuery(this).parent().find('.statisticsTitle').text(), jQuery(this).parent('.expresscurate_background_wrap'));
     });
     /**/
     jQuery('.expresscurate_keywords_settings .addKeywords input').on("keyup", function (e) {
-        if (e.keyCode == 188 || e.keyCode == 13) {
-            insertKeyword_KeywordsSettings(checkKeyword(jQuery('.addKeywords input')), jQuery('.keywordsPart ul'));
+        if (e.keyCode == 13) {
+            insertKeyword_KeywordsSettings(multipleKeywords(jQuery('.addKeywords input')), jQuery('.keywordsPart ul'));
         }
     });
     jQuery('.expresscurate_keywords_settings .addKeywords span').on('click', function () {
-        insertKeyword_KeywordsSettings(checkKeyword(jQuery('.addKeywords input')), jQuery('.keywordsPart ul'));
+        insertKeyword_KeywordsSettings(multipleKeywords(jQuery('.addKeywords input')), jQuery('.keywordsPart ul'));
     });
 
     jQuery('.usedWordsPart ul .add').live('click', function () {
@@ -235,16 +253,16 @@ jQuery(document).ready(function ($) {
             val,
             textarea = $('.description textarea');
         /*keywords in meta description*/
-        var keywords=jQuery('#expresscurate_defined_tags').val().split(', '),
-            metaDesc=$('.description  textarea').val(),
-            includedKeywordsCount=0;
-        for(var i=0;i<keywords.length;i++){
-            if(new RegExp(' '+keywords[i].toLowerCase()+' ').test(' '+metaDesc.toLowerCase())){
+        var keywords = jQuery('#expresscurate_defined_tags').val().split(', '),
+            metaDesc = $('.description  textarea').val(),
+            includedKeywordsCount = 0;
+        for (var i = 0; i < keywords.length; i++) {
+            if (new RegExp(' ' + keywords[i].toLowerCase() + ' ').test(' ' + metaDesc.toLowerCase())) {
                 includedKeywordsCount++;
             }
         }
-        jQuery('.usedKeywordsCount').replaceWith('<p class="usedKeywordsCount"><span class="bold">'+includedKeywordsCount+'</span>'+' / '+keywords.length+'</p>');
-         /**/
+        jQuery('.usedKeywordsCount').replaceWith('<p class="usedKeywordsCount"><span class="bold">' + includedKeywordsCount + '</span>' + ' / ' + keywords.length + '</p>');
+        /**/
         if (count > maxVal) {
             textarea.val(textarea.val().substring(0, maxVal));
         } else {
@@ -266,21 +284,24 @@ jQuery(document).ready(function ($) {
         $('.description  p , .description div').addClass('expresscurate_displayNone');
         $('.description').css({'background-color': '#ffffff'});
     });
-   $(document).click(function(e){
-      if(jQuery('.expresscurate_widget').length>0 && !$(e.target).parents('#expresscurate').is('div')){
-          $('.description  textarea').addClass('textareaBorder');
-          $('.description  p , .description div').addClass('expresscurate_displayNone');
-          $('.description').css({'background-color': '#ffffff'});
-       }
-   });
+    $(document).click(function (e) {
+        if (jQuery('.expresscurate_widget').length > 0 && !$(e.target).parents('#expresscurate').is('div')) {
+            $('.description  textarea').addClass('textareaBorder');
+            $('.description  p , .description div').addClass('expresscurate_displayNone');
+            $('.description').css({'background-color': '#ffffff'});
+        }
+    });
+
     $('.expresscurate_keywords_settings ul li').live('hover', function () {
         $(this).find('.hover').removeClass('expresscurate_displayNone');
         $(this).find('.addPost').removeClass('expresscurate_displayNone');
+        $(this).css('background-color', '#FCFCFC');
     });
 
     $('.expresscurate_keywords_settings ul li').live('mouseleave', function () {
         $(this).find('.hover').addClass('expresscurate_displayNone');
         $(this).find('.addPost').addClass('expresscurate_displayNone');
+        $(this).css('background-color', 'transparent');
     });
 
     jQuery('.expresscurate_keywords_settings ul li').live('hover', function () {
@@ -291,9 +312,9 @@ jQuery(document).ready(function ($) {
         jQuery(this).find('.hover').addClass('expresscurate_displayNone');
 
     });
-    jQuery('.expresscurate_widget_wrapper label span').click(function(){
+    jQuery('.expresscurate_widget_wrapper label span').click(function () {
         var el = jQuery(this).addClass('rotated');
-        setTimeout(function() {
+        setTimeout(function () {
             el.removeClass('rotated');
         }, 1000);
     });

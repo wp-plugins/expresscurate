@@ -8,6 +8,7 @@
 <?php
 $feed = ExpressCurate_Settings::getCurationNews();
 $limit = ExpressCurate_Settings::NEWS_FEED_COUNT;
+if(count($feed)){
       for ($x = 0; $x < $limit; $x++) {
         $title = str_replace(' & ', ' &amp; ', $feed[$x]['title']);
         $link = $feed[$x]['link'];
@@ -17,6 +18,7 @@ $limit = ExpressCurate_Settings::NEWS_FEED_COUNT;
         echo '<small><em>Posted on ' . $date . '</em></small></p>';
         echo '<p>' . $description . '</p>';
       }
+}
 ?>
 
 

@@ -59,7 +59,9 @@
 .expresscurate_clear {
     clear: both;
 }
-
+.expresscurate_inlineBlock{
+    display: inline-block;
+}
 /*keywords settings*/
 .expresscurate_keywords_settings{
     max-width: 1124px;
@@ -1712,7 +1714,8 @@
         cursor: default;
     }
         .expresscurate_support .block,
-        .expresscurate_faq .block{
+        .expresscurate_faq .block,
+    .expresscurate_trendingPosts .block{
             display: inline-block;
             width: 440px;
             min-height: 330px;
@@ -1833,7 +1836,8 @@
         padding: 0;
         margin-top: 35px;
     }
-        .expresscurate_faq .questionBox{
+        .expresscurate_faq .questionBox,
+        .expresscurate_trendingPosts .questionBox{
             width: 180px;
             height: 117px;
             background-color: #ffffff;
@@ -1852,7 +1856,8 @@
             text-align: center;
 
         }
-           .expresscurate_faq .questionBox span{
+           .expresscurate_faq .questionBox span,
+           .expresscurate_trendingPosts .questionBox span{
                display: table-cell;
                vertical-align: middle;
            }
@@ -1876,7 +1881,6 @@
         width: 240px;
         height: 177px;
     }
-/**/
 /*menu*/
 .expresscurate_tabMenu{
     border-bottom: solid;
@@ -1884,7 +1888,9 @@
     border-color: #0074a2;
     max-width:1020px;
     width: 1020px;
-    margin-top: 70px;
+    margin-top: 30px;
+    position: relative;
+    font-size: 0;
 }
     .expresscurate_tabMenu a{
         display: inline-block;
@@ -1895,26 +1901,28 @@
         width: 16%;
         line-height: 65px;
         color: #989898;
-        transition: color 400ms ;
+        transition: color 300ms ;
     }
     .expresscurate_tabMenu a:hover{
         color: #0074a2;
     }
-.expresscurate_tabMenu a.active{
-    position: relative;
+.expresscurate_tabMenu .arrow{
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+    border-right: 5px solid transparent;
+    border-left: 5px solid transparent;
+    border-bottom: 5px solid #0074a2;
+    transition: left 500ms ;
+    -webkit-transition: left 500ms ;
+    -moz-transition: left 500ms ;
+    -o-transition: left 500ms ;
+    -ms-transition: left 500ms ;
+    right: auto;
+    bottom: 0px;
 }
-    .expresscurate_tabMenu a.active:before{
-        content: '';
-        display: block;
-        width: 0;
-        height: 0;
-        position: absolute;
-        border-right: 5px solid transparent;
-        border-left: 5px solid transparent;
-        border-bottom: 5px solid #0074a2;
-        left: 47%;
-        bottom: 0px;
-    }
 @media  (max-width: 1020px){
     .expresscurate_tabMenu{
         width: 100%;

@@ -79,6 +79,9 @@ function display_curated_paragraphs(paragraphs, count) {
 
 //paragraphs slider
 jQuery(document).ready( function(){
+
+    moveMenuArrow();
+
     function buttonsStatus(){
         var l = parseInt(jQuery('#curated_paragraphs').css('left'));
         var listEnd = jQuery('#curated_paragraphs').width() + l;
@@ -135,8 +138,21 @@ jQuery(document).ready( function(){
             });
         }
     });
-});
 
+    jQuery('.expresscurate_tabMenu a').hover(function(){
+        var menuItemWidth=jQuery(this).width(),
+            index=jQuery(this).index();
+        jQuery('.expresscurate_tabMenu .arrow').css({'left':(index*menuItemWidth)-menuItemWidth/2+30+'px'});
+    });
+    jQuery('.expresscurate_tabMenu').mouseleave(function(){
+        moveMenuArrow();
+    });
+});
+function moveMenuArrow(){
+    var menuItemWidth= jQuery('.expresscurate_tabMenu a').width(),
+        index=jQuery('.expresscurate_tabMenu a.active').index();
+    jQuery('.expresscurate_tabMenu .arrow').css({'left':(index*menuItemWidth)-menuItemWidth/2+30+'px'});
+}
 //
 
 function display_curated_tags(keywords) {
@@ -492,7 +508,7 @@ jQuery(document).ready(function ($) {
                             if (data_check.status === 'success' && data_check.statusCode === 200) {
                                 display_curated_images(data.result.images);
                                 jQuery("#expresscurate_loading").fadeOut('fast');
-                            } else if (data_check.status === 'fail' && data_check.statusCode === 403) {
+                            } else if (data_check.status === 'fail' && data_check.statusCode === 200) {
                                 jQuery('.content .img').css('background-image', jQuery("#expresscurate_loading img").attr('src'));
                                 $.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_download_images', {images: data.result.images, post_id: jQuery('#post_ID').val()}, function (res) {
                                     var data_images = $.parseJSON(res);
@@ -584,7 +600,6 @@ jQuery(document).ready(function ($) {
         var rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
         jQuery(this).next('span').children('a').attr('href', rest + jQuery(this).val());
     });
-
     jQuery('.switch').on("click", function (e) {
         var elem=jQuery(this),
             slider=jQuery(this).find('.slider'),

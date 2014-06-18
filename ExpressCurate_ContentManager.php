@@ -9,6 +9,15 @@
 
 class ExpressCurate_ContentManager {
 
+  public function check_get_url() {
+    $file_get_enabled = preg_match('/1|yes|on|true/i', ini_get('allow_url_fopen'));
+    if (!$file_get_enabled && !is_callable('curl_init')) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public function get_article() {
     $url = $this->_post('expresscurate_source', '');
     if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0) {
@@ -25,20 +34,27 @@ class ExpressCurate_ContentManager {
       echo json_encode($data);
       die();
     }
-    if ($this->_get('check', '') == 1) {
-      $data_check = array();
-      $curated_urls = $this->get_meta_values('expresscurate_link_', $url);
-      if (isset($curated_urls[0]) && isset($curated_urls[0]['meta_value'])) {
-        $data_check["status"] = "notification";
-        $data_check["msg"] = "This page has been curated before";
-      }
+    if (!$this->check_get_url()) {
+      $data_check["status"] = "error";
+      $data_check["error"] = "Could not make HTTP request: Please enable <b>allow_url_open</b> in php.ini";
       echo json_encode($data_check);
       die();
     } else {
-      $tags = $this->_post('tags', '');
+      if ($this->_get('check', '') == 1) {
+        $data_check = array();
+        $curated_urls = $this->get_meta_values('expresscurate_link_', $url);
+        if (isset($curated_urls[0]) && isset($curated_urls[0]['meta_value'])) {
+          $data_check["status"] = "notification";
+          $data_check["msg"] = "This page has been curated before";
+        }
+        echo json_encode($data_check);
+        die();
+      } else {
+        $tags = $this->_post('tags', '');
 
-      $HtmlParser = new ExpressCurate_HtmlParser($url);
-      $HtmlParser->getHtml($tags);
+        $HtmlParser = new ExpressCurate_HtmlParser($url);
+        $HtmlParser->getHtml($tags);
+      }
     }
   }
 
@@ -90,7 +106,7 @@ class ExpressCurate_HtmlParser {
   }
 
   public function doRequest() {
-    $this->html = $this->file_get_contents_utf8($this->url);
+    $this->html = $this->file_get_contents_utf8($this->url, false);
   }
 
   public function strip_tags_content($text, $tags = array(), $invert = FALSE) {
@@ -164,11 +180,13 @@ class ExpressCurate_HtmlParser {
 
   public function getHtml() {
     $this->doRequest();
-    $this->title = $this->getTitle();
-    $this->keywords = $this->getKeywords();
-    $this->description = $this->getDescription();
-    $this->cleanHtml();
-    $this->getElementsByTagsName();
+    if (strlen($this->html) > 3) {
+      $this->title = $this->getTitle();
+      $this->keywords = $this->getKeywords();
+      $this->description = $this->getDescription();
+      $this->cleanHtml();
+      $this->getElementsByTagsName();
+    }
   }
 
   public function cleanHtml() {
@@ -230,7 +248,7 @@ class ExpressCurate_HtmlParser {
     foreach ($pTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
         //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
-        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue),ENT_QUOTES, "UTF-8"));
+        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue), ENT_QUOTES, "UTF-8"));
         $pi++;
       }
       $t->parentNode->removeChild($t);
@@ -241,7 +259,7 @@ class ExpressCurate_HtmlParser {
     foreach ($textTags as $t) {
       if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
         //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
-        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue),ENT_QUOTES, "UTF-8"));
+        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue), ENT_QUOTES, "UTF-8"));
         $pi++;
       }
     }
@@ -314,32 +332,57 @@ class ExpressCurate_HtmlParser {
     return $total_occurrence;
   }
 
-  private function file_get_contents_utf8($url) {
-    $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
-    $context = stream_context_create($options);
-    $content = @file_get_contents($url, false, $context);
+  public function file_get_contents_utf8($url, $get_http_status = false) {
+    $content = '';
     $charset = '';
     $utf8 = false;
-    foreach ($http_response_header as $header) {
-      if (substr(strtolower($header), 0, 13) == "content-type:") {
-        if (count(explode(";", $header)) > 1) {
-          list($contentType, $charset) = explode(";", $header);
+    $user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36';
+    $file_get_enabled = preg_match('/1|yes|on|true/i', ini_get('allow_url_fopen'));
+    if ($file_get_enabled) {
+      $options = array('http' => array('user_agent' => $user_agent));
+      $context = stream_context_create($options);
+      $content = @file_get_contents($url, false, $context);
+      foreach ($http_response_header as $header) {
+        if (substr(strtolower($header), 0, 13) == "content-type:") {
+          if (count(explode(";", $header)) > 1) {
+            list($contentType, $charset) = explode(";", $header);
+          }
         }
       }
-    }
 
-    if ($charset && strpos(strtolower($charset), 'utf-8')) {
-      $utf8 = true;
-    } else {
-      $charset = mb_detect_encoding($content);
-      if (strpos(strtolower($charset), 'utf-8')) {
+      if ($charset && strpos(strtolower($charset), 'utf-8')) {
         $utf8 = true;
+      } else {
+        $charset = mb_detect_encoding($content);
+        if (strpos(strtolower($charset), 'utf-8')) {
+          $utf8 = true;
+        }
       }
+      if (!$utf8) {
+        $content = utf8_encode($content);
+      }
+    } elseif (is_callable('curl_init')) {
+      $ch = curl_init($url);
+      //curl_setopt($ch, CURLOPT_HEADER, 1);
+      curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: text/xml;charset=\"utf-8\""));
+
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+      curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+      $content = curl_exec($ch);
+      $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+      curl_close($ch);
+    } else {
+      $data = array('status' => 'warning', 'msg' => 'Could not make HTTP request: Please set \'allow_url_open\' in php.ini');
+      echo json_encode($data);
+      die();
     }
-    if (!$utf8) {
-      $content = utf8_encode($content);
+    if (!$get_http_status) {
+      return $content;
+    } else {
+      return array('content' => $content, 'http_status' => $http_status);
     }
-    return $content;
   }
 
   private function removeElementsByTagName($tagName, $document) {

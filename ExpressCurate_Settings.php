@@ -537,16 +537,15 @@ class ExpressCurate_Settings {
       require_once(ABSPATH . 'wp-admin/includes/image.php');
       $siteDomain = parse_url(get_site_url(), PHP_URL_HOST);
       if (count($images) > 0 && is_writable($upload_dir['path'])) {
+        $content_manager = new ExpressCurate_HtmlParser($images[1][0]);
         foreach ($images[1] as $i => $image) {
           $image = strtok($image, '?');
           $domain = parse_url($image, PHP_URL_HOST);
           if ($siteDomain != $domain || strpos($image, 'expresscurate_tmp')) {
-            $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
-            $context = stream_context_create($options);
-            $image_data = file_get_contents($image, false, $context);
+            //$options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
+            //$context = stream_context_create($options);
+            $image_data = $content_manager->file_get_contents_utf8($image);
             $filename[$i] = basename($image);
-
-
             if (wp_mkdir_p($upload_dir['path'])) {
               $file[$i] = $upload_dir['path'] . '/' . $filename[$i];
             } else {
@@ -560,7 +559,6 @@ class ExpressCurate_Settings {
                 'post_status' => 'inherit'
             );
             //if need to set first image as featured
-
             if ((get_option("expresscurate_featured", '') == '' || get_option("expresscurate_featured", '') == 1) && !has_post_thumbnail($post_id) && $i == 0) {
               $attach_id[$i] = wp_insert_attachment($attachment[$i], $file[$i], $post_id);
               $attach_data[$i] = wp_generate_attachment_metadata($attach_id[$i], $file[$i]);
@@ -808,6 +806,7 @@ class ExpressCurate_Settings {
 // Render the support template
     include(sprintf("%s/templates/support.php", dirname(__FILE__)));
   }
+
   public function show_expresscurate_faq_page() {
     if (!current_user_can('edit_posts')) {
       wp_die(__('You do not have sufficient permissions to access this page.'));
@@ -815,7 +814,7 @@ class ExpressCurate_Settings {
 // Render the support template
     include(sprintf("%s/templates/faq.php", dirname(__FILE__)));
   }
- 
+
   public function expresscurate_admin_print_styles() {
     $plaugunUrl = plugin_dir_url(__FILE__);
     wp_enqueue_script('expresscurate', $plaugunUrl . 'js/expresscurate.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
@@ -834,20 +833,22 @@ class ExpressCurate_Settings {
     }
   }
 
-  private static function getCurationNews($url = self::NEWS_FEED_URL) {
+  public static function getCurationNews($url = self::NEWS_FEED_URL) {
+    libxml_disable_entity_loader(false);
     $rss = new DOMDocument();
-    $rss->load($url);
     $feed = array();
-    foreach ($rss->getElementsByTagName('item') as $i => $node) {
-      $item = array(
-          'title' => $node->getElementsByTagName('title')->item(0)->nodeValue,
-          'desc' => $node->getElementsByTagName('description')->item(0)->nodeValue,
-          'link' => $node->getElementsByTagName('link')->item(0)->nodeValue,
-          'date' => $node->getElementsByTagName('pubDate')->item(0)->nodeValue,
-      );
-      array_push($feed, $item);
-      if ($i == self::NEWS_FEED_COUNT) {
-        break;
+    if (ini_get('allow_url_fopen') && $rss->load($url, LIBXML_NOWARNING) === true) {
+      foreach ($rss->getElementsByTagName('item') as $i => $node) {
+        $item = array(
+            'title' => $node->getElementsByTagName('title')->item(0)->nodeValue,
+            'desc' => $node->getElementsByTagName('description')->item(0)->nodeValue,
+            'link' => $node->getElementsByTagName('link')->item(0)->nodeValue,
+            'date' => $node->getElementsByTagName('pubDate')->item(0)->nodeValue,
+        );
+        array_push($feed, $item);
+        if ($i == self::NEWS_FEED_COUNT) {
+          break;
+        }
       }
     }
     return $feed;
@@ -926,7 +927,7 @@ class ExpressCurate_Settings {
   public function keywords_widget() {
     ?>
     <div id="expresscurate_keywords_widget" class="expresscurate_keywords_widget" title="<?php echo self::PLUGIN_NAME ?>">
-      <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
+    <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }
@@ -934,7 +935,7 @@ class ExpressCurate_Settings {
   public function search_widget() {
     ?>
     <div id="expresscurate_search_widget" class="expresscurate_search_widget  " title="<?php echo self::PLUGIN_NAME ?>">
-      <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
+    <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }

@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
 Requires at least: 3.9
 Tested up to: 3.9
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -95,6 +95,9 @@ e.g.
 
 
 == Changelog ==
+
+= 1.2.3 =
+* Problems with plugin activation are fixed.
 
 = 1.2.2 =
 * Miscellaneous bug fixes and improvements.

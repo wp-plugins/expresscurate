@@ -9,7 +9,8 @@ global $post;
     $keywords = new ExpressCurate_Keywords();
     $new_post_data = false;
     $post_keywords = trim(get_post_meta($post->ID, '_expresscurate_keywords', true), ',');
-    $pre_def_keyword = $_REQUEST['expresscurate_keyword'];
+    $new_post_content = false;
+    $pre_def_keyword = isset($_REQUEST['expresscurate_keyword'])?$_REQUEST['expresscurate_keyword']:'';
     $pre_def_description = "";
     if (isset($_REQUEST['expresscurate_keyword'])) {
         $pre_def_description = "TODO: write description using " . $pre_def_keyword;

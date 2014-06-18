@@ -1,5 +1,5 @@
 <?php
-
+require_once 'ExpressCurate_ContentManager.php';
 /*
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
@@ -58,14 +58,21 @@ class ExpressCurate_ExportAPI {
     if (!$data['img_url'] && !$data['img_url2']) {
       $data_check = array('status' => "error", 'msg' => "Data is empty!");
     } else {
-      $img = @file_get_contents($data['img_url'], false, $context);
+      $content_manager = new ExpressCurate_HtmlParser($data['img_url']);
+      $img = $content_manager->file_get_contents_utf8($data['img_url'], true);  //@file_get_contents($data['img_url'], false, $context);
+      $http_response_header = $img['http_status'];
+      $img = $img['content'];
       if(!$img){
-        $img = @file_get_contents($data['img_url2'], false, $context);
+        //$img = @file_get_contents($data['img_url2'], false, $context);
+        $img = $content_manager->file_get_contents_utf8($data['img_url2'], true);
+        $http_response_header = $img['http_status'];
+        $img = $img['content'];
       }
       if ($img) {
-        if ($http_response_header[0] == "HTTP/1.1 200 OK") {
+        
+        if ($http_response_header == "HTTP/1.1 200 OK" || $http_response_header == 200) {
           $data_check = array('status' => 'success', 'statusCode' => 200);
-        } else if ($http_response_header[0] == "HTTP/1.1 403 Forbidden") {
+        } else if ($http_response_header == "HTTP/1.1 403 Forbidden" || $http_response_header == 403) {
           $data_check = array('status' => 'fail', 'statusCode' => 403);
         } else {
           $data_check = array('status' => 'fail', 'statusCode' => $http_response_header[0]);
@@ -79,8 +86,8 @@ class ExpressCurate_ExportAPI {
   }
 
   public function download_images() {
+    
     $data = $_REQUEST;
-
     if (!$data['images']) {
       $result = array('status' => "error", 'error' => "Data is empty!");
     } else {
@@ -101,9 +108,10 @@ class ExpressCurate_ExportAPI {
       $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
       $context = stream_context_create($options);
       if (count($images) > 0 && is_writable($upload_dir['path'])) {
+        $content_manager = new ExpressCurate_HtmlParser($images[0]);
         for ($i = 0; $i < count($images); $i++) {
           $image = strtok($images[$i], '?');
-          $image_data = file_get_contents($images[$i], false, $context);
+          $image_data = $content_manager->file_get_contents_utf8($images[$i]);
           $filename[$i] = basename($image);
           if (wp_mkdir_p($upload_dir['path'])) {
             $file[$i] = $upload_dir['path'] . '/expresscurate_tmp/' . $post_id . '/' . $filename[$i];
