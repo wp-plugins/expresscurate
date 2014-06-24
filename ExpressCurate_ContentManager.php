@@ -332,7 +332,7 @@ class ExpressCurate_HtmlParser {
     return $total_occurrence;
   }
 
-  public function file_get_contents_utf8($url, $get_http_status = false) {
+  public function file_get_contents_utf8($url, $get_http_status = false, $set_utf8 = true) {
     $content = '';
     $charset = '';
     $utf8 = false;
@@ -342,6 +342,7 @@ class ExpressCurate_HtmlParser {
       $options = array('http' => array('user_agent' => $user_agent));
       $context = stream_context_create($options);
       $content = @file_get_contents($url, false, $context);
+      $http_status = $http_response_header;
       foreach ($http_response_header as $header) {
         if (substr(strtolower($header), 0, 13) == "content-type:") {
           if (count(explode(";", $header)) > 1) {
@@ -349,7 +350,6 @@ class ExpressCurate_HtmlParser {
           }
         }
       }
-
       if ($charset && strpos(strtolower($charset), 'utf-8')) {
         $utf8 = true;
       } else {
@@ -358,7 +358,7 @@ class ExpressCurate_HtmlParser {
           $utf8 = true;
         }
       }
-      if (!$utf8) {
+      if (!$utf8 && $set_utf8) {
         $content = utf8_encode($content);
       }
     } elseif (is_callable('curl_init')) {

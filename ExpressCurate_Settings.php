@@ -85,6 +85,7 @@ class ExpressCurate_Settings {
     register_setting('expresscurate-group', 'expresscurate_smart_tagging');
     register_setting('expresscurate-group', 'expresscurate_quotes_style');
     register_setting('expresscurate-group', 'expresscurate_hours_interval');
+    register_setting('expresscurate-group', 'expresscurate_manually_approve_smart');
     add_action('admin_footer', array(&$this, 'add_inline_popup_content'));
     add_action('wp_ajax_expresscurate_export_api_get_terms', array($this->exportAPI, 'get_terms'));
     add_action('wp_ajax_expresscurate_export_api_check_auth', array($this->exportAPI, 'check_auth'));
@@ -111,7 +112,12 @@ class ExpressCurate_Settings {
   public function expresscurate_publish_box() {
     $smart_publishing = '';
     if ($GLOBALS['post']->post_status !== 'publish') {
-      $smart_publishing = '<div class="misc-pub-section expresscurate_smart_puplish"><input type="checkbox" name="expresscurate_smart_publish_status" id="expresscurate_smart_publish_status" value="1" /><span><label for="expresscurate_smart_publish_status">&nbsp;&nbsp;Smart Publish</label></span></div>';
+      if(get_option('expresscurate_manually_approve_smart', '')==0){
+        $checked = 'checked="checked"';
+      }else{
+        $checked = '';
+      }
+      $smart_publishing = '<div class="misc-pub-section expresscurate_smart_puplish"><input type="checkbox" name="expresscurate_smart_publish_status" id="expresscurate_smart_publish_status" value="1" '.$checked.'/><span><label for="expresscurate_smart_publish_status">&nbsp;&nbsp;Smart-Publish</label></span></div>';
     }
     echo $smart_publishing;
   }
@@ -441,23 +447,23 @@ class ExpressCurate_Settings {
 //      krsort($sorted_tags);
 //      array_reverse($sorted_tags);
 //      $tags = $sorted_tags;
-      echo $post_content;
       foreach ($tags as $tag) {
-
         $tag_name = str_replace('/\s+/', '[ ]', $tag->name);
         //preg_match("/(?<!\[a-zA-Z])(?=[^>]*(<|$))#" . $tag_name . "/b(\W|$)/i", $post_content, $tag_in_content);
-        $tag_in_content = strpos($post_content, "#" . $tag_name);
+        //$tag_in_content = strpos($post_content, "/#" . $tag_name);
+        preg_match("/#".$tag_name."/i", $post_content, $tag_in_content);
         if ($tag_in_content) {
           preg_match("/>#" . $tag_name . '(\W|$<\/a>)/i', $post_content, $tag_in_a);
+          var_dump($tag_in_a);
           if (!isset($tag_in_a[0])) {
-            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag_name . "(\W|$)/i", '<a class="expresscurate_contentTags" href="' . get_tag_link($tag->id) . '">#' . strtolower($tag_name) . '</a> ', $post_content, 1);
+            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag_name . "(\W|$)/i", '<a class="expresscurate_contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag_name) . '</a> ', $post_content, 1);
           }
         } else {
           preg_match("/(?<!\w)(?=[^>]*(<|$))" . $tag_name . "(\W|$)/i", $post_content, $tag_in_content);
           if (isset($tag_in_content[0])) {
             preg_match("/>" . $tag_name . '(\W|$<\/a>)/i', $post_content, $tag_in_a);
             if (!isset($tag_in_a[0])) {
-              $post_content = preg_replace("/(\W|^)" . $tag_name . "(\W|$)/i", '$1<a class="expresscurate_contentTags" href="' . get_tag_link($tag->id) . '">#' . strtolower($tag_name) . '</a>$2 ', $post_content, 1);
+              $post_content = preg_replace("/(\W|^)" . $tag_name . "(\W|$)/i", '$1<a class="expresscurate_contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag_name) . '</a>$2 ', $post_content, 1);
             }
           }
         }
@@ -544,7 +550,7 @@ class ExpressCurate_Settings {
           if ($siteDomain != $domain || strpos($image, 'expresscurate_tmp')) {
             //$options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
             //$context = stream_context_create($options);
-            $image_data = $content_manager->file_get_contents_utf8($image);
+            $image_data = $content_manager->file_get_contents_utf8($image, false, false);
             $filename[$i] = basename($image);
             if (wp_mkdir_p($upload_dir['path'])) {
               $file[$i] = $upload_dir['path'] . '/' . $filename[$i];
@@ -899,11 +905,12 @@ class ExpressCurate_Settings {
     $hourdiff = round((strtotime($recent_posts[0]['post_date']) - strtotime($now)) / (60 * 60));
     if ($hourdiff >= get_option("expresscurate_hours_interval") && $posts->have_posts()) {
       wp_update_post(array('ID' => $posts->posts[0]->ID, 'post_status' => 'publish'));
-    } elseif (!$posts->have_posts() && get_settings('admin_email')) {
+      update_option('expresscurate_publish_mail_sent', 0);
+    } elseif (!$posts->have_posts() && get_settings('admin_email') && get_option('expresscurate_publish_mail_sent', '0') == "0") {
       $subject = "ExpressCurate Smart Publishing Status";
       $message = "There is no curated posts to publish \n";
-      wp_mail(get_settings('admin_email'), $subject, $message
-      );
+      wp_mail(get_settings('admin_email'), $subject, $message);
+      update_option('expresscurate_publish_mail_sent', 1);
     }
   }
 
