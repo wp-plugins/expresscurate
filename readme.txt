@@ -99,8 +99,8 @@ e.g.
 = 1.2.4 =
 * Problems with double-links on hashtags are fixed.
 * New Setting: Auto-approval flag for smart-publishing.
-* Spamy-emails issue with smart-publishing is fixed.
-* Paragraph search possibity in the curate content dialog.
+* Spammy-emails issue with smart-publishing is fixed.
+* Paragraph search possibility in the curate content dialog.
 
 = 1.2.3 =
 * Problems with plugin activation are fixed.
