@@ -148,7 +148,11 @@ class ExpressCurate_Keywords {
   public function get_stats($keywords = array(), $args = false, $post_content = false, $get_posts_count = false) {
     if ($_POST && isset($_POST['keywords'])) {
       $keywords = $this->array_map('trim', explode(",", $_POST['keywords']));
-      $post_content = $this->get_words(false, array('title' => $_POST['post_title'], 'content' => $_POST['post_content']));
+      if(isset($_POST['post_title'])){
+        $post_content = $this->get_words(false, array('title' => $_POST['post_title'], 'content' => $_POST['post_content']));
+      }else{
+        $post_content = $this->get_words($args);
+      }
     } else {
       if (!$post_content) {
         $post_content = $this->get_words($args);

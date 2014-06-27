@@ -112,12 +112,12 @@ class ExpressCurate_Settings {
   public function expresscurate_publish_box() {
     $smart_publishing = '';
     if ($GLOBALS['post']->post_status !== 'publish') {
-      if(get_option('expresscurate_manually_approve_smart', '')==0){
+      if (get_option('expresscurate_manually_approve_smart', '') == 0) {
         $checked = 'checked="checked"';
-      }else{
+      } else {
         $checked = '';
       }
-      $smart_publishing = '<div class="misc-pub-section expresscurate_smart_puplish"><input type="checkbox" name="expresscurate_smart_publish_status" id="expresscurate_smart_publish_status" value="1" '.$checked.'/><span><label for="expresscurate_smart_publish_status">&nbsp;&nbsp;Smart-Publish</label></span></div>';
+      $smart_publishing = '<div class="misc-pub-section expresscurate_smart_puplish"><input type="checkbox" name="expresscurate_smart_publish_status" id="expresscurate_smart_publish_status" value="1" ' . $checked . '/><span><label for="expresscurate_smart_publish_status">&nbsp;&nbsp;Smart-Publish</label></span></div>';
     }
     echo $smart_publishing;
   }
@@ -155,12 +155,10 @@ class ExpressCurate_Settings {
     $text = apply_filters('the_content', $text);
 
     $text = preg_replace('@<script[^>]*?>.*?</script>@si', '', $text);
-    //var_dump($text);
     $expresscurateerpt_length = 300;
     if (strlen($text) > $expresscurateerpt_length) {
       $text = $this->truncateHtml($text, $expresscurateerpt_length, '');
     }
-    //var_dump($attachments);die;
     if ($attachments) {
       $attachment_img = wp_get_attachment_image($attachments[0]->ID, 'thumbnail');
       $attachment_img = '<div class="fimgContainer">
@@ -386,6 +384,24 @@ class ExpressCurate_Settings {
     include(sprintf("%s/templates/metabox.php", dirname(__FILE__)));
   }
 
+  private function checkOpenTag($matches) {
+    if (strpos($matches[0], '<') === false) {
+      return $matches[0];
+    } else {
+      return '<strong>' . $matches[1] . '</strong>' . $this->doReplace($matches[2]);
+    }
+  }
+
+  private function doReplace($html) {
+    return preg_replace_callback('/(\b' . $this->word . '\b)(.*?>)/i', array(&$this, 'checkOpenTag'), $html);
+  }
+
+  public function replace($html, $word) {
+    $this->word = $word;
+
+    return $this->doReplace($html);
+  }
+
   public function generate_tags($post_id) {
     $defined_tags = "";
     $post_tags = array();
@@ -406,7 +422,6 @@ class ExpressCurate_Settings {
     }
     $content_tags = array();
     preg_match_all('/(?<!\w)(?=[^>]*(<|$))#\w+/i', $post_content, $content_tags);
-//var_dump($content_tags); die;
 
     foreach ($content_tags[0] as $content_tag) {
       $content_tag_insert = str_replace("#", "", trim($content_tag));
@@ -429,44 +444,28 @@ class ExpressCurate_Settings {
       }
     }
     $tags = get_the_tags($post_id);
-    if ($tags && count($tags)) {
-//      $sorted_tags = array();
-//      foreach ($tags as $tag) {
-//
-//        $tag_name = str_replace('/\s+/', '[ ]', $tag->name);
-//        echo $tag_name . "<br />";
-//        if (isset($sorted_tags[str_word_count($tag_name)])) {
-//          $key = (str_word_count($tag_name) + 1);
-//        } else {
-//          $key = str_word_count($tag_name);
-//        }
-//        $sorted_tags[$key]["name"] = $tag_name;
-//        $sorted_tags[$key]["id"] = $tag->term_id;
-//      }
-//      var_dump($sorted_tags);
-//      krsort($sorted_tags);
-//      array_reverse($sorted_tags);
-//      $tags = $sorted_tags;
+    $count_tags = count($tags);
+    if ($tags && count($count_tags)) {
+
+      $sorted_tags = array();
+
       foreach ($tags as $tag) {
         $tag_name = str_replace('/\s+/', '[ ]', $tag->name);
-        //preg_match("/(?<!\[a-zA-Z])(?=[^>]*(<|$))#" . $tag_name . "/b(\W|$)/i", $post_content, $tag_in_content);
-        //$tag_in_content = strpos($post_content, "/#" . $tag_name);
-        preg_match("/#".$tag_name."/i", $post_content, $tag_in_content);
-        if ($tag_in_content) {
-          preg_match("/>#" . $tag_name . '(\W|$<\/a>)/i', $post_content, $tag_in_a);
-          var_dump($tag_in_a);
-          if (!isset($tag_in_a[0])) {
-            $post_content = preg_replace("/(?<!\w)(?=[^>]*(<|$))#" . $tag_name . "(\W|$)/i", '<a class="expresscurate_contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag_name) . '</a> ', $post_content, 1);
-          }
-        } else {
-          preg_match("/(?<!\w)(?=[^>]*(<|$))" . $tag_name . "(\W|$)/i", $post_content, $tag_in_content);
-          if (isset($tag_in_content[0])) {
-            preg_match("/>" . $tag_name . '(\W|$<\/a>)/i', $post_content, $tag_in_a);
-            if (!isset($tag_in_a[0])) {
-              $post_content = preg_replace("/(\W|^)" . $tag_name . "(\W|$)/i", '$1<a class="expresscurate_contentTags" href="' . get_tag_link($tag->term_id) . '">#' . strtolower($tag_name) . '</a>$2 ', $post_content, 1);
-            }
-          }
-        }
+        $sorted_tags[$tag_name]["count_words"] = str_word_count($tag_name);
+        $sorted_tags[$tag_name]["name"] = $tag_name;
+        $sorted_tags[$tag_name]["id"] = $tag->term_id;
+      }
+      // For php5.3
+//      usort($sorted_tags, function ($a, $b) {
+//                return $b['count_words'] - $a['count_words'];
+//              });
+      usort($sorted_tags, create_function('$a,$b', 'return $b["count_words"] - $a["count_words"];'));
+      $tags = $sorted_tags;
+      $tagsObj = new Expresscurate_Tags();
+      $post_content = $tagsObj->removeTagLinks($the_post->post_content);
+      foreach ($tags as $tag) {
+        $tag_name = str_replace('/\s+/', '[ ]', $tag["name"]);
+        $post_content = $tagsObj->createTag($post_content, $tag_name, $tag["id"]);
       }//end tags
     }
     return $post_content;
@@ -740,9 +739,12 @@ class ExpressCurate_Settings {
           }
         }
       }
-
       if ($keywords && !is_author()) {
-        $keword_arr = array_map('trim', explode(',', $keywords));
+        if (!is_array($keywords)) {
+          $keword_arr = array_map('trim', explode(',', $keywords));
+        } else {
+          $keword_arr = $keywords;
+        }
         $keword_arr = array_unique($keword_arr);
         $keywords = wp_filter_nohtml_kses(str_replace('"', '', implode(',', $keword_arr)));
         $meta_string .= sprintf("<meta name=\"keywords\" content=\"%s\" />\n", $keywords);
@@ -934,7 +936,7 @@ class ExpressCurate_Settings {
   public function keywords_widget() {
     ?>
     <div id="expresscurate_keywords_widget" class="expresscurate_keywords_widget" title="<?php echo self::PLUGIN_NAME ?>">
-    <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
+      <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }
@@ -942,9 +944,36 @@ class ExpressCurate_Settings {
   public function search_widget() {
     ?>
     <div id="expresscurate_search_widget" class="expresscurate_search_widget  " title="<?php echo self::PLUGIN_NAME ?>">
-    <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
+      <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
+  }
+
+}
+
+class Expresscurate_Tags {
+
+  private function checkOpenTag($matches) {
+    if (strpos($matches[3], '</a') < strpos($matches[3], '<a')) {
+      return $matches[0];
+    } else {
+      return '<a class="expresscurate_contentTags" href="' . get_tag_link($this->tag_id) . '">#' . strtolower($matches[0]) . '</a>';
+    }
+  }
+
+  private function doReplace($html) {
+    return preg_replace_callback('/(\b' . $this->word . '\b)(?=[^>]*(<|$))(?=(.*?>))/Uis', array(&$this, 'checkOpenTag'), $html, 1);
+  }
+
+  public function createTag($html, $word, $tag_id) {
+    $this->word = $word;
+    $this->tag_id = $tag_id;
+    return $this->doReplace($html);
+  }
+
+  public function removeTagLinks($html) {
+    $tagLinks = '/<a class="expresscurate_contentTags".*?>(.*?)<\/a>/i';
+    return str_replace("#", "", preg_replace($tagLinks, '$1', $html));
   }
 
 }

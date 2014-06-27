@@ -169,8 +169,10 @@ class ExpressCurate_ExportAPI {
         }
       }
       $post_id = $this->insert_post($data, $post_status);
+      $post_categories = wp_get_post_categories($post_id, array( 'fields' => 'names'));
+      $post_tags = wp_get_post_tags($post_id, array( 'fields' => 'names'));
       if ($post_id) {
-        $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'msg' => "Post saved as " . $post_status . "."));
+        $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'post_categories'=>$post_categories, 'post_tags'=>$post_tags, 'msg' => "Post saved as " . $post_status . "."));
       } else {
         $result = json_encode(array('status' => "error", 'msg' => "Something went wrong!"));
       }
@@ -203,13 +205,13 @@ class ExpressCurate_ExportAPI {
     $meta_value = 1;
     add_post_meta($post_id, $meta_key, $meta_value);
     if (isset($data['keywords']) && $data['keywords']) {
-      add_post_meta($post_id, '_expresscurate_keywords', $data['keywords']);
+      update_post_meta($post_id, '_expresscurate_keywords', $data['keywords']);
     }
     if (isset($data['description']) && $data['description']) {
-      add_post_meta($post_id, '_expresscurate_description', $data['description']);
+      update_post_meta($post_id, '_expresscurate_description', $data['description']);
     }
     if ($post_status == 'draft' && get_option('expresscurate_publish', '') == 1) {
-      add_post_meta($post_id, '_expresscurate_smart_publish', 1);
+      update_post_meta($post_id, '_expresscurate_smart_publish', 1);
     }
 
     return $post_id;

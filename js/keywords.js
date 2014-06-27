@@ -228,7 +228,7 @@ jQuery(document).ready(function ($) {
 
     jQuery('.usedWordsPart ul .add').live('click', function () {
         jQuery(this).parents('li').css({'background-color': '#FCFCFC'});
-        add_keyword(checkKeyword(jQuery(this).parent().find('.word')), jQuery('.keywordsPart ul'));
+        insertKeyword_KeywordsSettings(multipleKeywords(jQuery(this).parent().find('.word')), jQuery('.keywordsPart ul'));
         jQuery(this).parents('li').fadeOut(1000).remove();
         if (jQuery('.usedWordsPart ul li').length == 0) {
             jQuery('.usedWordsPart .notDefined').removeClass('expresscurate_displayNone');
