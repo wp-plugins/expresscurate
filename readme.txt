@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
 Requires at least: 3.9
 Tested up to: 3.9
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -96,15 +96,19 @@ e.g.
 
 == Changelog ==
 
+= 1.2.6 =
+* Improved text selection in content curation dialog
+* It is now possible to filter out short paragraphs in content curation dialog.
+* It is now possible to search within loaded paragraphs in content curation dialog.
+* Toolbar button that allows to highlight post keywords.
+* Miscellaneous bug fixes and improvements.
+
 = 1.2.5 =
 * Hashtagging is improved and bugfixed.
 * Keywords adding is fixed.
 
 = 1.2.4 =
 * Problems with double-links on hashtags are fixed.
-* New Setting: Auto-approval flag for smart-publishing.
-* Spammy-emails issue with smart-publishing is fixed.
-* Paragraph search possibility in the curate content dialog.
 
 = 1.2.3 =
 * Problems with plugin activation are fixed.

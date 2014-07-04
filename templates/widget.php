@@ -3,8 +3,10 @@ global $post;
 ?>
 <a name="expresscurate" id="expresscurate" xmlns="http://www.w3.org/1999/html"></a>
 <div id="expresscurate_widget_wrapper" class="expresscurate_widget_wrapper">
-    <label>Keywords <span><a href="#" onclick="updateKeywords();
-      return false;"></a></span></label>
+    <label>Keywords <span class="rotate"><a href="#" onclick="SEOControl.updateKeywords();
+      return false;"></a></span>
+        <span class="mark" onclick="Keywords.markEditorKeywords();return false;"><span>mark keywords</span></span>
+    </label>
     <?php
     $keywords = new ExpressCurate_Keywords();
     $new_post_data = false;

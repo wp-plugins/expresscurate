@@ -7,8 +7,8 @@ $keywords_stats = $keywords->get_stats(false, false, $post_content, true);
 <div class="expresscurate_dashboard">
   <div>
       <div class="dashboardMessage expresscurate_displayNone">
-          <span>Currently you don't have any defined keywords. Start adding now.  <a class="settingsLink"
-                                                                                    href="admin.php?page=expresscurate_keywords">Keywords Dashboard</a></span>
+          <span>Currently you don't have any defined keywords.  <a class="settingsLink"
+                                                                                    href="admin.php?page=expresscurate_keywords">Start adding now.</a></span>
       </div>
   <?php
   foreach ($keywords_stats as $word => $stat) {

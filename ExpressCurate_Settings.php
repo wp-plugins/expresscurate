@@ -270,11 +270,15 @@ class ExpressCurate_Settings {
 
   public function expresscurate_add_plugins($plugin_array) {
     $pluginUrl = plugin_dir_url(__FILE__);
-    $plugin_array['expresscurate'] = $pluginUrl . 'js/expresscurate_buttons.js';
+    //$plugin_array['expresscurate'] = $pluginUrl . 'js/expresscurate_buttons.js';
+      $plugin_array['expresscurate'] = $pluginUrl . 'js/Buttons.js';
     return $plugin_array;
   }
 
   public function expresscurate_register_buttons($buttons) {
+    if (get_option('expresscurate_seo', '') == 1) {
+      array_push($buttons, 'markKeywords');
+    }
     array_push($buttons, 'annotation');
     array_push($buttons, 'lefttextbox');
     array_push($buttons, 'justifytextbox');
@@ -312,7 +316,7 @@ class ExpressCurate_Settings {
   public function add_inline_popup_content() {
     ?>
     <div id="expresscurate_dialog" class="expresscurate_dialog" title="<?php echo self::PLUGIN_NAME ?>">
-      <?php include(sprintf("%s/templates/metabox.php", dirname(__FILE__))); ?>
+      <?php include(sprintf("%s/templates/dialog.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }
@@ -381,7 +385,7 @@ class ExpressCurate_Settings {
   }
 
   public function add_inner_meta_boxes($post) {
-    include(sprintf("%s/templates/metabox.php", dirname(__FILE__)));
+    include(sprintf("%s/templates/dialog.php", dirname(__FILE__)));
   }
 
   private function checkOpenTag($matches) {
@@ -403,6 +407,7 @@ class ExpressCurate_Settings {
   }
 
   public function generate_tags($post_id) {
+    $tagsObj = new Expresscurate_Tags();
     $defined_tags = "";
     $post_tags = array();
     if (@get_option("expresscurate_defined_tags")) {
@@ -412,8 +417,12 @@ class ExpressCurate_Settings {
       $defined_tags = explode(",", $defined_tags);
     }
     $the_post = get_post($post_id);
+
 // get the content of the post
     $post_content = $the_post->post_content;
+    if (strpos($post_content, 'keywordsHighlight') !== false) {
+      $post_content = $tagsObj->removeHighlights($post_content);
+    }
     $tags = get_the_tags($post_id);
     if ($tags) {
       foreach ($tags as $tag) {
@@ -461,7 +470,7 @@ class ExpressCurate_Settings {
 //              });
       usort($sorted_tags, create_function('$a,$b', 'return $b["count_words"] - $a["count_words"];'));
       $tags = $sorted_tags;
-      $tagsObj = new Expresscurate_Tags();
+
       $post_content = $tagsObj->removeTagLinks($the_post->post_content);
       foreach ($tags as $tag) {
         $tag_name = str_replace('/\s+/', '[ ]', $tag["name"]);
@@ -513,6 +522,10 @@ class ExpressCurate_Settings {
     } else {
       $the_post = get_post($post_id);
       $post_content = $the_post->post_content;
+      if (strpos($post_content, 'keywordsHighlight') !== false) {
+        $tags_obj = new Expresscurate_Tags();
+        $post_content = $tags_obj->removeHighlights($post_content);
+      }
     }
 
     //Smart publishing
@@ -626,6 +639,10 @@ class ExpressCurate_Settings {
       } else {
         $the_post = get_post($post_id);
         $post_content = $the_post->post_content;
+        if (strpos($post_content, 'keywordsHighlight') !== false) {
+          $tags_obj = new Expresscurate_Tags();
+          $post_content = $tags_obj->removeHighlights($post_content);
+        }
       }
       $curated_post = array(
           'ID' => $post_id,
@@ -825,8 +842,20 @@ class ExpressCurate_Settings {
 
   public function expresscurate_admin_print_styles() {
     $plaugunUrl = plugin_dir_url(__FILE__);
-    wp_enqueue_script('expresscurate', $plaugunUrl . 'js/expresscurate.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
-    wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
+    //wp_enqueue_script('expresscurate', $plaugunUrl . 'js/expresscurate.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
+    //wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
+      //
+      wp_enqueue_script('expresscurate_menu', $plaugunUrl . 'js/Menu.js');
+      wp_enqueue_script('expresscurate_dialog', $plaugunUrl . 'js/Dialog.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
+      wp_enqueue_script('expresscurate_settings', $plaugunUrl . 'js/Settings.js', array('jquery'));
+      wp_enqueue_script('expresscurate_support', $plaugunUrl . 'js/Support.js', array('jquery'));
+      wp_enqueue_script('expresscurate_faq', $plaugunUrl . 'js/FAQ.js', array('jquery'));
+
+      wp_enqueue_script('expresscurate_keyword_utils', $plaugunUrl . 'js/Keywords/KeywordUtils.js', array('jquery'));
+      wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/Keywords/Keywords.js', array('jquery'));
+      wp_enqueue_script('expresscurate_seo_control_center', $plaugunUrl . 'js/Keywords/SEOControlCenter.js', array('jquery'));
+      wp_enqueue_script('expresscurate_keywords_dashboard_widget', $plaugunUrl . 'js/Keywords/DashboardWidget.js', array('jquery'));
+      //
     wp_enqueue_style('texpresscurate', $plaugunUrl . 'css/expresscurate.css');
     wp_enqueue_style('wp-jquery-ui-dialog');
     wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.8.css');
@@ -843,7 +872,7 @@ class ExpressCurate_Settings {
 
   public static function getCurationNews($url = self::NEWS_FEED_URL) {
     libxml_disable_entity_loader(false);
-    $rss = new DOMDocument();
+    $rss = new DOMDocument('1.0', 'UTF-8');
     $feed = array();
     if (ini_get('allow_url_fopen') && $rss->load($url, LIBXML_NOWARNING) === true) {
       foreach ($rss->getElementsByTagName('item') as $i => $node) {
@@ -974,6 +1003,11 @@ class Expresscurate_Tags {
   public function removeTagLinks($html) {
     $tagLinks = '/<a class="expresscurate_contentTags".*?>(.*?)<\/a>/i';
     return str_replace("#", "", preg_replace($tagLinks, '$1', $html));
+  }
+
+  public function removeHighlights($html) {
+    $spans = '/<span class="keywordsHighlight".*?>(.*?)<\/span>/i';
+    return preg_replace($spans, '$1', $html);
   }
 
 }

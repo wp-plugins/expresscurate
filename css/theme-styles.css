@@ -1,3 +1,12 @@
+
+.expresscurate_keywordsHighlight{
+    background-color: rgb(255, 198, 125);
+    /* color: #1CBB9F;
+    border-style: solid;
+     border-width: 1px;
+     border-color: #1CBB9F;*/
+}
+
 .expresscurate_contentTags{
 	font-style:italic;
 	text-decoration:none !important;

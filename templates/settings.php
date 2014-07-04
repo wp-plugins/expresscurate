@@ -413,7 +413,10 @@
 </tr>
 <tr valign="top">
     <th scope="row" colspan="2">
-        <div id="publisherWrap">
+        <div id="publisherWrap" class=" <?php if ($expresscurate_seo=='Off') {
+    echo 'expresscurate_displayNone';
+    }
+    ?> />">
             <table class="width-bottom-border">
                 <tr>
                     <th scope="row" class="width-for-td">

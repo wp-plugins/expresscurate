@@ -5,6 +5,10 @@ $user_email = '';
 if ($current_user->user_email) {
   $user_email = $current_user->user_email;
 }
+$msg_placeholder = 'Message';
+if(isset($_GET['type']) && $_GET['type']=='keywords'){
+    $msg_placeholder = 'Please, write your suggestions here ...';
+}
 $sent = false;
 if ($_POST) {
   if ($_POST['expresscurate_support_email'] && $_POST['expresscurate_support_message']) {
@@ -49,8 +53,8 @@ if ($_POST) {
           <input id="expresscurate_support_email" name="expresscurate_support_email" class="inputStyle" placeholder="Email"
                  value="<?php echo $user_email ?>"/>
           <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
-                    placeholder="Message"></textarea>
-          <a class="feedbackButton send greenBackground" href="#" onclick="expresscurate_support_submit();">Send</a>
+                    placeholder="<?php echo $msg_placeholder?>"></textarea>
+          <a class="feedbackButton send greenBackground" href="#" onclick="Support.expresscurateSupportSubmit();">Send</a>
         </form>
     </div>
   </div>

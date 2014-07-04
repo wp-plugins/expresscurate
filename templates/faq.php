@@ -66,7 +66,7 @@ $limit = 3;
                value="<?php echo $user_email ?>"/>
         <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
                   placeholder="Question"></textarea>
-        <a class="askButton send greenBackground" href="#" onclick="expresscurate_support_submit();">Ask</a>
+        <a class="askButton send greenBackground" href="#" onclick="FAQ.expresscurateSupportSubmit();">Ask</a>
       </form>
     </div>
   </div>

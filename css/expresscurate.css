@@ -64,7 +64,7 @@
 }
 /*keywords settings*/
 .expresscurate_keywords_settings{
-    max-width: 1124px;
+    max-width: 1224px;
 }
 .expresscurate_keywords_settings label {
     font-size: 23px;
@@ -86,7 +86,7 @@
     float: right;
     display: inline-block;
     color: #1cbb9f;
-    margin: 50px 50px 0 0;
+    margin: 50px 150px 0 0;
     cursor: pointer;
 }
     .expresscurate_keywords_settings .writeUs span{
@@ -128,6 +128,7 @@
     .expresscurate_keywords_settings .usedWordsPart {
         padding-left: 35px;
         min-width: 440px;
+        padding-right: 120px;
     }
 
             .expresscurate_keywords_settings .usedWordsPart .verticalCenter {
@@ -619,6 +620,56 @@
             vertical-align: text-bottom;
             margin:0 0 2px 5px;
         }
+        .expresscurate_widget_wrapper .mark{
+            background-image: url("../images/markKeywords.png");
+            background-position: bottom;
+            background-repeat: no-repeat;
+            width: 25px;
+            height: 20px;
+            margin: 0 5px 0 0;
+            float: right;
+            position: relative;
+        }
+            .expresscurate_dialog .footer .labels li.markButton span,
+            .expresscurate_widget_wrapper .mark span{
+                display: none;
+                position: absolute;
+                bottom: -2px;
+                height: 18px;
+                font-size: 13px;
+                font-family: OpenSans-Regular;
+                line-height: 13px;
+                background: #303030;
+                color: #ffffff;
+                -moz-border-radius: 0px;
+                -webkit-border-radius: 0px;
+                border-radius: 0px;
+                z-index: 100;
+                padding: 0 9px;
+                width: 93px;
+                padding-top: 5px;
+                left: -135px;
+            }
+            .expresscurate_dialog .footer .labels li.markButton span{
+                bottom: 3px !important;
+            }
+                .expresscurate_dialog .footer .labels li.markButton span:before,
+                .expresscurate_widget_wrapper .mark span:before{
+                    content: '';
+                    display: block;
+                    width: 0;
+                    height: 0;
+                    position: absolute;
+                    border-top: 11px solid transparent;
+                    border-bottom: 11px solid transparent;
+                    border-left: 11px solid #303030;
+                    top: 0px;
+                    right: -11px;
+                }
+            .expresscurate_dialog .footer .labels li.markButton:hover span,
+            .expresscurate_widget_wrapper .mark:hover span{
+                display: block;
+            }
         .expresscurate_widget_wrapper label .rotated {
             transition-duration: 800ms;
             -webkit-transition-duration: 800ms;
@@ -884,11 +935,12 @@
                             font-size: 12px;
                             font-family: OpenSans-Regular;
                             line-height: 14px;
-                            background: #303030;
+                            background: #161616;
+                            opacity: .9;
                             color: #ffffff;
-                            -moz-border-radius: 0;
-                            -webkit-border-radius: 0;
-                            border-radius: 0;
+                            -moz-border-radius: 3px;
+                            -webkit-border-radius: 3px;
+                            border-radius: 3px;
                             z-index: 100;
                             padding: 0 5px;
                             width: 170px;
@@ -902,11 +954,11 @@
                                 width: 0;
                                 height: 0;
                                 position: absolute;
-                                border-left: 9px solid transparent;
-                                border-right: 9px solid transparent;
-                                border-bottom: 9px solid #303030;
-                                top: -9px;
-                                left: 90px;
+                                border-left: 5px solid transparent;
+                                border-right: 5px solid transparent;
+                                border-bottom: 5px solid #161616;
+                                top: -5px;
+                                left: 85px;
                             }
                         .expresscurate_widget .description .hint:hover .tooltip{
                             display: block;
@@ -1211,7 +1263,7 @@
 }
 
 .expresscurate_dialog .footer {
-    padding: 0 10px;
+    padding: 0 15px;
 }
 
 #expresscurate_dialog div.mce-toolbar-grp {
@@ -1246,7 +1298,17 @@
     padding: 2px 8px;
     text-align: center;
 }
-
+.expresscurate_dialog .footer .labels li.markButton{
+    height: 31px;
+    width: 31px;
+    float: right;
+    background-image: url("../images/markKeywords.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+}
 .expresscurate_dialog .footer .labels a.remove {
     background-image: url("../images/expresscurate_sprite.png");
     background-repeat: no-repeat;
@@ -1297,30 +1359,65 @@
 }
 /*show short paragraphs*/
 .expresscurate_dialog_shortPar{
-    text-align: center;
-    line-height: 35px;
-    padding: 0 10px;
-    height: 35px;
-    width: auto;
+    width: 200px;
+    float: right !important;
+    background-color: transparent !important;
 }
-    .expresscurate_dialog_shortPar span{
-        text-decoration: none;
-        color: #fff;
+    .expresscurate_dialog_shortPar label{
+        color: #555555;
+        font-family: OpenSans-Regular;
+        font-size: 14px;
     }
-    .expresscurate_dialog_shortPar .expresscurate_radioLabel{
-        margin-left: 25px !important;
+    .expresscurate_dialog_shortPar .shortPButton{
+        display: inline-block;
+        line-height: 21px;
+        height: 21px;
+        border-style: solid;
+        border-width: 1px;
+        float: right;
+        margin-top: 8px;
+        text-align: left;
     }
-        .expresscurate_dialog_shortPar .expresscurate_radioLabel:before{
-            border-color: #fff !important;
-            margin-top: 7px !important;
-            border-width: 2px !important;
+
+    .expresscurate_dialog_shortPar .shortPButtonActive{
+        border-color: #25bfa1;
+        color: #25bfa1;
+        width: 56px;
+        padding-left: 5px;
+    }
+    .expresscurate_dialog_shortPar .shortPButtonInactive{
+        border-color: #bdbdbd;
+        color: #bdbdbd;
+        width: 53px;
+        padding-left: 8px;
+    }
+        .expresscurate_dialog_shortPar .shortPButton span{
+            display: inline-block;
+            width: 17px;
+            height: 17px;
+            margin: 2px;
+            float: right;
         }
-            .expresscurate_dialog_shortPar #shortTexts[type=radio]:checked + label:before{
+        .expresscurate_dialog_shortPar .shortPButtonActive span{
+            background-color: #25bfa1;
+        }
+        .expresscurate_dialog_shortPar .shortPButtonInactive span{
+            background-color: #bdbdbd;
+        }
+
+/* .expresscurate_dialog_shortPar .expresscurate_radioLabel{
+    margin-left: 0px !important;
+}
+    /*.expresscte_dialog_shortPar .expresscurate_radioLabel:before{
+        border:none;
+        margin-top: 7px !important;
+    }*/
+            /*.expresscurate_dialog_shortPar #shortTexts[type=radio]:checked + label:before{
                 background-image: url("../images/radioCheckedWhite.png");
                 background-repeat: no-repeat;
                 background-position: center;
-                background-size: 10px;
-            }
+                background-size: 12px;
+            }*/
 /*search paragraphs*/
 .expresscurate_dialog_search{
     background-color: #777777 !important;
@@ -1374,7 +1471,7 @@
     background-position: 0 0;
     background-size: auto 408px;
     padding: 0 40px;
-    width: 787px;
+    width: 784px;
     height: 66px;
     padding: 0 33px;
     box-sizing: border-box;
@@ -1936,7 +2033,9 @@
             background-color: #25bfa1;
             color: #ffffff !important;
             text-align: center;
-
+            width: 100%;
+            height: 100%;
+            padding: 0;
         }
            .expresscurate_faq .questionBox span,
            .expresscurate_trendingPosts .questionBox span{
@@ -1962,6 +2061,7 @@
         margin: 5px;
         width: 240px;
         height: 177px;
+        background-color: #fff;
     }
 /*menu*/
 .expresscurate_tabMenu{
@@ -2004,6 +2104,7 @@
     -ms-transition: left 500ms ;
     right: auto;
     bottom: 0px;
+    z-index: 1;
 }
 @media  (max-width: 1020px){
     .expresscurate_tabMenu{
@@ -2036,4 +2137,8 @@
 .expresscurate_marginTopBottom10{
     margin: 10px 0px;
     display: block;
+}
+.mce-toolbar .mce-btn[aria-label='Highlight Keywords'] i{
+    width: 25px !important;
+    background-repeat: no-repeat;
 }

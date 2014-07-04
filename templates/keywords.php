@@ -11,7 +11,7 @@ $keywords_stats = $keywords->get_stats(false, false, $post_content, true);
     <input type="hidden" id="expresscurate_admin_url" value="<?php echo admin_url(); ?>"/>
     <input type="hidden" id="expresscurate_plugin_dir" value="<?php echo plugin_dir_url(__FILE__); ?>"/>
     <label>Keywords Dashboard<sup>beta</sup></label>
-    <a href="mailto:support@expresscurate.com" class="writeUs">Suggestions? <span>Submit here!</span></a>
+    <a href="admin.php?page=expresscurate&type=keywords" class="writeUs">Suggestions? <span>Submit here!</span></a>
     <div class="expresscurate_clear"></div>
     <div class="keywordsPart">
         <div class="keywordsWrap">

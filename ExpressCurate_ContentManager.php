@@ -239,29 +239,7 @@ class ExpressCurate_HtmlParser {
         }
         $i++;
       }
-    }
-
-//get text
-    $pTags = $xpath->query('//p');
-
-    $pi = 0;
-    foreach ($pTags as $t) {
-      if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
-        //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
-        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue), ENT_QUOTES, "UTF-8"));
-        $pi++;
-      }
       $t->parentNode->removeChild($t);
-    }
-
-    $textTags = $xpath->query('//text()');
-
-    foreach ($textTags as $t) {
-      if (strlen(trim($t->nodeValue)) > 100 && $pi < 150) {
-        //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
-        $result_paragraphs[] = strip_tags(htmlentities(trim($t->nodeValue), ENT_QUOTES, "UTF-8"));
-        $pi++;
-      }
     }
 //get H1
     $h1Tag = $xpath->query('//h1');
@@ -269,6 +247,7 @@ class ExpressCurate_HtmlParser {
       if (strlen($h1->nodeValue) > 3) {
         $result_h1 .= htmlentities($h1->nodeValue, ENT_QUOTES, "UTF-8") . "\n";
       }
+      $h1->parentNode->removeChild($h1);
     }
 //get H2
     $h2Tag = $xpath->query('//h2');
@@ -276,12 +255,40 @@ class ExpressCurate_HtmlParser {
       if (strlen($h2->nodeValue) > 3) {
         $result_h2 .= htmlentities($h2->nodeValue, ENT_QUOTES, "UTF-8") . "\n";
       }
+      $h2->parentNode->removeChild($h2);
     }
 //get H3
     $h3Tag = $xpath->query('//h3');
     foreach ($h3Tag as $h3) {
       if (strlen($h3->nodeValue) > 3) {
         $result_h3 .= htmlentities($h3->nodeValue, ENT_QUOTES, "UTF-8") . "\n";
+      }
+      $h3->parentNode->removeChild($h3);
+    }
+//get text
+    $i = 0;
+    $articleTags = $xpath->query('/html/body/article');
+    foreach ($articleTags as $t) {
+      //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
+      $result_paragraphs[$i]['value'] = strip_tags(htmlentities(trim($t->nodeValue), ENT_QUOTES, "UTF-8"));
+      $result_paragraphs[$i]['tag'] = 'article';
+      $t->parentNode->removeChild($t);
+      $i++;
+    }
+
+
+    $textTags = $xpath->query('/html/body//text()');
+
+    foreach ($textTags as $t) {
+      if ($t->length > 15 && $t->parentNode->tagName != 'a' && $t->parentNode->tagName != 'h1' && $t->parentNode->tagName != 'h2' && $t->parentNode->tagName != 'h3') {
+        //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
+        $result_paragraphs[$i]['value'] = strip_tags(htmlentities($t->nodeValue, ENT_QUOTES, "UTF-8"));
+        if ($t->parentNode->nodeName == "blockquote" || $t->parentNode->parentNode->nodeName == "blockquote" || $t->parentNode->parentNode->parentNode->nodeName == "blockquote") {
+          $result_paragraphs[$i]['tag'] = "blockquote";
+        } else {
+          $result_paragraphs[$i]['tag'] = $t->parentNode->nodeName;
+        }
+        $i++;
       }
     }
 
@@ -350,6 +357,16 @@ class ExpressCurate_HtmlParser {
           }
         }
       }
+      $headers = headers_list();
+      // get the content type header
+      foreach ($headers as $header) {
+        if (substr(strtolower($header), 0, 13) == "content-type:") {
+          list($contentType, $charset) = explode(";", trim(substr($header, 14), 2));
+          if (strtolower(trim($charset)) == "charset=utf-8") {
+            $utf8 = true;
+          }
+        }
+      }
       if ($charset && strpos(strtolower($charset), 'utf-8')) {
         $utf8 = true;
       } else {
@@ -366,7 +383,6 @@ class ExpressCurate_HtmlParser {
       //curl_setopt($ch, CURLOPT_HEADER, 1);
       curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: text/xml;charset=\"utf-8\""));
-
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
