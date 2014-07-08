@@ -282,10 +282,17 @@ class ExpressCurate_HtmlParser {
     foreach ($textTags as $t) {
       if ($t->length > 15 && $t->parentNode->tagName != 'a' && $t->parentNode->tagName != 'h1' && $t->parentNode->tagName != 'h2' && $t->parentNode->tagName != 'h3') {
         //$result_paragraphs[] = strip_tags($this->escapeJsonString(trim($t->nodeValue)));
-        $result_paragraphs[$i]['value'] = strip_tags(htmlentities($t->nodeValue, ENT_QUOTES, "UTF-8"));
         if ($t->parentNode->nodeName == "blockquote" || $t->parentNode->parentNode->nodeName == "blockquote" || $t->parentNode->parentNode->parentNode->nodeName == "blockquote") {
+          if ($t->parentNode->nodeName == "blockquote") {
+            $result_paragraphs[$i]['value'] = strip_tags(htmlentities($t->parentNode->nodeValue, ENT_QUOTES, "UTF-8"));
+          } elseif ($t->parentNode->parentNode && $t->parentNode->parentNode->nodeName == "blockquote") {
+            $result_paragraphs[$i]['value'] = strip_tags(htmlentities($t->parentNode->parentNode->nodeValue, ENT_QUOTES, "UTF-8"));
+          } elseif ($t->parentNode->parentNode->parentNode && $t->parentNode->parentNode->parentNode->nodeName == "blockquote") {
+            $result_paragraphs[$i]['value'] = strip_tags(htmlentities($t->parentNode->parentNode->parentNode->nodeValue, ENT_QUOTES, "UTF-8"));
+          }
           $result_paragraphs[$i]['tag'] = "blockquote";
         } else {
+          $result_paragraphs[$i]['value'] = strip_tags(htmlentities($t->nodeValue, ENT_QUOTES, "UTF-8"));
           $result_paragraphs[$i]['tag'] = $t->parentNode->nodeName;
         }
         $i++;
@@ -321,8 +328,8 @@ class ExpressCurate_HtmlParser {
       arsort($smart_tags);
       $smart_tags = array_slice(array_keys(array_reverse($smart_tags)), 0, $max_count);
     }
-
-    $result = array('title' => $this->title, 'headings' => array('h1' => $result_h1, 'h2' => $result_h2, 'h3' => $result_h3), 'metas' => array('description' => $this->description, 'keywords' => $smart_tags), 'images' => $result_images, 'paragraphs' => $result_paragraphs);
+    $result_paragraphs_unique = $this->arrayUnique($result_paragraphs);
+    $result = array('title' => $this->title, 'headings' => array('h1' => $result_h1, 'h2' => $result_h2, 'h3' => $result_h3), 'metas' => array('description' => $this->description, 'keywords' => $smart_tags), 'images' => $result_images, 'paragraphs' => $result_paragraphs_unique);
 
     $data = array('status' => 'success', 'result' => $result);
     echo json_encode($data);
@@ -399,6 +406,30 @@ class ExpressCurate_HtmlParser {
     } else {
       return array('content' => $content, 'http_status' => $http_status);
     }
+  }
+
+  private function arrayUnique($array, $preserveKeys = false) {
+    // Unique Array for return
+    $arrayRewrite = array();
+    // Array with the md5 hashes
+    $arrayHashes = array();
+    foreach ($array as $key => $item) {
+      // Serialize the current element and create a md5 hash
+      $hash = md5(serialize($item));
+      // If the md5 didn't come up yet, add the element to
+      // to arrayRewrite, otherwise drop it
+      if (!isset($arrayHashes[$hash])) {
+        // Save the current element hash
+        $arrayHashes[$hash] = $hash;
+        // Add element to the unique Array
+        if ($preserveKeys) {
+          $arrayRewrite[$key] = $item;
+        } else {
+          $arrayRewrite[] = $item;
+        }
+      }
+    }
+    return $arrayRewrite;
   }
 
   private function removeElementsByTagName($tagName, $document) {

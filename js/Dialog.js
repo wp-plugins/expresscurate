@@ -9,7 +9,7 @@ var ExpresscurateDialog = (function(jQuery){
         var editor = tinyMCE.get('content');
         if (editor) {
             editor.execCommand("mceInsertContent", true, html);
-        } else {
+        } else {  
             editor = jQuery('#content');
             if (editor.length == 0) {
                 if (tinyMCE.editors.length > 0) {
@@ -112,7 +112,7 @@ var ExpresscurateDialog = (function(jQuery){
         jQuery.each(keywords, function (index, value) {
             keywords_html += '<li  id="curated_post_tag_' + index + '"><span>' + value + '</span><a href="#" class="remove" onclick="ExpresscurateDialog.delCuratedTag(' + index + '); return false;">&times;</a></li>';
         });
-        keywords_html+='<li class="markButton" onclick="Keywords.markCuratedKeywords();return false;"><span>mark keywords</span></li>';
+        keywords_html+='<li class="expresscurate_preventTextSelection markButton" onclick="Keywords.markCuratedKeywords();return false;"><span>mark keywords</span></li>';
         jQuery("#curated_tags").html(keywords_html);
     };
 
@@ -157,7 +157,7 @@ var ExpresscurateDialog = (function(jQuery){
     };
 
     var displayShortParagraphs = function () {
-        var shortParagraphs_html = '<li class="expresscurate_dialog_shortPar expresscurate_shortParInactiveColor">\
+        var shortParagraphs_html = '<li class="expresscurate_preventTextSelection expresscurate_dialog_shortPar expresscurate_shortParInactiveColor">\
             <label>Short Paragraphs</label>\
             <span class="shortPButton shortPButtonActive">show<span></span></span>\
         </li>';
@@ -165,7 +165,7 @@ var ExpresscurateDialog = (function(jQuery){
     };
 
     var displayCuratedParagraphsSearch = function () {
-        var search_html = '<li class="expresscurate_dialog_search">\
+        var search_html = '<li class="expresscurate_preventTextSelection expresscurate_dialog_search">\
             <input class="disableInputStyle expresscurate_displayNone"/>\
             <span class="close expresscurate_displayNone">&#215</span>\
             <span class="icon"></span>\
@@ -603,8 +603,12 @@ var ExpresscurateDialog = (function(jQuery){
                 elem.addClass('shortPButtonActive').removeClass('shortPButtonInactive').html('show<span></span>');
                 shortestParagraphLength = 150;
             }
-            displayCuratedParagraphs(curatedParagraphs, curatedParagraphs.length,true);
-            closeSearch();
+            var searchInput=jQuery('.expresscurate_dialog_search input');
+            if(!searchInput.hasClass('expresscurate_displayNone')){
+                searchInParagraphs(searchInput.val());
+            }else{
+                displayCuratedParagraphs(curatedParagraphs, curatedParagraphs.length,true);
+            }
         });
     };
 

@@ -75,7 +75,7 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
       </div>
       <div class="clear"></div>
       <div class="controls hidden">
-        <ul class="tags" id="expresscurate_special">
+        <ul class="expresscurate_preventTextSelection tags" id="expresscurate_special">
 
         </ul>
         <div class="clear"></div>

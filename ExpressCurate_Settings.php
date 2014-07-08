@@ -851,10 +851,10 @@ class ExpressCurate_Settings {
       wp_enqueue_script('expresscurate_support', $plaugunUrl . 'js/Support.js', array('jquery'));
       wp_enqueue_script('expresscurate_faq', $plaugunUrl . 'js/FAQ.js', array('jquery'));
 
-      wp_enqueue_script('expresscurate_keyword_utils', $plaugunUrl . 'js/Keywords/KeywordUtils.js', array('jquery'));
-      wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/Keywords/Keywords.js', array('jquery'));
-      wp_enqueue_script('expresscurate_seo_control_center', $plaugunUrl . 'js/Keywords/SEOControlCenter.js', array('jquery'));
-      wp_enqueue_script('expresscurate_keywords_dashboard_widget', $plaugunUrl . 'js/Keywords/DashboardWidget.js', array('jquery'));
+      wp_enqueue_script('expresscurate_keyword_utils', $plaugunUrl . 'js/keywords/KeywordUtils.js', array('jquery'));
+      wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords/Keywords.js', array('jquery'));
+      wp_enqueue_script('expresscurate_seo_control_center', $plaugunUrl . 'js/keywords/SEOControlCenter.js', array('jquery'));
+      wp_enqueue_script('expresscurate_keywords_dashboard_widget', $plaugunUrl . 'js/keywords/DashboardWidget.js', array('jquery'));
       //
     wp_enqueue_style('texpresscurate', $plaugunUrl . 'css/expresscurate.css');
     wp_enqueue_style('wp-jquery-ui-dialog');

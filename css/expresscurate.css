@@ -1388,8 +1388,8 @@
     .expresscurate_dialog_shortPar .shortPButtonInactive{
         border-color: #bdbdbd;
         color: #bdbdbd;
-        width: 53px;
-        padding-left: 8px;
+        padding-left: 0;
+        width: 62px;
     }
         .expresscurate_dialog_shortPar .shortPButton span{
             display: inline-block;
@@ -1403,6 +1403,8 @@
         }
         .expresscurate_dialog_shortPar .shortPButtonInactive span{
             background-color: #bdbdbd;
+            float: left;
+            margin-right: 9px;
         }
 
 /* .expresscurate_dialog_shortPar .expresscurate_radioLabel{
@@ -1418,6 +1420,22 @@
                 background-position: center;
                 background-size: 12px;
             }*/
+
+/**/
+.expresscurate_tag_blockquote{
+    position: relative;
+}
+.expresscurate_tag_blockquote:before {
+    background-repeat: no-repeat;
+    background-image: url("../images/expresscurate_sprite.png");
+    background-position: 1px -49px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    content: '';
+    width: 20px;
+    height: 20px;
+}
 /*search paragraphs*/
 .expresscurate_dialog_search{
     background-color: #777777 !important;
@@ -2121,6 +2139,12 @@
         color: #989898;
     }
 /**/
+.expresscurate_preventTextSelection{
+    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -khtml-user-select: none; /* webkit (konqueror) browsers */
+    -ms-user-select: none; /
+}
 .expresscurate_news_container{
     margin-top: 30px;
 }
