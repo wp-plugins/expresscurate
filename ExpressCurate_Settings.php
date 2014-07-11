@@ -54,12 +54,8 @@ class ExpressCurate_Settings {
   public function init() {
     add_action('save_post', array(&$this, 'save_post'));
     add_filter('post_updated_messages', array(&$this, 'expresscurate_messages'));
-    add_filter('the_excerpt', array(&$this, 'expresscurate_the_excerpt'));
-    add_filter('get_the_excerpt', array(&$this, 'expresscurate_the_excerpt'));
     add_filter('mce_css', array(&$this, 'add_expresscurate_editor_style'));
 
-    // remove_filter('the_content', 'wpautop');
-    //remove_filter( 'the_excerpt', 'wpautop' );
     // Above and below content filters
   }
 
@@ -111,7 +107,7 @@ class ExpressCurate_Settings {
 
   public function expresscurate_publish_box() {
     $smart_publishing = '';
-    if ($GLOBALS['post']->post_status !== 'publish') {
+    if ($GLOBALS['post']->post_status !== 'publish' && $GLOBALS['post']->post_type !== 'acf') {
       if (get_option('expresscurate_manually_approve_smart', '') == 0) {
         $checked = 'checked="checked"';
       } else {
@@ -122,146 +118,6 @@ class ExpressCurate_Settings {
     echo $smart_publishing;
   }
 
-  function expresscurate_continue_reading_link() {
-    return ' <a href="' . get_permalink() . '">' . __('more', 'expresscurate') . '</a>';
-  }
-
-  public function expresscurate_the_excerpt($text) {
-    global $post;
-    $attachments = '';
-    $text = get_the_content();
-    if (has_shortcode($text, 'gallery') || preg_match('/\[gallery\s(.*)\]/isU', $text)) {
-      // Retrieve the first gallery in the post
-      // Extract the shortcode arguments from the $page or $post
-      $shortcode_args = shortcode_parse_atts($this->get_match('/\[gallery\s(.*)\]/isU', $text));
-      // get the attachments specified in the "ids" shortcode argument
-      $attachments = get_posts(
-              array(
-                  'include' => $shortcode_args["ids"],
-                  'post_status' => 'inherit',
-                  'post_type' => 'attachment',
-                  'post_mime_type' => 'image',
-                  'order' => 'menu_order ID',
-                  'orderby' => 'post__in', //this forces the order to be based on the order of the "include" param
-                  'numberposts' => 1,
-              )
-      );
-    }
-
-    remove_shortcode('gallery');
-    $text = strip_shortcodes($text);
-    $text = preg_replace('/\[gallery\s(.*)\]/isU', '', $text);
-    $text = preg_replace("/<img[^>]+\>/i", '', $text);
-    $text = apply_filters('the_content', $text);
-
-    $text = preg_replace('@<script[^>]*?>.*?</script>@si', '', $text);
-    $expresscurateerpt_length = 300;
-    if (strlen($text) > $expresscurateerpt_length) {
-      $text = $this->truncateHtml($text, $expresscurateerpt_length, '');
-    }
-    if ($attachments) {
-      $attachment_img = wp_get_attachment_image($attachments[0]->ID, 'thumbnail');
-      $attachment_img = '<div class="fimgContainer">
-			<a href="' . get_permalink($post->ID) . '">' . $attachment_img . '</a>
-			</div>';
-      $text = $attachment_img . $text;
-    }
-
-    return $text;
-  }
-
-  public function truncateHtml($text, $length = 100, $ending = '...', $exact = true, $considerHtml = true) {
-    if ($considerHtml) {
-      // if the plain text is shorter than the maximum length, return the whole text
-      if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
-        return $text;
-      }
-      //remove all images
-      $text = preg_replace('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', '', $text);
-      // splits all html-tags to scanable lines
-      preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
-
-      $total_length = strlen($ending);
-      $open_tags = array();
-      $truncate = '';
-      foreach ($lines as $line_matchings) {
-        // if there is any html-tag in this line, handle it and add it (uncounted) to the output
-        if (!empty($line_matchings[1])) {
-          // if it's an "empty element" with or without xhtml-conform closing slash
-          if (preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line_matchings[1])) {
-            // do nothing
-            // if tag is a closing tag
-          } else if (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
-            // delete tag from $open_tags list
-            $pos = array_search($tag_matchings[1], $open_tags);
-            if ($pos !== false) {
-              unset($open_tags[$pos]);
-            }
-            // if tag is an opening tag
-          } else if (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
-            // add tag to the beginning of $open_tags list
-            array_unshift($open_tags, strtolower($tag_matchings[1]));
-          }
-          // add html-tag to $truncate'd text
-          $truncate .= $line_matchings[1];
-        }
-        // calculate the length of the plain text part of the line; handle entities as one character
-        $content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
-        if ($total_length + $content_length > $length) {
-          // the number of characters which are left
-          $left = $length - $total_length;
-          $entities_length = 0;
-          // search for html entities
-          if (preg_match_all('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', $line_matchings[2], $entities, PREG_OFFSET_CAPTURE)) {
-            // calculate the real length of all entities in the legal range
-            foreach ($entities[0] as $entity) {
-              if ($entity[1] + 1 - $entities_length <= $left) {
-                $left--;
-                $entities_length += strlen($entity[0]);
-              } else {
-                // no more characters left
-                break;
-              }
-            }
-          }
-          $truncate .= substr($line_matchings[2], 0, $left + $entities_length);
-          // maximum lenght is reached, so get off the loop
-          break;
-        } else {
-          $truncate .= $line_matchings[2];
-          $total_length += $content_length;
-        }
-        // if the maximum length is reached, get off the loop
-        if ($total_length >= $length) {
-          break;
-        }
-      }
-    } else {
-      if (strlen($text) <= $length) {
-        return $text;
-      } else {
-        $truncate = substr($text, 0, $length - strlen($ending));
-      }
-    }
-    // if the words shouldn't be cut in the middle...
-    if (!$exact) {
-      // ...search the last occurance of a space...
-      $spacepos = strrpos($truncate, ' ');
-      if (isset($spacepos)) {
-        // ...and cut the text in this position
-        $truncate = substr($truncate, 0, $spacepos);
-      }
-    }
-    // add the defined ending to the text
-    $truncate .= $ending;
-    if ($considerHtml) {
-      // close all unclosed html-tags
-      foreach ($open_tags as $tag) {
-        $truncate .= '</' . $tag . '>';
-      }
-    }
-    return $truncate;
-  }
 
   public function expresscurate_buttons() {
     add_filter("mce_external_plugins", array(&$this, 'expresscurate_add_plugins'));
@@ -271,7 +127,7 @@ class ExpressCurate_Settings {
   public function expresscurate_add_plugins($plugin_array) {
     $pluginUrl = plugin_dir_url(__FILE__);
     //$plugin_array['expresscurate'] = $pluginUrl . 'js/expresscurate_buttons.js';
-      $plugin_array['expresscurate'] = $pluginUrl . 'js/Buttons.js';
+    $plugin_array['expresscurate'] = $pluginUrl . 'js/Buttons.js';
     return $plugin_array;
   }
 
@@ -507,9 +363,12 @@ class ExpressCurate_Settings {
    * Save the metaboxes for this custom post type
    */
   public function save_post($post_id) {
-
-// verify if this is an auto save routine.
-// If it is our form has not been submitted, so we dont want to do anything
+    $post_type = get_post_type($post_id);
+    
+    if($post_type == 'acf'){
+       return;
+    }
+    
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
       return;
     }
@@ -723,7 +582,7 @@ class ExpressCurate_Settings {
     global $post;
     ?>
     <div id="expresscurate_widget" class="expresscurate_widget" title="<?php echo self::PLUGIN_NAME ?>">
-      <?php include(sprintf("%s/templates/widget.php", dirname(__FILE__))); ?>
+    <?php include(sprintf("%s/templates/widget.php", dirname(__FILE__))); ?>
     </div>
 
 
@@ -844,18 +703,18 @@ class ExpressCurate_Settings {
     $plaugunUrl = plugin_dir_url(__FILE__);
     //wp_enqueue_script('expresscurate', $plaugunUrl . 'js/expresscurate.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
     //wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
-      //
+    //
       wp_enqueue_script('expresscurate_menu', $plaugunUrl . 'js/Menu.js');
-      wp_enqueue_script('expresscurate_dialog', $plaugunUrl . 'js/Dialog.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
-      wp_enqueue_script('expresscurate_settings', $plaugunUrl . 'js/Settings.js', array('jquery'));
-      wp_enqueue_script('expresscurate_support', $plaugunUrl . 'js/Support.js', array('jquery'));
-      wp_enqueue_script('expresscurate_faq', $plaugunUrl . 'js/FAQ.js', array('jquery'));
+    wp_enqueue_script('expresscurate_dialog', $plaugunUrl . 'js/Dialog.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
+    wp_enqueue_script('expresscurate_settings', $plaugunUrl . 'js/Settings.js', array('jquery'));
+    wp_enqueue_script('expresscurate_support', $plaugunUrl . 'js/Support.js', array('jquery'));
+    wp_enqueue_script('expresscurate_faq', $plaugunUrl . 'js/FAQ.js', array('jquery'));
 
-      wp_enqueue_script('expresscurate_keyword_utils', $plaugunUrl . 'js/keywords/KeywordUtils.js', array('jquery'));
-      wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords/Keywords.js', array('jquery'));
-      wp_enqueue_script('expresscurate_seo_control_center', $plaugunUrl . 'js/keywords/SEOControlCenter.js', array('jquery'));
-      wp_enqueue_script('expresscurate_keywords_dashboard_widget', $plaugunUrl . 'js/keywords/DashboardWidget.js', array('jquery'));
-      //
+    wp_enqueue_script('expresscurate_keyword_utils', $plaugunUrl . 'js/keywords/KeywordUtils.js', array('jquery'));
+    wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords/Keywords.js', array('jquery'));
+    wp_enqueue_script('expresscurate_seo_control_center', $plaugunUrl . 'js/keywords/SEOControlCenter.js', array('jquery'));
+    wp_enqueue_script('expresscurate_keywords_dashboard_widget', $plaugunUrl . 'js/keywords/DashboardWidget.js', array('jquery'));
+    //
     wp_enqueue_style('texpresscurate', $plaugunUrl . 'css/expresscurate.css');
     wp_enqueue_style('wp-jquery-ui-dialog');
     wp_enqueue_style('menu-expresscurate', $plaugunUrl . 'css/menu-style-3.8.css');
@@ -965,7 +824,7 @@ class ExpressCurate_Settings {
   public function keywords_widget() {
     ?>
     <div id="expresscurate_keywords_widget" class="expresscurate_keywords_widget" title="<?php echo self::PLUGIN_NAME ?>">
-      <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
+    <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }
@@ -973,7 +832,7 @@ class ExpressCurate_Settings {
   public function search_widget() {
     ?>
     <div id="expresscurate_search_widget" class="expresscurate_search_widget  " title="<?php echo self::PLUGIN_NAME ?>">
-      <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
+    <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }

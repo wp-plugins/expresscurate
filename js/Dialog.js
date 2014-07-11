@@ -53,9 +53,9 @@ var ExpresscurateDialog = (function(jQuery){
     };
 
     var displayCuratedParagraphs = function (paragraphs, count,shortPar) {
-        jQuery('.paragraphs_preview').width(paragraphs.length * paragraphWidth);
+
         var text_html = '';
-        var sorted = new Array();
+        var sorted = [];
         jQuery.each(paragraphs, function(index, value) {
             if (value['value'].length > shortestParagraphLength) {
                 sorted[index] = value['value'];
@@ -72,6 +72,10 @@ var ExpresscurateDialog = (function(jQuery){
         });
         jQuery('#curated_paragraphs li').remove();
         jQuery(text_html).appendTo('#curated_paragraphs');
+        var liCount=jQuery('#curated_paragraphs li').length;
+        jQuery('.paragraphs_preview').width(liCount * paragraphWidth);
+        jQuery('#curated_paragraphs').css('left','0');
+        buttonsStatus();
     };
 
     var searchInParagraphs = function (search){
@@ -159,7 +163,7 @@ var ExpresscurateDialog = (function(jQuery){
     var displayShortParagraphs = function () {
         var shortParagraphs_html = '<li class="expresscurate_preventTextSelection expresscurate_dialog_shortPar expresscurate_shortParInactiveColor">\
             <label>Short Paragraphs</label>\
-            <span class="shortPButton shortPButtonActive">show<span></span></span>\
+            <span class="shortPButton shortPButtonInactive">hide<span></span></span>\
         </li>';
         return shortParagraphs_html;
     };
@@ -598,9 +602,9 @@ var ExpresscurateDialog = (function(jQuery){
             var elem = jQuery(this);
             if (shortestParagraphLength == 150) {
                 shortestParagraphLength = 0;
-                elem.addClass('shortPButtonInactive').removeClass('shortPButtonActive').html('hide<span></span>');
-            } else {
                 elem.addClass('shortPButtonActive').removeClass('shortPButtonInactive').html('show<span></span>');
+            } else {
+                elem.addClass('shortPButtonInactive').removeClass('shortPButtonActive').html('hide<span></span>');
                 shortestParagraphLength = 150;
             }
             var searchInput=jQuery('.expresscurate_dialog_search input');

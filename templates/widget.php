@@ -5,7 +5,7 @@ global $post;
 <div id="expresscurate_widget_wrapper" class="expresscurate_widget_wrapper">
     <label>Keywords <span class="rotate"><a href="#" onclick="SEOControl.updateKeywords();
       return false;"></a></span>
-        <span class="mark expresscurate_preventTextSelection" onclick="Keywords.markEditorKeywords();return false;"><span>mark keywords</span></span>
+        <span class="mark expresscurate_preventTextSelection" onclick="Keywords.markEditorKeywords();"><span>mark keywords</span></span>
     </label>
     <?php
     $keywords = new ExpressCurate_Keywords();
