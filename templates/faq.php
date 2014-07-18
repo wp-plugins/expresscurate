@@ -33,7 +33,7 @@ $limit = 3;
           $link = $feed[$x]['link'];
           ?>
           <div class="inlineBlock">
-            <a class="questionBox" href="<?php echo $link ?>" target="_blank"><span><?php echo $title ?></span></a>
+            <a class="questionBox" href="<?php echo $link ?>" target="_blank"><span><?php echo esc_attr($title) ?></span></a>
           </div>
           <?php
         }

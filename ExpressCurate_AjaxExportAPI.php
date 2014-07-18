@@ -1,4 +1,5 @@
 <?php
+
 require_once 'ExpressCurate_ContentManager.php';
 /*
   Author: ExpressCurate
@@ -7,7 +8,7 @@ require_once 'ExpressCurate_ContentManager.php';
   License URI: http://www.gnu.org/licenses/gpl.html
  */
 
-class ExpressCurate_ExportAPI {
+class ExpressCurate_AjaxExportAPI {
 
   public function get_terms() {
     $data = array();
@@ -62,14 +63,14 @@ class ExpressCurate_ExportAPI {
       $img = $content_manager->file_get_contents_utf8($data['img_url'], true);  //@file_get_contents($data['img_url'], false, $context);
       $http_response_header = $img['http_status'];
       $img = $img['content'];
-      if(!$img){
+      if (!$img) {
         //$img = @file_get_contents($data['img_url2'], false, $context);
         $img = $content_manager->file_get_contents_utf8($data['img_url2'], true);
         $http_response_header = $img['http_status'];
         $img = $img['content'];
       }
       if ($img) {
-        
+
         if ($http_response_header == "HTTP/1.1 200 OK" || $http_response_header == 200) {
           $data_check = array('status' => 'success', 'statusCode' => 200);
         } else if ($http_response_header == "HTTP/1.1 403 Forbidden" || $http_response_header == 403) {
@@ -86,7 +87,7 @@ class ExpressCurate_ExportAPI {
   }
 
   public function download_images() {
-    
+
     $data = $_REQUEST;
     if (!$data['images']) {
       $result = array('status' => "error", 'error' => "Data is empty!");
@@ -169,10 +170,10 @@ class ExpressCurate_ExportAPI {
         }
       }
       $post_id = $this->insert_post($data, $post_status);
-      $post_categories = wp_get_post_categories($post_id, array( 'fields' => 'names'));
-      $post_tags = wp_get_post_tags($post_id, array( 'fields' => 'names'));
+      $post_categories = wp_get_post_categories($post_id, array('fields' => 'names'));
+      $post_tags = wp_get_post_tags($post_id, array('fields' => 'names'));
       if ($post_id) {
-        $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'post_categories'=>$post_categories, 'post_tags'=>$post_tags, 'msg' => "Post saved as " . $post_status . "."));
+        $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'post_categories' => $post_categories, 'post_tags' => $post_tags, 'msg' => "Post saved as " . $post_status . "."));
       } else {
         $result = json_encode(array('status' => "error", 'msg' => "Something went wrong!"));
       }
@@ -217,16 +218,23 @@ class ExpressCurate_ExportAPI {
     return $post_id;
   }
 
-  private function get_meta_values($key = '', $url = '', $type = 'post') {
+  public function get_meta_values($key = '', $url = '', $type = '', $post_id = null) {
     global $wpdb;
     if (empty($key))
       return;
-    $metas = $wpdb->get_results("
-        SELECT p.ID, p.guid, pm.meta_value FROM {$wpdb->postmeta} pm
-        LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-        WHERE pm.meta_key LIKE '{$key}%'
-        AND pm.meta_value = '{$url}'
-        AND p.post_type = 'post'", ARRAY_A);
+    $metas_sql = "SELECT p.ID, p.guid, pm.meta_value FROM {$wpdb->postmeta} pm
+         LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+         WHERE pm.meta_key LIKE '{$key}%'";
+    if ($url) {
+      $metas_sql .=" AND pm.meta_value = '{$url}'";
+    }
+    if ($type) {
+      $metas_sql .=" AND p.post_type = '{$type}'";
+    }
+    if ($post_id) {
+      $metas_sql .=" AND p.ID = '{$post_id}'";
+    }
+    $metas = $wpdb->get_results($metas_sql, ARRAY_A);
     return $metas;
   }
 

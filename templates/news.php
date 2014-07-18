@@ -14,7 +14,7 @@ if(count($feed)){
         $link = $feed[$x]['link'];
         $description = $feed[$x]['desc'];
         $date = date('l F d, Y', strtotime($feed[$x]['date']));
-        echo '<p><strong><a href="' . $link . '" title="' . $title . '" target="_blank">' . $title . '</a></strong><br />';
+        echo '<p><strong><a href="' . $link . '" title="' . $title . '" target="_blank">' . esc_attr($title) . '</a></strong><br />';
         echo '<small><em>Posted on ' . $date . '</em></small></p>';
         echo '<p>' . $description . '</p>';
       }

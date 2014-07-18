@@ -5,7 +5,7 @@
   License: GPLv3 or later
   License URI: http://www.gnu.org/licenses/gpl.html
  */
-require_once 'ExpressCurate_ExportAPI.php';
+require_once 'ExpressCurate_AjaxExportAPI.php';
 require_once 'ExpressCurate_Keywords.php';
 require_once 'ExpressCurate_ContentManager.php';
 
@@ -21,14 +21,14 @@ class ExpressCurate_Settings {
   const NEWS_FEED_URL = "http://news.expresscurate.com/feed/";
   const NEWS_FEED_COUNT = 10;
 
-  private $exportAPI = null;
+  private $ajaxExportAPI = null;
   private $keywords = null;
 
   /**
    * Construct the plugin object
    */
   public function __construct() {
-    $this->exportAPI = new ExpressCurate_ExportAPI();
+    $this->ajaxExportAPI = new ExpressCurate_AjaxExportAPI();
     $this->contentManager = new ExpressCurate_ContentManager();
     $this->keywords = new ExpressCurate_Keywords();
     // register actions
@@ -40,6 +40,7 @@ class ExpressCurate_Settings {
     add_action('init', array(&$this, 'init'));
     add_action('init', array(&$this, 'register_curated_post_status'), 0);
     add_action('init', array(&$this, 'expresscurate_buttons')); //'wpc_buttons'
+    add_action('init', array(&$this, 'include_api'));
     add_filter('manage_edit-post_columns', array(&$this, 'curated_column_register'));
     add_action('manage_posts_custom_column', array(&$this, 'curated_column_display'), 10, 2);
     add_filter('manage_edit-post_sortable_columns', array(&$this, 'curated_column_register_sortable'));
@@ -83,12 +84,12 @@ class ExpressCurate_Settings {
     register_setting('expresscurate-group', 'expresscurate_hours_interval');
     register_setting('expresscurate-group', 'expresscurate_manually_approve_smart');
     add_action('admin_footer', array(&$this, 'add_inline_popup_content'));
-    add_action('wp_ajax_expresscurate_export_api_get_terms', array($this->exportAPI, 'get_terms'));
-    add_action('wp_ajax_expresscurate_export_api_check_auth', array($this->exportAPI, 'check_auth'));
-    add_action('wp_ajax_expresscurate_export_api_check_images', array($this->exportAPI, 'check_images'));
-    add_action('wp_ajax_expresscurate_export_api_download_images', array($this->exportAPI, 'download_images'));
-    add_action('wp_ajax_expresscurate_export_api_save_post', array($this->exportAPI, 'save_post'));
-    add_action('wp_ajax_expresscurate_export_api_check_source', array($this->exportAPI, 'check_source'));
+    add_action('wp_ajax_expresscurate_export_api_get_terms', array($this->ajaxExportAPI, 'get_terms'));
+    add_action('wp_ajax_expresscurate_export_api_check_auth', array($this->ajaxExportAPI, 'check_auth'));
+    add_action('wp_ajax_expresscurate_export_api_check_images', array($this->ajaxExportAPI, 'check_images'));
+    add_action('wp_ajax_expresscurate_export_api_download_images', array($this->ajaxExportAPI, 'download_images'));
+    add_action('wp_ajax_expresscurate_export_api_save_post', array($this->ajaxExportAPI, 'save_post'));
+    add_action('wp_ajax_expresscurate_export_api_check_source', array($this->ajaxExportAPI, 'check_source'));
     add_action('wp_ajax_expresscurate_get_article', array($this->contentManager, 'get_article'));
     add_action('wp_ajax_expresscurate_keywords_get_post_keyword_stats', array($this->keywords, 'get_post_keyword_stats'));
     add_action('wp_ajax_expresscurate_keywords_add_post_keyword', array($this->keywords, 'add_post_keyword'));
@@ -513,9 +514,9 @@ class ExpressCurate_Settings {
       return;
     }
     if (wp_mkdir_p($upload_dir['path'])) {
-      $this->exportAPI->delete_dir($upload_dir['path'] . '/expresscurate_tmp/' . $post_id);
+      $this->ajaxExportAPI->delete_dir($upload_dir['path'] . '/expresscurate_tmp/' . $post_id);
     } else {
-      $this->exportAPI->delete_dir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id);
+      $this->ajaxExportAPI->delete_dir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id);
     }
   }
 
@@ -557,7 +558,7 @@ class ExpressCurate_Settings {
     add_options_page(
             self::PLUGIN_NAME . ' Settings', self::PLUGIN_NAME, 'manage_options', 'expresscurate', array(&$this, 'plugin_settings_page')
     );
-    add_menu_page(self::PLUGIN_NAME, self::PLUGIN_NAME, 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '', 6);
+    add_menu_page(self::PLUGIN_NAME, self::PLUGIN_NAME, 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '', '9.95458');
     add_submenu_page('expresscurate', self::PLUGIN_NAME, '', 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '');
     add_submenu_page('expresscurate', 'Keywords', 'Keywords', 'edit_posts', 'expresscurate_keywords', array(&$this, 'show_expresscurate_keywords'), '');
     add_submenu_page('expresscurate', 'News', 'News', 'edit_posts', 'expresscurate_news', array(&$this, 'show_expresscurate_news'), '');
@@ -835,6 +836,9 @@ class ExpressCurate_Settings {
     <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
+  }
+  public function include_api(){
+    include(sprintf("%s/ExpressCurate_API.php", dirname(__FILE__)));
   }
 
 }

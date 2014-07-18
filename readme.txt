@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
 Requires at least: 3.9
 Tested up to: 3.9
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -93,15 +93,20 @@ e.g.
 10. Top Curated Websites. Visit the top curated websites and pages.
 11. Summary-at-a-glance of keywords usage in your Wordpress blog.
 12. Keywords Dashboard. This is a centralized place where you can add and manage your target keywords, as well as monitor key stats for optimizing SEO performance.
-13. Enter your target keywords and ExpressCurate will calculate their usage stats, so you can decide which keywords are underutilized, overused, or just right.
-14. A shortcut for creating a post with an emphasis on a specific keyword.
-15. Color coding to identify how optimal your keyword is used.
-16. Most frequently used words (not keywords) in your blog or site.
+13. Keywords Dashboard: Enter your target keywords and ExpressCurate will calculate their usage stats, so you can decide which keywords are underutilized, overused, or just right.
+14. Keywords Dashboard: A shortcut for creating a post with an emphasis on a specific keyword.
+15. Keywords Dashboard: Color coding to identify how optimal your keyword is used.
+16. Keywords Dashboard: Most frequently used words (not keywords) in your blog or site.
 17. Submit your ideas, problems, and suggestions. We would love to hear from you!
 
 
 
 == Changelog ==
+
+= 1.2.9 =
+* API methods to retrieve source urls: expresscurate_the_source_url, expresscurate_the_source_urls
+* Problems with WooThemes are fixed.
+* Miscellaneous bug fixes and improvements.
 
 = 1.2.8 =
 * Miscellaneous bug fixes and improvements.
