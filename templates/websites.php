@@ -52,7 +52,11 @@ $curated_posts = array();
 		<?php }?>
       </ul>  
       <?php
-    }
+    }else{?>
+    <span class="expresscurate_notDefined">
+        No Curated Post. <a href="<?php echo admin_url(); ?>post-new.php">Curate New Post Now</a>.
+    </span>
+   <?php }
     ?>
   </div>
 </div>

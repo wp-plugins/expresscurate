@@ -423,12 +423,12 @@ var ExpresscurateDialog = (function(jQuery){
             var currentImage = 0;
             var numberOfImages = 0;
 
-            jQuery('.prevImg, .nextImg').click(function (e) {
+            jQuery('.prevImg, .nextImg, .expresscurate_dialog .img').click(function (e) {
                 numberOfImages = jQuery('ul#curated_images li').length;
-                if (jQuery(this).hasClass('next')) {
-                    currentImage = (++currentImage > numberOfImages) ? numberOfImages : currentImage;
+                if (jQuery(this).hasClass('next') || jQuery(this).hasClass('img')) {
+                    currentImage = (++currentImage >= numberOfImages) ? 0 : currentImage;
                 } else if (jQuery(this).hasClass('prev')) {
-                    currentImage = (--currentImage < 0) ? 0 : currentImage;
+                    currentImage = (--currentImage < 0) ? (numberOfImages - 1) : currentImage;
                 }
                 var img = jQuery('ul#curated_images li:eq(' + currentImage + ')').css('background-image');
                 if (img) {

@@ -119,7 +119,6 @@ class ExpressCurate_Settings {
     echo $smart_publishing;
   }
 
-
   public function expresscurate_buttons() {
     add_filter("mce_external_plugins", array(&$this, 'expresscurate_add_plugins'));
     add_filter('mce_buttons', array(&$this, 'expresscurate_register_buttons'));
@@ -277,6 +276,7 @@ class ExpressCurate_Settings {
 
 // get the content of the post
     $post_content = $the_post->post_content;
+
     if (strpos($post_content, 'keywordsHighlight') !== false) {
       $post_content = $tagsObj->removeHighlights($post_content);
     }
@@ -287,9 +287,10 @@ class ExpressCurate_Settings {
       }
     }
     $content_tags = array();
-    preg_match_all('/(?<!\w)(?=[^>]*(<|$))#\w+/i', $post_content, $content_tags);
+    preg_match_all('/\s(?<!\w)(?=[^>]*(<|$))#\w+/iu', $post_content, $content_tags);
 
     foreach ($content_tags[0] as $content_tag) {
+
       $content_tag_insert = str_replace("#", "", trim($content_tag));
 //adding content tag to post tags if not exists
       if (!in_array($content_tag_insert, $post_tags)) {
@@ -303,6 +304,11 @@ class ExpressCurate_Settings {
         //$defined_tag_insert = preg_replace('/\s+/', '|', $defined_tag_insert);
 //adding defined tag to post tags if tag exists in posttitle or post content
         preg_match("/(?<!\w)(?=[^>]*(<|$))" . $defined_tag_insert . "(\W|$)/i", $post_content, $tag_in_content);
+
+
+
+
+
         if ((isset($tag_in_content[0]) || strpos($the_post->title, $defined_tag_insert)) && !in_array($defined_tag_insert, $post_tags)) {
 
           wp_set_post_tags($post_id, $defined_tag_insert, true);
@@ -327,8 +333,7 @@ class ExpressCurate_Settings {
 //              });
       usort($sorted_tags, create_function('$a,$b', 'return $b["count_words"] - $a["count_words"];'));
       $tags = $sorted_tags;
-
-      $post_content = $tagsObj->removeTagLinks($the_post->post_content);
+      $post_content = $tagsObj->removeTagLinks($post_content);
       foreach ($tags as $tag) {
         $tag_name = str_replace('/\s+/', '[ ]', $tag["name"]);
         $post_content = $tagsObj->createTag($post_content, $tag_name, $tag["id"]);
@@ -365,17 +370,18 @@ class ExpressCurate_Settings {
    */
   public function save_post($post_id) {
     $post_type = get_post_type($post_id);
-    
-    if($post_type == 'acf'){
-       return;
+
+    if ($post_type == 'acf') {
+      return;
     }
-    
+
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
       return;
     }
     if (wp_is_post_revision($post_id))
       return;
     $upload_dir = wp_upload_dir();
+
 // get the content of the post
     if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
       $post_content = $this->generate_tags($post_id);
@@ -387,7 +393,6 @@ class ExpressCurate_Settings {
         $post_content = $tags_obj->removeHighlights($post_content);
       }
     }
-
     //Smart publishing
     if (get_option('expresscurate_publish', '') == 1) {
       if (isset($_POST['expresscurate_smart_publish_status']) && $_POST['expresscurate_smart_publish_status'] == 1) {
@@ -583,7 +588,7 @@ class ExpressCurate_Settings {
     global $post;
     ?>
     <div id="expresscurate_widget" class="expresscurate_widget" title="<?php echo self::PLUGIN_NAME ?>">
-    <?php include(sprintf("%s/templates/widget.php", dirname(__FILE__))); ?>
+      <?php include(sprintf("%s/templates/widget.php", dirname(__FILE__))); ?>
     </div>
 
 
@@ -751,7 +756,7 @@ class ExpressCurate_Settings {
     return $feed;
   }
 
-  public function add_user_profile_metas() {
+  public function add_user_profile_metas($profile_fields) {
     // Add new fields
     $profile_fields['expresscurate_twitter'] = 'Twitter Username';
     $profile_fields['expresscurate_facebook'] = 'Facebook URL';
@@ -825,7 +830,7 @@ class ExpressCurate_Settings {
   public function keywords_widget() {
     ?>
     <div id="expresscurate_keywords_widget" class="expresscurate_keywords_widget" title="<?php echo self::PLUGIN_NAME ?>">
-    <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
+      <?php include(sprintf("%s/templates/dashboard/keywords_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }
@@ -833,11 +838,12 @@ class ExpressCurate_Settings {
   public function search_widget() {
     ?>
     <div id="expresscurate_search_widget" class="expresscurate_search_widget  " title="<?php echo self::PLUGIN_NAME ?>">
-    <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
+      <?php include(sprintf("%s/templates/dashboard/search_widget.php", dirname(__FILE__))); ?>
     </div>
     <?php
   }
-  public function include_api(){
+
+  public function include_api() {
     include(sprintf("%s/ExpressCurate_API.php", dirname(__FILE__)));
   }
 
@@ -854,7 +860,7 @@ class Expresscurate_Tags {
   }
 
   private function doReplace($html) {
-    return preg_replace_callback('/(\b' . $this->word . '\b)(?=[^>]*(<|$))(?=(.*?>))/Uis', array(&$this, 'checkOpenTag'), $html, 1);
+    return preg_replace_callback('/(\b' . $this->word . '\b)(?=[^>]*(<|$))(?=(.*?>))/Uuis', array(&$this, 'checkOpenTag'), $html, 1);
   }
 
   public function createTag($html, $word, $tag_id) {
@@ -865,11 +871,16 @@ class Expresscurate_Tags {
 
   public function removeTagLinks($html) {
     $tagLinks = '/<a class="expresscurate_contentTags".*?>(.*?)<\/a>/i';
-    return str_replace("#", "", preg_replace($tagLinks, '$1', $html));
+    $html = preg_replace($tagLinks, '$1', $html);
+    preg_match_all('/\s(?<!\w)(?=[^>]*(<|$))#\w+/iu', $html, $tags);
+    foreach ($tags[0] as $tag){
+      $html = str_replace($tag, str_replace('#', '', $tag), $html);
+    }
+    return $html;
   }
 
   public function removeHighlights($html) {
-    $spans = '/<span class="keywordsHighlight".*?>(.*?)<\/span>/i';
+    $spans = '/<span class="expresscurate_keywordsHighlight">(.*?)<\/span>/uis';
     return preg_replace($spans, '$1', $html);
   }
 

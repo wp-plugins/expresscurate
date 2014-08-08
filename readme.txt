@@ -103,6 +103,9 @@ e.g.
 
 == Changelog ==
 
+= 1.2.10 =
+* Miscellaneous bug fixes and improvements.
+
 = 1.2.9 =
 * API methods to retrieve source urls: expresscurate_the_source_url, expresscurate_the_source_urls
 * Problems with WooThemes are fixed.

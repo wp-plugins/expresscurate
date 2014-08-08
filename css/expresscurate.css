@@ -100,10 +100,11 @@
         text-align: center;
         margin-left: 12px;
     }
-.expresscurate_keywords_settings .notDefined{
+.expresscurate_keywords_settings .notDefined, .expresscurate_notDefined{
     font-size: 14px;
     margin-top: 20px;
     color: #b1b1b1;
+    font-family:  OpenSans-Regular;
 }
     .expresscurate_keywords_settings .keywordsPart,
     .expresscurate_keywords_settings .usedWordsPart {
@@ -1137,6 +1138,7 @@
     background-repeat: no-repeat;
     background-position: center center;
     background-size: auto 90%;
+	cursor: pointer;
 }
 
 .expresscurate_dialog .img .nav a {
@@ -1551,6 +1553,7 @@
 
 /*new added*/
 .expresscurate_dialog .imgContainer{
+	-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;
 }
 
 .expresscurate_dialog .imgIcons{
