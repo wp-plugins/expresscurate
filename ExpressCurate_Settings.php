@@ -632,12 +632,6 @@ class ExpressCurate_Settings {
         $keywords = wp_filter_nohtml_kses(str_replace('"', '', implode(',', $keword_arr)));
         $meta_string .= sprintf("<meta name=\"keywords\" content=\"%s\" />\n", $keywords);
       }
-
-      $author_gplus = get_user_meta($post->post_author, 'expresscurate_gplus', true);
-
-      if (strlen($author_gplus) > 1) {
-        $meta_string .= '<link rel="author" href="' . $author_gplus . '"/>';
-      }
     }
     if ($meta_string != null) {
       echo "\n<!-- ExpressCurate SEO-->\n";
