@@ -35,36 +35,35 @@ global $post;
     <input type="hidden" id="expresscurate_post_id" value="<?php echo $post->ID; ?>"/>
     <textarea id="expresscurate_defined_tags" class="expresscurate_displayNone"
               name="expresscurate_defined_tags"><?php echo $post_keywords; ?></textarea>
-
+<!--
     <?php
-    if ($post_keywords) {
+/*    if ($post_keywords) {
         $args = array('id' => $post->ID);
         $post_keywords_stats = $keywords->get_stats(array_map('trim', explode(",", $post_keywords)), $args, $new_post_content);
         foreach ($post_keywords_stats as $word => $stats) {
-            ?>
+            */?>
             <div class="expresscurate_background_wrap">
                 <span class="close">&#215</span>
 
-                <div title="<?php echo $word; ?>"
-                     class="statisticsTitle expresscurate_<?php echo($stats['color'] ? $stats['color'] : 'blue'); ?>">
-                    <span><?php echo $word; ?></span></div>
-                <div title="Occurance in Title: <?php echo($stats['title'] ? 'yes' : 'no') ?>"
+                <div title="<?php /*echo $word; */?>"
+                     class="statisticsTitle expresscurate_<?php /*echo($stats['color'] ? $stats['color'] : 'blue'); */?>">
+                    <span><?php /*echo $word; */?></span></div>
+                <div title="Occurance in Title: <?php /*echo($stats['title'] ? 'yes' : 'no') */?>"
                      class="statistics borderRight">
                     <div class="center">title<img
-                            src="<?php echo plugin_dir_url(__FILE__); ?>../images/<?php echo($stats['title'] ? 'yes' : 'no') ?>.png">
+                            src="<?php /*echo plugin_dir_url(__FILE__); */?>../images/<?php /*echo($stats['title'] ? 'yes' : 'no') */?>.png">
                     </div>
                 </div>
 
-                <div title="Occurance in Content: <?php echo $stat['percent']; ?>%" class="statistics">
-                    <div class="center">content<span><?php echo $stats['percent']; ?>%</span></div>
+                <div title="Occurance in Content: <?php /*echo $stat['percent']; */?>%" class="statistics">
+                    <div class="center">content<span><?php /*echo $stats['percent']; */?>%</span></div>
                 </div>
             </div>
         <?php
-        }
-        ?>
+/*        }
+        */?>
 
-    <?php } ?>
-
+    --><?php /*} */?>
 
     <div class="addKeywords">
         <input type="text" placeholder="Add Keywords" class="disableInputStyle"/>

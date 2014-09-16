@@ -67,7 +67,7 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
             <div class="img noimage">
             </div>
         </div>
-        <div class="editor right">
+        <div class="editor right" style="max-height: 200px; ">
           <?php wp_editor('', 'expresscurate_content_editor', $settings); ?>
 
           <div class="clear"></div>

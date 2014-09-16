@@ -1,4 +1,5 @@
 var Keywords = (function(jQuery) {
+    var colors=['Red','Blue','Green','Orange','LightBlue','Yellow','LightGreen'];
   var addKeyword = function(keywords, beforeElem) {
     keywords = keywords.join(',');
     var keywordHtml = '';
@@ -31,96 +32,81 @@ var Keywords = (function(jQuery) {
   };
 
   //
-  var markCuratedKeywords = function() {
-    var ed = tinyMCE.activeEditor;
-    var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-    if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length <= 0) {
-      if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
-        check_editor = setTimeout(function check() {
-          clearTimeout(check_editor);
-          highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-          if (highlightedElems.length > 0) {
-            markDialogKeywords(ed);
-            setTimeout(check, 15000);
-          }
-        }, 1);
-      }
-      markDialogKeywords(ed);
-    } else {
-      highlightedElems.each(function(index, val) {
-        jQuery(val).replaceWith(this.childNodes);
-      });
-    }
-  };
+    var markCuratedKeywords = function(){
+        var ed = tinyMCE.activeEditor;
+        var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
+        var keywords = [];
+        jQuery('#curated_tags li').each(function (index, value) {
+            keywords.push(jQuery(value).text().slice(0, -1).trim());
+        });
+        keywords.pop();
+        if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length <= 0) {
+            if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
+                check_editor = setTimeout(function check() {
+                    clearTimeout(check_editor);
+                    highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
+                    if (highlightedElems.length > 0) {
+                        markKeywords(ed,keywords);
+                        setTimeout(check, 15000);
+                    }
+                }, 1);
+            }
+            markKeywords(ed,keywords);
+        } else {
+            highlightedElems.each(function (index, val) {
+                jQuery(val).replaceWith(this.childNodes);
+            });
+        }
+    };
+    var markEditorKeywords = function(){
+        var ed = tinyMCE.get('content');
+        if (!ed) {
+            ed = jQuery('#content');
+        }
+        var keywords = jQuery('#expresscurate_defined_tags').val().split(', '),
+            highlightedElems=jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
+        if(jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length<=0 && jQuery('#expresscurate_defined_tags').val().length>0){
+            if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && jQuery('.expresscurate_widget').length > 0) {
+                check_editor = setTimeout(function check() {
+                    clearTimeout(check_editor);
+                    highlightedElems=jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
+                    if(highlightedElems.length>0){
+                        markKeywords(ed,keywords);
+                        setTimeout(check, 15000);
+                    }
+                }, 1);
+            }
+            markKeywords(ed,keywords);
+        }else{
+            highlightedElems.each(function(index,val){
+                jQuery(val).replaceWith(this.childNodes);
+            });
+            ed.controlManager.setActive('markKeywords', false);
+        }
+    };
 
-  var markDialogKeywords = function(ed) {
-    var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight'),
+    var markKeywords = function (ed,keywords) {
+        var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight'),
             bookmark = ed.selection.getBookmark(2, true);
-    highlightedElems.each(function(index, val) {
-      jQuery(val).replaceWith(this.childNodes);
-    });
-    var keywords = [];
-    jQuery('#curated_tags li').each(function(index, value) {
-      keywords.push(jQuery(value).text().slice(0, -1).trim());
-    });
-    keywords.pop();
-    var matches;
-    keywords = keywords.join('|');
-    matches = ed.getBody();
-    jQuery(matches).html(function(index, oldHTML) {
-       return oldHTML.replace(new RegExp('((^|\\s|>))(' + keywords + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\;|.?<|$))', 'gmi'), '$2<span class="expresscurate_keywordsHighlight">$3</span>');
-    });
-    ed.selection.moveToBookmark(bookmark);
-  };
- 
-  var markEditorKeywords = function() {
-    var ed = tinyMCE.get('content');
-    if (!ed) {
-      ed = jQuery('#content');
-    }
-    var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-    if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length <= 0 && jQuery('#expresscurate_defined_tags').val().length > 0) {
-      if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && jQuery('.expresscurate_widget').length > 0) {
-        check_editor = setTimeout(function check() {
-          clearTimeout(check_editor);
-          highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-          if (highlightedElems.length > 0) {
-            markKeywords(ed);
-            setTimeout(check, 15000);
-          }
-        }, 1);
-      }
-      markKeywords(ed);
-    } else {
-      highlightedElems.each(function(index, val) {
-        jQuery(val).replaceWith(this.childNodes);
-      });
-      ed.controlManager.setActive('markKeywords', false);
-    }
-  };
+        highlightedElems.each(function (index, val) {
+            jQuery(val).replaceWith(this.childNodes);
+        });
 
-  var markKeywords = function(ed) {
-    var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight'),
-            bookmark = ed.selection.getBookmark(2, true);
-    highlightedElems.each(function(index, val) {
-      jQuery(val).replaceWith(this.childNodes);
-    });
-    var keywords = jQuery('#expresscurate_defined_tags').val().split(', '),
-            matches;
-    keywords = keywords.join('|');
-    matches = ed.getBody();
-    jQuery(matches).html(function(index, oldHTML) {
-       return oldHTML.replace(new RegExp('((^|\\s|>))(' + keywords + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\;|.?<|$))', 'gmi'), '$2<span class="expresscurate_keywordsHighlight">$3</span>');
-    });
+        var   matches = ed.getBody(),
+            i=0;
+        keywords.forEach(function(val){
+            jQuery(matches).html(function(index, oldHTML) {
+                return oldHTML.replace(new RegExp('((^|\\s|>|))(' + val + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$))', 'gmi'), '$2<span class="expresscurate_keywordsHighlight expresscurate_highlight'+colors[i%7]+'">$3</span>');
+            });
+            if(jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length>0){
+                ed.controlManager.setActive('markKeywords', true);
+            }
+            i++;
+        });
+        ed.selection.moveToBookmark(bookmark);
+    };
 
-    if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length > 0) {
-      ed.controlManager.setActive('markKeywords', true);
-    }
-    ed.selection.moveToBookmark(bookmark);
-  };
-  //
-
-  var setupKeywords = function() {
+    var setupKeywords = function() {
     if (jQuery('.keywordsPart ul li').length > 0) {
       jQuery('.keywordsPart .notDefined').addClass('expresscurate_displayNone');
     }
@@ -137,7 +123,7 @@ var Keywords = (function(jQuery) {
       insertKeywordInKeywordsSettings(KeywordUtils.multipleKeywords(jQuery('.addKeywords input')), jQuery('.keywordsPart ul'));
     });
 
-    jQuery('.usedWordsPart ul .add').live('click', function() {
+        jQuery('.usedWordsPart ul').on('click','.add', function () {
       jQuery(this).parents('li').css({'background-color': '#FCFCFC'});
       insertKeywordInKeywordsSettings(KeywordUtils.multipleKeywords(jQuery(this).parent().find('.word')), jQuery('.keywordsPart ul'));
       jQuery(this).parents('li').fadeOut(1000).remove();

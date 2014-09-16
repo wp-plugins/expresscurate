@@ -565,12 +565,13 @@ class ExpressCurate_Settings {
     );
     add_menu_page(self::PLUGIN_NAME, self::PLUGIN_NAME, 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '', '9.95458');
     add_submenu_page('expresscurate', self::PLUGIN_NAME, '', 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '');
-    add_submenu_page('expresscurate', 'Keywords', 'Keywords', 'edit_posts', 'expresscurate_keywords', array(&$this, 'show_expresscurate_keywords'), '');
-    add_submenu_page('expresscurate', 'News', 'News', 'edit_posts', 'expresscurate_news', array(&$this, 'show_expresscurate_news'), '');
     add_submenu_page('expresscurate', 'Top Sources', 'Top Sources', 'edit_posts', 'expresscurate_websites', array(&$this, 'show_expresscurate_websites'), '');
+    add_submenu_page('expresscurate', 'Keywords', 'Keywords', 'edit_posts', 'expresscurate_keywords', array(&$this, 'show_expresscurate_keywords'), '');
+    add_submenu_page('expresscurate', 'Settings', 'Settings', 'manage_options', 'expresscurate_settings', array(&$this, 'plugin_settings_page'), '');
+    add_submenu_page('expresscurate', 'News', 'News', 'edit_posts', 'expresscurate_news', array(&$this, 'show_expresscurate_news'), '');
     add_submenu_page('expresscurate', 'FAQ', 'FAQ', 'edit_posts', 'expresscurate_faq', array(&$this, 'show_expresscurate_faq_page'), '');
     add_submenu_page('expresscurate', 'Support', 'Support', 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '');
-    add_submenu_page('expresscurate', 'Settings', 'Settings', 'manage_options', 'expresscurate_settings', array(&$this, 'plugin_settings_page'), '');
+
   }
 
   //Add widget
@@ -673,6 +674,14 @@ class ExpressCurate_Settings {
     include(sprintf("%s/templates/news.php", dirname(__FILE__)));
   }
 
+  public function show_expresscurate_paid_version() {
+      if (!current_user_can('edit_posts')) {
+          wp_die(__('You do not have sufficient permissions to access this page.'));
+      }
+// Render the settings template
+        include(sprintf("%s/templates/paid.php", dirname(__FILE__)));
+  }
+
   public function show_expresscurate_websites() {
     if (!current_user_can('edit_posts')) {
       wp_die(__('You do not have sufficient permissions to access this page.'));
@@ -710,11 +719,10 @@ class ExpressCurate_Settings {
     //wp_enqueue_script('expresscurate', $plaugunUrl . 'js/expresscurate.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
     //wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
     //
-      wp_enqueue_script('expresscurate_menu', $plaugunUrl . 'js/Menu.js');
+    wp_enqueue_script('expresscurate_menu', $plaugunUrl . 'js/Menu.js');
     wp_enqueue_script('expresscurate_dialog', $plaugunUrl . 'js/Dialog.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
     wp_enqueue_script('expresscurate_settings', $plaugunUrl . 'js/Settings.js', array('jquery'));
     wp_enqueue_script('expresscurate_support', $plaugunUrl . 'js/Support.js', array('jquery'));
-    wp_enqueue_script('expresscurate_faq', $plaugunUrl . 'js/FAQ.js', array('jquery'));
 
     wp_enqueue_script('expresscurate_keyword_utils', $plaugunUrl . 'js/keywords/KeywordUtils.js', array('jquery'));
     wp_enqueue_script('expresscurate_keywords', $plaugunUrl . 'js/keywords/Keywords.js', array('jquery'));

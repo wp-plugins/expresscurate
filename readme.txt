@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
 Requires at least: 3.9
 Tested up to: 3.9
-Stable tag: 1.2.10
+Stable tag: 1.2.11
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -103,6 +103,13 @@ e.g.
 
 == Changelog ==
 
+= 1.2.11 =
+* The authorship rel=author meta tags are removed.
+* Wordpress 4 supported now.
+* We no longer automatically create tags out of keywords.
+* Auto-hashtagging was confusing for some of our customers. While we left this feature present in the plugin, it is now disabled by default.
+* Miscellaneous bug fixes and improvements.
+
 = 1.2.10 =
 * Miscellaneous bug fixes and improvements.
 
@@ -165,7 +172,7 @@ e.g.
 * Miscellaneous bug fixes and improvements.
 
 = 1.1.6 =
-* Wordpress 3.9 support,
+* Wordpress 3.9 support.
 * Keyword Tags Suggestion Fixes.
 
 = 1.1.5 =
@@ -182,14 +189,14 @@ e.g.
 * Miscellaneous bug fixes and improvements.
 
 = 1.1.1 =
-* Authorship for posts
-* Publisher for website
-* Social profile attributes for users (visible with ExpressCurate Theme, author page)
-* Smart publishing, available for curated draft posts
-* New text box tools for better blog styling
-* Image selection from original page enhanced
-* Paragraph selection from original page enhanced
-* Optional Auto-Hashtagging
+* Authorship for posts.
+* Publisher for website.
+* Social profile attributes for users (visible with ExpressCurate Theme, author page).
+* Smart publishing, available for curated draft posts.
+* New text box tools for better blog styling.
+* Image selection from original page enhanced.
+* Paragraph selection from original page enhanced.
+* Optional Auto-Hashtagging.
 
 = 1.1 =
 * Miscellaneous bug fixes and improvements.

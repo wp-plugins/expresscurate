@@ -499,7 +499,14 @@
         font-family: OpenSans-Bold;
         font-weight: bold;
     }
-
+@media (max-width: 1400px) {
+    .expresscurate_keywords_settings .usedWordsPart{
+        padding-left: 20px;
+    }
+    .expresscurate_keywords_settings .keywordsPart .keywordsWrap{
+        border:none;
+    }
+}
 /**/
 
 .expresscurate_page_expresscurate_settings .gray-italic {
@@ -807,6 +814,7 @@
         color: #555555;
         font-family: OpenSans-Regular;
         font-size: 16px;
+        line-height: 16px;
     }
 
     .expresscurate_widget_wrapper .addKeywords span {
@@ -2082,6 +2090,22 @@
     position: relative;
     font-size: 0;
 }
+
+.expresscurate_proLabel{
+    color: #fff;
+    background-color: #e84c3d;
+    font-size: 10px;
+    font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
+    font-style: italic;
+    margin-left: 5px;
+    display: inline-block;
+    width: 22px;
+    height: 13px;
+    line-height: 10px;
+    padding-left: 4px;
+    border-radius: 3px;
+    font-weight: normal !important;
+}
     .expresscurate_tabMenu a{
         display: inline-block;
         text-align: center;
@@ -2155,4 +2179,8 @@
 .mce-toolbar .mce-btn[aria-label='Highlight Keywords'] i{
     width: 25px !important;
     background-repeat: no-repeat;
+}
+#wp-expresscurate_content_editor-editor-container .mce-container.mce-edit-area {
+  max-height: 140px;
+  overflow-y: auto;
 }

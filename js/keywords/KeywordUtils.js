@@ -53,7 +53,7 @@ var KeywordUtils = (function(jQuery){
         close: function (keyword, elemToRemove) {
             var defTags = jQuery('textarea[name=expresscurate_defined_tags]'),
                 newVal = '';
-            newVal = KeywordUtils.justText(defTags).replace(keyword, '');
+            newVal = KeywordUtils.justText(defTags).toLowerCase().replace(keyword.toLowerCase(), '');
             newVal = newVal.replace(', ,', ',');
             var lastChar = newVal.slice(-2);
             if (lastChar == ', ') {

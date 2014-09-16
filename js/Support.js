@@ -7,7 +7,6 @@ var Support = (function(jQuery){
             var msg = jQuery("#expresscurate_support_message").val();
             var regularExpression = /^[\w\-\s]+$/;
             valid_msg = regularExpression.test(msg);
-            console.log(valid_msg);
             if (msg == "" || msg == null) {
                 valid_msg = false;
                 jQuery("#expresscurate_support_message").after('<label class="errorMessage">Please enter the message</label>');
