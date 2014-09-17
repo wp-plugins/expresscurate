@@ -316,7 +316,7 @@
     </th>
     <td>
         <input type="text" id="expresscurate_max_tags" class="centered-text" value="<?php
-        if (get_option('expresscurate_max_tags')) {
+        if (get_option('expresscurate_max_tags', '')!=='') {
             echo get_option('expresscurate_max_tags');
         } else {
             echo '3';

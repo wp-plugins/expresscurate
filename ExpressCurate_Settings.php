@@ -266,17 +266,15 @@ class ExpressCurate_Settings {
     $tagsObj = new Expresscurate_Tags();
     $defined_tags = "";
     $post_tags = array();
-    if (@get_option("expresscurate_defined_tags")) {
-      $defined_tags = get_option("expresscurate_defined_tags");
-    }
-    if ($defined_tags) {
-      $defined_tags = explode(",", $defined_tags);
-    }
+//    if (@get_option("expresscurate_defined_tags")) {
+//      $defined_tags = get_option("expresscurate_defined_tags");
+//    }
+//    if ($defined_tags) {
+//      $defined_tags = explode(",", $defined_tags);
+//    }
     $the_post = get_post($post_id);
-
 // get the content of the post
     $post_content = $the_post->post_content;
-
     if (strpos($post_content, 'keywordsHighlight') !== false) {
       $post_content = $tagsObj->removeHighlights($post_content);
     }
@@ -290,29 +288,10 @@ class ExpressCurate_Settings {
     preg_match_all('/\s(?<!\w)(?=[^>]*(<|$))#\w+/iu', $post_content, $content_tags);
 
     foreach ($content_tags[0] as $content_tag) {
-
       $content_tag_insert = str_replace("#", "", trim($content_tag));
 //adding content tag to post tags if not exists
       if (!in_array($content_tag_insert, $post_tags)) {
         wp_set_post_tags($post_id, strtolower($content_tag_insert), true);
-      }
-    }
-    if ($defined_tags && count($defined_tags)) {
-      foreach ($defined_tags as $defined_tag) {
-        $defined_tag_insert = trim($defined_tag);
-        $defined_tag_insert = str_replace('/\s+/', '[ ]', $defined_tag_insert);
-        //$defined_tag_insert = preg_replace('/\s+/', '|', $defined_tag_insert);
-//adding defined tag to post tags if tag exists in posttitle or post content
-        preg_match("/(?<!\w)(?=[^>]*(<|$))" . $defined_tag_insert . "(\W|$)/i", $post_content, $tag_in_content);
-
-
-
-
-
-        if ((isset($tag_in_content[0]) || strpos($the_post->title, $defined_tag_insert)) && !in_array($defined_tag_insert, $post_tags)) {
-
-          wp_set_post_tags($post_id, $defined_tag_insert, true);
-        }
       }
     }
     $tags = get_the_tags($post_id);
@@ -814,9 +793,7 @@ class ExpressCurate_Settings {
 
   private function get_match($regex, $content) {
     preg_match($regex, $content, $matches);
-    return $matches[1]
-
-    ;
+    return $matches[1];
   }
 
   private function pluginUrl() {
@@ -874,7 +851,7 @@ class Expresscurate_Tags {
   public function removeTagLinks($html) {
     $tagLinks = '/<a class="expresscurate_contentTags".*?>(.*?)<\/a>/i';
     $html = preg_replace($tagLinks, '$1', $html);
-    preg_match_all('/\s(?<!\w)(?=[^>]*(<|$))#\w+/iu', $html, $tags);
+    preg_match_all('/(^|\s|>|)(?<!\w)(?=[^>]*(<|$))#\w+/Uuis', $html, $tags);
     foreach ($tags[0] as $tag){
       $html = str_replace($tag, str_replace('#', '', $tag), $html);
     }
