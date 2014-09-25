@@ -59,7 +59,7 @@ class ExpressCurate_Keywords {
   public function add_keyword($keyword, $get_stats = false) {
     $defined_tags_arr = array();
     if ($_REQUEST) {
-      $keywords = explode(",",$_REQUEST['keywords']);
+      $keywords = explode(",", $_REQUEST['keywords']);
       $get_stats = $_REQUEST['get_stats'];
     }
     $defined_tags = get_option("expresscurate_defined_tags", '');
@@ -67,34 +67,37 @@ class ExpressCurate_Keywords {
       $defined_tags_arr = $this->array_map('trim', explode(",", $defined_tags));
       unset($defined_tags_arr['']);
     }
-    if(count($keywords)>0){
-        foreach($keywords as $key=>$keyword){
-            $keyword = trim($keyword);
-            if (strlen($keyword) > 2) {
-                if (preg_grep("/\b" . $keyword . "\b\w+/i", $defined_tags_arr)) {
-                    $result = array('status' => "warning", 'msg' => __($keyword . ' is already defined'));
-                } else {
-                    if ($defined_tags) {
+    if (count($keywords) > 0) {
+      foreach ($keywords as $key => $keyword) {
+        $keyword = str_replace('"', '', stripslashes(trim($keyword)));
+        $keyword = str_replace("\\\"", '', $keyword);
+        $keyword = str_replace("\\'", '', $keyword);
+        $keyword = str_replace("\\\\", '', $keyword);
+        if (strlen($keyword) > 2) {
+          if (preg_grep("/\b" . $keyword . "\b\w+/i", $defined_tags_arr)) {
+            $result = array('status' => "warning", 'msg' => __($keyword . ' is already defined'));
+          } else {
+            if ($defined_tags) {
 
-                        $defined_tags .= ", " . $keyword;
-                    } else {
-                        $defined_tags = $keyword;
-                    }
-                    $defined_tags = str_replace(', ,', ',', $defined_tags);
-                    update_option('expresscurate_defined_tags', $defined_tags);
-                }
-            }else{
-                unset($keywords[$key]);
+              $defined_tags .= ", " . $keyword;
+            } else {
+              $defined_tags = $keyword;
             }
-        }
-        if ($get_stats == true) {
-            $stats = $this->get_stats(array($keywords), false, false, false);
-            $result = array('status' => "success", 'stats' => $stats);
+            $defined_tags = str_replace(', ,', ',', $defined_tags);
+            update_option('expresscurate_defined_tags', $defined_tags);
+          }
         } else {
-            $result = array('status' => "success");
+          unset($keywords[$key]);
         }
-    }else{
-        $result = array('status' => "warning", 'msg' => __('Something went wrong'));
+      }
+      if ($get_stats == true) {
+        $stats = $this->get_stats(array($keywords), false, false, false);
+        $result = array('status' => "success", 'stats' => $stats);
+      } else {
+        $result = array('status' => "success");
+      }
+    } else {
+      $result = array('status' => "warning", 'msg' => __('Something went wrong'));
     }
 
     echo json_encode($result);
@@ -106,19 +109,19 @@ class ExpressCurate_Keywords {
 
     if ($_REQUEST) {
       $keyword = $_REQUEST['keyword'];
-        if(strpos($keyword, ",")){
-            $keywords = explode(',', $keyword);
-        }
+      if (strpos($keyword, ",")) {
+        $keywords = explode(',', $keyword);
+      }
       $post_id = (isset($_REQUEST['post_id']) ? $_REQUEST['post_id'] : false);
     }
     if ($post_id) {
       $args = array('id' => $post_id);
     }
-      if(count(@$keywords)>0){
-          $stats = $this->get_stats($keywords, $args, false, false);
-      }else{
-          $stats = $this->get_stats(array($keyword), $args, false, false);
-      }
+    if (count(@$keywords) > 0) {
+      $stats = $this->get_stats($keywords, $args, false, false);
+    } else {
+      $stats = $this->get_stats(array($keyword), $args, false, false);
+    }
     $result = array('status' => "success", 'stats' => $stats);
     echo json_encode($result);
     die();
@@ -148,9 +151,9 @@ class ExpressCurate_Keywords {
   public function get_stats($keywords = array(), $args = false, $post_content = false, $get_posts_count = false) {
     if ($_POST && isset($_POST['keywords'])) {
       $keywords = $this->array_map('trim', explode(",", $_POST['keywords']));
-      if(isset($_POST['post_title'])){
+      if (isset($_POST['post_title'])) {
         $post_content = $this->get_words(false, array('title' => $_POST['post_title'], 'content' => $_POST['post_content']));
-      }else{
+      } else {
         $post_content = $this->get_words($args);
       }
     } else {
@@ -169,8 +172,12 @@ class ExpressCurate_Keywords {
       }
     }
     $keyword_in = array();
-    if (count($keywords)>0) {
+    if (count($keywords) > 0) {
       foreach ($keywords as $keyword) {
+        $keyword = str_replace('"', '', stripslashes(trim($keyword)));
+        $keyword = str_replace("\\\"", '', $keyword);
+        $keyword = str_replace("\\'", '', $keyword);
+        $keyword = str_replace("\\\\", '', $keyword);
         $keyword_in[$keyword]['added_count'] = 0;
         preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
         //str_ireplace(" ".$keyword." ", '', $post_content['content'], $keyword_in[$keyword]['count']);
