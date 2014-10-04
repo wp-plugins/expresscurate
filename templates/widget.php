@@ -73,7 +73,9 @@ global $post;
 <div class="clear"></div>
 <div class="description">
     <label for="description">Description</label>
-    <textarea id="description" class="disableInputStyle textareaBorder"
+
+    <div class="descriptionWrap textareaBorder">
+        <textarea id="description" class="expresscurate_disableInputStyle"
               name="expresscurate_description"><?php
         if (strlen($pre_def_description) > 3 && get_post_meta($post->ID, '_expresscurate_description', true) == '') {
             echo trim($pre_def_description);
@@ -82,8 +84,7 @@ global $post;
         }
         ?>
     </textarea>
-
-
+    </div>
         <div class="hint expresscurate_displayNone borderRight">
             <span>characters left</span>
             <p class="lettersCount"><span class="bold">156</span> / 156</p>

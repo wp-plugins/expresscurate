@@ -395,7 +395,7 @@ class ExpressCurate_Settings {
     if ($curated_content > 0 || $curated_before == 1 && current_user_can('edit_post', $post_id)) {
 //download images
       $images = array();
-      preg_match_all("/\< *[img][^\>]*[src] *= *[\"\']{0,1}([^\"\']*)/i", $post_content, $images);
+      preg_match_all("/\<img\s[^\>]*src\s*=\s*([\"'])(((?!\1).)*)\1/i", $post_content, $images);
       require_once(ABSPATH . 'wp-admin/includes/image.php');
       $siteDomain = parse_url(get_site_url(), PHP_URL_HOST);
       if (count($images) > 0 && is_writable($upload_dir['path'])) {
@@ -540,7 +540,7 @@ class ExpressCurate_Settings {
   public function add_menu() {
 // Add a page to manage this plugin's settings
     add_options_page(
-            self::PLUGIN_NAME . ' Settings', self::PLUGIN_NAME, 'manage_options', 'expresscurate', array(&$this, 'plugin_settings_page')
+            self::PLUGIN_NAME . ' Settings', self::PLUGIN_NAME, 'manage_options', 'expresscurate_settings', array(&$this, 'plugin_settings_page')
     );
     add_menu_page(self::PLUGIN_NAME, self::PLUGIN_NAME, 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '', '9.95458');
     add_submenu_page('expresscurate', self::PLUGIN_NAME, '', 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '');

@@ -113,7 +113,7 @@ var SEOControl = (function (jQuery) {
             insertKeywordInWidget(KeywordUtils.multipleKeywords(jQuery('.addKeywords input')), jQuery('.addKeywords'));
         });
         /*remove Keyword*/
-        jQuery('.expresscurate_background_wrap .close').live('click', function () {
+        jQuery('.expresscurate_widget_wrapper').on('click touchend', '.expresscurate_background_wrap .close', function () {
             KeywordUtils.close(jQuery(this).parent().find('.statisticsTitle').text(), jQuery(this).parent('.expresscurate_background_wrap'));
         });
         /*meta description*/
@@ -124,7 +124,7 @@ var SEOControl = (function (jQuery) {
                 textarea = jQuery('.description textarea');
             /*keywords in meta description*/
 
-            var keywords = new Array(),
+            var keywords = [],
                 metaDesc = jQuery('.description  textarea').val(),
                 includedKeywordsCount = 0,
                 keywordsCount = 0;
@@ -132,7 +132,7 @@ var SEOControl = (function (jQuery) {
             if (defKeywords.length > 0) {
                 keywords = defKeywords.split(', ');
                 for (var i = 0; i < keywords.length; i++) {
-                    var myRegExp = new RegExp('\\b' + keywords[i] + '\\b', 'gi');
+                    var myRegExp = new RegExp('((^|\\s|>|))(' + keywords[i] + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$))', 'gmi');
                     if (metaDesc.match(myRegExp)) {
                         includedKeywordsCount++;
                     }
@@ -150,22 +150,22 @@ var SEOControl = (function (jQuery) {
         });
 
         jQuery('.description, .description p').click(function () {
-            jQuery('.description  p , .description div').removeClass('expresscurate_displayNone');
+            jQuery('.description  p , .description .hint').removeClass('expresscurate_displayNone');
             jQuery('.description').css({'background-color': '#ffc67d'});
-            jQuery('.description  textarea').removeClass('textareaBorder');
+            jQuery('.description  .descriptionWrap').removeClass('textareaBorder');
             jQuery('.description textarea').focus();
         });
 
         jQuery('.expresscurate_widget_wrapper').click(function () {
-            jQuery('.description  textarea').addClass('textareaBorder');
-            jQuery('.description  p , .description div').addClass('expresscurate_displayNone');
+            jQuery('.description  .descriptionWrap').addClass('textareaBorder');
+            jQuery('.description  p , .description .hint').addClass('expresscurate_displayNone');
             jQuery('.description').css({'background-color': '#ffffff'});
         });
 
         jQuery(document).click(function (e) {
             if (jQuery('.expresscurate_widget').length > 0 && !jQuery(e.target).parents('#expresscurate').is('div')) {
-                jQuery('.description  textarea').addClass('textareaBorder');
-                jQuery('.description  p , .description div').addClass('expresscurate_displayNone');
+                jQuery('.description  .descriptionWrap').addClass('textareaBorder');
+                jQuery('.description  p , .description .hint').addClass('expresscurate_displayNone');
                 jQuery('.description').css({'background-color': '#ffffff'});
             }
         });
@@ -176,7 +176,8 @@ var SEOControl = (function (jQuery) {
                 el.removeClass('rotated');
             }, 1000);
         });
-
+        /*mark keyword*/
+        jQuery('.expresscurate_widget_wrapper .mark').on('touchend',Keywords.markEditorKeywords());
     };
 
     var isSetup = false;

@@ -877,24 +877,33 @@
                 color: #ffffff;
             }
 
-        #expresscurate .description {
-            padding: 0 13px 5px 13px;
-            margin-top: 10px;
-        }
-
-            #expresscurate .description label {
-                font-family: OpenSans-Regular;
-                font-size: 13px;
-                line-height: 20px;
-                color: #494949;
+            #expresscurate .description {
+                padding: 0 13px 5px 13px;
+                margin-top: 10px;
             }
-
-            #expresscurate .description textarea {
-                resize: none;
+                    #expresscurate .description label {
+                        font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
+                        font-size: 13px;
+                        line-height: 20px;
+                        color: #494949;
+                    }
+            #expresscurate .descriptionWrap{
                 width: 100%;
-                height: 80px;
                 overflow: hidden;
+                background: #fff;
             }
+                    #expresscurate .descriptionWrap  textarea{
+                        width: 110%;
+                        width: -webkit-calc(100% + 17px);
+                        width: -moz-calc(100% + 17px);
+                        width: calc(100% + 17px);
+                        padding: 8px 15% 5px 3%;
+                    }
+                    #expresscurate .description textarea {
+                        resize: none;
+                        height: 80px;
+                        resize:none;
+                    }
             #expresscurate .description .textareaBorder{
                 border-style: solid;
                 border-width: 1px;
@@ -2183,4 +2192,25 @@
 #wp-expresscurate_content_editor-editor-container .mce-container.mce-edit-area {
   max-height: 140px;
   overflow-y: auto;
+}
+.expresscurate_disableInputStyle{
+    border-style: none;
+    border: none !important;
+    outline: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none !important;
+    border-color: transparent;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+.expresscurate_disableInputStyle:focus , .expresscurate_disableInputStyle:active{
+    outline: none;
+    border: none;
+    webkit-box-shadow: none !important;
+    box-shadow:none !important;
+}
+a:active{
+    outline:none !important;
 }

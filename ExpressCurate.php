@@ -4,7 +4,7 @@
   Plugin Name: ExpressCurate
   Plugin URI: http://www.expresscurate.com/products/wordpress-plugin
   Description: ExpressCurate simplifies and expedites content curation and provides SEO enhancement and keyword effectiveness monitoring.
-  Version: 1.2.13
+  Version: 1.2.14
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
   License: GPLv3 or later
@@ -65,17 +65,14 @@ if (class_exists('ExpressCurate')) {
 
   // Add a link to the settings page onto the plugin page
   if (isset($expresscurate)) {
-
     // Add the settings link to the plugins page
     function expresscurate_settings_link($links) {
-      $settings_link = '<a href="options-general.php?page=expresscurate">Settings</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL" target="_blank">Donate</a>';
+      $settings_link = '<a href="admin.php?page=expresscurate_settings">Settings</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL" target="_blank">Donate</a>';
       array_unshift($links, $settings_link);
       return $links;
     }
 
     $plugin = plugin_basename(__FILE__);
-    if (get_option("current_theme") == ExpressCurate_Settings::PLUGIN_THEME) {
-      add_filter("plugin_action_links_$plugin", 'expresscurate_settings_link');
-    }
+    add_filter("plugin_action_links_$plugin", 'expresscurate_settings_link');
   }
 }
