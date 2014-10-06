@@ -5,7 +5,7 @@ var SEOControl = (function (jQuery) {
         if (keywords.length > 0) {
             var post_id = jQuery('#expresscurate_post_id').val();
             jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_keywords_get_post_keyword_stats', {keyword: keywords, post_id: post_id}, function (res) {
-                data = jQuery.parseJSON(res);
+                var data = jQuery.parseJSON(res);
                 if (data.status === 'success') {
                     jQuery.each(data.stats, function (key, value) {
                         var title = (value.title > 0 ? "yes" : "no");
@@ -47,8 +47,8 @@ var SEOControl = (function (jQuery) {
                  numOccurencesTitle=titleText.match(myRegExp).length;*/
 
                 var title = (numOccurencesTitle > 0 ? "yes" : "no"),
-                    inContent = (numOccurencesContent / contentWords.length * 100).toFixed(2),
-                    color;
+                    inContent = (contentWords.length>0)?((numOccurencesContent / contentWords.length * 100).toFixed(2)):0,
+                    color="blue";
                 if (inContent < 3) {
                     color = 'blue';
                 } else if (inContent >= 3 && inContent <= 5) {
@@ -177,7 +177,10 @@ var SEOControl = (function (jQuery) {
             }, 1000);
         });
         /*mark keyword*/
-        jQuery('.expresscurate_widget_wrapper .mark').on('touchend',Keywords.markEditorKeywords());
+        jQuery('.expresscurate_widget_wrapper .mark').on('touchend',function(e){
+            if(e.target==jQuery('.expresscurate_widget_wrapper .mark'))
+             Keywords.markEditorKeywords();
+        });
     };
 
     var isSetup = false;
