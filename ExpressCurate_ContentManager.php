@@ -357,13 +357,17 @@ class ExpressCurate_HtmlParser {
       $context = stream_context_create($options);
       $content = @file_get_contents($url, false, $context);
       $http_status = $http_response_header;
-      foreach ($http_response_header as $header) {
-        if (substr(strtolower($header), 0, 13) == "content-type:") {
-          if (count(explode(";", $header)) > 1) {
-            list($contentType, $charset) = explode(";", $header);
+
+      if (!empty($http_response_header)) {
+          foreach ($http_response_header as $header) {
+              if (substr(strtolower($header), 0, 13) == "content-type:") {
+                  if (count(explode(";", $header)) > 1) {
+                      list($contentType, $charset) = explode(";", $header);
+                  }
+              }
           }
-        }
       }
+
       $headers = headers_list();
       // get the content type header
       foreach ($headers as $header) {

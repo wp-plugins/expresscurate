@@ -28,24 +28,23 @@
 	font-style:italic;
 	text-decoration:none !important;
 }
-.expresscurate_annotate:before{
+.expresscurate_annotate:before,
+.annotate:before{
   position: absolute;
   height: 12px;
   width: 12px;
   top: -7px;
-  right: 50px;
   transform: rotate(45deg) skew(10deg, 10deg);
   -webkit-transform: rotate(45deg) skew(10deg, 10deg);
   -ms-transform: rotate(45deg) skew(10deg, 10deg);
   background-color: #F3F3F3;
   border-left: 1px solid #e6e6e6;
   border-top: 1px solid #e6e6e6;
-}
-.expresscurate_annotate:before {
   content: "";
   right: 20%;
 }
-.expresscurate_annotate {
+.expresscurate_annotate,
+.annotate{
   padding: 20px 27px;
   border: 1px solid #e6e6e6;
   position: relative;

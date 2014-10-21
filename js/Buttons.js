@@ -63,12 +63,11 @@ var Buttons = (function (jQuery) {
                     ed.selection.setCursorLocation(0);
                 }
             } else {
-
                 var content = '';
                 if (!node.is('div')) {
                     content = ed.selection.getContent();
                 } else if (isbox) {
-                    content = jQuery(ed.selection.getNode()).parents('div').html();
+                    content =(jQuery(ed.selection.getNode()).is('div'))? jQuery(ed.selection.getNode()).html(): jQuery(ed.selection.getNode()).parents('div').html();
                     jQuery(node).remove();
                 }
                 if (content == '') {
@@ -87,9 +86,9 @@ var Buttons = (function (jQuery) {
                 texboxElem.className = cssClass;
                 texboxElem.innerHTML = content;
                 ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
-
-                var activeElem = jQuery(ed.selection.getNode()).parents('div').attr('id');
-                activeElem = activeElem.substring(0, activeElem.indexOf('-'));
+                var activeElem =(jQuery(ed.selection.getNode()).is('div'))? jQuery(ed.selection.getNode()).attr('id'): jQuery(ed.selection.getNode()).parents('div').attr('id');
+                if(activeElem.indexOf('-')>0)
+                    activeElem = activeElem.substring(0, activeElem.indexOf('-'));
                 ed.controlManager.setActive(activeElem, true);
             }
         }
@@ -271,7 +270,7 @@ var Buttons = (function (jQuery) {
                         activeButton = 'righttextbox';
                     else if (cssClass == 'expresscurate_justify_text_box')
                         activeButton = 'justifytextbox';
-                    else if (cssClass == 'expresscurate_annotate')
+                    else if (cssClass == 'expresscurate_annotate' || cssClass == 'annotate')
                         activeButton = 'annotation';
                     ed.controlManager.setActive('lefttextbox', false);
                     ed.controlManager.setActive('righttextbox', false);

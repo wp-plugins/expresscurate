@@ -541,8 +541,10 @@ var ExpresscurateDialog = (function(jQuery){
                 html += insite_html;
                 if (html.length > 0) {
                     if (jQuery("#expresscurate_source").val().length > 0) {
-                        var matches = jQuery("#expresscurate_source").val().match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
-                        var domain = matches && matches[1];
+                        //var matches = jQuery("#expresscurate_source").val().match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+                        //var domain = matches && matches[1];
+                        var domain = jQuery("#expresscurate_source").val();
+                            domain =  domain.match(/^(http|https)/) ? domain : 'http://'+domain;
                         if (domain) {
                             html += '<div class="expresscurate_source"><p>' + jQuery("#expresscurate_from").val() + ' <a class="expresscurated" data-curated-url="' + jQuery("#expresscurate_source").val() + '"  href = "' + jQuery("#expresscurate_source").val() + '">' + domain + '</a></p></div><br/>';
                         }
@@ -563,9 +565,9 @@ var ExpresscurateDialog = (function(jQuery){
         jQuery('#expresscurate_submit').click(function () {
             jQuery("#expresscurate_loading").show();
             submitExpresscurateForm();
-            jQuery(document).ajaxComplete(function () {
-
-            });
+            //jQuery(document).ajaxComplete(function () {
+            //
+            //});
         });
         jQuery('#expresscurate_source').keypress(function (e) {
             if (e.keyCode == 13 || e.keyCode == 40) {

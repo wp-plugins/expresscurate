@@ -108,8 +108,8 @@ class ExpressCurate_Settings {
 
   public function expresscurate_publish_box() {
     $smart_publishing = '';
-    if ($GLOBALS['post']->post_status !== 'publish' && $GLOBALS['post']->post_type !== 'acf') {
-      if (get_option('expresscurate_manually_approve_smart', '') == 0) {
+      if ($GLOBALS['post']->post_status !== 'publish') {
+          if (get_option('expresscurate_manually_approve_smart', '') == 0 || get_post_meta($GLOBALS['post']->ID,'_expresscurate_smart_publish', true) == '1') {
         $checked = 'checked="checked"';
       } else {
         $checked = '';
@@ -785,7 +785,11 @@ class ExpressCurate_Settings {
       update_option('expresscurate_publish_mail_sent', 0);
     } elseif (!$posts->have_posts() && get_settings('admin_email') && get_option('expresscurate_publish_mail_sent', '0') == "0") {
       $subject = "ExpressCurate Smart Publishing Status";
-      $message = "There is no curated posts to publish \n";
+        $blogName = get_bloginfo('Name');
+        $blogUrl = get_bloginfo('url');
+        $message = "$blogName\n
+                        $blogUrl\n
+                        There is no curated posts to publish \n";
       wp_mail(get_settings('admin_email'), $subject, $message);
       update_option('expresscurate_publish_mail_sent', 1);
     }

@@ -180,6 +180,17 @@ class ExpressCurate_AjaxExportAPI {
     } else {
       $result = json_encode(array('status' => "error", 'msg' => "Data is emty!"));
     }
+
+      //Smart publishing
+      if (get_option('expresscurate_publish', '') == 1) {
+          $smartPublish = 1;
+
+          if (get_option('expresscurate_manually_approve_smart') == 1) {
+              $smartPublish = 0;
+          }
+          update_post_meta($post_id, '_expresscurate_smart_publish', $smartPublish);
+      }
+      
     echo $result;
     die;
   }
