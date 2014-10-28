@@ -14,6 +14,10 @@ class ExpressCurate_Settings {
   const POST_TYPE = "post";
   const COLUMN_NAME = "curated";
   const COLUMN_TITLE = "Curated";
+
+  const SMART_PUBLISH_COLUMN_NAME = "smart_publish_date";
+  const SMART_PUBLISH_COLUMN_TITLE = "Smart Publish Date";
+
   const PLUGIN_FOLDER = "expresscurate";
   const PLUGIN_INNER_NAME = "expresscurate";
   const PLUGIN_NAME = "ExpressCurate";
@@ -33,6 +37,7 @@ class ExpressCurate_Settings {
     $this->keywords = new ExpressCurate_Keywords();
     // register actions
     add_action('admin_init', array(&$this, 'admin_init'));
+    add_action('admin_init', array(&$this, 'show_smart_publish_date_column'));
     add_action('admin_menu', array(&$this, 'add_menu'));
     add_action('admin_menu', array(&$this, 'expresscurate_add_widget'));
     add_action('admin_print_styles', array(&$this, 'expresscurate_admin_print_styles'));
@@ -44,6 +49,7 @@ class ExpressCurate_Settings {
     add_filter('manage_edit-post_columns', array(&$this, 'curated_column_register'));
     add_action('manage_posts_custom_column', array(&$this, 'curated_column_display'), 10, 2);
     add_filter('manage_edit-post_sortable_columns', array(&$this, 'curated_column_register_sortable'));
+
     add_filter('request', array(&$this, 'curated_column_orderby'));
     add_action('wp_enqueue_scripts', array(&$this, 'expresscurate_theme_styles'));
     add_action('wp_head', array(&$this, 'add_expresscurate_seo'));
@@ -211,6 +217,42 @@ class ExpressCurate_Settings {
 
     return $vars;
   }
+
+    function show_smart_publish_date_column()
+    {
+        if (get_option('expresscurate_publish')) {
+            add_filter('manage_edit-post_columns', array(&$this, 'smart_publish_column_register'));
+            add_action('manage_posts_custom_column', array(&$this, 'smart_publish_column_display'), 10, 2);
+            add_filter('manage_edit-post_sortable_columns', array(&$this, 'smart_publish_column_register_sortable'));
+        }
+    }
+    // Register the column
+    function smart_publish_column_register($columns)
+    {
+        return array_merge($columns, array(self::SMART_PUBLISH_COLUMN_NAME => __(self::SMART_PUBLISH_COLUMN_TITLE, self::PLUGIN_FOLDER)));
+    }
+
+// Display the column content
+    public function smart_publish_column_display($column_name, $post_id)
+    {
+        if ('smart_publish_date' != $column_name)
+            return;
+
+        $smartPublishDate = get_post_meta($post_id, 'smart_publish_date', true);
+        if (!empty($smartPublishDate)) {
+            $smartPublishDate = '<em>' . __($smartPublishDate, self::PLUGIN_FOLDER) . '</em>';
+        } else {
+            $smartPublishDate = '';
+        }
+        echo $smartPublishDate;
+    }
+
+// Register the column as sortable
+    public function smart_publish_column_register_sortable($columns)
+    {
+        $columns[self::SMART_PUBLISH_COLUMN_NAME] = self::SMART_PUBLISH_COLUMN_NAME;
+        return $columns;
+    }
 
   public function settings_section_expresscurate() {
 // Think of this as help text for the section.
@@ -782,6 +824,7 @@ class ExpressCurate_Settings {
     $hourdiff = round((strtotime($recent_posts[0]['post_date']) - strtotime($now)) / (60 * 60));
     if ($hourdiff >= get_option("expresscurate_hours_interval") && $posts->have_posts()) {
       wp_update_post(array('ID' => $posts->posts[0]->ID, 'post_status' => 'publish'));
+      update_post_meta($posts[0]->ID,'smart_publish_date', $now);
       update_option('expresscurate_publish_mail_sent', 0);
     } elseif (!$posts->have_posts() && get_settings('admin_email') && get_option('expresscurate_publish_mail_sent', '0') == "0") {
       $subject = "ExpressCurate Smart Publishing Status";
@@ -863,7 +906,7 @@ class Expresscurate_Tags {
   }
 
   public function removeHighlights($html) {
-    $spans = '/<span class="expresscurate_keywordsHighlight">(.*?)<\/span>/uis';
+    $spans = '/<span class="expresscurate_keywordsHighlight .*?">(.*?)<\/span>/uis';
     return preg_replace($spans, '$1', $html);
   }
 

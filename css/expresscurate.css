@@ -1549,7 +1549,17 @@
     background-position: center center;
     background-size: auto 90%;
 }
-
+.expresscurate_dialog .imageCount{
+    position: absolute;
+    color: #fff;
+    opacity: .6;
+    background-color: #303030;
+    right: 8px;
+    bottom: 8px;
+    display: block;
+    padding: 3px;
+    z-index: 2000000;
+}
 .expresscurate_dialog .left {
     float: left;
 }

@@ -65,6 +65,7 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
                 </div>
             </div>
             <div class="img noimage">
+                <span class="imageCount expresscurate_displayNone"></span>
             </div>
         </div>
         <div class="editor right" style="max-height: 200px; ">

@@ -1,37 +1,7 @@
 var Buttons = (function (jQuery) {
-    var getId = function (prefix) {
-        var uniqueId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0,
-                v = c == 'x' ? r : r & 0x3 | 0x8;
-            return v.toString(16);
-        });
-
-        return (prefix || '') + '-' + uniqueId;
-    };
-
-    var getElem = function (node, cssClass) {
-        if (node && node.className && !!~node.className.indexOf(cssClass)) {
-            return node;
-        }
-
-        if (node.parentNode) {
-            return getElem(node.parentNode, cssClass);
-        }
-
-        return false;
-    };
-
     var textboxCommand = function (ed, elem, cssClass, isVal) {
-        var node = jQuery(ed.selection.getNode());
-        if (!node.is('div')) {
-            node = node.parents('div');
-        }
-        var selectedClass = jQuery(node).attr('class'),
-            isbox;
-
         if (isVal) {
-
-            var id = elem + getId(),
+            var id = elem,
                 texboxElem = ed.getDoc().createElement('DIV');
 
             texboxElem.id = id;
@@ -39,79 +9,68 @@ var Buttons = (function (jQuery) {
             texboxElem.innerHTML = '<p class="placeholder">Add your annotation</p>';
 
             ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
-            var activeElem = jQuery(ed.selection.getNode()).parents('div').attr('id');
-            activeElem = activeElem.substring(0, activeElem.indexOf('-'));
+            var activeElem = jQuery(ed.selection.getNode()).parents('div').eq(0).attr('id');
             ed.controlManager.setActive(activeElem, true);
             var placeholders = tinyMCE.activeEditor.dom.select('p.placeholder');
             ed.selection.select(placeholders[placeholders.length - 1]);
 
         } else {
+            var node = jQuery(ed.selection.getNode()),
+                selectedId = jQuery(node).parents('div[class*=expresscurate]').attr('id') || jQuery(node).parents('div[class*=annotat]').attr('id'),
+                nodeIsBox = jQuery(node).is('div') && jQuery(node).attr('class') && (jQuery(node).attr('class').indexOf('expresscurate') > -1 || jQuery(node).attr('class').indexOf('annotat') > -1),
+                nodeIsWrapped = jQuery(node).parents('div[class*=expresscurate]').length > 0 || jQuery(node).parents('div[class*=annotat]').length>0;
 
-            if (selectedClass)
-                isbox = selectedClass.indexOf('text_box') >= 0 || selectedClass.indexOf('annotate') >= 0;
-            if (selectedClass == cssClass) {
-                var texbox = getElem(ed.selection.getNode(), cssClass);
-                if (texbox) {
-                    if (jQuery(texbox).html() == '<p>&nbsp;</p>') {
-                        jQuery(texbox).html('');
-                        jQuery(texbox).remove();
+            if (node.is('div') && jQuery(node).attr('class') && (jQuery(node).attr('class').indexOf('expresscurate')>-1 || jQuery(node).attr('class').indexOf('annotat')>-1) && jQuery(node).attr('id')==elem) {
+                node.before(node.html());
+                node.remove();
+                       } else if (nodeIsWrapped && selectedId == elem) {
+                if (jQuery(node).html() == '<p>&nbsp;</p>') {
+                    jQuery(node).html('');
+                    jQuery(node).remove();
                     } else {
-                        var unwrapElem = jQuery(ed.selection.getNode());
-                        unWrap(unwrapElem);
+                    unWrap(node, elem);
                     }
                     ed.controlManager.setActive(elem, false);
                     ed.selection.setCursorLocation(0);
-                }
+
             } else {
                 var content = '';
-                if (!node.is('div')) {
+                if (nodeIsBox) {
+                    content = node.html();
+                    node.remove();
+                } else if (nodeIsWrapped) {
+                    content = node.parents('div').eq(0).html();
+                    node.parents('div').eq(0).remove();
+                } else {
                     content = ed.selection.getContent();
-                } else if (isbox) {
-                    content =(jQuery(ed.selection.getNode()).is('div'))? jQuery(ed.selection.getNode()).html(): jQuery(ed.selection.getNode()).parents('div').html();
-                    jQuery(node).remove();
-                }
-                if (content == '') {
-                    content = '<p>&nbsp;</p>';
-                } else if (content.indexOf('<p>') < 0) {
-                    content = '<p>' + content + '</p>';
-                }
-                if (selectedClass && isbox) {
-                    ed.execCommand('mceRemoveNode', 0, node.id);
                 }
 
-                var id = elem + getId(),
+                var id = elem,
                     texboxElem = ed.getDoc().createElement('DIV');
 
                 texboxElem.id = id;
                 texboxElem.className = cssClass;
                 texboxElem.innerHTML = content;
                 ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
-                var activeElem =(jQuery(ed.selection.getNode()).is('div'))? jQuery(ed.selection.getNode()).attr('id'): jQuery(ed.selection.getNode()).parents('div').attr('id');
-                if(activeElem.indexOf('-')>0)
-                    activeElem = activeElem.substring(0, activeElem.indexOf('-'));
+                var activeElem = id;
+
                 ed.controlManager.setActive(activeElem, true);
             }
         }
     };
 
-    var unWrap = function (elem) {
-        if (elem.is('span'))
-            elem = elem.parent('p');
-        if (elem.parents().is('blockquote')) {
-            elem = elem.parents('blockquote');
-        }
+    var unWrap = function (elem, elemId) {
+        var wrapper = elem.parents('div#' + elemId + '');
         if (elem.index() == 0) {
-            elem.parents('div').before(elem);
-        } else if (elem.parents('div').children().length == elem.index() + 1) {
-            elem.parents('div').after(elem);
+            wrapper.before(elem);
+        } else if (wrapper.children().length == elem.index() + 1) {
+            wrapper.after(elem);
         } else {
-            var divhtml = jQuery(elem).html(),
+            var divhtml = wrapper.html(),
                 divElem = jQuery(elem);
-            if (!divElem.is('div')) {
-                divhtml = divElem.parents('div').html();
-            }
+
             var myps = divhtml.split(elem.html());
-            elem.parents('div').after(elem.parent('div').clone().html(myps[1])).html(myps[0]).after(elem);
+            wrapper.after(wrapper.clone().html(myps[1])).html(myps[0]).after(elem);
             if (elem.prev().children('blockquote').html() == '')
                 elem.prev().children('blockquote').remove();
         }
@@ -178,27 +137,27 @@ var Buttons = (function (jQuery) {
                 // if(ed.id != 'expresscurate_insight_editor' && ed.id != 'expresscurate_content_editor') {
                 //if (ed.id != 'expresscurate_content_editor') {
                 ed.addButton('annotation', {
-                    title: 'Add Annotation (Ctrl + Up)',
+                    title: 'Add Annotation (Alt + A | Ctrl + Up)',
                     cmd: 'annotation',
                     image: url + '/../images/annotate.png'
                 });
                 ed.addButton('righttextbox', {
-                    title: 'Add Right-Box (Ctrl + R | Ctrl + Right)',
+                    title: 'Add Right-Box (Alt + R | Ctrl + Right)',
                     cmd: 'righttextbox',
                     image: url + '/../images/rightBox.png'
                 });
                 ed.addButton('justifytextbox', {
-                    title: 'Add Center-Box (Ctrl + J | Ctrl + Down)',
-                    cmd: 'justifytextbox',
+                     title: 'Add Center-Box (Alt + J | Ctrl + Down)',
+                   cmd: 'justifytextbox',
                     image: url + '/../images/justifyBox.png'
                 });
                 ed.addButton('lefttextbox', {
-                    title: 'Add Left-Box (Ctrl + L | Ctrl + Left)',
-                    cmd: 'lefttextbox',
+                     title: 'Add Left-Box (Alt + L | Ctrl + Left)',
+                   cmd: 'lefttextbox',
                     image: url + '/../images/leftBox.png'
                 });
                 ed.addButton('markKeywords', {
-                    title: 'Highlight Keywords (Ctrl + H)',
+                    title: 'Highlight Keywords (Alt + H)',
                     cmd: 'markKeywords',
                     class: 'expresscurate_HighlightButton',
                     image: url + '/../images/markKeywords.png'
@@ -206,27 +165,27 @@ var Buttons = (function (jQuery) {
                 //  }
 
                 ed.onKeyDown.add(function (ed, e) {
-                    if (e.ctrlKey && (e.keyCode == 76 || e.keyCode == 37)) {     // ctrl+l|ctrl+left
+                    if ((e.altKey && e.keyCode == 76) || (e.ctrlKey && e.keyCode == 37)) {     // alt+l|ctrl+left
                         e.returnValue = false;
                         textboxCommand(ed, 'lefttextbox', 'expresscurate_fl_text_box');
                         e.preventDefault();
                         return false;
-                    } else if (e.ctrlKey && (e.keyCode == 82 || e.keyCode == 39)) {     // ctrl+r|ctrl+right
+                    } else if ((e.altKey && e.keyCode == 82 ) || (e.ctrlKey && e.keyCode == 39)) {     // alt+r|Ctrl+right
                         e.returnValue = false;
                         textboxCommand(ed, 'righttextbox', 'expresscurate_fr_text_box');
                         e.preventDefault();
                         return false;
-                    } else if (e.ctrlKey && (e.keyCode == 74 || e.keyCode == 40)) {     // ctrl+j|ctrl+down
+                    } else if ((e.altKey && e.keyCode == 74 ) || (e.ctrlKey && e.keyCode == 40)) {     // alt+j|Ctrl+down
                         e.returnValue = false;
                         textboxCommand(ed, 'justifytextbox', 'expresscurate_justify_text_box');
                         e.preventDefault();
                         return false;
-                    } else if (e.ctrlKey && e.keyCode == 38) {     // ctrl+up
+                    } else if ((e.altKey && e.keyCode == 65) || (e.ctrlKey && e.keyCode == 38)) {     // alt+a |Ctrl+up
                         e.returnValue = false;
                         textboxCommand(ed, 'annotation', 'expresscurate_annotate');
                         e.preventDefault();
                         return false;
-                    } else if (e.ctrlKey && e.keyCode == 72) {     // ctrl+h
+                    } else if (e.altKey && e.keyCode == 72) {     // alt+h
                         e.returnValue = false;
                         markKeywordsCommand(ed);
                         e.preventDefault();
@@ -244,6 +203,20 @@ var Buttons = (function (jQuery) {
                         ed.controlManager.buttons && ed.controlManager.buttons.blockquote && ed.controlManager.buttons.blockquote.remove() ||
                         ed.controlManager.controls && ed.controlManager.controls.content_blockquote && ed.controlManager.controls.content_blockquote.remove();
                     }
+                    jQuery(dom.select('div[id*=textbox]')).each(function (index, val) {
+                        var id = jQuery(val).attr('id');
+                        if (id.indexOf('-') > -1) {
+                            id = id.substring(0, id.indexOf('-'));
+                            jQuery(val).attr('id', id);
+                        }
+                });
+                    jQuery(dom.select('div[id*=annotation]')).each(function (index, val) {
+                        var id = jQuery(val).attr('id');
+                        if (id.indexOf('-') > -1) {
+                            id = id.substring(0, id.indexOf('-'));
+                            jQuery(val).attr('id', id);
+                        }
+                    });
                 });
                 ed.onClick.add(function (ed, e) {
                     if (jQuery('.expresscurate_widget').length > 0) {
@@ -255,11 +228,11 @@ var Buttons = (function (jQuery) {
                 ed.onNodeChange.add(function (ed) {
 
                     var node, elem = jQuery(ed.selection.getNode());
+                    node = elem;
 
-                    if (elem.is('div')) {
-                        node = elem;
-                    } else {
-                        node = elem.parents('div');
+                    var nodeIsWrapped = jQuery(node).parents('div[class*=expresscurate]').length > 0 || jQuery(node).parents('div[class*=annotat]').length>0;
+                    if (nodeIsWrapped) {
+                        node = jQuery(node).parents('div[class*=expresscurate]')  || jQuery(node).parents('div[class*=annotat]');
                     }
 
                     var cssClass = jQuery(node).attr('class'),
@@ -330,10 +303,10 @@ var Buttons = (function (jQuery) {
                 };
             }
         });
-        QTags.addButton('annotation', 'Annotation', '<div id="annotation' + getId() + '" class="expresscurate_annotate"><p>&nbsp;', '</p></div>', '', 'Add Annotation');
-        QTags.addButton('lefttextbox', 'Left-Box', '<div id="lefttextbox' + getId() + '" class="expresscurate_fl_text_box"><p>&nbsp;', '</p></div>', '', 'Add Left-Box');
-        QTags.addButton('justifytextbox', 'Center-Box', '<div id="justifytextbox' + getId() + '" class="expresscurate_justify_text_box"><p>&nbsp;', '</p></div>', '', 'Add Center-Box');
-        QTags.addButton('righttextbox', 'Right-Box', '<div id="righttextbox' + getId() + '" class="expresscurate_fr_text_box"><p>&nbsp;', '</p></div>', '', 'Add Right-Box');
+        QTags.addButton('annotation', 'Annotation', '<div id="annotation" class="expresscurate_annotate"><p>&nbsp;', '</p></div>', '', 'Add Annotation');
+        QTags.addButton('lefttextbox', 'Left-Box', '<div id="lefttextbox" class="expresscurate_fl_text_box"><p>&nbsp;', '</p></div>', '', 'Add Left-Box');
+        QTags.addButton('justifytextbox', 'Center-Box', '<div id="justifytextbox" class="expresscurate_justify_text_box"><p>&nbsp;', '</p></div>', '', 'Add Center-Box');
+        QTags.addButton('righttextbox', 'Right-Box', '<div id="righttextbox" class="expresscurate_fr_text_box"><p>&nbsp;', '</p></div>', '', 'Add Right-Box');
 
 
         // Register plugin

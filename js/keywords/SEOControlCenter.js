@@ -34,17 +34,11 @@ var SEOControl = (function (jQuery) {
             contentWords = words_in_text(content.toLowerCase()),
             keywords = KeywordUtils.justText(jQuery('#expresscurate_defined_tags')).toLowerCase().split(', '),
             keywordHtml = '';
-        // myRegExp=new RegExp('((^|\\s|>|))[&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$]', 'gmi');
         if (keywords.length > 0 && keywords[0] !== '') {
             jQuery.each(jQuery(keywords), function (index, value) {
-                var numOccurencesContent = jQuery.grep(contentWords,function (elem) {
-                        return elem === value;
-                    }).length,
-                    numOccurencesTitle = jQuery.grep(titleWords,function (elem) {
-                        return elem === value;
-                    }).length;
-                /*var numOccurencesContent=content.match(myRegExp).length,
-                 numOccurencesTitle=titleText.match(myRegExp).length;*/
+                var myRegExp = new RegExp('((^|\\s|>|))(' + value + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$))', 'gmi');
+                var numOccurencesContent=(content.match(myRegExp))? content.match(myRegExp).length:0,
+                    numOccurencesTitle=titleText.match(myRegExp)?titleText.match(myRegExp).length:0;
 
                 var title = (numOccurencesTitle > 0 ? "yes" : "no"),
                     inContent = (contentWords.length>0)?((numOccurencesContent / contentWords.length * 100).toFixed(2)):0,

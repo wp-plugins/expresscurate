@@ -45,6 +45,11 @@ var ExpresscurateDialog = (function(jQuery){
             if (jQuery('ul#curated_images li').length > 0) {
                 jQuery('.content .img').removeClass("noimage");
                 jQuery('.content .img').css('background-image', jQuery('ul#curated_images li').first().css('background-image'))
+                var numberOfImages = jQuery('ul#curated_images li').length;
+                if (numberOfImages > 0) {
+                    var counter = jQuery('.expresscurate_dialog .imageCount');
+                    counter.text('1/' + numberOfImages).removeClass('expresscurate_displayNone');
+                }
             } else {
                 error_html = '<div class="error">No image found for specified size</div>';
                 jQuery('#expresscurate_post_form').before(error_html);
@@ -426,13 +431,16 @@ var ExpresscurateDialog = (function(jQuery){
             jQuery('.prevImg, .nextImg, .expresscurate_dialog .img').click(function (e) {
                 numberOfImages = jQuery('ul#curated_images li').length;
                 if (jQuery(this).hasClass('next') || jQuery(this).hasClass('img')) {
-                    currentImage = (++currentImage >= numberOfImages) ? 0 : currentImage;
+                    currentImage = (++currentImage > numberOfImages) ? numberOfImages : currentImage;
                 } else if (jQuery(this).hasClass('prev')) {
-                    currentImage = (--currentImage < 0) ? (numberOfImages - 1) : currentImage;
+                    currentImage = (--currentImage < 0) ? 0 : currentImage;
                 }
                 var img = jQuery('ul#curated_images li:eq(' + currentImage + ')').css('background-image');
                 if (img) {
                     jQuery('.content .img').css('background-image', img);
+                    if (numberOfImages > 0) {
+                        jQuery('.expresscurate_dialog .imageCount').text((currentImage + 1) + '/' + numberOfImages).removeClass('expresscurate_displayNone');
+                }
                 }
             });
 
@@ -576,7 +584,7 @@ var ExpresscurateDialog = (function(jQuery){
             }
         });
 
-        jQuery('.expresscurate_dialog_search .icon').live('click', function () {
+        jQuery('html').on('click', '.expresscurate_dialog_search .icon', function () {
             var input = jQuery('.expresscurate_dialog_search input'),
                 close = jQuery('.expresscurate_dialog_search .close'),
                 icon=jQuery('.expresscurate_dialog_search .icon');
@@ -590,17 +598,17 @@ var ExpresscurateDialog = (function(jQuery){
                 searchInParagraphs(input.val());
             }
         });
-        jQuery('.expresscurate_dialog_search input').live('keyup', function (e) {
+        jQuery('html').on('keyup', '.expresscurate_dialog_search input', function (e) {
             if(e.keyCode==13){
                 searchInParagraphs(jQuery(this).val());
             }
         });
 
-        jQuery('.expresscurate_dialog_search .close').live('click', function () {
+        jQuery('html').on('click', '.expresscurate_dialog_search .close', function () {
             closeSearch();
         });
 
-        jQuery('.expresscurate_dialog_shortPar .shortPButton').live('click', function () {
+        jQuery('html').on('click', '.expresscurate_dialog_shortPar .shortPButton', function () {
             var elem = jQuery(this);
             if (shortestParagraphLength == 150) {
                 shortestParagraphLength = 0;
