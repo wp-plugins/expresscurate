@@ -60,11 +60,11 @@ ExpressCurate solves this problem by bringing all the key elements for content c
 
 = How To Get Started =
 
-**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.2.1.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.2.1.zip)**. It's simple. It's free.
+**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.2.17.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.2.17.zip)**. It's simple. It's free.
 
-You can also **[download](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")** a **free [ExpressCurate WordPress theme](http://www.expresscurate.com/products/wordpress-theme "Your favorite WordPress Theme")**. It will give your curated content a modern online news look.  
+You can also **[download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme")** a **free [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme")**. It will give your curated content a modern online news look.  
 
-Make the content curation process even faster with [ExpressCurate Chrome Extension](http://www.expresscurate.com/products/chrome-extension "Your favorite Chrome Extension").
+Make the content curation process even faster with [ExpressCurate Chrome Extension](http://www.expresscurate.com/p/products/chrome-extension "Your favorite Chrome Extension").
 
 
 
