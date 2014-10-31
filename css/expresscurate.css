@@ -588,9 +588,9 @@
 
 .expresscurate_dashboard .settingsLink {
     color: #0074a2;
-    font-family: OpenSans-Regular;
+    font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
     font-size: 13px;
-    margin: 10px 0 0px 15px;
+    margin: 10px 0 0 15px;
     line-height: 20px;
     display: block;
 }
@@ -598,13 +598,20 @@
         color:#2ea2cc;
     }
 .expresscurate_dashboard .expresscurate_background_wrap {
-    margin: 6px 5px !important;
-    width: 200px !important;
+    margin: 6px 5px;
+    width: 200px;
+    min-height: 70px;
 }
     .expresscurate_dashboard .statisticsTitleWrap{
-        max-height: 47px;
         overflow: hidden;
     }
+.expresscurate_dashboard .statisticsTitle{
+    height: 30px;
+}
+.expresscurate_dashboard .statisticsTitle span{
+    max-width: 100%;
+    line-height: 21px;
+}
 .expresscurate_widget_wrapper {
     width: 96%;
     padding-right: 6px;
@@ -612,7 +619,7 @@
 }
     .expresscurate_widget_wrapper label {
         font-family: OpenSans-Regular;
-        font-size: 13px;
+        font-size: 14px;
         color: #9e9e9e;
         display: block;
         margin-left: 6px;
@@ -699,13 +706,15 @@
        width: 46% !important;
     }
 }
+.expresscurate_widget_wrapper .expresscurate_background_wrap {
+    margin: 5px;
+    width: 123px;
+    min-height: 86px;
+}
 .expresscurate_background_wrap {
     background-color: #f1f1f1;
     display: inline-block;
-    width: 123px;
-    min-height: 86px;
     height: auto;
-    margin: 5px;
     position: relative;
 }
 
@@ -724,10 +733,12 @@
         .expresscurate_background_wrap:hover .close {
             display: block;
         }
+    .expresscurate_widget_wrapper .expresscurate_background_wrap .statisticsTitle {
+        height: 47px;
+    }
     .expresscurate_background_wrap .statisticsTitle {
         width: 100%;
         display: block;
-        height: 47px;
         text-align: left;
         overflow: hidden;
     }
@@ -738,19 +749,20 @@
         vertical-align: middle;
         margin-right: -0.25em;
     }
+        .expresscurate_widget_wrapper .expresscurate_background_wrap .statisticsTitle span {
+            line-height: 19px;
+            max-width: 90px;
+        }
         .expresscurate_background_wrap .statisticsTitle span {
-            font-family: OpenSans-Semibold;
+            font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
             font-size: 14px;
             color: #ffffff;
             padding:5px 15px 5px 15px;
             overflow: hidden;
             text-overflow: ellipsis;
             text-transform: capitalize;
-            line-height: 19px;
-            max-width: 90px;
             display: inline-block;
             vertical-align: middle;
-
         }
 
     .expresscurate_background_wrap .statistics {
@@ -770,11 +782,13 @@
 
         .expresscurate_background_wrap .statistics img {
             display: block;
+            margin-left: 2px;
         }
 
 .expresscurate_background_wrap .center {
-    text-align: left;
+    text-align: center;
     margin: 0 auto;
+    padding-left: 1px;
     display: inline-block;
 }
 
@@ -813,8 +827,8 @@
         background-color: #f1f1f1;
         color: #555555;
         font-family: OpenSans-Regular;
-        font-size: 16px;
-        line-height: 16px;
+        font-size: 14px;
+        line-height: 14px;
     }
 
     .expresscurate_widget_wrapper .addKeywords span {
@@ -856,6 +870,10 @@
 
     .expresscurate_widget .lettersCount {
         margin-bottom: 10px;
+        line-height: 20px !important;
+    }
+    .expresscurate_widget .usedKeywordsCount{
+        line-height: 20px !important;
     }
 
         .expresscurate_widget .expresscurate_keywords span {
@@ -883,14 +901,15 @@
             }
                     #expresscurate .description label {
                         font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
-                        font-size: 13px;
-                        line-height: 20px;
+                        font-size: 14px;
+                        line-height: 25px;
                         color: #494949;
                     }
             #expresscurate .descriptionWrap{
                 width: 100%;
                 overflow: hidden;
                 background: #fff;
+                margin-bottom: 8px;
             }
                     #expresscurate .descriptionWrap  textarea{
                         width: 110%;
@@ -911,8 +930,9 @@
             }
 
             #expresscurate .description p {
-                font-family: OpenSans-Light;
+                font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
                 font-size: 12px;
+                line-height: 14px;
                 color: #494949;
                 margin: 0 0 0 5px;
             }
@@ -1749,6 +1769,36 @@
 .expresscurate_dialog .hidden {
     display: none;
 }
+/*mark keyword dialog*/
+#expresscurate_keyword_dialog{
+    height: 100px !important;
+}
+#expresscurate_keyword_dialog-body{
+    height: 80px !important;
+    background-color: #fff;
+    padding: 10px 15px!important;
+    box-sizing: border-box;
+}
+#expresscurate_keyword_dialog .mce-foot,
+#expresscurate_keyword_dialog .mce-first{
+    display: none;
+}
+.expresscurate_keywordMessage{
+    display: block;
+}
+#expresscurate_keyword_dialog a.button-primary{
+    display: inline-block;
+    float: right;
+    margin-top: 15px;
+}
+#expresscurate_keyword_dialog a.cancel{
+    display: inline-block;
+    margin-top: 20px;
+    color: #a00;
+}
+#expresscurate_keyword_dialog a.cancel:hover{
+    color: red;
+}
 
 /*Settings page*/
 .expresscurate a{
@@ -1792,18 +1842,18 @@
     background-repeat: no-repeat;
     background-position: 2px -637px;
 }
-.expresscurate .switch{
-    width: 61px;
+.expresscurate .checkboxLabel{
+    width: 57px;
     height: 23px;
     border-width: 2px;
     border-style: solid;
     border-radius: 4px;
-    margin:4px 10px;
+    margin:7px 10px;
     line-height: 23px;
     font-size: 12px;
     position: relative;
     display: inline-block;
-    font-family: OpenSans-Bold;
+    font-family: OpenSans-Bold, Verdana, Geneva, sans-serif;
     cursor: pointer;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -1811,46 +1861,48 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    border-color: #bdbdbd;
+    max-width:100% !important;
 }
-    .expresscurate .switch .slider{
-        display: block;
-        width: 27px;
-        height: 19px;
-        position: absolute;
-        top:2px;
-        /*-webkit-transition: all 1s ease;
-        -moz-transition: all 1s ease;
-        -o-transition: all 1s ease;
-        -ms-transition: all 1s ease;
-        transition: all 1s ease;*/
-    }
-
-    .expresscurate .switch p{
-        color: #25bfa1;
-        margin: 0 4px;
-        text-transform: uppercase;
-    }
-        .expresscurate .switch p span{
-            color: #bdbdbd;
-            margin: 0 0 0 4px;
-
-        }
-    .expresscurate .sliderOnBack{
-        background-color: #25bfa1;
-        right: 2px;
-        left:auto;
-    }
-    .expresscurate .sliderOffBack{
-        background-color: #bdbdbd;
-        left: 2px;
-        right: auto;
-    }
-    .expresscurate .switchOn{
-        border-color: #25bfa1;
-    }
-    .expresscurate .switchOff{
-        border-color: #bdbdbd;
-    }
+.expresscurate .checkboxLabel:after{
+    content: '';
+    display: block;
+    width: 27px;
+    height: 19px;
+    position: absolute;
+    top:2px;
+    right: auto;
+    -webkit-transition: left 400ms ease-in-out;
+    -moz-transition: left 400ms ease-in-out;
+    -o-transition: left 400ms ease-in-out;
+    -ms-transition: left 400ms ease-in-out;
+    transition: left 300ms ease;
+    background-color: #bdbdbd;
+    left: 2px;
+    background-image: none !important;
+    border-radius: 0 !important;
+    margin:0;
+    z-index: 6;
+}
+.expresscurate .checkboxLabel:before{
+    text-transform: uppercase;
+    color: #bdbdbd;
+    margin: 0 0 0 5px;
+    content: 'ON \00a0OFF';
+    z-index: 5;
+}
+.expresscurate input[type="checkbox"]:checked + .checkboxLabel{
+    border-color: #25bfa1;
+}
+.expresscurate input[type="checkbox"]:checked + .checkboxLabel:after{
+    background-color: #25bfa1;
+    left:28px;
+}
+.expresscurate input[type="checkbox"]:checked + .checkboxLabel:before{
+    color: #25bfa1;
+    margin: 0 0 0 5px;
+}
+/**/
 
 .expresscurate .form-table {
     margin-left: 25px;
@@ -1940,9 +1992,11 @@
             font-family: OpenSans-Regular;
         }
         .expresscurate_support .errorMessage,
-        .expresscurate_faq .errorMessage{
+        .expresscurate_faq .errorMessage,
+        .expresscurate_errorMessage{
             color: #e84c3d !important;
             font-size: 12px !important;
+            margin: 5px 0;
         }
         .expresscurate_support > div > label,
         .expresscurate_faq > div>label{
@@ -2059,8 +2113,8 @@
             padding:30px;
             vertical-align: top;
             text-decoration: none;
-            font-family: OpenSans-Semibold;
-            font-size: 18px;
+            font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
+            font-size: 16px;
             color: #666666;
             display: table;
         }

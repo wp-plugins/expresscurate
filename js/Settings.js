@@ -15,42 +15,26 @@ var Settings = (function(jQuery){
             }
 
         });
-        jQuery('div#expresscurate_publish').on('click',function(){
-            if (jQuery(this).hasClass('switchOn')) {
-                jQuery('#smartPublishingWrap').removeClass('expresscurate_displayNone').slideUp('slow');
+        jQuery('#expresscurate_publish').on('change',function(){
+            var slider=jQuery('#smartPublishingWrap');
+            if (jQuery(this).is(':checked')) {
+                slider.removeClass('expresscurate_displayNone').hide().slideDown('slow');
             } else {
-                jQuery('#smartPublishingWrap').removeClass('expresscurate_displayNone').hide().slideDown('slow');
+                slider.removeClass('expresscurate_displayNone').slideUp('slow');
             }
         });
         jQuery('#expresscurate_seo').click(function () {
-            if (jQuery('input[name=expresscurate_seo]:checked').val() == '0') {
-                jQuery('#publisherWrap').removeClass('expresscurate_displayNone').hide().slideDown('slow');
+            var slider=jQuery('#publisherWrap');
+            if (jQuery(this).is(':checked')) {
+                slider.removeClass('expresscurate_displayNone').hide().slideDown('slow');
             } else {
-                jQuery('#publisherWrap').slideUp('slow');
+                slider.slideUp('slow');
             }
         });
-
         jQuery('input[name=expresscurate_publisher]').bind("change paste keyup", function () {
             var href = jQuery(this).next('span').children('a').attr('href');
             var rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
             jQuery(this).next('span').children('a').attr('href', rest + jQuery(this).val());
-        });
-        jQuery('.switch').on("click", function (e) {
-            var elem = jQuery(this),
-                slider = jQuery(this).find('.slider'),
-                input_id = elem.attr('id');
-            if (slider.hasClass('sliderOffBack')) {
-                slider.removeClass('sliderOffBack').addClass('sliderOnBack');
-                elem.removeClass('switchOff').addClass('switchOn');
-                jQuery('#' + input_id + '_yes').attr('checked', 'checked');
-                jQuery('#' + input_id + '_no').attr("checked", false);
-
-            } else {
-                slider.removeClass('sliderOnBack').addClass('sliderOffBack');
-                elem.removeClass('switchOn').addClass('switchOff');
-                jQuery('#' + input_id + '_yes').attr('checked', false);
-                jQuery('#' + input_id + '_no').attr('checked', 'checked');
-            }
         });
     };
 

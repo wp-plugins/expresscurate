@@ -1,4 +1,4 @@
-var KeywordUtils = (function(jQuery){
+var KeywordUtils = (function (jQuery) {
     return {
         checkKeyword: function (text) {
             text = text.replace(/[,.;:?!]+/g, '').trim();
@@ -32,6 +32,7 @@ var KeywordUtils = (function(jQuery){
         },
 
         multipleKeywords: function (el) {
+            jQuery('.expresscurate_errorMessage').remove();
             var keywords = '';
             if (el.is('span')) {
                 keywords = KeywordUtils.justText(el);
@@ -40,11 +41,15 @@ var KeywordUtils = (function(jQuery){
                 el.val('');
             }
             var arr = keywords.split(',');
-            var result=new Array();
+            var result = new Array();
             for (var i = 0; i < arr.length; i++) {
                 var checked_keyword = KeywordUtils.checkKeyword(arr[i]);
-                if (checked_keyword.length > 0) {
+                if (checked_keyword.length > 1) {
                     result.push(checked_keyword);
+                } else {
+                    if (jQuery('#expresscurate_widget').length){
+                        jQuery('.addKeywords').after('<p class="expresscurate_errorMessage">Keyword is too short.</p>')
+                    }
                 }
             }
             return result;
@@ -88,6 +93,40 @@ var KeywordUtils = (function(jQuery){
             } else {
                 return elem.text();
             }
+        },
+        startLoading: function (input, elemToRotate) {
+            input.prop('disabled', true);
+            var rotation = 360;
+            elemToRotate.css({
+                '-webkit-transition-duration': '1500ms',
+                'transition-duration': '1500ms',
+                '-webkit-transform': 'rotate(' + rotation + 'deg)',
+                '-moz-transform': 'rotate(' + rotation + 'deg)',
+                '-ms-transform': 'rotate(' + rotation + 'deg)',
+                'transform': 'rotate(' + rotation + 'deg)'
+            });
+            interval = setInterval(function () {
+                rotation += 360;
+                elemToRotate.css({
+                    '-webkit-transform': 'rotate(' + rotation + 'deg)',
+                    '-moz-transform': 'rotate(' + rotation + 'deg)',
+                    '-ms-transform': 'rotate(' + rotation + 'deg)',
+                    'transform': 'rotate(' + rotation + 'deg)'
+                });
+            }, 1500);
+        },
+        endLoading: function (input, elemToRotate) {
+            input.removeAttr('disabled');
+            clearInterval(interval);
+            elemToRotate.css({
+                '-webkit-transition-duration': '0s',
+                'transition-duration': '0s',
+                '-webkit-transform': 'rotate(0deg)',
+                '-moz-transform': 'rotate(0deg)',
+                '-ms-transform': 'rotate(0deg)',
+                'transform': 'rotate(0deg)'
+            });
+            input.focus();
         }
     }
 })(window.jQuery);

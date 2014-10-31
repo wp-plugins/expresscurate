@@ -187,7 +187,7 @@ var Buttons = (function (jQuery) {
                         return false;
                     } else if (e.altKey && e.keyCode == 72) {     // alt+h
                         e.returnValue = false;
-                        markKeywordsCommand(ed);
+                        Keywords.markEditorKeywords();
                         e.preventDefault();
                         return false;
                     }
@@ -272,7 +272,7 @@ var Buttons = (function (jQuery) {
                         textboxCommand(ed, 'annotation', 'expresscurate_annotate', val);
                     });
                     ed.addCommand('markKeywords', function () {
-                        markKeywordsCommand(ed);
+                        Keywords.markEditorKeywords();
                     });
                 }
             },

@@ -1,30 +1,9 @@
 var SEOControl = (function (jQuery) {
     var insertKeywordInWidget = function (keywords, beforeElem) {
-        keywords = keywords.join(',');
-        var keywordHtml = '';
-        if (keywords.length > 0) {
-            var post_id = jQuery('#expresscurate_post_id').val();
-            jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_keywords_get_post_keyword_stats', {keyword: keywords, post_id: post_id}, function (res) {
-                var data = jQuery.parseJSON(res);
-                if (data.status === 'success') {
-                    jQuery.each(data.stats, function (key, value) {
-                        var title = (value.title > 0 ? "yes" : "no");
-                        keywordHtml = '<div class="expresscurate_background_wrap"> \
-                                   <span class="close">&#215</span>\
-                                   <div title="' + key + '" class="statisticsTitle expresscurate_' + value.color + '"><span>' + key + '</span></div> \
-                                   <div title="Occurance in Title: ' + title + '" class="statistics borderRight">\
-                                        <div class="center">title<img src="' + jQuery('#expresscurate_plugin_dir').val() + '../images/' + title + '.png">\</div> \
-                                   </div> \
-                                   <div title="Occurance in Content: ' + value.percent + '%" class="statistics"> \
-                                        <div class="center">content<span>' + value.percent + '%</span></div>\
-                                   </div> \
-                                </div>';
-                        beforeElem.before(keywordHtml);
-                        updateKeywords();
-                    });
-                }
-            });
-        }
+        KeywordUtils.startLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
+        jQuery.when(updateKeywords()).done(function () {
+            KeywordUtils.endLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
+        });
     };
 
     var updateKeywords = function (content) {

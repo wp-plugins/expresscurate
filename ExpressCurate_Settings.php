@@ -138,7 +138,7 @@ class ExpressCurate_Settings {
   }
 
   public function expresscurate_register_buttons($buttons) {
-    if (get_option('expresscurate_seo', '') == 1) {
+    if (get_option('expresscurate_seo', '') == 'on') {
       array_push($buttons, 'markKeywords');
     }
     array_push($buttons, 'annotation');
@@ -404,7 +404,7 @@ class ExpressCurate_Settings {
     $upload_dir = wp_upload_dir();
 
 // get the content of the post
-    if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
+    if (get_option('expresscurate_smart_tagging') == "on" || get_option('expresscurate_smart_tagging', '') == '') {
       $post_content = $this->generate_tags($post_id);
     } else {
       $the_post = get_post($post_id);
@@ -422,7 +422,7 @@ class ExpressCurate_Settings {
     }
 
     //Seo part
-    if (get_option('expresscurate_seo', '') == 1) {
+    if (get_option('expresscurate_seo', '') == 'on') {
       $expresscurate_keywords = isset($_POST['expresscurate_defined_tags']) ? $_POST['expresscurate_defined_tags'] : '';
       $expresscurate_description = isset($_POST['expresscurate_description']) ? $_POST['expresscurate_description'] : '';
       update_post_meta($post_id, '_expresscurate_keywords', $expresscurate_keywords);
@@ -462,8 +462,9 @@ class ExpressCurate_Settings {
                 'post_mime_type' => $wp_filetype['type'],
                 'post_status' => 'inherit'
             );
-            //if need to set first image as featured
-            if ((get_option("expresscurate_featured", '') == '' || get_option("expresscurate_featured", '') == 1) && !has_post_thumbnail($post_id) && $i == 0) {
+
+
+          if ((get_option("expresscurate_featured", '') == '' || get_option("expresscurate_featured", '') == 1) && !has_post_thumbnail($post_id) && $i == 0) {
               $attach_id[$i] = wp_insert_attachment($attachment[$i], $file[$i], $post_id);
               $attach_data[$i] = wp_generate_attachment_metadata($attach_id[$i], $file[$i]);
               wp_update_attachment_metadata($attach_id[$i], $attach_data[$i]);
@@ -471,13 +472,14 @@ class ExpressCurate_Settings {
               set_post_thumbnail($post_id, $attach_id[0]);
               $post_content = preg_replace('#<img([^>]+)>#i', '', $post_content, 1);
               //preg_match('/\<img(.*?)\/\>/', $post_content, $aaa);
-            } else {
+          } else {
               $attach_id[$i] = wp_insert_attachment($attachment[$i], $file[$i], $post_id);
               //$attach_data[$i] = wp_generate_attachment_metadata($attach_id[$i], $file[$i]);
               $post_content = preg_replace(
-                      '#src="' . $image . '"+#', 'src="' . wp_get_attachment_url($attach_id[$i]) . '"', $post_content
+                  '#src="' . $image . '"+#', 'src="' . wp_get_attachment_url($attach_id[$i]) . '"', $post_content
               );
-            }
+          }
+
           }
         }
       } else {
@@ -520,7 +522,7 @@ class ExpressCurate_Settings {
       add_action('save_post', array(&$this, 'save_post'));
     } else {
 
-      if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
+      if (get_option('expresscurate_smart_tagging') == "on" || get_option('expresscurate_smart_tagging', '') == '') {
         $post_content = $this->generate_tags($post_id);
       } else {
         $the_post = get_post($post_id);
@@ -597,7 +599,7 @@ class ExpressCurate_Settings {
 
   //Add widget
   public function expresscurate_add_widget() {
-    if (get_option('expresscurate_seo', '') == 1) {
+    if (get_option('expresscurate_seo', '') == 'on') {
       $post_types = array('post', 'page');
       $post_types = array_merge($post_types, get_post_types(array('_builtin' => false, 'public' => true), 'names'));
       foreach ($post_types as $post_type) {
@@ -624,10 +626,10 @@ class ExpressCurate_Settings {
     $post_id = $post->ID;
     $meta_string = '';
     //(is_home() || is_page() || is_search() || is_category())
-    if (!is_feed() && (get_option('expresscurate_seo', '')) == 1 && (get_option('expresscurate_publisher', ''))) {
+    if (!is_feed() && (get_option('expresscurate_seo', '')) == 'on' && (get_option('expresscurate_publisher', ''))) {
       $meta_string .= '<link href="' . get_option('expresscurate_publisher', '') . '" rel="publisher" />';
     }
-    if ((is_single() || is_page() || is_author()) && (get_option('expresscurate_seo', '') == 1)) {
+    if ((is_single() || is_page() || is_author()) && (get_option('expresscurate_seo', '') == 'on')) {
       $keywords = get_post_meta($post_id, '_expresscurate_keywords', true);
       $description = get_post_meta($post_id, '_expresscurate_description', true);
       if ($description && !is_author()) {

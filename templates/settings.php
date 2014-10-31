@@ -136,44 +136,27 @@
                 <tr>
                     <td class="smartPublishingWidth width-for-td">
                         <b class="expresscurate_marginTopBottom10">Smart publishing: </b>
-                        <!--try on/off expresscurate_publish-->
                         <?php
                         $expresscurate_publish = get_option('expresscurate_publish', '') == "1" ? 'On' : 'Off';
                         ?>
-                        <!---->
-                        <div class="hidden">
-                            <input type="radio" id="expresscurate_publish_yes" value="1"
-                                   name="expresscurate_publish" <?php
-                            if (get_option('expresscurate_publish') == "1") {
-                                echo 'checked="checked"';
-                            }
-                            ?> />
-                            <label for="expresscurate_publish_yes"> Yes </label>
-                            <input type="radio" id="expresscurate_publish_no" value="0"
-                                   name="expresscurate_publish" <?php
-                            if (get_option('expresscurate_publish', '') == "0" || !get_option('expresscurate_publish', '')) {
-                                echo 'checked="checked"';
-                            }
-                            ?> />
-                            <label for="expresscurate_publish_no"> No </label>
-                        </div>
-                        <br/>
                     </td>
                     <td>
-                        <div class="switch switch<?php echo $expresscurate_publish; ?>" id="expresscurate_publish">
-                            <p class="switchText">yes<span class="">no</span></p>
-                            <span class="slider slider<?php echo $expresscurate_publish; ?>Back"></span>
-                        </div>
+                        <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_publish"
+                               name="expresscurate_publish" <?php
+                        if (get_option('expresscurate_publish', '') == "on") {
+                            echo 'checked';
+                        }
+                        ?> />
+                        <label class="checkboxLabel" for="expresscurate_publish"></label>
                     </td>
                 </tr>
                 <tr >
                     <td colspan="2">
                         <?php
                         $show_interval = "expresscurate_displayNone";
-                        if( get_option('expresscurate_publish', '') == 1){
+                        if (get_option('expresscurate_publish', '') == 'on') {
                             $show_interval = "";
                         }
-
                         ?>
                         <div id="smartPublishingWrap" class="<?php echo $show_interval;?>">
                             <table>
@@ -184,33 +167,17 @@
                                             <?php
                                             $expresscurate_manually_approve_smart = get_option('expresscurate_manually_approve_smart', '') == "1" ? 'On' : 'Off';
                                             ?>
-                                            <!---->
-                                            <div class="hidden">
-                                                <input type="radio" id="expresscurate_manually_approve_smart_yes" value="1"
-                                                       name="expresscurate_manually_approve_smart" <?php
-                                                if (get_option('expresscurate_manually_approve_smart') == "1") {
-                                                    echo 'checked="checked"';
-                                                }
-                                                ?> />
-                                                <label for="expresscurate_manually_approve_smart_yex"> Yes </label>
-                                                <input type="radio" id="expresscurate_manually_approve_smart_no" value="0"
-                                                       name="expresscurate_manually_approve_smart" <?php
-                                                if (get_option('expresscurate_manually_approve_smart', '') == "0" || !get_option('expresscurate_manually_approve_smart', '')) {
-                                                    echo 'checked="checked"';
-                                                }
-                                                ?> />
-                                                <label for="expresscurate_manually_approve_smart_no"> No </label>
-                                            </div>
                                             <br/>
                                             <label class="expresscurate_marginTop15" for="hours_interval"><b>Publish draft articles:</b></label>
                                         </td>
                                         <td>
-                                            <div
-                                                class="expresscurate_marginTop20 switch switch<?php echo $expresscurate_manually_approve_smart; ?>"
-                                                id="expresscurate_manually_approve_smart">
-                                                <p class="switchText">yes<span class="">no</span></p>
-                                                <span class="slider slider<?php echo $expresscurate_manually_approve_smart; ?>Back"></span>
-                                            </div>
+                                            <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_manually_approve_smart"
+                                                   name="expresscurate_manually_approve_smart" <?php
+                                            if (get_option('expresscurate_manually_approve_smart', '') == "on") {
+                                                echo 'checked';
+                                            }
+                                            ?> />
+                                            <label class="checkboxLabel expresscurate_marginTop20" for="expresscurate_manually_approve_smart"></label>
                                             <br/>
                                             <select class="expresscurate_marginTop15" name="expresscurate_hours_interval">
                                                 <?php
@@ -352,29 +319,15 @@
           </span>
     </td>
     <td>
-        <!--try on/off quotes_style-->
         <?php
         $expresscurate_quotes_style = get_option('expresscurate_quotes_style', '') == "1" ? 'On' : 'Off';
         ?>
-        <div class="switch switch<?php echo $expresscurate_quotes_style; ?>" id="quotes_style">
-            <p class="switchText">yes<span class="">no</span></p>
-            <span class="slider slider<?php echo $expresscurate_quotes_style; ?>Back"></span>
-        </div>
-        <!---->
-        <div class="hidden">
-            <input type="radio" id="quotes_style_yes" value="1" name="expresscurate_quotes_style" <?php
-            if (get_option('expresscurate_quotes_style') == "1" || get_option('expresscurate_quotes_style', '') == '') {
-                echo 'checked="checked"';
-            }
-            ?> />
-            <label for="quotes_style_yes"> Yes </label>
-            <input type="radio" id="quotes_style_no" value="0" name="expresscurate_quotes_style" <?php
-            if (get_option('expresscurate_quotes_style', '') == "0") {
-                echo 'checked="checked"';
-            }
-            ?> />
-            <label for="quotes_style_no"> No </label>
-        </div>
+        <input class="expresscurate_displayNone" type="checkbox" id="quotes_style" name="expresscurate_quotes_style" <?php
+        if (get_option('expresscurate_quotes_style', '') == "on") {
+            echo 'checked';
+        }
+        ?> />
+        <label class="checkboxLabel" for="quotes_style"></label>
     </td>
 </tr>
 <tr valign="top" class="width-bottom-border">
@@ -386,37 +339,24 @@
           </span>
     </td>
     <td>
-        <!--try on/off expresscurate_seo-->
         <?php
-        $expresscurate_seo = get_option('expresscurate_seo', '') == "1" ? 'On' : 'Off';
+        $expresscurate_seo = get_option('expresscurate_seo', '') == "on" ? 'On' : 'Off';
         ?>
-        <div class="switch switch<?php echo $expresscurate_seo; ?>" id="expresscurate_seo">
-            <p class="switchText">yes<span class="">no</span></p>
-            <span class="slider slider<?php echo $expresscurate_seo; ?>Back"></span>
-        </div>
-        <!---->
-        <div class="hidden">
-            <input type="radio" id="expresscurate_seo_yes" value="1" name="expresscurate_seo" <?php
-            if (get_option('expresscurate_seo') == "1" || get_option('expresscurate_seo', '') == '') {
-                echo 'checked="checked"';
-            }
-            ?> />
-            <label for="expresscurate_seo_yes"> Yes </label>
-            <input type="radio" id="expresscurate_seo_no" value="0" name="expresscurate_seo" <?php
-            if (get_option('expresscurate_seo', '') == "0") {
-                echo 'checked="checked"';
-            }
-            ?> />
-            <label for="expresscurate_seo_no"> No </label>
-        </div>
+        <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_seo" name="expresscurate_seo" <?php
+        if (get_option('expresscurate_seo', '') == "on") {
+            echo 'checked';
+        }
+        ?> />
+        <label class="checkboxLabel" for="expresscurate_seo"></label>
     </td>
 </tr>
 <tr valign="top">
     <th scope="row" colspan="2">
-        <div id="publisherWrap" class=" <?php if ($expresscurate_seo=='Off') {
-    echo 'expresscurate_displayNone';
-    }
-    ?> />">
+        <div id="publisherWrap" class=" <?php
+        if ($expresscurate_seo == 'Off') {
+            echo 'expresscurate_displayNone';
+        }
+        ?> />">
             <table class="width-bottom-border">
                 <tr>
                     <th scope="row" class="width-for-td">
@@ -452,29 +392,15 @@
           </span>
     </td>
     <td>
-        <!--try on/off smart_tags-->
         <?php
-        $smart_tags = get_option('expresscurate_smart_tagging', '') == "1" ? 'On' : 'Off';
+        $smart_tags = get_option('expresscurate_smart_tagging', '') == "on" ? 'On' : 'Off';
         ?>
-        <div class="switch switch<?php echo $smart_tags ?>" id="smart_tags">
-            <p class="switchText">yes<span class="">no</span></p>
-            <span class="slider slider<?php echo $smart_tags ?>Back"></span>
-        </div>
-        <!---->
-        <div class="hidden">
-            <input type="radio" id="smart_tags_yes" value="1" name="expresscurate_smart_tagging" <?php
-            if (get_option('expresscurate_smart_tagging') == "1" || get_option('expresscurate_smart_tagging', '') == '') {
-                echo 'checked="checked"';
-            }
-            ?> />
-            <label for="smart_tags"> Yes </label>
-            <input type="radio" id="smart_tags_no" value="0" name="expresscurate_smart_tagging" <?php
-            if (get_option('expresscurate_smart_tagging', '') == "0") {
-                echo 'checked="checked"';
-            }
-            ?> />
-            <label for="smart_tags_no"> No </label>
-        </div>
+        <input class="expresscurate_displayNone" type="checkbox" id="smart_tags" name="expresscurate_smart_tagging" <?php
+        if (get_option('expresscurate_smart_tagging') == "on") {
+            echo 'checked';
+        }
+        ?> />
+        <label class="checkboxLabel" for="smart_tags"></label>
     </td>
 </tr>
 <tr valign="top">
