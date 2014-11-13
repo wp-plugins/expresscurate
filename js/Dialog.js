@@ -540,8 +540,9 @@ var ExpresscurateDialog = (function(jQuery){
 
                 bg = bg.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
                 if (bg.indexOf('images/noimage.png') === -1 && bg.length > 5) {
+
                     ///html += jQuery("#curated_content_selected_img li").html();
-                    html += '<img class="' + alignImg + ' ' + imgSize + '" src="' + bg + '">';
+                    html += '<img class="' + alignImg + ' ' + imgSize + '" src="' + bg + '" data-img-curated-from="' + jQuery("#expresscurate_source").val() + '">';
                 }
                 if (tinyMCE.get('expresscurate_content_editor').getContent().length > 0) {
                     html += "<blockquote>" + tinyMCE.get('expresscurate_content_editor').getContent() + "</blockquote><br />";

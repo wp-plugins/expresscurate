@@ -13,6 +13,7 @@ var Keywords = (function (jQuery) {
             }, function (res) {
                 data = jQuery.parseJSON(res);
                 if (data.status === 'success') {
+                    console.log(beforeElem.html(''));
                     jQuery.each(data.stats, function (key, value) {
                         keywordHtml = '<li>\
                             <span class="color expresscurate_' + value.color + '"></span>\
@@ -56,7 +57,7 @@ var Keywords = (function (jQuery) {
         });
         keywords.pop();
         if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length <= 0) {
-            if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
+            /*if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
                 check_editor = setTimeout(function check() {
                     clearTimeout(check_editor);
                     highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
@@ -65,7 +66,7 @@ var Keywords = (function (jQuery) {
                         setTimeout(check, 15000);
                     }
                 }, 1);
-            }
+            }*/
             markKeywords(ed, keywords);
         } else {
             highlightedElems.each(function (index, val) {
@@ -95,7 +96,7 @@ var Keywords = (function (jQuery) {
                     ed.controlManager.setActive('markKeywords', true);
                     activeMarkButton = true;
                     if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length <= 0) {
-                        if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && jQuery('.expresscurate_widget').length > 0) {
+                        /*if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && jQuery('.expresscurate_widget').length > 0) {
                             check_editor = setTimeout(function check() {
                                 clearTimeout(check_editor);
                                 if (activeMarkButton) {
@@ -105,7 +106,8 @@ var Keywords = (function (jQuery) {
                                 }
                                 setTimeout(check, 15000);
                             }, 1);
-                        }
+                        }*/
+                        markKeywords(ed, keywords);
                     }
                 } else {
                     highlightedElems.each(function (index, val) {

@@ -1,7 +1,8 @@
 <?php
 $keywords = new ExpressCurate_Keywords();
-$post_content = $keywords->get_words();
-$keywords_stats = $keywords->get_stats(false, false, $post_content, true);
+$keywords_stats = $keywords->getKeywordStats();
+$words_stats = $keywords->getKeywordStats(true);
+
 ?>
 <div class="expresscurate_keywords_settings wrap">
     <div class="expresscurate_menu">
@@ -73,7 +74,6 @@ $keywords_stats = $keywords->get_stats(false, false, $post_content, true);
         <label class="notDefined">There is no enough data.</label>
         <ul>
             <?php
-            $words_stats = $keywords->get_stats(array_keys(array_slice($post_content['words'], 0, 30, true)), false, $post_content);
             $i = 0;
             foreach ($words_stats as $word => $stat) {
                 if ($stat['percent'] >= 1 && $i < 15) {

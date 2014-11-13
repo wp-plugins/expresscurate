@@ -138,9 +138,9 @@ class ExpressCurate_Settings {
   }
 
   public function expresscurate_register_buttons($buttons) {
-    if (get_option('expresscurate_seo', '') == 'on') {
+   // if (get_option('expresscurate_seo', '') == 'on')
       array_push($buttons, 'markKeywords');
-    }
+    //}
     array_push($buttons, 'annotation');
     array_push($buttons, 'lefttextbox');
     array_push($buttons, 'justifytextbox');
@@ -403,8 +403,9 @@ class ExpressCurate_Settings {
       return;
     $upload_dir = wp_upload_dir();
 
-// get the content of the post
-    if (get_option('expresscurate_smart_tagging') == "on" || get_option('expresscurate_smart_tagging', '') == '') {
+    // get the content of the post
+    $smart_tagging = get_option('expresscurate_smart_tagging', '');
+    if ($smart_tagging == "on" || $smart_tagging == '') {
       $post_content = $this->generate_tags($post_id);
     } else {
       $the_post = get_post($post_id);
@@ -415,137 +416,190 @@ class ExpressCurate_Settings {
       }
     }
     //Smart publishing
-    if (get_option('expresscurate_publish', '') == 1) {
+    if (get_option('expresscurate_publish', '') == 'on') {
       if (isset($_POST['expresscurate_smart_publish_status']) && $_POST['expresscurate_smart_publish_status'] == 1) {
         update_post_meta($post_id, '_expresscurate_smart_publish', 1);
+      }else {
+          update_post_meta($post_id, '_expresscurate_smart_publish', 0);
       }
     }
 
-    //Seo part
-    if (get_option('expresscurate_seo', '') == 'on') {
+	
+	// save keywords, no matter seo is on or not
       $expresscurate_keywords = isset($_POST['expresscurate_defined_tags']) ? $_POST['expresscurate_defined_tags'] : '';
-      $expresscurate_description = isset($_POST['expresscurate_description']) ? $_POST['expresscurate_description'] : '';
       update_post_meta($post_id, '_expresscurate_keywords', $expresscurate_keywords);
+    
+	
+	// save seo options
+    if (get_option('expresscurate_seo', '') == 'on') {
+      $expresscurate_description = isset($_POST['expresscurate_description']) ? $_POST['expresscurate_description'] : '';
+
       update_post_meta($post_id, '_expresscurate_description', $expresscurate_description);
     }
 
-//check if content curated
-    $curated_content = preg_match_all('/data-curated-url=["\']?([^"\' ]*)["\' ]/is', $post_content, $curated_links);
-//preg_match('/^<a.*?href=(["\'])(.*?)\1.*$/', $post_content, $link);
+        $image_made_featured = get_post_meta($post_id, '_expresscurate_image_made_featured', true);
+        if($image_made_featured && strlen($image_made_featured) > 0) {
+            $post_content = str_replace($image_made_featured, '', $post_content);
+        }
+	
+	    // check if there is featured image
+	    $make_featured = get_option("expresscurate_featured", '');
+	    $make_featured = ($make_featured == '' || $make_featured == 1) && !has_post_thumbnail($post_id);
 
-    $curated_before = get_post_meta($post_id, 'is_expresscurate');
-    if ($curated_content > 0 || $curated_before == 1 && current_user_can('edit_post', $post_id)) {
-//download images
-      $images = array();
-      preg_match_all("/\<img\s[^\>]*src\s*=\s*([\"'])(((?!\1).)*)\1/i", $post_content, $images);
-      require_once(ABSPATH . 'wp-admin/includes/image.php');
-      $siteDomain = parse_url(get_site_url(), PHP_URL_HOST);
-      if (count($images) > 0 && is_writable($upload_dir['path'])) {
-        $content_manager = new ExpressCurate_HtmlParser($images[1][0]);
-        foreach ($images[1] as $i => $image) {
-          $image = strtok($image, '?');
-          $domain = parse_url($image, PHP_URL_HOST);
-          if ($siteDomain != $domain || strpos($image, 'expresscurate_tmp')) {
-            //$options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
-            //$context = stream_context_create($options);
-            $image_data = $content_manager->file_get_contents_utf8($image, false, false);
-            $filename[$i] = basename($image);
-            if (wp_mkdir_p($upload_dir['path'])) {
-              $file[$i] = $upload_dir['path'] . '/' . $filename[$i];
-            } else {
-              $file[$i] = $upload_dir['basedir'] . '/' . $filename[$i];
+	    // look for curated images
+		preg_match_all('/\<img\s[^\>]*data-img-curated-from\s*=\s*(["\'])((?:\\.|(?!\1).)*)\1[^\>]*\>/i', $post_content, $curated_images);
+
+      // proceed only if there are curated images and it's possible to upload them
+		if(count($curated_images) > 0 && count($curated_images[0]) > 0) {
+            $upload_dir_writable = is_writable($upload_dir['path']);
+            if (!$upload_dir_writable) {
+                $warning = get_option('expresscurate_not_writable_warning');
+                $warning[$post_id] = "Your upload dir is not writable";
+                update_option('expresscurate_not_writable_warning', $warning);
             }
-            $file[$i] = strtok($file[$i], '?');
-            file_put_contents($file[$i], $image_data);
-            $wp_filetype = wp_check_filetype($filename[$i], null);
-            $attachment[$i] = array(
-                'post_mime_type' => $wp_filetype['type'],
-                'post_status' => 'inherit'
-            );
 
+            $siteDomain = parse_url(get_site_url(), PHP_URL_HOST);
+            if ($upload_dir_writable) {
+                foreach ($curated_images[0] as $i => $full_image) {
+                    // resolve image address
+                    preg_match_all('/src\s*=\s*(["\'])((?:\\.|(?!\1).)*)\1/i', $full_image, $curated_image_sources);
+                    // check so that the curated image has a source
+                    if (count($curated_image_sources) > 0 && isset($curated_image_sources[2][0])) {
+                        // now get the image and its source
+                        $image = $curated_image_sources[2][0];
+                        $image_from = $curated_images[2][$i];
 
-          if ((get_option("expresscurate_featured", '') == '' || get_option("expresscurate_featured", '') == 1) && !has_post_thumbnail($post_id) && $i == 0) {
-              $attach_id[$i] = wp_insert_attachment($attachment[$i], $file[$i], $post_id);
-              $attach_data[$i] = wp_generate_attachment_metadata($attach_id[$i], $file[$i]);
-              wp_update_attachment_metadata($attach_id[$i], $attach_data[$i]);
-              //set first image as featured
-              set_post_thumbnail($post_id, $attach_id[0]);
-              $post_content = preg_replace('#<img([^>]+)>#i', '', $post_content, 1);
-              //preg_match('/\<img(.*?)\/\>/', $post_content, $aaa);
-          } else {
-              $attach_id[$i] = wp_insert_attachment($attachment[$i], $file[$i], $post_id);
-              //$attach_data[$i] = wp_generate_attachment_metadata($attach_id[$i], $file[$i]);
-              $post_content = preg_replace(
-                  '#src="' . $image . '"+#', 'src="' . wp_get_attachment_url($attach_id[$i]) . '"', $post_content
+                        // clean-up and check domain
+                        $image = strtok($image, '?');
+                        $image_filename = basename($image);
+                        $domain = parse_url($image, PHP_URL_HOST);
+
+                        // create attachement
+                        $wp_filetype = wp_check_filetype($image_filename, null);
+                        $attachment = array(
+                            'post_mime_type' => $wp_filetype['type'],
+                            'post_status' => 'inherit'
+                        );
+
+                        // check if download is required
+                        if ($siteDomain != $domain || strpos($image, 'expresscurate_tmp')) {
+                            // all set, try to download it
+                            require_once(ABSPATH . 'wp-admin/includes/image.php');
+                            $content_manager = new ExpressCurate_HtmlParser($image_from);
+                            // download
+                            $image_data = $content_manager->file_get_contents_utf8($image, false, false);
+                            // create file
+                            if (wp_mkdir_p($upload_dir['path'])) {
+                                $file = $upload_dir['path'] . '/' . $image_filename;
+                            } else {
+                                $file = $upload_dir['basedir'] . '/' . $image_filename;
+                            }
+                            $file = strtok($file, '?');
+                            file_put_contents($file, $image_data);
+
+                            // now we have the attachement
+                            // make it a featured image
+                            $attach_id = wp_insert_attachment($attachment, $file, $post_id);
+                            $attach_data = wp_generate_attachment_metadata($attach_id, $file);
+                            wp_update_attachment_metadata($attach_id, $attach_data);
+
+                            if ($make_featured) {
+                                //set first image as featured
+                                set_post_thumbnail($post_id, $attach_id);
+                                update_post_meta($post_id, '_expresscurate_image_made_featured', $full_image);
+
+                                $post_content = str_replace($full_image, '', $post_content);
+
+                                // make sure second image doesn't become featured
+                                $make_featured = 0;
+                            } else {
+                                $post_content = str_replace(
+                                    $curated_image_sources[0][$i],
+                                    'src="' . wp_get_attachment_url($attach_id) . '"',
+                                    $post_content);
+                            }
+                        } else if ($make_featured) {
+                          //  var_dump(parse_url($image));
+                           // $image_filename = basename($image);
+                            // create file
+                            $image_path = parse_url($image);
+                            $file =  $image_path['path'];
+//                            if (wp_mkdir_p($upload_dir['path'])) {
+//                                $file = $upload_dir['path'] . '/' . $image_filename;
+//                            } else {
+//                                $file = $upload_dir['basedir'] . '/' . $image_filename;
+//                            }
+                            $file = strtok($file, '?');
+
+                            // now we have the attachement
+                            // make it a featured image
+                            $attach_id = wp_insert_attachment($attachment, $file, $post_id);
+                            $attach_data = wp_generate_attachment_metadata($attach_id, $file);
+                            wp_update_attachment_metadata($attach_id, $attach_data);
+
+                            //set first image as featured
+                            set_post_thumbnail($post_id, $attach_id);
+                            update_post_meta($post_id, '_expresscurate_image_made_featured', $full_image);
+
+                            $post_content = str_replace($full_image, '', $post_content);
+
+                            // make sure second image doesn't become featured
+                            $make_featured = 0;
+                        }
+                    }
+
+                    // end foreach
+                }
+                // end writable if
+            }
+            // end curated image count if
+            }
+
+              preg_match_all('/\sdata-curated-url\s*=\s*(["\'])((?:\\.|(?!\1).)*)\1/i', $post_content, $curated_links);
+
+              $curated_links_meta = $this->get_metas($post_id); //get_post_meta($post_id, 'expresscurate_links');
+              if (!$curated_links_meta) {
+                $curated_links_meta = array();
+              } else {
+                $curated_links_meta = $curated_links_meta[0];
+
+                // delete metas
+                foreach ($curated_links_meta as $i => $curated_links_meta) {
+                    delete_post_meta($post_id, 'expresscurate_link_' . $i, $curated_links_meta);
+                }
+              }
+              if (isset($curated_links[2])) {
+                foreach ($curated_links[2] as $curated_link) {
+                  $curated_links_meta[] = $curated_link;
+                }
+              }
+             array_unique($curated_links_meta);
+              foreach ($curated_links_meta as $i => $curated_links_meta) {
+                update_post_meta($post_id, 'expresscurate_link_' . $i, $curated_links_meta);
+              }
+              update_post_meta($post_id, 'is_expresscurate', 1);
+
+              $curated_post = array(
+                  'ID' => $post_id,
+                  'post_content' => $post_content
               );
-          }
+        //category
+              $category = get_the_category($post_id);
+              if (count($category) == 1 && $category[0]->cat_ID == 1) {
+                $categories = array(get_option('expresscurate_def_cat'));
+                wp_set_post_terms($post_id, $categories, 'category');
+              }
+              remove_action('save_post', array(&$this, 'save_post'));
+              wp_update_post($curated_post);
+              add_action('save_post', array(&$this, 'save_post'));
 
-          }
+        if (wp_mkdir_p($upload_dir['path'])) {
+          $this->ajaxExportAPI->delete_dir($upload_dir['path'] . '/expresscurate_tmp/' . $post_id);
+        } else {
+          $this->ajaxExportAPI->delete_dir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id);
         }
-      } else {
-        if (!is_writable($upload_dir['path'])) {
-          $warning = get_option('expresscurate_not_writable_warning');
-          $warning[$post_id] = "Your upload dir is not writable";
-          update_option('expresscurate_not_writable_warning', $warning);
-        }
-      }
-      $curated_links_meta = $this->get_metas($post_id); //get_post_meta($post_id, 'expresscurate_links');
-      if (!$curated_links_meta) {
-        $curated_links_meta = array();
-      } else {
-        $curated_links_meta = $curated_links_meta[0];
-      }
-      if (isset($curated_links[1])) {
-        foreach ($curated_links[1] as $curated_link) {
-          $curated_links_meta[] = $curated_link;
-        }
-      }
-      array_unique($curated_links_meta);
-      foreach ($curated_links_meta as $i => $curated_links_meta) {
-        update_post_meta($post_id, 'expresscurate_link_' . $i, $curated_links_meta);
-      }
-      update_post_meta($post_id, 'is_expresscurate', 1);
 
-      $curated_post = array(
-          'ID' => $post_id,
-          'post_content' => $post_content,
-          'status' => 'published'
-      );
-//category
-      $category = get_the_category($post_id);
-      if (count($category) == 1 && $category[0]->cat_ID == 1) {
-        $categories = array(get_option('expresscurate_def_cat'));
-        wp_set_post_terms($post_id, $categories, 'category');
-      }
-      remove_action('save_post', array(&$this, 'save_post'));
-      wp_update_post($curated_post);
-      add_action('save_post', array(&$this, 'save_post'));
-    } else {
-
-      if (get_option('expresscurate_smart_tagging') == "on" || get_option('expresscurate_smart_tagging', '') == '') {
-        $post_content = $this->generate_tags($post_id);
-      } else {
-        $the_post = get_post($post_id);
-        $post_content = $the_post->post_content;
-        if (strpos($post_content, 'keywordsHighlight') !== false) {
-          $tags_obj = new Expresscurate_Tags();
-          $post_content = $tags_obj->removeHighlights($post_content);
-        }
-      }
-      $curated_post = array(
-          'ID' => $post_id,
-          'post_content' => $post_content,
-      );
-      remove_action('save_post', array(&$this, 'save_post'));
-      wp_update_post($curated_post);
-      add_action('save_post', array(&$this, 'save_post'));
       return;
-    }
-    if (wp_mkdir_p($upload_dir['path'])) {
-      $this->ajaxExportAPI->delete_dir($upload_dir['path'] . '/expresscurate_tmp/' . $post_id);
-    } else {
-      $this->ajaxExportAPI->delete_dir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id);
-    }
   }
 
   public function expresscurate_messages($m) {
@@ -599,13 +653,13 @@ class ExpressCurate_Settings {
 
   //Add widget
   public function expresscurate_add_widget() {
-    if (get_option('expresscurate_seo', '') == 'on') {
+   // if (get_option('expresscurate_seo', '') == 'on') {
       $post_types = array('post', 'page');
       $post_types = array_merge($post_types, get_post_types(array('_builtin' => false, 'public' => true), 'names'));
       foreach ($post_types as $post_type) {
         add_meta_box('expresscurate', ' SEO Control Center', array(&$this, 'expresscurate_meta_box'), $post_type, 'side', 'high');
       }
-    }
+   // }
   }
 
   public function expresscurate_meta_box() {

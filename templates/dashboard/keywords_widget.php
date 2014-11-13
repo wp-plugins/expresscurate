@@ -1,7 +1,6 @@
 <?php
 $keywords = new ExpressCurate_Keywords();
-$post_content = $keywords->get_words();
-$keywords_stats = $keywords->get_stats(false, false, $post_content, true);
+$keywords_stats = $keywords->getKeywordStats();
 ?>
 
 <div class="expresscurate_dashboard">

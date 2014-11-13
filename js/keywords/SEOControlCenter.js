@@ -7,7 +7,7 @@ var SEOControl = (function (jQuery) {
     };
 
     var updateKeywords = function (content) {
-        var content = ((jQuery('#content').css("display") == "block") ? jQuery('#content').val() : tinyMCE.get("content").getContent());
+        var content = jQuery('#content').val();
         var titleText = jQuery('#titlediv input[name=post_title]').val(),
             titleWords = words_in_text(titleText.toLowerCase()),
             contentWords = words_in_text(content.toLowerCase()),
@@ -34,13 +34,12 @@ var SEOControl = (function (jQuery) {
                                 <span class="close">&#215</span>\
                             <div class="statisticsTitle expresscurate_' + color + '"><span>' + value + '</span></div>\
                                 <div class="statistics borderRight">\
-                                <div class="center">title<img src="' + jQuery('#expresscurate_plugin_dir').val() + '../images/' + title + '.png"></div> \
-                                </div> \
-                                <div class="statistics"> \
+                                <div class="center">title<img src="' + jQuery('#expresscurate_plugin_dir').val() + '../images/' + title + '.png"></div>\
+                                </div>\
+                                <div class="statistics">\
                             <div class="center">content<span>' + inContent + '%</span></div>\
-                                </div> \
+                                </div>\
                                 </div>';
-
             });
             jQuery('.expresscurate_background_wrap').remove();
             jQuery('.expresscurate_widget .addKeywords').before(keywordHtml);
@@ -65,6 +64,7 @@ var SEOControl = (function (jQuery) {
     };
     var setupSEOControl = function () {
         setupKeywords();
+
         if (jQuery.trim(jQuery('textarea[name=expresscurate_description]').val()) == '') {
             jQuery('textarea[name=expresscurate_description]').empty();
         }

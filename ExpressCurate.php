@@ -4,7 +4,7 @@
   Plugin Name: ExpressCurate
   Plugin URI: http://www.expresscurate.com/products/wordpress-plugin
   Description: ExpressCurate simplifies and expedites content curation and provides SEO enhancement and keyword effectiveness monitoring.
-  Version: 1.2.18
+  Version: 1.2.19
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
   License: GPLv3 or later
@@ -46,12 +46,12 @@ if (class_exists('ExpressCurate')) {
   register_activation_hook(__FILE__, array('ExpressCurate', 'activate'));
   register_deactivation_hook(__FILE__, array('ExpressCurate', 'deactivate'));
   add_action('expresscurate_publish_event', 'expresscurate_publish_event');
-  
+
   function expresscurate_publish_event(){
     $expresscurate_settings = new ExpressCurate_Settings();
     $expresscurate_settings->publish_event();
   }
-  
+
   function cron_add_5min($schedules) {
     $schedules['5min'] = array(
         'interval' => 5 * 60,

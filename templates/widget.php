@@ -71,6 +71,7 @@ global $post;
     </div>
 </div>
 <div class="clear"></div>
+<?php if (get_option('expresscurate_seo', '') == 'on') { ?>
 <div class="description">
     <label for="description">Description</label>
 
@@ -99,3 +100,4 @@ global $post;
     <p class="expresscurate_displayNone">The meta description tag is intented to be a brief and concise summary of your
         page's content.</p>
 </div>
+<?php } ?>
