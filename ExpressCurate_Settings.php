@@ -89,7 +89,7 @@ class ExpressCurate_Settings {
     register_setting('expresscurate-group', 'expresscurate_quotes_style');
     register_setting('expresscurate-group', 'expresscurate_hours_interval');
     register_setting('expresscurate-group', 'expresscurate_manually_approve_smart');
-    add_action('admin_footer', array(&$this, 'add_inline_popup_content'));
+    add_action('add_meta_boxes', array(&$this, 'add_inline_popup_content'));
     add_action('wp_ajax_expresscurate_export_api_get_terms', array($this->ajaxExportAPI, 'get_terms'));
     add_action('wp_ajax_expresscurate_export_api_check_auth', array($this->ajaxExportAPI, 'check_auth'));
     add_action('wp_ajax_expresscurate_export_api_check_images', array($this->ajaxExportAPI, 'check_images'));
@@ -568,16 +568,16 @@ class ExpressCurate_Settings {
                     delete_post_meta($post_id, 'expresscurate_link_' . $i, $curated_links_meta);
                 }
               }
-              if (isset($curated_links[2])) {
+              if (isset($curated_links[2]) && count($curated_links[2]) > 0 ) {
                 foreach ($curated_links[2] as $curated_link) {
                   $curated_links_meta[] = $curated_link;
                 }
+                array_unique($curated_links_meta);
+                foreach ($curated_links_meta as $i => $curated_links_meta) {
+                  update_post_meta($post_id, 'expresscurate_link_' . $i, $curated_links_meta);
+                }
+                 update_post_meta($post_id, 'is_expresscurate', 1);
               }
-             array_unique($curated_links_meta);
-              foreach ($curated_links_meta as $i => $curated_links_meta) {
-                update_post_meta($post_id, 'expresscurate_link_' . $i, $curated_links_meta);
-              }
-              update_post_meta($post_id, 'is_expresscurate', 1);
 
               $curated_post = array(
                   'ID' => $post_id,

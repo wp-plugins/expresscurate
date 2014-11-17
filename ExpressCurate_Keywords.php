@@ -283,19 +283,20 @@ class ExpressCurate_Keywords {
                     }
                 }
             }
-            foreach($stats[0] as &$stat){
-                if(is_array($stat)){
-                    $stat['title'] = round(($stat['title_matches']/($stats[0]['total_title_words_count']))*100, 2);
-                    $stat['percent'] = round(($stat['count']/($stats[0]['total_words']))*100, 2);
-                    if ($stat['percent'] < 3) {
-                        $color = 'blue';
-                    } elseif ($stat['percent'] >= 3 && $stat['percent']<= 5) {
-                        $color = 'green';
-                    } elseif ($stat['percent'] > 5) {
-                        $color = 'red';
-                    }
-                    $stat['color'] = $color;
+
+        }
+        foreach($stats[0] as &$stat){
+            if(is_array($stat)){
+                $stat['title'] = round(($stat['title_matches']/($stats[0]['total_title_words_count']))*100, 2);
+                $stat['percent'] = round(($stat['count']/($stats[0]['total_words']))*100, 2);
+                if ($stat['percent'] < 3) {
+                    $color = 'blue';
+                } elseif ($stat['percent'] >= 3 && $stat['percent']<= 5) {
+                    $color = 'green';
+                } elseif ($stat['percent'] > 5) {
+                    $color = 'red';
                 }
+                $stat['color'] = $color;
             }
         }
         unset($stats[0]['total_words']);
