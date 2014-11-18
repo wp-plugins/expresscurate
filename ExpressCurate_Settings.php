@@ -89,7 +89,7 @@ class ExpressCurate_Settings {
     register_setting('expresscurate-group', 'expresscurate_quotes_style');
     register_setting('expresscurate-group', 'expresscurate_hours_interval');
     register_setting('expresscurate-group', 'expresscurate_manually_approve_smart');
-    add_action('add_meta_boxes', array(&$this, 'add_inline_popup_content'));
+    add_action('admin_footer', array(&$this, 'add_inline_popup_content'));
     add_action('wp_ajax_expresscurate_export_api_get_terms', array($this->ajaxExportAPI, 'get_terms'));
     add_action('wp_ajax_expresscurate_export_api_check_auth', array($this->ajaxExportAPI, 'check_auth'));
     add_action('wp_ajax_expresscurate_export_api_check_images', array($this->ajaxExportAPI, 'check_images'));
@@ -176,11 +176,14 @@ class ExpressCurate_Settings {
   }
 
   public function add_inline_popup_content() {
+      $screen = get_current_screen();
+      if($screen->parent_file == 'edit.php') {
     ?>
     <div id="expresscurate_dialog" class="expresscurate_dialog" title="<?php echo self::PLUGIN_NAME ?>">
       <?php include(sprintf("%s/templates/dialog.php", dirname(__FILE__))); ?>
     </div>
     <?php
+      }
   }
 
 // Register the column

@@ -3,6 +3,7 @@ var Keywords = (function (jQuery) {
     var addKeyword = function (keywords, beforeElem) {
         KeywordUtils.startLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
         jQuery('.expresscurate_errorMessage').remove();
+        var keywordsToHighlight = keywords;
         keywords = keywords.join(',');
         var keywordHtml = '',
             errorMessage='';
@@ -13,7 +14,7 @@ var Keywords = (function (jQuery) {
             }, function (res) {
                 data = jQuery.parseJSON(res);
                 if (data.status === 'success') {
-                    console.log(beforeElem.html(''));
+                    beforeElem.html('');
                     jQuery.each(data.stats, function (key, value) {
                         keywordHtml = '<li>\
                             <span class="color expresscurate_' + value.color + '"></span>\
@@ -25,13 +26,17 @@ var Keywords = (function (jQuery) {
                             <span class="inTitle expresscurate_floatRight">' + value.title + ' %</span>\
                          </li>';
                         beforeElem.append(keywordHtml);
-                        KeywordUtils.highlight(key);
+
                     });
                 }else if(data.status ==='warning' && data.msg==='Something went wrong'){
                     errorMessage='Something went wrong';
                 }
             }).always(function(){
                 KeywordUtils.endLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
+                jQuery(keywordsToHighlight).each(function (index, value) {
+                    KeywordUtils.highlight(value, beforeElem.find('li'));
+            });
+
             });
         }else{
             errorMessage= 'Keyword is too short.'

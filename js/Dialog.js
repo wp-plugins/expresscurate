@@ -431,16 +431,16 @@ var ExpresscurateDialog = (function(jQuery){
             jQuery('.prevImg, .nextImg, .expresscurate_dialog .img').click(function (e) {
                 numberOfImages = jQuery('ul#curated_images li').length;
                 if (jQuery(this).hasClass('next') || jQuery(this).hasClass('img')) {
-                    currentImage = (++currentImage > numberOfImages) ? numberOfImages : currentImage;
+                    currentImage = (++currentImage > numberOfImages-1) ? 0 : currentImage;
                 } else if (jQuery(this).hasClass('prev')) {
-                    currentImage = (--currentImage < 0) ? 0 : currentImage;
+                    currentImage = (--currentImage <0) ? numberOfImages-1 : currentImage;
                 }
                 var img = jQuery('ul#curated_images li:eq(' + currentImage + ')').css('background-image');
                 if (img) {
                     jQuery('.content .img').css('background-image', img);
                     if (numberOfImages > 0) {
                         jQuery('.expresscurate_dialog .imageCount').text((currentImage + 1) + '/' + numberOfImages).removeClass('expresscurate_displayNone');
-                }
+                    }
                 }
             });
 

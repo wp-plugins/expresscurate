@@ -229,6 +229,7 @@ class ExpressCurate_Keywords {
     public function getKeywordStats($getTopWords = false){
         $publishedPostCount = wp_count_posts()->publish;
         $stats = array();
+        $resultArray = array();
 
         if($getTopWords) {
             $words = array();
@@ -249,8 +250,9 @@ class ExpressCurate_Keywords {
                 }
             }
             $definedKeyWords = get_option('expresscurate_defined_tags', true);
-
-            $words = array_keys(array_slice($words[0], 0, 30, true));
+            if (!empty($words[0])){
+                $words = array_keys(array_slice($words[0], 0, 30, true));
+            }
             if (!empty($definedKeyWords)){
                 $definedKeywordsArray = explode(',', strtolower(str_replace(' ', '', $definedKeyWords)));
 
@@ -285,23 +287,26 @@ class ExpressCurate_Keywords {
             }
 
         }
-        foreach($stats[0] as &$stat){
-            if(is_array($stat)){
-                $stat['title'] = round(($stat['title_matches']/($stats[0]['total_title_words_count']))*100, 2);
-                $stat['percent'] = round(($stat['count']/($stats[0]['total_words']))*100, 2);
-                if ($stat['percent'] < 3) {
-                    $color = 'blue';
-                } elseif ($stat['percent'] >= 3 && $stat['percent']<= 5) {
-                    $color = 'green';
-                } elseif ($stat['percent'] > 5) {
-                    $color = 'red';
+        if (!empty($stats[0])) {
+            foreach($stats[0] as &$stat){
+                if(is_array($stat)){
+                    $stat['title'] = round(($stat['title_matches']/($stats[0]['total_title_words_count']))*100, 2);
+                    $stat['percent'] = round(($stat['count']/($stats[0]['total_words']))*100, 2);
+                    if ($stat['percent'] < 3) {
+                        $color = 'blue';
+                    } elseif ($stat['percent'] >= 3 && $stat['percent']<= 5) {
+                        $color = 'green';
+                    } elseif ($stat['percent'] > 5) {
+                        $color = 'red';
+                    }
+                    $stat['color'] = $color;
                 }
-                $stat['color'] = $color;
             }
+            unset($stats[0]['total_words']);
+            unset($stats[0]['total_title_words_count']);
+            $resultArray = $stats[0];
         }
-        unset($stats[0]['total_words']);
-        unset($stats[0]['total_title_words_count']);
-        $resultArray = $stats[0];
+
         return $resultArray;
     }
 

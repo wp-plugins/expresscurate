@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
 Requires at least: 3.9
 Tested up to: 4.0
-Stable tag: 1.2.20
+Stable tag: 1.2.21
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -60,7 +60,7 @@ ExpressCurate solves this problem by bringing all the key elements for content c
 
 = How To Get Started =
 
-**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.2.20.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.2.20.zip)**. It's simple. It's free.
+**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.2.21.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.2.21.zip)**. It's simple. It's free.
 
 You can also **[download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme")** a **free [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme")**. It will give your curated content a modern online news look.  
 
@@ -102,6 +102,9 @@ e.g.
 
 
 == Changelog ==
+
+= 1.2.21 =
+* Miscellaneous bug fixes and improvements.
 
 = 1.2.20 =
 * Conflicts with Mail Poet plugin are fixed.

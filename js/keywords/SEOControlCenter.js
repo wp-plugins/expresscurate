@@ -1,9 +1,51 @@
 var SEOControl = (function (jQuery) {
     var insertKeywordInWidget = function (keywords, beforeElem) {
-        KeywordUtils.startLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
+        /*Utils.startLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
+        Utils.endLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
         jQuery.when(updateKeywords()).done(function () {
-            KeywordUtils.endLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
-        });
+        });*/
+        if (keywords.length > 0) {
+            var titleText = jQuery('#titlediv input[name=post_title]').val(),
+                content = jQuery('#content').val(),
+                titleWords = words_in_text(titleText.toLowerCase()),
+                contentWords = words_in_text(content.toLowerCase()),
+                keywordHtml = '';
+            jQuery.each(jQuery(keywords), function (index, value) {
+                if(value.length>2){
+                    var myRegExp = new RegExp('((^|\\s|>|))(' + value + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$))', 'gmi');
+
+                    var numOccurencesContent = (content.match(myRegExp)) ? content.match(myRegExp).length : 0,
+                        numOccurencesTitle = titleText.match(myRegExp) ? titleText.match(myRegExp).length : 0;
+
+
+                    var title = (numOccurencesTitle > 0 ? "yes" : "no"),
+                        inContent = (contentWords.length > 0) ? ((numOccurencesContent / contentWords.length * 100).toFixed(2)) : 0,
+                        color = 'blue';
+                    if (inContent < 3) {
+                        color = 'blue';
+                    } else if (inContent >= 3 && inContent <= 5) {
+                        color = 'green';
+                    } else if (inContent > 5) {
+                        color = 'red';
+                    }
+                    if (inContent == 0) inContent = Math.round(inContent);
+                    keywordHtml += '<div class="expresscurate_background_wrap expresscurate_preventTextSelection">\
+                            <span class="close">&#215</span>\
+                            <div class="statisticsTitle expresscurate_' + color + '"><span>' + value + '</span></div>\
+                            <div class="statistics borderRight">\
+                            <div class="center">title<img src="' + jQuery('#expresscurate_plugin_dir').val() + '../images/' + title + '.png"></div>\
+                            </div>\
+                            <div class="statistics">\
+                            <div class="center">content<span>' + inContent + '%</span></div>\
+                            </div>\
+                            </div>';
+                }
+            });
+            if(keywordHtml!=''){
+                jQuery('.addKeywords').before(keywordHtml);
+            }
+        }
+
     };
 
     var updateKeywords = function (content) {
