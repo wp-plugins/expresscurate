@@ -176,13 +176,23 @@ class ExpressCurate_Settings {
   }
 
   public function add_inline_popup_content() {
-      $screen = get_current_screen();
-      if($screen->parent_file == 'edit.php') {
-    ?>
-    <div id="expresscurate_dialog" class="expresscurate_dialog" title="<?php echo self::PLUGIN_NAME ?>">
-      <?php include(sprintf("%s/templates/dialog.php", dirname(__FILE__))); ?>
-    </div>
-    <?php
+      $display = false;
+
+      $post_types = get_post_types( '', 'names' );
+
+      foreach ( $post_types as $post_type ) {
+          if(get_post_type() == $post_type){
+              $display = true;
+          }
+      }
+      //$screen = get_current_screen();
+      //if (strpos($screen->parent_file,'edit.php') == 0) {
+      if ($display) {
+          ?>
+          <div id="expresscurate_dialog" class="expresscurate_dialog" title="<?php echo self::PLUGIN_NAME ?>">
+              <?php include(sprintf("%s/templates/dialog.php", dirname(__FILE__))); ?>
+          </div>
+      <?php
       }
   }
 
@@ -393,6 +403,12 @@ class ExpressCurate_Settings {
    * Save the metaboxes for this custom post type
    */
   public function save_post($post_id) {
+
+   if(isset($_POST['analytics_issues'])){
+      $warning = get_option('expresscurate_not_writable_warning');
+      $warning[$post_id] = "You have 6 warnings ";
+      update_option('expresscurate_not_writable_warning', $warning);
+   }
     $post_type = get_post_type($post_id);
 
     if ($post_type == 'acf') {

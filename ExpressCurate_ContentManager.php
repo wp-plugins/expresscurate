@@ -203,7 +203,7 @@ class ExpressCurate_HtmlParser {
 
   public function getElementsByTagsName() {
     $this->html = preg_replace('/^.*(?=<html>)/i', '', $this->html);
-
+    $this->html = str_replace("\0", " ",$this->html);
     $this->dom = new DOMDocument();
     @$this->dom->loadHTML($this->html);
 

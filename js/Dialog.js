@@ -567,7 +567,7 @@ var ExpresscurateDialog = (function(jQuery){
                 } else {
                     return false;
                 }
-                tinyMCE.activeEditor.execCommand('annotation', undefined, true);
+                //tinyMCE.activeEditor.execCommand('annotation', undefined, true);
             });
         }
 
