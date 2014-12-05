@@ -424,7 +424,7 @@ class ExpressCurate_Settings {
 
     // get the content of the post
     $smart_tagging = get_option('expresscurate_smart_tagging', '');
-    if ($smart_tagging == "on" || $smart_tagging == '') {
+    if ($smart_tagging == "on") {
       $post_content = $this->generate_tags($post_id);
     } else {
       $the_post = get_post($post_id);
@@ -434,6 +434,19 @@ class ExpressCurate_Settings {
         $post_content = $tags_obj->removeHighlights($post_content);
       }
     }
+
+//      if (get_option('expresscurate_smart_tagging') == "on") {
+//          $post_content = $this->generate_tags($post_id);
+//      } else {
+//          $the_post = get_post($post_id);
+//          $post_content = $the_post->post_content;
+//          if (strpos($post_content, 'keywordsHighlight') !== false) {
+//              $tags_obj = new Expresscurate_Tags();
+//              $post_content = $tags_obj->removeHighlights($post_content);
+//          }
+//      }
+
+
     //Smart publishing
     if (get_option('expresscurate_publish', '') == 'on') {
       if (isset($_POST['expresscurate_smart_publish_status']) && $_POST['expresscurate_smart_publish_status'] == 1) {
@@ -666,7 +679,7 @@ class ExpressCurate_Settings {
     add_submenu_page('expresscurate', 'Settings', 'Settings', 'manage_options', 'expresscurate_settings', array(&$this, 'plugin_settings_page'), '');
     add_submenu_page('expresscurate', 'News', 'News', 'edit_posts', 'expresscurate_news', array(&$this, 'show_expresscurate_news'), '');
     add_submenu_page('expresscurate', 'FAQ', 'FAQ', 'edit_posts', 'expresscurate_faq', array(&$this, 'show_expresscurate_faq_page'), '');
-    add_submenu_page('expresscurate', 'Support', 'Support', 'edit_posts', 'expresscurate', array(&$this, 'show_expresscurate_support_page'), '');
+    add_submenu_page('expresscurate', 'Support', 'Support', 'edit_posts', 'support', array(&$this, 'show_expresscurate_support_page'), '');
 
   }
 

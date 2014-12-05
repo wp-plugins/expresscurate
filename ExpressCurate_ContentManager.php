@@ -20,9 +20,12 @@ class ExpressCurate_ContentManager {
 
   public function get_article() {
     $url = $this->_post('expresscurate_source', '');
+    $url = preg_replace( '/\s+/', '', $url );
+
     if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0) {
       $url = 'http://' . $url;
     }
+
     if (strlen($url) < 1) {
       $data = array('status' => 'error', 'error' => 'Please enter URL!');
       echo json_encode($data);
@@ -397,6 +400,7 @@ class ExpressCurate_HtmlParser {
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
       $content = curl_exec($ch);
       $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
       curl_close($ch);

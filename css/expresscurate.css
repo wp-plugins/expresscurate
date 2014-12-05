@@ -2247,6 +2247,19 @@ div[aria-describedby="expresscurate_dialog"]{
 .expresscurate_news_container{
     margin-top: 30px;
 }
+
+.expresscurate_news_container li {
+    background-color: #ffffff;
+    border: 1px solid #e2e2e2;
+    display: block;
+    font-family: OpenSans-Regular,Verdana,Geneva,sans-serif;
+    height: auto;
+    margin: 0 0 10px;
+    padding: 15px 15px 10px;
+    position: relative;
+    width: 758px;
+}
+
 .expresscurate_marginTop30{
     margin-top: 30px !important;
 }
@@ -2290,3 +2303,4 @@ div[aria-describedby="expresscurate_dialog"]{
 a:active{
     outline:none !important;
 }
+
