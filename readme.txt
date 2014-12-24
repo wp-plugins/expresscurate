@@ -17,15 +17,10 @@ ExpressCurate plugin is a content curation tool for WordPress. It enables you to
 ExpressCurate plugin includes:
 
 * **RSS feeds and Google alerts importer**
-
 * **Curation post composer and editor**
-
 * **SEO optimization**
-
 * **Keyword analysis and management**
-
 * **Flexible publishing options**
-
 * **Curation on-the-go**: optional [Chrome extension](https://chrome.google.com/webstore/detail/expresscurate/nldipdepdfjilejlpeeknodkpiajhfkf?hl=en "Your favorite Chrome Extension") and [Android app](https://play.google.com/store/apps/details?id=com.expresscurate "Your favorite Android app") (both free)
 
 ExpressCurate is an ideal tool for professional bloggers, marketing agencies, and marketing professionals that need to rapidly scale content marketing efforts with limited budgets, time, and resources. 
@@ -35,51 +30,37 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 = FEATURE HIGHLIGHTS =
 
+
 **RSS feeds and Google Alerts**
-
 * **RSS & Google Alerts Importer** - bring content from your RSS feeds and Google Alerts directly into ExpressCurate, providing you a convenient starting point.
-
 * **Content Notification Emails** - receive emails with newly discovered content.
-
 * **Top Curation Sources** - keep track of your top curation sources. 
 
 
 **Curation Post Composer and Editor**
-
 * **Quickstart button** - start a curated post with a single click of a button.
-
 * **Prefilled content** - ExpressCurate prefills the original content, images, and some web page attributes to provide you with an easy starting point.
-
 * **Multi-Source Curation** - curate content from one article or multiple sources into a single post.
-
 * **Content augmentation** - ExpressCurate enables you to add your perspective in the annotation area, pick an image, format the post, decide on the type of link to include, and much more.
-
 * **Content Quality Checker** - ExpressCurate checks key quality attributes, such as article length, percentage of curated vs. unique content, keyword and image utilization, and more.
 
 
 **SEO Optimization**
-
 * **SEO Essentials** - add all key SEO elements into your post from a single page. These components include adding a meta title and description, categories, keywords, customizing URLs, and more.
-
 * **Post Analysis** - analyze your post for duplicate content, optimal length, optimal keyword utilization, usage of graphics, and other elements necessary for creating a high-quality post.
-
 * **Sitemap Rules** - Create sitemap update rules based on your business and content model by defining sitemap update frequency, new page/post priorities, and other attributes.
 
 
 **Keyword Analysis and Management**
-
 * **Keyword Center** -  A centralized area where you can monitor keyword utilization in your blog, manage target keywords, and discover/add new ones based on the most frequently used words in your blog.
 
 
 **Flexible Publishing Options**
-
 * **Publishing Options** - ExpressCurate provides you with flexibility to publish your curated post immediately, schedule it for a later time, or smart-publish automatically based on time intervals specified by you.
 
 
 **Curation On-The-Go**
-
 * **Chrome Web Browser** - use the [ExpressCurate Chrome Extension](https://chrome.google.com/webstore/detail/expresscurate/nldipdepdfjilejlpeeknodkpiajhfkf?hl=en "Your favorite Chrome Extension") to discover content, bookmark articles for future curation, as well as curate and create posts on the go without having to go to WordPress to create a post draft.
-
 * **Android App** - use [ExpressCurate Android app](https://play.google.com/store/apps/details?id=com.expresscurate "Your favorite Android app") on your smartphone or tablet to discover content and create curated posts more quickly. 
 
 
@@ -87,7 +68,6 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 = How To Get Started =
 [Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.0.0.zip "Your favorite content marketing tools") for WordPress.  
-
 You can also [download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme") a **free** [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme"). It will give your curated content a modern online news look.
 
 
