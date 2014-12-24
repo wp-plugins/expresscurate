@@ -2,11 +2,11 @@
 $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true, 'tinymce' => true, 'quicktags' => false);
 ?>
 <div>
-  <div class="content_editor" id ="expresscurate_post_form">
+  <div class="content_editor expresscurate_Styles" id ="expresscurate_post_form">
     <div class="main">
       <div class="header">
         <div class="addressbar">
-          <input type="text" placeholder="<?php echo __('Insert source URL to start', ExpressCurate_Settings::PLUGIN_FOLDER) ?>" id="expresscurate_source" name="expresscurate_source" value="<?php echo @get_post_meta($post->ID, 'expresscurate_source', true); ?>">
+          <input type="text" placeholder="<?php echo __('Insert source URL to start', ExpressCurate_Actions::PLUGIN_FOLDER) ?>" id="expresscurate_source" name="expresscurate_source" value="<?php echo @get_post_meta($post->ID, 'expresscurate_source', true); ?>">
           <input type="hidden" id="expresscurate_admin_url" value="<?php echo admin_url(); ?>" />
           <button class="load"  id="expresscurate_submit">Load</button>
         </div>
@@ -68,7 +68,7 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
                 <span class="imageCount expresscurate_displayNone"></span>
             </div>
         </div>
-        <div class="editor right" style="max-height: 200px; ">
+        <div class="editor right">
           <?php wp_editor('', 'expresscurate_content_editor', $settings); ?>
 
           <div class="clear"></div>
@@ -97,7 +97,7 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
       <ul class="labels" id="curated_tags">
       </ul>
       <div class="clear"></div>
-      <button class="curate right" id="expresscurate_insert" onclick="return false;"><?php echo __('Curate into post', ExpressCurate_Settings::PLUGIN_FOLDER) ?></button>
+      <button class="curate right" id="expresscurate_insert" onclick="return false;"><?php echo __('Curate into post', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
       <div class="clear"></div>
     </div>
   </div>

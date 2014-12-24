@@ -1,15 +1,15 @@
 <?php
 $keywords = new ExpressCurate_Keywords();
-$keywords_stats = $keywords->getKeywordStats();
+$keywords_stats = $keywords->getKeywordStats($post_content);
 ?>
 
-<div class="expresscurate_dashboard">
+<div class="expresscurate_dashboard expresscurate_Styles expresscurate_dashboard_keywords">
   <div>
-      <div class="dashboardMessage expresscurate_displayNone">
-          <span>Currently you don't have any defined keywords.  <a class="settingsLink"
-                                                                                    href="admin.php?page=expresscurate_keywords">Start adding now.</a></span>
-      </div>
-  <?php
+      <label class=" <?php if (sizeof($keywords_stats) != 0) {
+          echo 'expresscurate_displayNone';
+      } ?> expresscurate_notDefined">Currently you don't have any defined keywords.  <a class="settingsLink" href="admin.php?page=expresscurate_keywords">Start adding now.</a></label>
+
+      <?php
   foreach ($keywords_stats as $word => $stat) {
     ?>
     <div class="expresscurate_background_wrap ">

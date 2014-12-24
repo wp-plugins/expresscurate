@@ -55,6 +55,18 @@
   clear:both;
   color: #A39E9E;
 }
+/*.expresscurate_annotate:before,
+.annotate:before{
+    display: none !important;
+}
+.expresscurate_annotate,
+.annotate{
+    border: none !important;
+    color: inherit !important;
+    line-height: inherit !important;
+    padding: inherit !important;
+    background-color: transparent !important;
+}*/
 /*Text boxes*/
 .expresscurate_fl_text_box , .expresscurate_fr_text_box , .expresscurate_justify_text_box{
 	min-height:25px !important;
@@ -76,7 +88,7 @@
 }
 .expresscurate_fr_text_box {
 	float: right;
-	margin:20px 0px 20px 20px;
+	margin:20px 0 20px 20px;
 }
 .expresscurate_justify_text_box{
 	width:92%;

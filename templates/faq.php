@@ -13,15 +13,16 @@ if ($_POST) {
     unset($_POST);
   }
 }
-$feed = ExpressCurate_Settings::getCurationNews('http://news.expresscurate.com/category/faq/feed/');
+$feed = ExpressCurate_Actions::getCurationNews('http://news.expresscurate.com/category/faq/feed/');
 $limit = 3;
 ?>
 
 
 <div class="expresscurate_faq wrap">
-  <div class="expresscurate_menu">
-    <?php include(sprintf("%s/menu.php", dirname(__FILE__))); ?>
-  </div>
+    <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
+        <h2>FAQ</h2>
+        <!--<label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sagittis nulla lectus,</label>-->
+    </div>
   <h2 class="expresscurate_displayNone">FAQ</h2>
 
   <div>
@@ -33,7 +34,7 @@ $limit = 3;
           $link = $feed[$x]['link'];
           ?>
           <div class="inlineBlock">
-            <a class="questionBox" href="<?php echo $link ?>" target="_blank"><span><?php echo esc_attr($title) ?></span></a>
+            <a class="questionBox" href="<?php echo $link ?>" target="_blank"><span><?php echo $title ?></span></a>
           </div>
           <?php
         }
@@ -51,11 +52,11 @@ $limit = 3;
     </div>
     <div class="block">
       <?php if (!$sent) { ?>
-        <label for="email">Ask a question</label>
+        <label for="expresscurate_support_email">Ask a question</label>
         <?php
       } else {
         ?>
-        <label for="email">Your question has been sent</label>
+        <label for="expresscurate_support_email">Your question has been sent</label>
         <?php
       }
       ?>
@@ -66,7 +67,7 @@ $limit = 3;
                value="<?php echo $user_email ?>"/>
         <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
                   placeholder="Question"></textarea>
-        <a class="askButton send greenBackground" href="#" onclick="Support.expresscurateSupportSubmit();">Ask</a>
+        <a class="askButton send greenBackground" href="#" onclick="Utils.expresscurateSupportSubmit();">Ask</a>
       </form>
     </div>
   </div>

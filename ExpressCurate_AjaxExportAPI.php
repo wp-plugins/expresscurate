@@ -42,10 +42,10 @@ class ExpressCurate_AjaxExportAPI {
 
   public function check_auth() {
     $response = array();
-    $response['logged_in'] = true;
-    $response['can_edit_post'] = current_user_can('edit_posts');
     $current_user = wp_get_current_user();
     if ($current_user && $current_user->data && $current_user->data->user_login) {
+      $response['logged_in'] = true;
+      $response['can_edit_post'] = current_user_can('edit_posts');
       $response['username'] = $current_user->data->user_login;
     }
     echo json_encode($response);
@@ -70,8 +70,7 @@ class ExpressCurate_AjaxExportAPI {
         $img = $img['content'];
       }
       if ($img) {
-
-        if ($http_response_header == "HTTP/1.1 200 OK" || $http_response_header == 200) {
+        if ((is_array($http_response_header) && ($http_response_header[0] == "HTTP/1.1 200 OK" || strpos($http_response_header[0], '200'))) || $http_response_header == "HTTP/1.1 200 OK" || $http_response_header == 200 || $http_response_header == 'HTTP\/1.1 200 OK') {
           $data_check = array('status' => 'success', 'statusCode' => 200);
         } else if ($http_response_header == "HTTP/1.1 403 Forbidden" || $http_response_header == 403) {
           $data_check = array('status' => 'fail', 'statusCode' => 403);
@@ -87,7 +86,6 @@ class ExpressCurate_AjaxExportAPI {
   }
 
   public function download_images() {
-
     $data = $_REQUEST;
     if (!$data['images']) {
       $result = array('status' => "error", 'error' => "Data is empty!");
@@ -155,10 +153,13 @@ class ExpressCurate_AjaxExportAPI {
       echo $result;
       die();
     }
-
     $result = false;
     $data = $_REQUEST;
-    $post_status = get_option('expresscurate_post_status', '') ? get_option('expresscurate_post_status', '') : 'draft';
+    if (isset($data['force_draft']) && $data['force_draft'] === 1) {
+      $post_status = 'draft';
+    } else {
+      $post_status = get_option('expresscurate_post_status', '') ? get_option('expresscurate_post_status', '') : 'draft';
+    }
     if (isset($data['url'])) {
       $domain = parse_url($data['url']);
       $domain = $domain['host'];
@@ -169,11 +170,14 @@ class ExpressCurate_AjaxExportAPI {
           $data['terms'][$i] = $term_id;
         }
       }
-      $post_id = $this->insert_post($data, $post_status);
-      $post_categories = wp_get_post_categories($post_id, array('fields' => 'names'));
+
+      $post_id = $this->insert_update_post($data, $post_status);
       $post_tags = wp_get_post_tags($post_id, array('fields' => 'names'));
+
+      $post_categories = wp_get_post_categories($post_id, array('fields' => 'names'));
       if ($post_id) {
-        $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'post_categories' => $post_categories, 'post_tags' => $post_tags, 'msg' => "Post saved as " . $post_status . "."));
+        $post = get_post($post_id, ARRAY_A);
+        $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'post_categories' => $post_categories, 'post_tags' => $post_tags, 'post_modified' => $post['post_modified'], 'post_modified_gmt'=> $post['post_modified_gmt'], 'msg' => "Post saved as " . $post_status . "."));
       } else {
         $result = json_encode(array('status' => "error", 'msg' => "Something went wrong!"));
       }
@@ -181,28 +185,50 @@ class ExpressCurate_AjaxExportAPI {
       $result = json_encode(array('status' => "error", 'msg' => "Data is emty!"));
     }
 
-      //Smart publishing
-      if (get_option('expresscurate_publish', '') == 1) {
-          $smartPublish = 1;
+    //Smart publishing
+    if (get_option('expresscurate_publish', '') == 'on') {
+        $smartPublish = 1;
 
-          if (get_option('expresscurate_manually_approve_smart') == 1) {
-              $smartPublish = 0;
-          }
-          update_post_meta($post_id, '_expresscurate_smart_publish', $smartPublish);
-      }
-      
+        if (get_option('expresscurate_manually_approve_smart') == 'on') {
+            $smartPublish = 0;
+        }
+        update_post_meta($post_id, '_expresscurate_smart_publish', $smartPublish);
+    }
     echo $result;
     die;
   }
 
-  private function insert_post($data, $post_status) {
+  public function get_feed() {
+    $feedManager = new ExpressCurate_FeedManager();
+    $feed = $feedManager->get_feed_content();
+    $result = array('status'=> 'OK', 'feeds'=>$feed);
+    echo json_encode($result);
+    die;
+  }
+
+  public function get_post() {
+    $data = $_REQUEST;
+    if (!$data['id']) {
+      $result = array('status' => "error", 'msg' => "ID is empty!");
+    }else{
+      $post = get_post($data['id'], ARRAY_A);
+      if($post){
+        $result = array('status' => "OK", 'post_modified' => $post['post_modified'], 'post_modified_gmt'=> $post['post_modified_gmt']);
+      }else{
+        $result = array('status' => "error", 'msg' => "Post not found");
+      }
+    }
+    echo json_encode($result);
+    die;
+  }
+
+  private function insert_update_post($data, $post_status) {
     $post_cats = array();
     if (!isset($data['terms']) || !count($data['terms'])) {
       $post_cats[] = get_option('expresscurate_def_cat');
     } else {
       $post_cats = $data['terms'];
     }
-
     $details = array(
         'post_content' => str_replace("&nbsp;", " ", $data['content']),
         'post_author' => get_current_user_id(),
@@ -212,7 +238,12 @@ class ExpressCurate_AjaxExportAPI {
         'post_type' => get_option('expresscurate_def_post_type', 'post')
     );
 
-    $post_id = wp_insert_post($details);
+    if (isset($data['post_id']) && $data['post_id'] != 0 && strlen($data['post_id']) > 0) {
+      $post_id = $details['ID'] = trim($data['post_id']);
+      wp_update_post($details);
+    } else {
+      $post_id = wp_insert_post($details);
+    }
     $meta_key = "expresscurate_chrome";
     $meta_value = 1;
     add_post_meta($post_id, $meta_key, $meta_value);
@@ -222,7 +253,7 @@ class ExpressCurate_AjaxExportAPI {
     if (isset($data['description']) && $data['description']) {
       update_post_meta($post_id, '_expresscurate_description', $data['description']);
     }
-    if ($post_status == 'draft' && get_option('expresscurate_publish', '') == 1) {
+    if ($post_status == 'draft' && get_option('expresscurate_publish', '') == 'on') {
       update_post_meta($post_id, '_expresscurate_smart_publish', 1);
     }
 
@@ -265,6 +296,18 @@ class ExpressCurate_AjaxExportAPI {
       }
     }
     rmdir($dirPath);
+  }
+
+  public function send_google_key() {
+    $data = $_REQUEST;
+    if (!$data['key']) {
+        update_option('expresscurate_google_auth_key', $data['key']);
+        $result = array('status' => true, 'msg' => "Key is set");
+    }else{
+        $result = array('status' => false, 'msg' => "Key is not set");
+    }
+    echo json_encode($result);
+    die;
   }
 
 }

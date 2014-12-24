@@ -1,43 +1,50 @@
-
-div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar{
-	padding: 0 1em;
-	background: #444 !important;
-	font-size: 13px;
-	line-height: 24px;
-	color: #fff;
-	border:none;
+div[aria-describedby="expresscurate_dialog"]{
+    padding: 0 !important;
     border-radius: 0 !important;
-    height: 30px;
-    font-weight: normal;
+    border:none;
+    z-index: 2147483647 !important;
 }
 .ui-widget-overlay{
-    z-index: 2147483647 !important;
-    background: #000 !important;
+    font-weight: normal;
     opacity:.6 !important;
+    background: #000 !important;
+    position: fixed;
+    z-index: 2147483646;
 }
-div[aria-describedby="expresscurate_dialog"] .ui-button-icon-primary,
-div[aria-describedby="expresscurate_dialog"] .ui-button-text{
-    display: none !important;
-}
-div[aria-describedby="expresscurate_dialog"]{
-    z-index: 2147483647 !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    border: transparent !important;
+div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar{
+	padding: 0;
+	font-size: 13px;
+	line-height: 30px;
+	color: #fff;
+	height: 30px;
+	border:none;
+    border-radius: 0;
+    background-color: #222222;
+
 }
 div[aria-describedby="expresscurate_dialog"] .ui-dialog-title{
 	display: block;
 	text-align: center;
-	padding: 0;
-    float: left;
-    margin: .1em 0;
+    width: 100%;
+    background: #222222;
+    margin: 0;
+    padding: 0;
     white-space: nowrap;
-    width: 90%;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: normal;
+}
+
+div[aria-describedby="expresscurate_dialog"] .ui-button-icon-primary,
+div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar-close span{
+    display: none !important;
+}
+
+div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar-close:before{
+	line-height: 13px;
 }
 div[aria-describedby="expresscurate_dialog"] .ui-button.ui-dialog-titlebar-close{
-    padding: 0;
+	padding: 0;
     background: none;
     border: none;
     width: 25px;
@@ -50,15 +57,22 @@ div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar-close:before{
     line-height: 20px !important;
     width: 30px !important;
     height: 30px !important;
-    line-height: 13px;
 }
 div[aria-describedby="expresscurate_dialog"] .ui-button.ui-dialog-titlebar-close:hover{
     color: #9d9d9d;
 }
-div[aria-describedby="expresscurate_dialog"] .ui-dialog-content {
+
+#expresscurate_dialog {
 	padding: 0;
 	border:none;
 }
 #wp-fullscreen-buttons .mce-btn, .mce-toolbar .mce-btn-group .mce-btn, .qt-fullscreen{
 	margin: 1px !important;
+}
+.mce-toolbar .mce-btn[aria-label='Highlight Keywords'] i{
+    width: 23px !important;
+    background-repeat: no-repeat;
+}
+#ui-datepicker-div{
+    display: none;
 }

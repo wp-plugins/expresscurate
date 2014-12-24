@@ -1,15 +1,37 @@
 var Buttons = (function (jQuery) {
-    var textboxCommand = function (ed, elem, cssClass, isVal) {
-        if (isVal) {
-            var id = elem,
-                texboxElem = ed.getDoc().createElement('DIV');
+    /*var getId = function (prefix) {
+        var uniqueId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0,
+                v = c == 'x' ? r : r & 0x3 | 0x8;
+            return v.toString(16);
+        });
 
+        return (prefix || '') + '-' + uniqueId;
+    };
+
+    var getElem = function (node, cssClass) {
+        if (node && node.className && !!~node.className.indexOf(cssClass)) {
+            return node;
+        }
+
+        if (node.parentNode) {
+            return getElem(node.parentNode, cssClass);
+        }
+
+        return false;
+    };*/
+
+    var textboxCommand = function (ed, elem, cssClass, isVal) {
+        var id = elem,
+            texboxElem = ed.getDoc().createElement('DIV'),
+            activeElem;
+        if (isVal) {
             texboxElem.id = id;
             texboxElem.className = cssClass;
             texboxElem.innerHTML = '<p class="placeholder">Add your annotation</p>';
 
             ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
-            var activeElem = jQuery(ed.selection.getNode()).parents('div').eq(0).attr('id');
+            activeElem = jQuery(ed.selection.getNode()).parents('div').eq(0).attr('id');
             ed.controlManager.setActive(activeElem, true);
             var placeholders = tinyMCE.activeEditor.dom.select('p.placeholder');
             ed.selection.select(placeholders[placeholders.length - 1]);
@@ -23,15 +45,15 @@ var Buttons = (function (jQuery) {
             if (node.is('div') && jQuery(node).attr('class') && (jQuery(node).attr('class').indexOf('expresscurate')>-1 || jQuery(node).attr('class').indexOf('annotat')>-1) && jQuery(node).attr('id')==elem) {
                 node.before(node.html());
                 node.remove();
-                       } else if (nodeIsWrapped && selectedId == elem) {
+            } else if (nodeIsWrapped && selectedId == elem) {
                 if (jQuery(node).html() == '<p>&nbsp;</p>') {
                     jQuery(node).html('');
                     jQuery(node).remove();
-                    } else {
+                } else {
                     unWrap(node, elem);
-                    }
-                    ed.controlManager.setActive(elem, false);
-                    ed.selection.setCursorLocation(0);
+                }
+                ed.controlManager.setActive(elem, false);
+                ed.selection.setCursorLocation(0);
 
             } else {
                 var content = '';
@@ -44,15 +66,11 @@ var Buttons = (function (jQuery) {
                 } else {
                     content = ed.selection.getContent();
                 }
-
-                var id = elem,
-                    texboxElem = ed.getDoc().createElement('DIV');
-
                 texboxElem.id = id;
                 texboxElem.className = cssClass;
                 texboxElem.innerHTML = content;
                 ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
-                var activeElem = id;
+                activeElem = id;
 
                 ed.controlManager.setActive(activeElem, true);
             }
@@ -79,50 +97,85 @@ var Buttons = (function (jQuery) {
         if (elem.prev().text() == '')
             elem.prev().remove();
     };
-    var markKeywordsCommand = function (ed) {
-        var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-        if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length <= 0 && jQuery('#expresscurate_defined_tags').val().length > 0) {
-            if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && jQuery('.expresscurate_widget').length > 0) {
-                check_editor = setTimeout(function check() {
-                    clearTimeout(check_editor);
-                    highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-                    if (highlightedElems.length > 0) {
-                        markKeywords(ed);
-                        setTimeout(check, 15000);
-                    }
-                }, 1);
-            }
-            markKeywords(ed);
-        } else {
-            highlightedElems.each(function (index, val) {
-                jQuery(val).replaceWith(this.childNodes);
-            });
-            ed.controlManager.setActive('markKeywords', false);
-        }
-    }
-    var markKeywords = function (ed){
-        var bookmark = ed.selection.getBookmark(2, true),
-            colors=['Red','Blue','Green','Orange','LightBlue','Yellow','LightGreen'],
-            highlightedElems=jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-        highlightedElems.each(function(index,val){
-            jQuery(val).replaceWith(this.childNodes);
-        });
-        var keywords = jQuery('#expresscurate_defined_tags').val().split(', '),
-            matches = ed.getBody(),
-            i=0;
-        keywords.forEach(function(val){
-            jQuery(matches).html(function(index, oldHTML) {
-                return oldHTML.replace(new RegExp('((^|\\s|>|))(' + val + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$))', 'gmi'), '$2<span class="expresscurate_keywordsHighlight expresscurate_highlight'+colors[i%7]+'">$3</span>');
-            });
-            if(jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length>0){
-                ed.controlManager.setActive('markKeywords', true);
-            }
-            i++;
-        });
-        ed.selection.moveToBookmark(bookmark);
-    };
 
+    var noFollow = function (ed) {
+        var elem = jQuery(ed.selection.getNode());
+        if (elem.is('a')) {
+            if (elem.attr('rel') == 'nofollow') {
+                elem.removeAttr('rel');
+                ed.controlManager.setActive('noFollow', true);
+            } else {
+                elem.attr('rel', 'nofollow');
+                ed.controlManager.setActive('noFollow', false);
+            }
+        }
+    };
+    var wordCount = function (ed) {
+        var lengthMessage, lengthColor;
+
+        var content = ((jQuery('#content').css("display") == "block") ? jQuery('#content').val() : tinyMCE.get("content").getContent()),
+            wordsCount = /*jQuery('#wp-word-count .word-count').text() ||*/ SEOControl.words_in_text(content).length;
+        if (wordsCount < 700) {
+            lengthColor = 'red';
+            lengthMessage = 'Your post is currently ' + wordsCount + ' word long.  The optimal post length is 700-1,600 words.';
+        } else if (wordsCount >= 700 && wordsCount <= 1600) {
+            lengthColor = 'green';
+            lengthMessage = 'Post length is ' + wordsCount + '. Good work! (The recommended length is 700-1600 words).';
+        } else {
+            lengthColor = 'red';
+            lengthMessage = 'The post has ' + wordsCount + ' words, which is longer than the recommended 700-1600 word.';
+        }
+
+        if (jQuery(content).is('blockquote')) {
+            var div = document.createElement('div');
+            div.innerHTML = content;
+            var blockquotes = jQuery(div).find('blockquote'),
+                wordsInBlockquotes = 0;
+            blockquotes.each(function (index, val) {
+                wordsInBlockquotes += SEOControl.words_in_text(jQuery(val).text()).length;
+            });
+            var quotationPersent = Math.round((wordsInBlockquotes / wordsCount) * 100),
+                quotationMessage = (quotationPersent > 20) ? "The quotation from the original source currently constitutes " + quotationPersent + "% your post.  Anything over 20% can be considered lower quality content." : "Good work! There is no more than 20% quotation used in the post.",
+                quotationColor = (quotationPersent > 20) ? 'red' : 'green';
+
+        } else {
+            quotationColor = 'blue';
+            quotationMessage = 'There is no quotation.';
+        }
+        if (jQuery(content).is('blockquote') && quotationPersent == 0) {
+            quotationColor = 'blue';
+            quotationMessage = 'There is no quotation.';
+        }
+
+        var messageHtml='<p class="lengthSuggestion ' + lengthColor + '">' + lengthMessage + '</p>\
+                                    <p class="lengthSuggestion  ' + quotationColor + '">' + quotationMessage + '</p>';
+
+
+        var imagesInPost =jQuery(content).find('img').length ? true: false,
+            videoInPost=tinyMCE.get('content').getContent().indexOf('[embed]')>-1;
+        messageHtml+=(!imagesInPost && !videoInPost)? '<p class="lengthSuggestion red">Your post currently doesn’t have an image(video). Adding a media is a good way to improve conversion rates by creating visual associations with your posts.</p>': '';
+        messageHtml +=jQuery('.attachment-post-thumbnail').length ? '' :'<p class="lengthSuggestion red">Your post currently doesn’t have a featured image. Adding a featured image is a good way to improve conversion rates by creating visual associations with your posts.</p>';
+
+            ed.windowManager.open({
+                title: 'Post Analysis',
+                id: 'expresscurate_wordCount_dialog',
+                width: 450,
+                html: messageHtml
+            });
+    };
+    var addKeyword =function(){
+        if(tinymce.activeEditor.selection.getContent().length > 3 && jQuery('#expresscurate_widget').length){
+            var keyword = tinymce.activeEditor.selection.getContent(),
+                input=jQuery('.addKeywords input');
+            keyword = keyword.replace(/<[^>]+>[^<]*<[^>]+>|<[^\/]+\/>/ig, "");
+            input.val(keyword);
+            SEOControl.insertKeywordInWidget(KeywordUtils.multipleKeywords(input, undefined), jQuery('.addKeywords'));
+        }
+    };
     var setupButtons = function () {
+        jQuery('html').on('click','.expresscurate_postAnalysis',function(){
+           wordCount(tinymce.activeEditor);
+        });
         tinymce.create('tinymce.plugins.expresscurate', {
             /**
              * Initializes the plugin, this will be executed after the plugin has been created.
@@ -139,33 +192,49 @@ var Buttons = (function (jQuery) {
                 ed.addButton('annotation', {
                     title: 'Add Annotation (Alt + A | Ctrl + Up)',
                     cmd: 'annotation',
-                    image: url + '/../images/annotate.png'
+                    classes: "btn expresscurateCostom expresscurateAnnotate"
                 });
                 ed.addButton('righttextbox', {
                     title: 'Add Right-Box (Alt + R | Ctrl + Right)',
                     cmd: 'righttextbox',
-                    image: url + '/../images/rightBox.png'
+                    classes: "btn expresscurateCostom expresscurateRightbox"
                 });
                 ed.addButton('justifytextbox', {
-                     title: 'Add Center-Box (Alt + J | Ctrl + Down)',
-                   cmd: 'justifytextbox',
-                    image: url + '/../images/justifyBox.png'
+                    title: 'Add Center-Box (Alt + J | Ctrl + Down)',
+                    cmd: 'justifytextbox',
+                    classes: "btn expresscurateCostom expresscurateJustify"
                 });
                 ed.addButton('lefttextbox', {
-                     title: 'Add Left-Box (Alt + L | Ctrl + Left)',
-                   cmd: 'lefttextbox',
-                    image: url + '/../images/leftBox.png'
+                    title: 'Add Left-Box (Alt + L | Ctrl + Left)',
+                    cmd: 'lefttextbox',
+                    classes: "btn expresscurateCostom expresscurateLeftbox"
                 });
                 ed.addButton('markKeywords', {
                     title: 'Highlight Keywords (Alt + H)',
                     cmd: 'markKeywords',
-                    class: 'expresscurate_HighlightButton',
-                    image: url + '/../images/markKeywords.png'
+                    classes: "btn expresscurateCostom expresscurateMarkKeywords"
+                });
+                ed.addButton('noFollow', {
+                    title: 'Follow / No Follow (Alt + F)',
+                    cmd: 'noFollow',
+                    classes: "btn expresscurateCostom expresscurateFollow"
+                });
+                ed.addButton('wordCount', {
+                    title: 'Post Analysis (Alt + W)',
+                    cmd: 'wordCount',
+                    classes: "btn expresscurateCostom expresscurateWordCount"
+                });
+                ed.addButton('addKeyword', {
+                    title: 'Add Keyword (Alt + K)',
+                    cmd: 'addKeyword',
+                    classes: "btn expresscurateCostom expresscurateAddKeyword"
                 });
                 //  }
 
                 ed.onKeyDown.add(function (ed, e) {
-                    if ((e.altKey && e.keyCode == 76) || (e.ctrlKey && e.keyCode == 37)) {     // alt+l|ctrl+left
+                    if (e.altKey && e.keyCode == 75) {
+                        addKeyword();
+                    }else if ((e.altKey && e.keyCode == 76) || (e.ctrlKey && e.keyCode == 37)) {     // alt+l|Ctrl+left
                         e.returnValue = false;
                         textboxCommand(ed, 'lefttextbox', 'expresscurate_fl_text_box');
                         e.preventDefault();
@@ -190,6 +259,16 @@ var Buttons = (function (jQuery) {
                         Keywords.markEditorKeywords();
                         e.preventDefault();
                         return false;
+                    } else if (e.altKey && e.keyCode == 70) {     // alt+f
+                        e.returnValue = false;
+                        noFollow(ed);
+                        e.preventDefault();
+                        return false;
+                    } else if (e.altKey && e.keyCode == 87) {     // alt+w
+                        e.returnValue = false;
+                        wordCount(ed);
+                        e.preventDefault();
+                        return false;
                     }
                 });
 
@@ -209,7 +288,7 @@ var Buttons = (function (jQuery) {
                             id = id.substring(0, id.indexOf('-'));
                             jQuery(val).attr('id', id);
                         }
-                });
+                    });
                     jQuery(dom.select('div[id*=annotation]')).each(function (index, val) {
                         var id = jQuery(val).attr('id');
                         if (id.indexOf('-') > -1) {
@@ -226,7 +305,7 @@ var Buttons = (function (jQuery) {
                     }
                 });
                 ed.onNodeChange.add(function (ed) {
-
+                    ed.controlManager.setActive('noFollow', false);
                     var node, elem = jQuery(ed.selection.getNode());
                     node = elem;
 
@@ -234,6 +313,14 @@ var Buttons = (function (jQuery) {
                     if (nodeIsWrapped) {
                         node = jQuery(node).parents('div[class*=expresscurate]')  || jQuery(node).parents('div[class*=annotat]');
                     }
+                    if (elem.is('a')) {
+                        if (elem.attr('rel') == 'nofollow') {
+                            ed.controlManager.setActive('noFollow', false);
+                        } else {
+                            ed.controlManager.setActive('noFollow', true);
+                        }
+                    }
+                    ed.controlManager.setDisabled('noFollow', ed.selection.getNode().nodeName != 'A');
 
                     var cssClass = jQuery(node).attr('class'),
                         activeButton = ' ';
@@ -273,6 +360,15 @@ var Buttons = (function (jQuery) {
                     });
                     ed.addCommand('markKeywords', function () {
                         Keywords.markEditorKeywords();
+                    });
+                    ed.addCommand('noFollow', function () {
+                        noFollow(ed);
+                    });
+                    ed.addCommand('wordCount', function () {
+                        wordCount(ed);
+                    });
+                    ed.addCommand('addKeyword', function () {
+                        addKeyword();
                     });
                 }
             },
@@ -315,7 +411,7 @@ var Buttons = (function (jQuery) {
 
     var isSetup = false;
 
-    return{
+    return {
         setup: function () {
             if (!isSetup) {
                 setupButtons();
@@ -323,6 +419,7 @@ var Buttons = (function (jQuery) {
             }
         }
     }
-})(window.jQuery);
+})
+(window.jQuery);
 
 Buttons.setup();

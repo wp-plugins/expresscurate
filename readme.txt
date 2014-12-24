@@ -1,70 +1,94 @@
 === ExpressCurate ===
 Contributors: expresscurate
-Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, keywords summary, keywords dashboard, seo control center, keyword, seo
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEHL
+Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, rss, feed, keywords summary, keywords dashboard, seo control center, keyword, seo, sitemap, google webmasters
+Donate link: https://bit.ly/expresscuratedonate
 Requires at least: 3.9
-Tested up to: 4.0
-Stable tag: 1.2.23
+Tested up to: 4.1
+Stable tag: 2.0.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
-ExpressCurate simplifies and expedites content curation and provides SEO enhancement and keyword effectiveness monitoring.
+ExpressCurate plugin is a content curation tool for WordPress. It enables you to create and publish high quality content within minutes.
+
 
 == Description ==
 
-The ExpressCurate content curation plugin is a WordPress platform for creating, optimizing, and publishing high-quality content.  
 
-While there are many content discovery tools, the process of curation in WordPress is still convoluted and confusing, requiring multiple steps and manually switching back and forth between screens, plug-ins, and programs.
+ExpressCurate plugin includes:
 
-ExpressCurate solves this problem by bringing all the key elements for content curation onto a single screen, making content curation in WordPress intuitive and quick! It combines the three essential content curation components -- content, keywords, and SEO -- in a single plugin. It includes: 
+* **RSS feeds and Google alerts importer**
+
+* **Curation post composer and editor**
+
+* **SEO optimization**
+
+* **Keyword analysis and management**
+
+* **Flexible publishing options**
+
+* **Curation on-the-go**: optional [Chrome extension](https://chrome.google.com/webstore/detail/expresscurate/nldipdepdfjilejlpeeknodkpiajhfkf?hl=en "Your favorite Chrome Extension") and [Android app](https://play.google.com/store/apps/details?id=com.expresscurate "Your favorite Android app") (both free)
+
+ExpressCurate is an ideal tool for professional bloggers, marketing agencies, and marketing professionals that need to rapidly scale content marketing efforts with limited budgets, time, and resources. 
 
 
-1. **Composer/Editor** to streamline the process of writing a curated post
-1. **Keyword Dashboard** for centrally storing and updating your keywords as well as for monitoring their usage within your blog/site content
-1. **SEO Control Center** for streamlining the creation of important SEO components associated with your posts, such as meta descriptions, keywords, and tags.
 
 
+= FEATURE HIGHLIGHTS =
 
-= Curated Post Composer and Editor Features =
+**RSS feeds and Google Alerts**
 
-1. **Quickstart Button.** Start a curated post with a single click of the Curate Content Button next to the standard Add Media.
-1. **Original Content Preloading.** Just specify the target URL of an article that you want to curate, and ExpressCurate will auto-populate the content into your post, making it easier and faster for you to edit and post an article.
-1. **Image Slider.** ExpressCurate can pick up images from the original post, making it easy to add a graphical element to your curated content.
-1. **Duplicate Content Check.** ExpressCurate provides a warning if the same URL has been used in a prior article in your blog, helping you to prevent a potential double-curation.
-1. **Multi-source Curation --** curate content from multiple sources and web pages in a single article.
-1. **Content-aware tag suggestions based on the keywords and tags defined in your prior WordPress blogs.**
-1. **Automatic hashtagging whenever # is used**
-1. **Google Authorship**
+* **RSS & Google Alerts Importer** - bring content from your RSS feeds and Google Alerts directly into ExpressCurate, providing you a convenient starting point.
 
- 
- 
-= Keywords Summary and Dashboard Features =
+* **Content Notification Emails** - receive emails with newly discovered content.
 
-1. **Keywords Summary.** Get a content-effectiveness summary for the keywords you are targeting, including how often they show up in your titles and text and the number of posts containing them.
-1. **Most Frequently Used Words.** Use the ExpressCurate Keywords Dashboard to find out the most frequently used words on your blog. This can give you new keyword directions or ideas on how to optimize your content for better results with the current keywords.
-1. **Keywords Center.** A centralized place to keep your keywords and keyphrases.  
-1. **Keyword Discovery.** Add new keywords/keyphrases and see their occurrence frequency in your blog content. You can also click on the "+" icon next to the words from the "most frequently used words" list to add to your target keywords list.
-1. **Keyword-targeted Posts.** Should you decide to create a post that is focused around a certain keyword/keyphrase from the keyword center, just click on the "add post" icon next to it. This will start a new post with hints focused around the usage of your target keywords in the post.  
- 
- 
- 
-= SEO Control Center Features =
+* **Top Curation Sources** - keep track of your top curation sources. 
 
-1. **SEO Control Center.** Enter all SEO-related information for your new post on the same page you are composing/editing your curated post.
-1. **Key page attributes and SEO enhancements** on a single page
-1. **Keywords**
-1. **Meta descriptions**
-1. **h1/h2/h3 tags**
+
+**Curation Post Composer and Editor**
+
+* **Quickstart button** - start a curated post with a single click of a button.
+
+* **Prefilled content** - ExpressCurate prefills the original content, images, and some web page attributes to provide you with an easy starting point.
+
+* **Multi-Source Curation** - curate content from one article or multiple sources into a single post.
+
+* **Content augmentation** - ExpressCurate enables you to add your perspective in the annotation area, pick an image, format the post, decide on the type of link to include, and much more.
+
+* **Content Quality Checker** - ExpressCurate checks key quality attributes, such as article length, percentage of curated vs. unique content, keyword and image utilization, and more.
+
+
+**SEO Optimization**
+
+* **SEO Essentials** - add all key SEO elements into your post from a single page. These components include adding a meta title and description, categories, keywords, customizing URLs, and more.
+
+* **Post Analysis** - analyze your post for duplicate content, optimal length, optimal keyword utilization, usage of graphics, and other elements necessary for creating a high-quality post.
+
+* **Sitemap Rules** - Create sitemap update rules based on your business and content model by defining sitemap update frequency, new page/post priorities, and other attributes.
+
+
+**Keyword Analysis and Management**
+
+* **Keyword Center** -  A centralized area where you can monitor keyword utilization in your blog, manage target keywords, and discover/add new ones based on the most frequently used words in your blog.
+
+
+**Flexible Publishing Options**
+
+* **Publishing Options** - ExpressCurate provides you with flexibility to publish your curated post immediately, schedule it for a later time, or smart-publish automatically based on time intervals specified by you.
+
+
+**Curation On-The-Go**
+
+* **Chrome Web Browser** - use the [ExpressCurate Chrome Extension](https://chrome.google.com/webstore/detail/expresscurate/nldipdepdfjilejlpeeknodkpiajhfkf?hl=en "Your favorite Chrome Extension") to discover content, bookmark articles for future curation, as well as curate and create posts on the go without having to go to WordPress to create a post draft.
+
+* **Android App** - use [ExpressCurate Android app](https://play.google.com/store/apps/details?id=com.expresscurate "Your favorite Android app") on your smartphone or tablet to discover content and create curated posts more quickly. 
+
 
 
 
 = How To Get Started =
+[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.0.0.zip "Your favorite content marketing tools") for WordPress.  
 
-**[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.1.2.23.zip)** for WordPress from **[here](http://downloads.wordpress.org/plugin/expresscurate.1.2.23.zip)**. It's simple. It's free.
-
-You can also **[download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme")** a **free [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme")**. It will give your curated content a modern online news look.  
-
-Make the content curation process even faster with [ExpressCurate Chrome Extension](http://www.expresscurate.com/p/products/chrome-extension "Your favorite Chrome Extension").
+You can also [download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme") a **free** [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme"). It will give your curated content a modern online news look.
 
 
 
@@ -102,6 +126,17 @@ e.g.
 
 
 == Changelog ==
+
+= 2.0.0 =
+* RSS & Google Alerts Importer.
+* Content Notification Emails.
+* A much better Top Curation Sources.
+* Content Quality Checker.
+* Advanced SEO Essentials.
+* Post Analysis.
+* Keyword Center.
+* Wordpress 4.1 supported now.
+* Curation On-The-Go.
 
 = 1.2.23 =
 * Auto-hashtagging is fixed.

@@ -1,15 +1,17 @@
-var ExpresscurateDialog = (function(jQuery){
+var ExpresscurateDialog = (function (jQuery) {
     var keywords;
     var curatedParagraphs = '';
     var shortestParagraphLength = 150;
     var plugin_folder = 'expresscurate';
     var paragraphWidth = 93;
 
-    var sendWPEditor = function (html) {
-        var editor = tinyMCE.get('content');
+    var sendWPEditor = function (html,inserted_tags) {
+        var editor = tinyMCE.get('content'),
+            keywordsInput=jQuery('.addKeywords input');
+        keywordsInput.val(inserted_tags);
         if (editor) {
             editor.execCommand("mceInsertContent", true, html);
-        } else {  
+        } else {
             editor = jQuery('#content');
             if (editor.length == 0) {
                 if (tinyMCE.editors.length > 0) {
@@ -23,12 +25,18 @@ var ExpresscurateDialog = (function(jQuery){
 
                 var newValue = oldValue.substring(0, selectionStart) + html + oldValue.substring(selectionEnd);
                 editor.val(newValue);
+
             }
         }
+        setTimeout(SEOControl.insertKeywordInWidget(KeywordUtils.multipleKeywords(keywordsInput, undefined), jQuery('.addKeywords')),500);
     };
 
     var displayCuratedImages = function (images) {
         var img_count = false;
+        // hide image container
+        jQuery('.imgContainer').hide();
+        jQuery('.expresscurate_dialog .editor').css('width', '100%');
+        //
         jQuery.each(images, function (index, value) {
             var img = new Image();
             img.onload = function () {
@@ -37,6 +45,10 @@ var ExpresscurateDialog = (function(jQuery){
                 if (width > 150 && height > 100) {
                     //images_html += '<li id="tcurated_image_' + index + '" class="tcurated_image" style="background-image: url(' + value + ')" onclick="ExpresscurateDialog.insertDeleteImage(' + index + ')"></li>';
                     jQuery('<li id="tcurated_image_' + index + '" class="tcurated_image" style="background-image: url(' + value + ')" onclick="ExpresscurateDialog.insertDeleteImage(' + index + ')"></li>').appendTo("#curated_images");
+                    // show image container
+                    jQuery('.expresscurate_dialog .editor').width(614);
+                    jQuery('.imgContainer').show();
+                    //
                 }
             };
             img.src = value;
@@ -51,22 +63,22 @@ var ExpresscurateDialog = (function(jQuery){
                     counter.text('1/' + numberOfImages).removeClass('expresscurate_displayNone');
                 }
             } else {
-                error_html = '<div class="error">No image found for specified size</div>';
+                error_html = '<div class="error">No image (of 120x100 or higher res) found in the original article.</div>';
                 jQuery('#expresscurate_post_form').before(error_html);
             }
         }, 300);
     };
 
-    var displayCuratedParagraphs = function (paragraphs, count,shortPar) {
-
+    var displayCuratedParagraphs = function (paragraphs, count, shortPar) {
+        jQuery('.paragraphs_preview').width(paragraphs.length * paragraphWidth);
         var text_html = '';
         var sorted = [];
-        jQuery.each(paragraphs, function(index, value) {
+        jQuery.each(paragraphs, function (index, value) {
             if (value['value'].length > shortestParagraphLength) {
                 sorted[index] = value['value'];
             }
         });
-        jQuery.each(sorted, function(index, value) {
+        jQuery.each(sorted, function (index, value) {
             if (typeof value !== 'undefined' && value !== null) {
                 text_html += '<li id="tcurated_text_' + index + '" title="' + value + '" class="expresscurate_tag_' + paragraphs[index].tag + '" onclick="ExpresscurateDialog.insertText(\'tcurated_text_' + index + '\', \'p\')">' + value + '</li>';
                 if (index < count && !shortPar) {
@@ -77,28 +89,28 @@ var ExpresscurateDialog = (function(jQuery){
         });
         jQuery('#curated_paragraphs li').remove();
         jQuery(text_html).appendTo('#curated_paragraphs');
-        var liCount=jQuery('#curated_paragraphs li').length;
+        var liCount = jQuery('#curated_paragraphs li').length;
         jQuery('.paragraphs_preview').width(liCount * paragraphWidth);
-        jQuery('#curated_paragraphs').css('left','0');
+        jQuery('#curated_paragraphs').css('left', '0');
         buttonsStatus();
     };
 
-    var searchInParagraphs = function (search){
-        search=search.toLowerCase().replace(/[,'.";:?!]+/g, '').trim().split(' ');
-        search = jQuery.grep(search, function( a ) {
+    var searchInParagraphs = function (search) {
+        search = search.toLowerCase().replace(/[,'.";:?!]+/g, '').trim().split(' ');
+        search = jQuery.grep(search, function (a) {
             return a !== '';
         });
-        var myRegEx =new RegExp('(' + search.join('|') + ')', 'g');
+        var myRegEx = new RegExp('(' + search.join('|') + ')', 'g');
 
-        var searchResult = new Array();
+        var searchResult = [];
 
-        jQuery.each(curatedParagraphs,function (index,val) {
-            if(val.value.toLowerCase().match(myRegEx) && val.value.length>shortestParagraphLength){
+        jQuery.each(curatedParagraphs, function (index, val) {
+            if (val.value.toLowerCase().match(myRegEx) && val.value.length > shortestParagraphLength) {
                 searchResult.push(val);
             }
         });
         jQuery('#curated_paragraphs li').remove();
-        displayCuratedParagraphs(searchResult, searchResult.length,true);
+        displayCuratedParagraphs(searchResult, searchResult.length, true);
     };
 
     var buttonsStatus = function () {
@@ -119,9 +131,9 @@ var ExpresscurateDialog = (function(jQuery){
     var displayCuratedTags = function (keywords) {
         var keywords_html = '';
         jQuery.each(keywords, function (index, value) {
-            keywords_html += '<li  id="curated_post_tag_' + index + '"><span>' + value + '</span><a href="#" class="remove" onclick="ExpresscurateDialog.delCuratedTag(' + index + '); return false;">&times;</a></li>';
+            keywords_html += '<li  id="curated_post_tag_' + index + '"><span class="tag">' + value + '</span><a href="#" class="remove" onclick="ExpresscurateDialog.delCuratedTag(' + index + '); return false;"></a></li>';
         });
-        keywords_html+='<li class="expresscurate_preventTextSelection markButton" onclick="Keywords.markCuratedKeywords();return false;"><span>mark keywords</span></li>';
+        keywords_html += '<li class="markButton expresscurate_preventTextSelection" onclick="Keywords.markCuratedKeywords();return false;"><span>mark keywords</span></li>';
         jQuery("#curated_tags").html(keywords_html);
     };
 
@@ -168,15 +180,15 @@ var ExpresscurateDialog = (function(jQuery){
     var displayShortParagraphs = function () {
         var shortParagraphs_html = '<li class="expresscurate_preventTextSelection expresscurate_dialog_shortPar expresscurate_shortParInactiveColor">\
             <label>Short Paragraphs</label>\
-            <span class="shortPButton shortPButtonInactive">hide<span></span></span>\
+            <span class="shortPButton shortPButtonInactive"><span></span></span>\
         </li>';
         return shortParagraphs_html;
     };
 
     var displayCuratedParagraphsSearch = function () {
         var search_html = '<li class="expresscurate_preventTextSelection expresscurate_dialog_search">\
-            <input class="disableInputStyle expresscurate_displayNone"/>\
-            <span class="close expresscurate_displayNone">&#215</span>\
+            <input class="expresscurate_disableInputStyle expresscurate_displayNone"/>\
+            <span class="close expresscurate_displayNone"></span>\
             <span class="icon"></span>\
         </li>';
         return search_html;
@@ -251,19 +263,19 @@ var ExpresscurateDialog = (function(jQuery){
         jQuery('#expresscurate_source').focus();
     };
 
-    var closeSearch = function (){
+    var closeSearch = function () {
         var input = jQuery('.expresscurate_dialog_search input'),
             close = jQuery('.expresscurate_dialog_search .close'),
-            icon=jQuery('.expresscurate_dialog_search .icon');
+            icon = jQuery('.expresscurate_dialog_search .icon');
         input.addClass('expresscurate_displayNone');
         close.addClass('expresscurate_displayNone');
         icon.removeClass('expresscurate_displayNone');
         jQuery('.expresscurate_dialog_search').css('width', '35px');
         input.val('');
-        displayCuratedParagraphs(curatedParagraphs, curatedParagraphs.length,true);
+        displayCuratedParagraphs(curatedParagraphs, curatedParagraphs.length, true);
     };
 
-    var submitExpresscurateForm = function(){
+    var submitExpresscurateForm = function () {
         var blog_domain = document.domain;
         //remove error divs
         jQuery('#expresscurate_dialog div.error').remove();
@@ -274,7 +286,7 @@ var ExpresscurateDialog = (function(jQuery){
         jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_get_article&check=1', jQuery('#expresscurate_post_form input').serialize(), function (res) {
             var data = jQuery.parseJSON(res);
             if (data.status == 'notification') {
-                notif_html = '<div class="updated">' + data.msg + '</div>';
+                notif_html = '<div class="error">' + data.msg + '</div>';
                 jQuery('#expresscurate_post_form').before(notif_html);
             }
         });
@@ -292,14 +304,20 @@ var ExpresscurateDialog = (function(jQuery){
                         jQuery("#curated_title").val(data.result.title);
                     }
                     if (data.result.images.length > 0) {
-                        jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_check_images', {img_url: data.result.images[data.result.images.length - 1], img_url2: data.result.images[data.result.images.length - 2]}, function (res) {
+                        jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_check_images', {
+                            img_url: data.result.images[data.result.images.length - 1],
+                            img_url2: data.result.images[data.result.images.length - 2]
+                        }, function (res) {
                             var data_check = jQuery.parseJSON(res);
                             if (data_check.status === 'success' && data_check.statusCode === 200) {
                                 displayCuratedImages(data.result.images);
                                 jQuery("#expresscurate_loading").fadeOut('fast');
                             } else if (data_check.status === 'fail' && data_check.statusCode === 200) {
                                 jQuery('.content .img').css('background-image', jQuery("#expresscurate_loading img").attr('src'));
-                                jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_download_images', {images: data.result.images, post_id: jQuery('#post_ID').val()}, function (res) {
+                                jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_export_api_download_images', {
+                                    images: data.result.images,
+                                    post_id: jQuery('#post_ID').val()
+                                }, function (res) {
                                     var data_images = jQuery.parseJSON(res);
                                     if (data_images.status == 'error') {
                                         error_html = '<div class="error">' + data_images.error + '</div>';
@@ -330,8 +348,8 @@ var ExpresscurateDialog = (function(jQuery){
                     displaySpecials(data.result);
 
                     if (data.result.paragraphs.length > 0) {
-                        curatedParagraphs=data.result.paragraphs;
-                        displayCuratedParagraphs(data.result.paragraphs, jQuery("#expresscurate_autosummary").val(),false);
+                        curatedParagraphs = data.result.paragraphs;
+                        displayCuratedParagraphs(data.result.paragraphs, jQuery("#expresscurate_autosummary").val(), false);
                     }
                     jQuery('#expresscurate_source').focus();
                 }
@@ -344,7 +362,7 @@ var ExpresscurateDialog = (function(jQuery){
         });
     };
 
-    var setupDialog = function(){
+    var setupDialog = function () {
         buttonsStatus();
         jQuery('.nextSlide').click(function (e) {
             if (jQuery(this).hasClass('inactiveButton')) {
@@ -478,50 +496,30 @@ var ExpresscurateDialog = (function(jQuery){
             });
 
             jQuery('.alignL').click(function (e) {
-                jQuery(this).css('background-position', 'right bottom');
-                jQuery('.alignNone').css('background-position', 'center top');
-                jQuery('.alignR').css('background-position', 'left top');
+                jQuery(this).css('background-position', '-1px -32px');
+                jQuery('.alignNone').css('background-position', '-1px -122px');
+                jQuery('.alignR').css('background-position', '-1px -62px');
             });
             jQuery('.alignR').click(function (e) {
-                jQuery('.alignL').css('background-position', 'right top');
-                jQuery('.alignNone').css('background-position', 'center top');
-                jQuery(this).css('background-position', 'left bottom');
+                jQuery('.alignL').css('background-position', '-1px -2px');
+                jQuery('.alignNone').css('background-position', '-1px -122px');
+                jQuery(this).css('background-position', '-1px -92px');
             });
             jQuery('.alignNone').click(function (e) {
-                jQuery('.alignL').css('background-position', 'right top');
-                jQuery(this).css('background-position', 'center bottom');
-                jQuery('.alignR').css('background-position', 'left top');
+                jQuery('.alignL').css('background-position', '-1px -2px');
+                jQuery(this).css('background-position', '-1px -152px');
+                jQuery('.alignR').css('background-position', '-1px -62px');
             });
 
             jQuery("#expresscurate_open-modal").click(function (event) {
                 event.preventDefault();
-                var editor = tinyMCE.get('content');
-                if (!editor) {
-                    editor = jQuery('#content');
-                    if (editor.length == 0) {
-                        if (tinyMCE.editors.length > 0) {
-                            editor = tinyMCE.editors[0];
-                        }
-                    }
-                }
-
-                var body = tinyMCE.activeEditor.dom.select('body.mce-content-body');
-                jQuery(body).append('<span class="cursourHolder"> </span>');
-                var sp = tinyMCE.activeEditor.dom.select('span.cursourHolder');
-                tinyMCE.activeEditor.selection.select(sp[sp.length - 1]);
-
-                if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
-                    if (!tinyMCE.execCommand("mceAddControl", true, "expresscurate_content_editor")) {
-                        tinyMCE.execCommand("mceAddEditor", true, "expresscurate_content_editor");
-                    }
-                }
-                $dialog.dialog('open');
+                openDialog();
             });
             jQuery("#expresscurate_insert").click(function () {
-                var ed=tinyMCE.activeEditor;
-                var highlightedElems=jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-                if(highlightedElems.length>0){
-                    highlightedElems.each(function(index,val){
+                var ed = tinyMCE.activeEditor;
+                var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
+                if (highlightedElems.length > 0) {
+                    highlightedElems.each(function (index, val) {
                         jQuery(val).replaceWith(this.childNodes);
                     });
                 }
@@ -530,39 +528,45 @@ var ExpresscurateDialog = (function(jQuery){
                 var inserted_tags_textarea = "";
                 inserted_tags_textarea = jQuery("#tax-input-post_tag").val();
                 jQuery('#curated_tags li').each(function (i) {
-                    inserted_tags_textarea += "," + jQuery(this).find('span').text();
+                    inserted_tags_textarea += "," + jQuery(this).find('span.tag').text();
                 });
                 jQuery("#tax-input-post_tag").val(inserted_tags_textarea);
                 jQuery(".tagadd").trigger('click');
+                jQuery('.expresscurate_sources_coll_widget .addSource input').val(jQuery('#expresscurate_source').val());
+                SourceCollection.addNew();
                 var html = "";
                 var insite_html = '';
                 var bg = jQuery('.img').css('background-image');
 
                 bg = bg.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
                 if (bg.indexOf('images/noimage.png') === -1 && bg.length > 5) {
-
                     ///html += jQuery("#curated_content_selected_img li").html();
-                    html += '<img class="' + alignImg + ' ' + imgSize + '" src="' + bg + '" data-img-curated-from="' + jQuery("#expresscurate_source").val() + '">';
+                    html += '<img class="' + alignImg + ' ' + imgSize + '" src="' + bg + '" data-img-curated-from="' + jQuery("#expresscurate_source").val() + '">'
                 }
                 if (tinyMCE.get('expresscurate_content_editor').getContent().length > 0) {
-                    html += "<blockquote>" + tinyMCE.get('expresscurate_content_editor').getContent() + "</blockquote><br />";
+                    html += '<blockquote cite = "' + jQuery("#expresscurate_source").val() + '">' + tinyMCE.get('expresscurate_content_editor').getContent() + '<br />';
                 }
                 html += insite_html;
                 if (html.length > 0) {
                     if (jQuery("#expresscurate_source").val().length > 0) {
-                        //var matches = jQuery("#expresscurate_source").val().match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
-                        //var domain = matches && matches[1];
+                      //  var matches = jQuery("#expresscurate_source").val().match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+                      //  var domain = matches && matches[1];
                         var domain = jQuery("#expresscurate_source").val();
-                            domain =  domain.match(/^(http|https)/) ? domain : 'http://'+domain;
+                        if(domain.indexOf('http://') == -1 && domain.indexOf('https://') == -1){
+                            domain = 'http://'+domain;
+                        }
+                        var title = jQuery("#curated_title").val();
+                        domain =  domain.match(/^(http|https)/) ? domain : 'http://'+domain;
                         if (domain) {
-                            html += '<div class="expresscurate_source"><p>' + jQuery("#expresscurate_from").val() + ' <a class="expresscurated" data-curated-url="' + jQuery("#expresscurate_source").val() + '"  href = "' + jQuery("#expresscurate_source").val() + '">' + domain + '</a></p></div><br/>';
+                            html += '<cite><p class="expresscurate_source">' + jQuery("#expresscurate_from").val() + ' <cite><a class="expresscurated" rel="nofollow" data-curated-url="' + domain + '"  href = "' + domain + '">' + title + '</a></p></cite><br/>';
                         }
                     }
+                    html += '</blockquote><br />';
                     if (jQuery("#titlewrap #title").val().length == 0) {
                         jQuery("#titlewrap #title").trigger('focus');
                         jQuery("#titlewrap #title").val(jQuery("#curated_title").val());
                     }
-                    sendWPEditor(html);
+                    sendWPEditor(html,inserted_tags_textarea);
                     $dialog.dialog('close');
                 } else {
                     return false;
@@ -574,9 +578,9 @@ var ExpresscurateDialog = (function(jQuery){
         jQuery('#expresscurate_submit').click(function () {
             jQuery("#expresscurate_loading").show();
             submitExpresscurateForm();
-            //jQuery(document).ajaxComplete(function () {
-            //
-            //});
+            jQuery(document).ajaxComplete(function () {
+
+            });
         });
         jQuery('#expresscurate_source').keypress(function (e) {
             if (e.keyCode == 13 || e.keyCode == 40) {
@@ -588,7 +592,7 @@ var ExpresscurateDialog = (function(jQuery){
         jQuery('html').on('click', '.expresscurate_dialog_search .icon', function () {
             var input = jQuery('.expresscurate_dialog_search input'),
                 close = jQuery('.expresscurate_dialog_search .close'),
-                icon=jQuery('.expresscurate_dialog_search .icon');
+                icon = jQuery('.expresscurate_dialog_search .icon');
             if (input.hasClass('expresscurate_displayNone')) {
                 input.removeClass('expresscurate_displayNone');
                 close.removeClass('expresscurate_displayNone');
@@ -600,7 +604,7 @@ var ExpresscurateDialog = (function(jQuery){
             }
         });
         jQuery('html').on('keyup', '.expresscurate_dialog_search input', function (e) {
-            if(e.keyCode==13){
+            if (e.keyCode == 13) {
                 searchInParagraphs(jQuery(this).val());
             }
         });
@@ -613,33 +617,87 @@ var ExpresscurateDialog = (function(jQuery){
             var elem = jQuery(this);
             if (shortestParagraphLength == 150) {
                 shortestParagraphLength = 0;
-                elem.addClass('shortPButtonActive').removeClass('shortPButtonInactive').html('show<span></span>');
+                elem.addClass('shortPButtonActive').removeClass('shortPButtonInactive');
             } else {
-                elem.addClass('shortPButtonInactive').removeClass('shortPButtonActive').html('hide<span></span>');
+                elem.addClass('shortPButtonInactive').removeClass('shortPButtonActive');
                 shortestParagraphLength = 150;
             }
-            var searchInput=jQuery('.expresscurate_dialog_search input');
-            if(!searchInput.hasClass('expresscurate_displayNone')){
+            var searchInput = jQuery('.expresscurate_dialog_search input');
+            if (!searchInput.hasClass('expresscurate_displayNone')) {
                 searchInParagraphs(searchInput.val());
-            }else{
-                displayCuratedParagraphs(curatedParagraphs, curatedParagraphs.length,true);
+            } else {
+                displayCuratedParagraphs(curatedParagraphs, curatedParagraphs.length, true);
             }
         });
+    };
+
+    var openDialog = function (source) {
+        var $dialog = jQuery("#expresscurate_dialog");
+        $dialog.dialog({
+            'dialogClass': 'wp-dialog',
+            'modal': true,
+            'autoOpen': false,
+            'closeOnEscape': true,
+            'width': '829px',
+            'height': 'auto',
+            'resizable': false,
+            'open': function () {
+                if (source) {
+                    jQuery('#expresscurate_source').val(source);
+                    jQuery('#expresscurate_submit').trigger("click");
+                }
+            },
+            'close': clearExpresscurateForm
+        });
+        $dialog.dialog('open');
     };
 
     var isSetup = false;
 
     return {
-        setup: function(){
-                if(!isSetup){
-                    jQuery(document).ready(function(){
-                        setupDialog();
-                        isSetup = true;
-                    });
-                }
-        },
+        setup: function () {
+            if (!isSetup) {
+                jQuery(document).ready(function () {
+                    setupDialog();
+                    isSetup = true;
+                    setTimeout(function () {
+                        if (window.expresscurate_load_url) {
+                            openDialog(window.expresscurate_load_url);
+                        }
+                    }, 0);
+                });
+                jQuery('html').on('keyup', '#expresscurate_source', function () {
+                    var input = jQuery(this),
+                        li_html = '',
+                        list = jQuery('.expresscurate_dialog .autoComplete');
+                    if (input.val().length > 1) {
+                        jQuery.post('admin-ajax.php?action=expresscurate_search_feed_bookmark&searchKeyword=' + input.val(), function (res) {
+                            var data = jQuery.parseJSON(res);
+                            jQuery.each(data.slice(0,5), function (key, value) {
+                                li_html += '<li data-link="' + value.link + '">' + value.title + '</li>';
+                            });
+                            if (li_html.length > 0) {
+                                input.after('<ul class="autoComplete">' + li_html + '</ul>');
+                            } else {
+                                list.remove();
+                            }
+                        });
 
-        insertText: insertText
+                    } else {
+                        list.remove();
+                    }
+                });
+                jQuery('html').on('click', '.expresscurate_dialog .autoComplete li', function () {
+                    var li = jQuery(this);
+                    jQuery('#expresscurate_source').val(li.data('link'));
+                    jQuery('#curated_title').val(li.text());
+                    jQuery('.expresscurate_dialog .autoComplete').remove();
+                });
+            };
+        },
+        insertText: insertText,
+        openDialog: openDialog,
+        delCuratedTag:delCuratedTag
     }
 })(window.jQuery);
 

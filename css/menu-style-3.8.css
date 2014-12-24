@@ -1,23 +1,27 @@
 #adminmenu #toplevel_page_expresscurate div.wp-menu-image:before {
   content: "";
 }
+.wp-not-current-submenu#toplevel_page_expresscurate div.wp-menu-image,
+.wp-not-current-submenu#toplevel_page_expresscurate:hover div.wp-menu-image,
+.wp-menu-open#toplevel_page_expresscurate div.wp-menu-image{
+    background-image: url("../images/wp_quotes.svg")!important;
+    background-size: 11px auto;
+    background-repeat: no-repeat;
+}
 .wp-not-current-submenu#toplevel_page_expresscurate div.wp-menu-image{
   content: "";
-  background: url("../images/expresscurate_sprite.png") no-repeat scroll center rgba(0, 0, 0, 0) !important;
-  background-position: 12px -219px !important;
+  background-position: 12px 10px !important;
   margin-top: 2px;
 }
 
 .wp-not-current-submenu#toplevel_page_expresscurate:hover div.wp-menu-image {
-  background: url("../images/expresscurate_sprite.png") no-repeat scroll center rgba(0, 0, 0, 0) !important;
-  background-position: 12px -178px !important;
+  background-position: 12px -23px !important;
   margin-top: 2px;
 }
 
 .wp-menu-open#toplevel_page_expresscurate div.wp-menu-image{
   content: "";
-  background: url("../images/expresscurate_sprite.png") no-repeat scroll center rgba(0, 0, 0, 0) !important;
-  background-position: 12px -137px !important;
+    background-position: 12px -56px !important;
   margin-top: 2px;
 }
 

@@ -20,32 +20,37 @@ blockquote > *:first-child {
 }
 
 blockquote:before {
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     width: 12px;
     height: 23px;
     position: absolute;
     display: inline-block;
-    background-size: 14px auto;
-    background-repeat: no-repeat;
-    background-position: 0 -429px;
-    background-image: url('../images/expresscurate_sprite.png');
+    background-position: 0 0;
     content: "";
     clear: both;
+    transform:rotate(180deg);
+    -ms-transform:rotate(180deg);
+    -moz-transform:rotate(180deg);
+    -webkit-transform:rotate(180deg);
+    -o-transform:rotate(180deg);
 }
 
+blockquote:after ,
+blockquote:before{
+    background-size: 97px auto;
+    background-repeat: no-repeat;
+    background-image: url('../images/feed_icons.svg');
+}
 blockquote:after {
-    right: 0px;
+    right: 0;
     bottom: -13px;
     width: 12px;
     height: 27px;
     text-align: right;
     position: absolute;
     display: inline-block;
-    background-size: 14px auto;
-    background-repeat: no-repeat;
-    background-position: 0 -233px;
-    background-image: url('../images/expresscurate_sprite.png');
+    background-position: 0 0;
     content: "";
     clear: both;
 }

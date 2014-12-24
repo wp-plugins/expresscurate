@@ -15,8 +15,12 @@ class ExpressCurate_Keywords {
     $post_arr = array();
     $post_titles = '';
     if ($args === false && $new_post === false) {
-      $args = array('status' => 'published', 'numberposts' => 1000000);
-
+      $posts = array();
+        $publishedPostCount = wp_count_posts()->publish;
+        for ($i = 0; $i < ceil($publishedPostCount / 200); $i++) {
+            $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
+            $posts = array_merge($posts, get_posts($args)) ;
+        }
     }
     if (isset($args['id'])) {
       $post = get_post($args['id']);
@@ -35,6 +39,7 @@ class ExpressCurate_Keywords {
         $post_titles = $new_post['title'];
       }
     }
+
     $post_text = strip_tags($post_text);
     $post_text = preg_replace('/\b(' . implode('|', $stop_words) . ')\b/iu', '', $post_text);
     $post_text = preg_replace('/\b[^\s]{1,2}\b/i', '', $post_text);
@@ -53,11 +58,12 @@ class ExpressCurate_Keywords {
     arsort($post_words);
 
     $total = array_sum($post_words);
-    $result = array('titles' => $post_titles, 'content' => $post_text, 'posts' => $post_arr, 'words' => $post_words, 'total' => $total);
+    $result = array('titles' => $post_titles, 'content' => $post_text, 'posts' => $post_arr, 'words' => $post_words, 'total' => $total, 'stopwords' => $stop_words);
     return $result;
   }
 
   public function add_keyword($keyword, $get_stats = false) {
+
     $defined_tags_arr = array();
     if ($_REQUEST) {
       $keywords = explode(",", $_REQUEST['keywords']);
@@ -68,13 +74,13 @@ class ExpressCurate_Keywords {
       $defined_tags_arr = $this->array_map('trim', explode(",", $defined_tags));
       unset($defined_tags_arr['']);
     }
-
     if (count($keywords) > 0) {
+
       foreach ($keywords as $key => $keyword) {
         $keyword = str_replace('"', '', stripslashes(trim($keyword)));
         $keyword = str_replace("\\\"", '', $keyword);
         $keyword = str_replace("\\'", '', $keyword);
-        $keyword = str_replace("\\\\", '', $keyword);
+        $keyword = str_replace("\\\\", '', $keyword);        
         if (strlen($keyword) > 2) {
           if (preg_grep("/\b" . $keyword . "\b\w+/i", $defined_tags_arr)) {
             $result = array('status' => "warning", 'msg' => __($keyword . ' is already defined'));
@@ -92,7 +98,6 @@ class ExpressCurate_Keywords {
           unset($keywords[$key]);
         }
       }
-
       if ($get_stats == true) {
         $stats = $this->getKeywordStats();
         $result = array('status' => "success", 'stats' => $stats);
@@ -100,9 +105,8 @@ class ExpressCurate_Keywords {
         $result = array('status' => "success");
       }
     } else {
-      $result = array('status' => "warning", 'msg' => __('Something went wrong'));
+      $result = array('status' => "warning", 'msg' => __('Calculation Error. Please try refreshing this web page.  If the problem persists, contact us'));
     }
-
     echo json_encode($result);
     die();
   }
@@ -145,86 +149,79 @@ class ExpressCurate_Keywords {
       update_option('expresscurate_defined_tags', $filtered_tags);
       $result = array('status' => "success");
     } else {
-      $result = array('status' => "error", 'msg' => "Something went wrong");
+      $result = array('status' => "error", 'msg' => "Calculation Error. Please try refreshing this web page.  If the problem persists, contact us");
     }
     echo json_encode($result);
     die();
   }
 
-  public function get_stats($keywords = array(), $args = false, $post_content = false, $get_posts_count = false) {
-
-      if (!$post_content) {
-        $post_content = $this->get_words($args);
-      }
-
-      if (!$keywords) {
-        $keywords = get_option('expresscurate_defined_tags', '');
-        if ($keywords) {
-          $keywords = explode(', ', $keywords);
-        } else {
-          $keywords = array();
+    public function get_stats($keywords = array(), $args = false, $post_content = false, $get_posts_count = false) {
+        if (!$post_content) {
+            $post_content = $this->get_words($args);
         }
-      }
-
-    $keyword_in = array();
-    if (count($keywords) > 0) {
-      foreach ($keywords as $keyword) {
-        $keyword = str_replace('"', '', stripslashes(trim($keyword)));
-        $keyword = str_replace("\\\"", '', $keyword);
-        $keyword = str_replace("\\'", '', $keyword);
-        $keyword = str_replace("\\\\", '', $keyword);
-        $keyword_in[$keyword]['added_count'] = 0;
-        preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
-        //str_ireplace(" ".$keyword." ", '', $post_content['content'], $keyword_in[$keyword]['count']);
-        $keyword_in[$keyword]['title'] = 0;
-        // $keyword_in[$keyword]['count'] = ((isset($post_content['words'][$keyword]) || isset($post_content['words']["#".$keyword])) ? $post_content['words'][$keyword] : 0);
-        if ($post_content['total'] !== 0) {
-          $keyword_in[$keyword]['percent'] = round(( $keyword_in[$keyword]['count'] / $post_content['total']) * 100, 2);
-          $keyword_in[$keyword]['posts_count'] = 0;
-          if ($get_posts_count) {
-            foreach ($post_content['posts'] as $post) {
-              preg_match_all('/\b' . $keyword . '\b/iu', $post, $matches, PREG_OFFSET_CAPTURE);
-              if (isset($matches[0][0][0])) {
-                $keyword_in[$keyword]['added_count'] = 1;
-                $keyword_in[$keyword]['posts_count']++;
-              }
+        if (!$keywords) {
+            $keywords = get_option('expresscurate_defined_tags', '');
+            if ($keywords) {
+                $keywords = explode(', ', $keywords);
+            } else {
+                $keywords = array();
             }
-          }
-        } else {
-          $keyword_in[$keyword]['posts_count'] = 0;
         }
-
-        $count = 0;
+        $keyword_in = array();
+        if (count($keywords) > 0) {
+            foreach ($keywords as $keyword) {
+                $keyword = str_replace('"', '', stripslashes(trim($keyword)));
+                $keyword = str_replace("\\\"", '', $keyword);
+                $keyword = str_replace("\\'", '', $keyword);
+                $keyword = str_replace("\\\\", '', $keyword);
+                $keyword_in[$keyword]['added_count'] = 0;
+                preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
+                //str_ireplace(" ".$keyword." ", '', $post_content['content'], $keyword_in[$keyword]['count']);
+                $keyword_in[$keyword]['title'] = 0;
+                // $keyword_in[$keyword]['count'] = ((isset($post_content['words'][$keyword]) || isset($post_content['words']["#".$keyword])) ? $post_content['words'][$keyword] : 0);
+                if ($post_content['total'] !== 0) {
+                    $keyword_in[$keyword]['percent'] = round(( $keyword_in[$keyword]['count'] / $post_content['total']) * 100, 2);
+                    $keyword_in[$keyword]['posts_count'] = 0;
+                    if ($get_posts_count) {
+                        foreach ($post_content['posts'] as $post) {
+                            preg_match_all('/\b' . $keyword . '\b/iu', $post, $matches, PREG_OFFSET_CAPTURE);
+                            if (isset($matches[0][0][0])) {
+                                $keyword_in[$keyword]['added_count'] = 1;
+                                $keyword_in[$keyword]['posts_count']++;
+                            }
+                        }
+                    }
+                } else {
+                    $keyword_in[$keyword]['posts_count'] = 0;
+                }
+                $count = 0;
 //        $post_titles = strlen($post_content['titles']);
-        preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['titles'], -1, $count);
-          $keyword_in[$keyword]['title_matches']  = $count;
-        if ($count > 0) {
-         // $keyword_in[$keyword]['title'] = round(( $count / $post_titles ) * 100, 2);
-            $post_title_words_array = explode(' ',$post_content['titles']);
-            $post_title_word_count = count($post_title_words_array);
-            $keyword_in[$keyword]['title'] = round(( $count / $post_title_word_count ) * 100, 2);
-          if ($keyword_in[$keyword]['added_count'] == 0) {
-            $keyword_in[$keyword]['posts_count']++;
-          }
+                preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['titles'], -1, $count);
+                $keyword_in[$keyword]['title_matches']  = $count;
+                if ($count > 0) {
+                    // $keyword_in[$keyword]['title'] = round(( $count / $post_titles ) * 100, 2);
+                    $post_title_words_array = explode(' ',$post_content['titles']);
+                    $post_title_word_count = count($post_title_words_array);
+                    $keyword_in[$keyword]['title'] = round(( $count / $post_title_word_count ) * 100, 2);
+                    if ($keyword_in[$keyword]['added_count'] == 0) {
+                        $keyword_in[$keyword]['posts_count']++;
+                    }
+                }
+            }
+            $keyword_in['total_title_words_count']  = count(explode(' ',$post_content['titles']));
+            $keyword_in['total_words']=$post_content['total'];
+            $keys = array();
+            foreach ($keyword_in as $key => $value) {
+                if (array_key_exists($key, $keys)) {
+                    $keys[$key] += $value;
+                } else {
+                    $keys[$key] = $value;
+                }
+            }
+            asort($keys, SORT_DESC);
         }
-      }
-
-      $keyword_in['total_title_words_count']  = count(explode(' ',$post_content['titles']));
-      $keyword_in['total_words']=$post_content['total'];
-      $keys = array();
-      foreach ($keyword_in as $key => $value) {
-        if (array_key_exists($key, $keys)) {
-          $keys[$key] += $value;
-        } else {
-          $keys[$key] = $value;
-        }
-      }
-
-      asort($keys, SORT_DESC);
+        return $keyword_in;
     }
-
-      return $keyword_in;
-  }
 
     public function getKeywordStats($getTopWords = false){
         $publishedPostCount = wp_count_posts()->publish;
@@ -263,7 +260,7 @@ class ExpressCurate_Keywords {
                 }
             }
 
-           // var_dump($definedKeywordsArray,$words);die;
+            // var_dump($definedKeywordsArray,$words);die;
         }
         for ($i = 0; $i < ceil($publishedPostCount / 200); $i++) {
             $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
@@ -310,7 +307,7 @@ class ExpressCurate_Keywords {
         return $resultArray;
     }
 
-  private function array_map($func, $array) {
+  public function array_map($func, $array) {
     $new_array = array();
     foreach ($array as $key => $value) {
       $new_array[$key] = call_user_func($func, $value);
@@ -318,12 +315,52 @@ class ExpressCurate_Keywords {
     return $new_array;
   }
 
-  private function array_map_keys($func, $array) {
+  public function array_map_keys($func, $array) {
     $new_array = array();
     foreach ($array as $key => $value) {
       $new_array[call_user_func($func, $key)] = $value;
     }
     return $new_array;
+  }
+
+  public function suggestKeywordsFromGoogle(){
+
+      $term   = urlencode( $_GET['term'] );
+      $mixed   = urlencode( $_GET['mixed'] );
+
+      $result = wp_remote_get( 'https://www.google.com/complete/search?output=toolbar&q=' . $term );
+
+      $return_arr = array();
+
+      if ( ! is_wp_error( $result ) ) {
+          preg_match_all( '`suggestion data="([^"]+)"/>`u', $result['body'], $matches );
+
+          if ( isset( $matches[1] ) && ( is_array( $matches[1] ) && $matches[1] !== array() ) ) {
+              foreach ( $matches[1] as $match ) {
+                  $return_arr[] = html_entity_decode( $match, ENT_COMPAT, 'UTF-8' );
+              }
+          }
+      }
+
+      $defined_tags_arr = array();
+      if(!empty($mixed)){
+          $defined_tags = get_option("expresscurate_defined_tags", '');
+          if ($defined_tags) {
+              $defined_tags_arr = $this->array_map('trim', explode(",", $defined_tags));
+              foreach ($defined_tags_arr as $keyword) {
+                  if (strpos($keyword, $term) === false){
+                      if(($key = array_search($keyword, $defined_tags_arr)) !== false) {
+                          unset($defined_tags_arr[$key]);
+                      }
+                  }
+              }
+              unset($defined_tags_arr['']);
+          }
+      }
+      $return_arr = array_merge($defined_tags_arr, $return_arr);
+      echo json_encode( $return_arr );
+      die();
+
   }
 
 }

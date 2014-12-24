@@ -19,15 +19,15 @@ if ($_POST) {
 }
 ?>
 
-<div class="expresscurate_support wrap">
-    <div class="expresscurate_menu">
-        <?php
-        include(sprintf("%s/menu.php", dirname(__FILE__)));?>
+<div class="expresscurate_support expresscurate_Styles wrap">
+    <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
+        <h2>Support</h2>
+        <!--<label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sagittis nulla lectus,</label>-->
     </div>
   <h2 class="expresscurate_displayNone"> Support</h2>
   <div class="">
     <div class="block">
-      <label class="margin10">Join the public curating revolution and leave a feedback by email or twitter</label>
+      <label class="publicRevolution">Join the public curating revolution and leave a feedback by email or twitter</label>
 
       <div>
         <a href="mailto:support@expresscurate.com" class="feedbackButton redBackground">email</a>
@@ -35,16 +35,16 @@ if ($_POST) {
         <a href="https://twitter.com/CurateSupport" target="_blank" class="feedbackButton blueBackground">twitter</a>
       </div>
       <label class="margin10">Like ExpressCurate tools & want to support us?</label>
-      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7T6FC4B97CEH" target="_blank"
+      <a href="https://www.bit.ly/expresscuratedonate" target="_blank"
          class="donate">donate</a>
     </div>
     <div class="block">
       <?php if (!$sent) { ?>
-        <label for="email">Leave your feedback</label>
+        <label for="expresscurate_support_email">Leave your feedback</label>
         <?php
       } else {
         ?>
-        <label for="email">Thanks for your feedback</label>
+        <label for="expresscurate_support_email">Thanks for your feedback</label>
         <?php
       }
       ?>
@@ -54,7 +54,7 @@ if ($_POST) {
                  value="<?php echo $user_email ?>"/>
           <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
                     placeholder="<?php echo $msg_placeholder?>"></textarea>
-          <a class="feedbackButton send greenBackground" href="#" onclick="Support.expresscurateSupportSubmit();">Send</a>
+          <a class="feedbackButton send greenBackground" href="#" onclick="Utils.expresscurateSupportSubmit();">Send</a>
         </form>
     </div>
   </div>

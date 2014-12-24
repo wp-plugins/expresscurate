@@ -1,81 +1,53 @@
 <?php
-$curated_posts_query = new WP_Query("meta_key=is_expresscurate&meta_value=1&posts_per_page=-1&order=DESC");
-$curated_links = array();
-$curated_posts = array();
+$feedManager = new ExpressCurate_FeedManager();
+$curated_links_rss = $feedManager->get_curated_links();
 ?>
-<div class="wrap">
-    <div class="expresscurate_menu">
-        <?php
-        include(sprintf("%s/menu.php", dirname(__FILE__)));?>
-    </div>
-  <h2 class="expresscurate_displayNone">Top curated websites</h2>
-  <div class="expresscurate_marginTop30">
+<div class="expresscurate_topSources expresscurate_Styles wrap">
+  <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
+    <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
+    <h2>Top Sources</h2>
+      <label class="pageDesc">Top sources where you have curated from.</label>
+  </div>
+  <div class="expresscurate_content_wrapper">
     <?php
-    if ($curated_posts_query->have_posts()) {
-      while ($curated_posts_query->have_posts()) {
-        $curated_posts_query->the_post();
-        $meta_values = get_post_meta(get_the_ID());
-        if ($meta_values['expresscurate_link_0'][0]) {
-          $domain = parse_url($meta_values['expresscurate_link_0'][0]);
-
-          if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain['host'], $regs)) {
-            $curated_links[] = $regs['domain'];
-            $curated_posts[$regs['domain']][] = '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
-          } else {
-            $curated_links[] = $domain['host'];
-            $curated_posts[$domain['host']][] = '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
-          }
-        }
-        //echo '<a href="' . get_permalink() . '">' . get_the_title() . '</a><br />';
-      }
-    }
-    wp_reset_postdata();
-    $top_links = array_count_values($curated_links);
-    arsort($top_links);
-    $res = array_reverse($top_links);
-    if (count($top_links)) {
+    if (count($curated_links_rss['links'])) {
       ?>
-      <ul>
-        <?php foreach ($top_links as $key => $top_link) { ?>
-			<li>
-				<h3 class="expresscurate_topCuratedHeader"><?php echo $key ?> (<?php echo $top_link ?>)<div></div></h3>
-				<ul class="expresscurate_topCuratedLink">
-					<?php foreach ($curated_posts[$key] as $i => $curated_post) { ?>
-					 <li><?php echo $curated_post ?></li>
-					<?php 
-						if ($i == 4) {
-							break;
-						}						
-					}?>
-				</ul>
-			</li>
-		<?php }?>
-      </ul>  
-      <?php
-    }else{?>
-    <span class="expresscurate_notDefined">
+      <ul class="expresscurate_columnsName">
+        <li class="mainTitle">Sources</li>
+        <li class="title expresscurate_floatRight">rss subscription status</li>
+        <li class="title expresscurate_floatRight expresscurate_marginRight30"># of curated posts</li>
+      </ul>
+      <ul class="expresscurate_URL">
+        <?php
+        foreach ($curated_links_rss['links'] as $key => $top_link) {
+          $tooltip_msg = 'Subscribe';
+          if ($top_link['feed_options']['feed_status'] == "rssStatusYes") {
+            $tooltip_msg = 'Subscribed';
+          } elseif ($top_link['feed_options']['feed_status'] == "rssStatusNo") {
+              $tooltip_msg = ' N/A';
+          }
+          ?>
+          <li>
+            <h3 class="expresscurate_topCuratedURL expresscurate_floatLeft"><?php echo $key ?></h3>
+            <span class="rssStatus expresscurate_floatRight <?php echo $top_link['feed_options']['feed_status'] ?> expresscurate_floatRight">rss
+                <?php if($tooltip_msg){ ?>
+                <span class="tooltip"><?php echo $tooltip_msg;?></span>
+              <?php } ?>
+            </span>
+            <span class="postsCount expresscurate_floatRight"><?php echo count($top_link['post_ids']) ?></span>
+            <input type="hidden" name="expresscurate_feed_url" value="<?php echo $top_link['feed_options']['feed_url'] ?>" />
+            <!--classes for rss status: rssStatusYes | rssStatusNo | rssStatusAdd -->
+              <div class="expresscurate_clear"></div>
+          </li>
+        <?php } ?>
+      </ul>
+    <?php } else {
+      ?>
+      <span class="expresscurate_notDefined">
         No Curated Post. <a href="<?php echo admin_url(); ?>post-new.php">Curate New Post Now</a>.
-    </span>
-   <?php }
+      </span>
+    <?php }
     ?>
   </div>
+  <!---->
 </div>
-<script>
-	jQuery(document).ready(function(){
-		jQuery('.expresscurate_topCuratedHeader').on('click', function () {
-			var header=jQuery(this);
-			var ul=header.parent().find('ul');
-			var div=header.find('div');
-			
-			if(ul.css('display')==='none'){
-				ul.slideDown(300);
-				header.css('color','#25bfa1');
-				div.addClass('expresscurate_rotatedArrow');
-			}else{
-					ul.slideUp(300);
-					header.css('color','#5c5c5c');
-					div.removeClass('expresscurate_rotatedArrow');
-				}
-		 });
-	});
-</script>
