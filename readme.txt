@@ -34,7 +34,6 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 **RSS feeds and Google Alerts**
 
-
 * **RSS & Google Alerts Importer** - bring content from your RSS feeds and Google Alerts directly into ExpressCurate, providing you a convenient starting point.
 * **Content Notification Emails** - receive emails with newly discovered content.
 * **Top Curation Sources** - keep track of your top curation sources. 
@@ -42,7 +41,6 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 
 **Curation Post Composer and Editor**
-
 
 * **Quickstart button** - start a curated post with a single click of a button.
 * **Prefilled content** - ExpressCurate prefills the original content, images, and some web page attributes to provide you with an easy starting point.
@@ -54,7 +52,6 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 **SEO Optimization**
 
-
 * **SEO Essentials** - add all key SEO elements into your post from a single page. These components include adding a meta title and description, categories, keywords, customizing URLs, and more.
 * **Post Analysis** - analyze your post for duplicate content, optimal length, optimal keyword utilization, usage of graphics, and other elements necessary for creating a high-quality post.
 * **Sitemap Rules** - Create sitemap update rules based on your business and content model by defining sitemap update frequency, new page/post priorities, and other attributes.
@@ -63,20 +60,17 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 **Keyword Analysis and Management**
 
-
 * **Keyword Center** -  A centralized area where you can monitor keyword utilization in your blog, manage target keywords, and discover/add new ones based on the most frequently used words in your blog.
 
 
 
 **Flexible Publishing Options**
 
-
 * **Publishing Options** - ExpressCurate provides you with flexibility to publish your curated post immediately, schedule it for a later time, or smart-publish automatically based on time intervals specified by you.
 
 
 
 **Curation On-The-Go**
-
 
 * **Chrome Web Browser** - use the [ExpressCurate Chrome Extension](https://chrome.google.com/webstore/detail/expresscurate/nldipdepdfjilejlpeeknodkpiajhfkf?hl=en "Your favorite Chrome Extension") to discover content, bookmark articles for future curation, as well as curate and create posts on the go without having to go to WordPress to create a post draft.
 * **Android App** - use [ExpressCurate Android app](https://play.google.com/store/apps/details?id=com.expresscurate "Your favorite Android app") on your smartphone or tablet to discover content and create curated posts more quickly. 
