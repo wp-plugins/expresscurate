@@ -107,6 +107,15 @@ class ExpressCurate_Sitemap
         echo json_encode(array('status'=>'success'));die;
     }
 
+    public function saveSitemapGoogleStatus(){
+        $data = $_REQUEST;
+        $status = $data['status'];
+        if($status == 'off'){
+            update_option('expresscurate_google_refresh_token','');
+        }
+        update_option('expresscurate_sitemap_submit',$status);
+    }
+
     private function addToRobots(){
         $path = get_home_path();
         $file = fopen($path.'robots.txt','w');
@@ -123,14 +132,12 @@ class ExpressCurate_Sitemap
 
         if (get_option('expresscurate_sitemap_submit_webmasters') == 'on') {
 
-            $responseToken = $googleAuth->getGoogleToken();
-            if ($responseToken) {
+            $accessToken = $googleAuth->getAccessToken();
+            if ($accessToken) {
                 $oauth = new ExpressCurate_GoogleAuth();
-                $oauth->accessToken = $responseToken;
+                $oauth->accessToken = $accessToken;
                 $response = $oauth->submit_sitemap(get_site_url(), get_site_url() . '/sitemap.xml');
-                update_option('expresscurate_google_auth_key',$responseToken);
-                wp_redirect( '/admin.php?page=expresscurate_settings', 301 );
-               // return $response;
+                 return $response;
             } else {
                 // @TODO notify user to get key
             }

@@ -43,16 +43,27 @@ var Settings = (function(jQuery){
             connectSelectOptions();
         });
         /*sitemap*/
-        jQuery('#expresscurate_sitemap_submit_webmasters').on('change',function(){
+        jQuery('#expresscurate_sitemap_submit').on('change',function(){
             showHideOptions(jQuery('.sitemapUpdateFrequency'),jQuery(this));
+            var status='';
+            if(jQuery(this).is(':checked')){
+                status = 'on';
+                jQuery('.expresscurate .getApiKey').removeClass('expresscurate_displayNone');
+            }else{
+                status = 'off';
+                jQuery('.expresscurate .getApiKey').addClass('expresscurate_displayNone');
+                jQuery('.expresscurate .submitSitemapWrap .generate').addClass('expresscurate_displayNone');
+            }
+            jQuery.post('admin-ajax.php?action=expresscurate_save_sitemap_google_status&status='+ status, function (res) {});
+
         });
         jQuery('.expresscurate #generateSiteMap').on('click',function(){
             jQuery.post('admin-ajax.php?action=expresscurate_sitemap_generate', function (res) {
                 var data = jQuery.parseJSON(res);
                 if (data.status === 'success') {
-                    jQuery('.expresscurate #submitSiteMap').removeClass('expresscurate_displayNone');
+                    jQuery('.expresscurate #submitSiteMap').removeClass('expresscurate_displayNone').addClass('generated');
                 }else{
-                    jQuery('.expresscurate #submitSiteMap').addClass('expresscurate_displayNone');
+                    jQuery('.expresscurate #submitSiteMap').addClass('expresscurate_displayNone').removeClass('generated');
                 }
             });
         });

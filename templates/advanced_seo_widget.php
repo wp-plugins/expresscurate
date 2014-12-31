@@ -6,7 +6,7 @@ global $post;
 
 <ul class="tabs">
     <li class="tab-link expresscurate_preventTextSelection green current" data-tab="tab-1">Advanced SEO</li>
-    <!--<li class="tab-link expresscurate_preventTextSelection red" data-tab="tab-2">Sitemap</li>-->
+ <!--   <li class="tab-link expresscurate_preventTextSelection red" data-tab="tab-2">Sitemap</li>-->
 </ul>
 
 <div id="tab-1" class="tab-content current">
@@ -58,7 +58,7 @@ global $post;
         <ul class="expresscurate_sitemap_widget">
             <li>
                 <div class="info">
-                    <span class="label">Configure Sitemap Manually:</span>
+                    <span class="label">Configure Sitemap Manually</span>
                 </div>
                 <div class="value">
                     <input class="expresscurate_displayNone" type="checkbox"
@@ -72,7 +72,7 @@ global $post;
                 <ul>
                     <li>
                         <div class="info">
-                            <span class="label">Exclude from sitemap:</span>
+                            <span class="label">Exclude from sitemap</span>
                         </div>
                         <div class="value">
                             <input class="expresscurate_displayNone" type="checkbox"
@@ -86,7 +86,7 @@ global $post;
                     <ul class="sitemapOption <?php if (get_post_meta($post->ID, 'expresscurate_sitemap_post_exclude_from_sitemap', true) == 'on') echo 'expresscurate_displayNone'; ?>">
                         <li>
                             <div class="info">
-                                <span class="label">Sitemap frequency:</span>
+                                <span class="label">Sitemap frequency</span>
                                 <span class="gray-italic desc">Please select frequency for posts in sitemap</span>
                             </div>
                             <div class="value">
@@ -140,7 +140,7 @@ global $post;
                         </li>
                         <li>
                             <div class="info">
-                                <span class="label">Sitemap priority:</span>
+                                <span class="label">Sitemap priority</span>
                                 <span class="gray-italic desc">Please select priority for posts in sitemap</span>
                             </div>
                             <div class="value">

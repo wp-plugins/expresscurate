@@ -7,7 +7,7 @@
 <ul>
 <li>
     <div class="title submitSitemapWrap">
-        <a class="generate <?php if(!get_option('expresscurate_sitemap_generation_last_date')) { echo 'expresscurate_displayNone'; } ?>" id="submitSiteMap" href="#">Submit Sitemap</a>
+            <a class="generate <?php if (strlen(get_option('expresscurate_google_refresh_token')) < 3) {echo 'expresscurate_displayNone'; }?>"  id="submitSiteMap" href="#">Submit Sitemap</a>
     </div>
         <a class="generate" id="generateSiteMap" href="#">Generate Sitemap</a>
 </li>
@@ -227,43 +227,46 @@
         </option>
     </select>
 </li>
-<li>
+<li class="expresscurate_sitemap_webmasters">
     <p class="title">Submit sitemap automatically?<span class="description ">If this option is enabled, sitemap will be submitted to webmaster tools of search engines automatically.</span></p>
-    <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_sitemap_submit_webmasters"
-           name="expresscurate_sitemap_submit_webmasters" <?php if (get_option('expresscurate_sitemap_submit_webmasters') == 'on') echo 'checked'; ?>>
-    <label class="controls checkboxLabel" for="expresscurate_sitemap_submit_webmasters"></label>
+    <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_sitemap_submit"
+           name="expresscurate_sitemap_submit" <?php if (get_option('expresscurate_sitemap_submit') == 'on') echo 'checked'; ?>/>
+    <label class="controls checkboxLabel" for="expresscurate_sitemap_submit"></label>
 </li>
-<li class="sitemapUpdateFrequency <?php if (get_option('expresscurate_sitemap_submit_webmasters') != 'on') { echo 'expresscurate_displayNone';}?> />">
-    <p class="title">Sitemap submission frequency<span class="description ">How often should sitemap be submitted to search engines?</span></p>
-    <select class="controls" name="expresscurate_sitemap_submit_frequency">
-        <option value="always" <?php
-        if (get_option('expresscurate_sitemap_submit_frequency') == 'always') {
-            echo 'selected="selected"';
-        }
-        ?>>On every Post
-        </option>
-        <option value="daily" <?php
-        if (get_option('expresscurate_sitemap_submit_frequency') == 'daily') {
-            echo 'selected="selected"';
-        }
-        ?>>Daily
-        </option>
-        <option value="weekly" <?php
-        if (get_option('expresscurate_sitemap_submit_frequency') == 'weekly') {
-            echo 'selected="selected"';
-        }
-        ?>>Weekly
-        </option>
-        <option value="monthly" <?php
-        if (get_option('expresscurate_sitemap_submit_frequency') == 'monthly') {
-            echo 'selected="selected"';
-        }
-        ?>>Monthly
-        </option>
-    </select>
-    <?php if(!$_SESSION['sitemap_token']){ ?>
-        <a class="getApiKey" href="admin-ajax.php?action=expresscurate_sitemap_submit">Get API Key </a>
-    <?php } ?>
+<li>
+    <div class="sitemapUpdateFrequency <?php if (get_option('expresscurate_sitemap_submit') != 'on') { echo 'expresscurate_displayNone';}?> />">
+        <p class="title">Sitemap submission frequency<span class="description ">How often should sitemap be submitted to search engines?</span></p>
+        <select class="controls" name="expresscurate_sitemap_submit_frequency">
+            <option value="always" <?php
+            if (get_option('expresscurate_sitemap_submit_frequency') == 'always') {
+                echo 'selected="selected"';
+            }
+            ?>>On every Post
+            </option>
+            <option value="daily" <?php
+            if (get_option('expresscurate_sitemap_submit_frequency') == 'daily') {
+                echo 'selected="selected"';
+            }
+            ?>>Daily
+            </option>
+            <option value="weekly" <?php
+            if (get_option('expresscurate_sitemap_submit_frequency') == 'weekly') {
+                echo 'selected="selected"';
+            }
+            ?>>Weekly
+            </option>
+            <option value="monthly" <?php
+            if (get_option('expresscurate_sitemap_submit_frequency') == 'monthly') {
+                echo 'selected="selected"';
+            }
+            ?>>Monthly
+            </option>
+        </select>
+        <?php //if(!$_SESSION['sitemap_token']){
+        $blogName = urlencode(urlencode(get_bloginfo('url')));
+        ?>
+            <a class="getApiKey  <?php if (strlen(get_option('expresscurate_google_refresh_token')) > 2) {echo 'expresscurate_displayNone';}?>" href="https://www.expresscurate.com/api/getsitemapkey/<?=$blogName?>">Authorize </a>
+    </div>
 </li>
 </ul>
 <div class="centerSave">

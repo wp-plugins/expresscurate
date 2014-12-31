@@ -12,6 +12,9 @@ if(isset($_GET['type']) && $_GET['type']=='keywords'){
 $sent = false;
 if ($_POST) {
   if ($_POST['expresscurate_support_email'] && $_POST['expresscurate_support_message']) {
+    add_filter( 'wp_mail_from', function($email){
+	return $_POST['expresscurate_support_email'];
+});
     wp_mail('support@expresscurate.com', 'Plugin feedback', $_POST['expresscurate_support_message']);
     $sent = true;
     unset($_POST);

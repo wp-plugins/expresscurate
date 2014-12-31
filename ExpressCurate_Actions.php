@@ -26,6 +26,7 @@ class ExpressCurate_Actions
     const PLUGIN_NAME = "ExpressCurate";
     const PLUGIN_THEME = "ExpressCurate";
     const NEWS_FEED_URL = "http://news.expresscurate.com/feed/";
+    const EXPRESSCURATE_URL = 'https://www.expresscurate.com/';
     const NEWS_FEED_COUNT = 10;
 
     //Extension
@@ -77,6 +78,7 @@ class ExpressCurate_Actions
         add_filter('wp_title', array(&$this, 'expresscurate_advanced_seo_update_title'));
     }
 
+
     /**
      * hook into WP's init action hook
      */
@@ -122,6 +124,7 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_keywords_delete_keyword', array($this->keywords, 'delete_keyword'));
         add_action('wp_ajax_expresscurate_show_smart_publish', array(&$this, 'show_expresscurate_smart_publish_page'));
         add_action('wp_ajax_expresscurate_smart_publish_event', array(&$this->smartPublish, 'publish_event'));
+        add_action('wp_ajax_expresscurate_save_sitemap_google_status', array(&$this->sitemap, 'saveSitemapGoogleStatus'));
 
         // This is for testing ONLY TODO remove this
         add_action('wp_ajax_expresscurate_email', array(&$this->feedManager, 'send_content_alert'));
@@ -185,7 +188,7 @@ class ExpressCurate_Actions
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_generation_interval');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_include_new_posts');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_include_new_pages');
-        register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_submit_webmasters');
+        register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_submit');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_submit_frequency');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_default_priority');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_default_changefreq');
@@ -1077,13 +1080,14 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         $_SESSION['sitemap_token'] = false;
-        if(get_option('expresscurate_seo', '' == "on") && get_option('expresscurate_sitemap_submit_webmasters') == 'on'){
-           $googleAuth = new ExpressCurate_GoogleAuth();
-            $responseToken = $googleAuth->getGoogleToken();
+       /* if(get_option('expresscurate_seo', '' == "on") && get_option('expresscurate_sitemap_submit_webmasters') == 'on'){
+          // $googleAuth = new ExpressCurate_GoogleAuth();
+           // $responseToken = $googleAuth->getGoogleToken();
+            $responseToken =  get_option('expresscurate_google_refresh_token');
             if($responseToken){
                 $_SESSION['sitemap_token'] = true;
             }
-        }
+        }*/
 
         // Render the settings template
         include(sprintf("%s/templates/settings.php", dirname(__FILE__)));
@@ -1329,7 +1333,7 @@ class ExpressCurate_Actions
 
     public function expresscurate_hide_admin_bar()
     {
-        if (isset($_REQUEST['expresscurate_preview'])) {
+        if (isset($_REQUEST['hideadminmenu']) && $_REQUEST['hideadminmenu']=='true') {
             return false;
         }
         return true;
@@ -1354,6 +1358,7 @@ class ExpressCurate_Actions
         if (!extension_loaded(self::MBSTRING)) {
             $warnings[] = self::MBSTRING;
         }
+
         if(count($warnings) > 0 ){
             $message = '<div class="update-nag">';
             foreach($warnings as $warning){
@@ -1362,6 +1367,22 @@ class ExpressCurate_Actions
             $message .= 'Please install before using plugin! </div>';
             echo $message;
         }
+
+        $blogName = urlencode(urlencode(get_bloginfo('url')));
+        $expresscurateWebsiteUrl = self::EXPRESSCURATE_URL;
+        if (strlen(get_option('expresscurate_google_refresh_token')) < 3 && get_option('expresscurate_sitemap_submit') == 'on') {
+            $warnings[] = 'Authorise access to Google Webmasters. <a href="'.$expresscurateWebsiteUrl.'/api/getsitemapkey/'.$blogName.'">Authorize </a>  |  <a href="options-general.php?page=expresscurate_settings"> Sitemap Settings </a>';
+        }
+
+        if(count($warnings) > 0 ){
+            $message = '<div class="update-nag">';
+            foreach($warnings as $warning){
+                $message .= $warning;
+            }
+            $message .= '</div>';
+            echo $message;
+        }
+
 
     }
 

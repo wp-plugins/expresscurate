@@ -86,9 +86,13 @@ var Keywords = (function (jQuery) {
         if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && jQuery('.expresscurate_widget').length > 0) {
             var ed = tinyMCE.get('content'),
                 keywords = ((definedKeywords !== '') ? definedKeywords.split(', ') : null),
-                check_editor;
+                check_editor,
+                highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
             if (keywords == null) {
                 ed.controlManager.setActive('markKeywords', false);
+                highlightedElems.each(function (index, val) {
+                    jQuery(val).replaceWith(this.childNodes);
+                });
                 tinyMCE.activeEditor.windowManager.open({
                     title: 'Mark keywords',
                     id: 'expresscurate_keyword_dialog',
@@ -97,7 +101,6 @@ var Keywords = (function (jQuery) {
                     html: '<label class="expresscurate_keywordMessage">Currently you don&#39;t have any defined keywords.</label>  <a class="button-primary" href="#expresscurate">Start adding now</a> <a href="#" class="cancel">Cancel</a>'
                 });
             } else if (ed) {
-                var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
                 if (!activeMarkButton) {
                     ed.controlManager.setActive('markKeywords', true);
                     activeMarkButton = true;

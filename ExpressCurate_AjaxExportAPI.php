@@ -300,9 +300,10 @@ class ExpressCurate_AjaxExportAPI {
 
   public function send_google_key() {
     $data = $_REQUEST;
-    if (!$data['key']) {
-        update_option('expresscurate_google_auth_key', $data['key']);
+    if ($data['refresh_token']) {
+        update_option('expresscurate_google_refresh_token', $data['refresh_token']);
         $result = array('status' => true, 'msg' => "Key is set");
+        wp_redirect( 'admin.php?page=expresscurate_settings', 301 );
     }else{
         $result = array('status' => false, 'msg' => "Key is not set");
     }

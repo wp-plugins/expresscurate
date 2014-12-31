@@ -1,10 +1,10 @@
 === ExpressCurate ===
 Contributors: expresscurate
-Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, rss, feed, keywords summary, keywords dashboard, seo control center, keyword, seo, sitemap, google webmasters
+Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, rss, feed, keywords summary, keywords dashboard, seo control center, keyword, seo, sitemap, google webmasters, google
 Donate link: https://bit.ly/expresscuratedonate
 Requires at least: 3.9
 Tested up to: 4.1
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -80,7 +80,7 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 
 = How To Get Started =
-[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.0.0.zip "Your favorite content marketing tools") for WordPress.  
+[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.0.1.zip "Your favorite content marketing tools") for WordPress.  
 You can also [download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme") a **free** [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme"). It will give your curated content a modern online news look.
 
 
@@ -94,6 +94,14 @@ e.g.
 1. Upload *expresscurate* folder to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 3. Curate using *Quickstart Button*.
+
+Also, install curation on-the-go tools.
+
+* **Chrome Web Browser** - install the [ExpressCurate Chrome Extension](https://chrome.google.com/webstore/detail/expresscurate/nldipdepdfjilejlpeeknodkpiajhfkf?hl=en "Your favorite Chrome Extension") to discover content, bookmark articles for future curation, as well as curate and create posts on the go without having to go to WordPress to create a post draft.
+* **Android App** - install [ExpressCurate Android app](https://play.google.com/store/apps/details?id=com.expresscurate "Your favorite Android app") on your smartphone or tablet to discover content and create curated posts more quickly. 
+
+You can also [download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme") a **free** [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme"). It will give your curated content a modern online news look.
+
 
 
 
@@ -119,6 +127,10 @@ e.g.
 
 
 == Changelog ==
+
+= 2.0.1 =
+* Sitemap Rules.
+* Miscellaneous bug fixes and improvements.
 
 = 2.0.0 =
 * RSS & Google Alerts Importer.

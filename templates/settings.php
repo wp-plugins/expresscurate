@@ -13,7 +13,7 @@ $expresscurate_seo = get_option('expresscurate_seo', '') == "on" ? 'On' : 'Off';
     <li class="tab-link expresscurate_preventTextSelection green current" data-tab="tab-1">General</li>
     <li class="tab-link expresscurate_preventTextSelection orange" data-tab="tab-5">Feed</li>
     <li class="tab-link expresscurate_preventTextSelection red" data-tab="tab-2">Smart publishing</li>
-    <!--<li id="sitemapTab" class="tab-link expresscurate_preventTextSelection blue <?php /*if ($expresscurate_seo == 'Off') {echo 'expresscurate_displayNone';}*/?>" data-tab="tab-3">Sitemap</li>-->
+    <li id="sitemapTab" class="tab-link expresscurate_preventTextSelection blue <?php /*if ($expresscurate_seo == 'Off') {echo 'expresscurate_displayNone';}*/?>" data-tab="tab-3">Sitemap</li>
     <li class="tab-link expresscurate_preventTextSelection yellow" data-tab="tab-4">Extension</li>
 </ul>
 

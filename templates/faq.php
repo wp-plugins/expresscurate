@@ -8,6 +8,9 @@ if ($current_user->user_email) {
 $sent = false;
 if ($_POST) {
   if ($_POST['expresscurate_support_email'] && $_POST['expresscurate_support_message']) {
+    add_filter( 'wp_mail_from', function($email){
+	return $_POST['expresscurate_support_email'];
+    });
     wp_mail('support@expresscurate.com', 'Expresscurate FAQ', $_POST['expresscurate_support_message']);
     $sent = true;
     unset($_POST);
