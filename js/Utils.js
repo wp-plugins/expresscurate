@@ -47,19 +47,19 @@ var Utils = (function (jQuery) {
         },
         /*message for empty lists*/
         notDefinedMessage: function (message, list) {
-                var pageWithControls=(jQuery('.expresscurate_feed_list').length || jQuery('.expresscurate_bookmarks').length) ? true : false;
-                if (list.length > 0) {
-                    message.addClass('expresscurate_displayNone');
-                    if(pageWithControls){
-                        jQuery('.expresscurate_controls').removeClass('expresscurate_displayNone');
-                    }
-                } else {
-                    message.removeClass('expresscurate_displayNone');
-                    if(pageWithControls){
-                        jQuery('.expresscurate_controls li.check').removeClass('active');
-                        jQuery('.expresscurate_controls').addClass('expresscurate_displayNone');
-                    }
+            var pageWithControls = (jQuery('.expresscurate_feed_list').length || jQuery('.expresscurate_bookmarks').length) ? true : false;
+            if (list.length > 0) {
+                message.addClass('expresscurate_displayNone');
+                if (pageWithControls) {
+                    jQuery('.expresscurate_controls').removeClass('expresscurate_displayNone');
                 }
+            } else {
+                message.removeClass('expresscurate_displayNone');
+                if (pageWithControls) {
+                    jQuery('.expresscurate_controls li.check').removeClass('active');
+                    jQuery('.expresscurate_controls').addClass('expresscurate_displayNone');
+                }
+            }
         },
         /*show/hide controls in content feed and bookmarks*/
         checkControls: function (controls) {
@@ -81,21 +81,20 @@ var Utils = (function (jQuery) {
             jQuery('#expresscurate_support_form .expresscurate_errorMessage').remove();
             var valid_msg = true;
             var valid_email = true,
-                supportMessage=jQuery("#expresscurate_support_message");
+                supportMessage = jQuery("#expresscurate_support_message");
             var msg = supportMessage.val();
-            var regularExpression = /^[\w\-\s]+$/;
-            valid_msg = regularExpression.test(msg);
             if (msg == "" || msg == null) {
                 valid_msg = false;
                 supportMessage.after('<label class="expresscurate_errorMessage">Please enter the message</label>');
-            } else if (!valid_msg) {
-                supportMessage.after('<label class="expresscurate_errorMessage">Input is not alphanumeric</label>');
+            } else if (msg.length < 3) {
+                valid_msg = false;
+                supportMessage.after('<label class="expresscurate_errorMessage">Message is too short</label>');
             } else
                 supportMessage.next('.expresscurate_errorMessage').remove();
 
-            var supportMail=jQuery("#expresscurate_support_email"),
+            var supportMail = jQuery("#expresscurate_support_email"),
                 email = supportMail.val();
-            regularExpression = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var regularExpression = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             valid_email = regularExpression.test(email);
             if (email == "" || email == null) {
                 valid_email = false;
@@ -189,22 +188,46 @@ var Utils = (function (jQuery) {
         setup: function () {
             if (!isSetup) {
                 jQuery(document).ready(function () {
-                    if(jQuery('.expresscurate_settings').length){
+                    if (jQuery('.expresscurate_settings').length) {
                         var tab_id = jQuery('.tabs').attr('data-currenttab');
-                        if(tab_id.length<1){
-                            tab_id='tab-1';
+                        if (tab_id.length < 1) {
+                            tab_id = 'tab-1';
                         }
                         jQuery('ul.tabs li').removeClass('current');
                         jQuery('.tab-content').removeClass('current');
-                          jQuery('.tabs').find('li[data-tab='+tab_id+']').addClass('current');
+                        jQuery('.tabs').find('li[data-tab=' + tab_id + ']').addClass('current');
                         jQuery("#" + tab_id).addClass('current');
                     }
+                    /*jQuery('.expresscurate_blocksContainer').sortable({
+                        distance: 12,
+                        forcePlaceholderSize: true,
+                        items: '.item',
+                        tolerance: 'pointer',
+                        start: function (event, ui) {
+                            // jQuery(this).find('> div').removeClass('item');
+                            ui.item.parent().masonry('destroy');
+                            // ui.item.parent().masonry();
+                        },
+                        change: function (event, ui) {
+                            // ui.item.parent().masonry();
+                        },
+                        stop: function (event, ui) {
+                            // jQuery(this).find('> div').addClass('item');
+                            ui.item.parent().masonry();
+                        },
+                        cursor: "move",
+                        placeholder: "expresscurate_sortablePlaceholder",
+                        grid: [ 20, 10 ]
+                    });*/
+
                     jQuery('.expresscurate_blocksContainer').masonry({
-                        itemSelector: '.item',
+                        itemSelector: '.expresscurate_masonryItem',
                         isResizable: true,
                         isAnimated: true,
-                        columnWidth: '.item'
+                        columnWidth: '.expresscurate_masonryItem',
+                        gutter: 10
                     });
+
                     if (jQuery('.expresscurate_dashboard_smartPublishing .topPart .target_date').length) {
                         Utils.countDown();
                     }
@@ -219,7 +242,8 @@ var Utils = (function (jQuery) {
 
                         //Save tab data
 
-                        jQuery.post('admin-ajax.php?action=expresscurate_change_tab_event', {tab: tab_id}, function (res){});
+                        jQuery.post('admin-ajax.php?action=expresscurate_change_tab_event', {tab: tab_id}, function (res) {
+                        });
                     });
                     jQuery('#expresscurate_sitemap_post_configure_manually').on('change', function () {
                         var options = jQuery('.expresscurate_sitemap_widget .hiddenOptions');

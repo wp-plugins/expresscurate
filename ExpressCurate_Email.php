@@ -2,6 +2,9 @@
 
 class ExpressCurate_Email
 {
+    const SUPPORT_EMAIL = "support@expresscurate.com";
+
+    private $customerEmail = null;
 
     public function sendContentAlertEmail($emailData)
     {
@@ -16,6 +19,24 @@ class ExpressCurate_Email
         }
         update_option('expresscurate_content_alert_lastDate', date('Y-m-d H:i:s'));
 
+    }
+
+    public function sendSupportEmail($emailFrom, $title, $message)
+    {
+        $this->setCustomerEmail($emailFrom) ;
+        add_filter( 'wp_mail_from',array(&$this,'getCustomerEmail'));
+        return wp_mail(self::SUPPORT_EMAIL, $title, $message);
+
+    }
+
+    public function getCustomerEmail()
+    {
+        return $this->customerEmail;
+    }
+
+    public function setCustomerEmail($val)
+    {
+        $this->customerEmail = $val;
     }
 
 }

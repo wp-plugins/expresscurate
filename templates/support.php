@@ -11,14 +11,11 @@ if(isset($_GET['type']) && $_GET['type']=='keywords'){
 }
 $sent = false;
 if ($_POST) {
-  if ($_POST['expresscurate_support_email'] && $_POST['expresscurate_support_message']) {
-    add_filter( 'wp_mail_from', function($email){
-	return $_POST['expresscurate_support_email'];
-});
-    wp_mail('support@expresscurate.com', 'Plugin feedback', $_POST['expresscurate_support_message']);
-    $sent = true;
-    unset($_POST);
-  }
+    if ($_POST['expresscurate_support_email'] && $_POST['expresscurate_support_message']) {
+        $expressCurateEmail = new ExpressCurate_Email();
+        $sent =  $expressCurateEmail->sendSupportEmail($_POST['expresscurate_support_email'], 'Plugin feedback', $_POST['expresscurate_support_message']);
+        unset($_POST);
+    }
 }
 ?>
 
@@ -51,7 +48,7 @@ if ($_POST) {
         <?php
       }
       ?>
-        <form method="post" action="<?php echo get_admin_url() ?>admin.php?page=expresscurate"
+        <form method="post" action=""
               id="expresscurate_support_form">
           <input id="expresscurate_support_email" name="expresscurate_support_email" class="inputStyle" placeholder="Email"
                  value="<?php echo $user_email ?>"/>

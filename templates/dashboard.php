@@ -24,31 +24,31 @@ if ($_POST) {
         <label></label>
     </div>
     <div class="expresscurate_blocksContainer">
-        <div id ='keyWords' class="expresscurate_keywordsBlock item ">
+        <div id ='keyWords' class="expresscurate_keywordsBlock expresscurate_masonryItem">
             <label class="label">Keywords Summary</label>
             <?php $this->keywords_widget(); ?>
         </div>
 
         <?php
         if (get_option('expresscurate_publish', '') == "on") { ?>
-            <div id="smartPublish" class="expresscurate_smartPublishBlock item">
+            <div id="smartPublish" class="expresscurate_smartPublishBlock expresscurate_masonryItem">
                 <label class="label">Smart Publishing Overview</label>
                 <?php $this->smart_publishing_widget(); ?>
             </div>
         <?php } ?>
 
-        <div id="feedWidget" class="expresscurate_feedBlock item">
+        <div id="feedWidget" class="expresscurate_feedBlock expresscurate_masonryItem">
             <label class="label">Feed</label>
             <?php $this->feed_widget();?>
         </div>
 
-        <div id="bookmarks" class="expresscurate_bookmarksBlock item">
+        <div id="bookmarks" class="expresscurate_bookmarksBlock expresscurate_masonryItem">
             <label class="label">Bookmarks</label>
             <?php $this->bookmarks_widget();?>
         </div>
 
 
-        <div id ='support' class="expresscurate_supportBlock item ">
+        <div id ='support' class="expresscurate_supportBlock expresscurate_masonryItem">
             <label class="label">Support</label>
             <div>
                 <?php if (!$sent) { ?>

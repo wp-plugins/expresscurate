@@ -10,13 +10,13 @@ $feed = ExpressCurate_Actions::getCurationNews();
 $limit = ExpressCurate_Actions::NEWS_FEED_COUNT;
 if(count($feed)){
     ?>
-      <ul>
+      <ul class="expresscurate_masonryWrap">
       <?php for ($x = 0; $x < $limit; $x++) {
         $title = str_replace(' & ', ' &amp; ', $feed[$x]['title']);
         $link = $feed[$x]['link'];
         $description = $feed[$x]['desc'];
         $date = date('l F d, Y', strtotime($feed[$x]['date'])); ?>
-          <li>
+          <li class="expresscurate_masonryItem">
               <a class="title" href="<?php echo $link; ?>"><?php echo $title; ?></a>
               <p>Posted on   <?php echo human_time_diff( strtotime($date), current_time('timestamp') ) . ' ago'; ?></p>
               <span class="description"><?php echo $description; ?></span>

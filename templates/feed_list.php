@@ -37,10 +37,10 @@ $content_list = $feedManager->get_feed_list();
     if (is_array($content_list['content']) && count($content_list['content'])) {
         $i = 0;
         ?>
-        <ul class="expresscurate_feedBoxes"><?php
+        <ul class="expresscurate_feedBoxes expresscurate_masonryWrap"><?php
         foreach ($content_list['content'] as $key => $item) {
             ?>
-            <li class="expresscurate_preventTextSelection">
+            <li class="expresscurate_preventTextSelection expresscurate_masonryItem">
                 <input id="uniqueId_<?php echo $i; ?>" class="checkInput" type="checkbox"/>
                 <label for="uniqueId_<?php echo $i; ?>"></label>
                 <textarea

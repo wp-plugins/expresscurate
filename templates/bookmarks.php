@@ -24,12 +24,21 @@ $bookmarks = $feedManager->get_bookmarks();
     </ul>
   </div>
   <label class="expresscurate_displayNone expresscurate_notDefined">Currently you have no bookmarked web pages.</label>
-  <ul class="expresscurate_bookmarkBoxes">
-    <?php
+  <ul class="expresscurate_bookmarkBoxes expresscurate_masonryWrap">
+      <div class="addNewBookmark expresscurate_masonryItem grid-sizer">
+          <label for="addBookmark ">Add new Bookmark</label>
+          <div class="addBookmark">
+              <input id="addBookmark" type="text" placeholder="URL" class="expresscurate_disableInputStyle"/>
+              <span class="expresscurate_preventTextSelection"><span></span></span>
+          </div>
+          <div class="expresscurate_clear"></div>
+          <p><span></span></p>
+      </div>
+      <?php
     $i = 0;
     foreach ($bookmarks as $key => $item) {
       ?>
-      <li class="expresscurate_preventTextSelection">
+      <li class="expresscurate_preventTextSelection expresscurate_masonryItem">
         <input id="uniqueId_<?php echo $i ?>" class="checkInput" type="checkbox"/>
         <label for="uniqueId_<?php echo $i ?>"></label>
         <textarea class="expresscurate_displayNone expresscurate_bookmarkData"><?php echo json_encode($item); ?></textarea>
@@ -86,13 +95,4 @@ $bookmarks = $feedManager->get_bookmarks();
     <textarea name="expresscurate_bookmarks_curate_data" id="expresscurate_bookmarks_curate_data" class="expresscurate_displayNone"></textarea>
     <input type="hidden" name="expresscurate_load_sources" value="1" />
   </form>
-  <div class="addNewBookmark">
-    <label for="addBookmark ">Add new Bookmark</label>
-    <div class="addBookmark">
-      <input id="addBookmark" type="text" placeholder="URL" class="expresscurate_disableInputStyle"/>
-      <span class="expresscurate_preventTextSelection"><span></span></span>
-    </div>
-    <div class="expresscurate_clear"></div>
-    <p><span></span></p>
-  </div>
 </div>

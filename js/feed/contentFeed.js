@@ -38,6 +38,7 @@ var FeedWall = (function (jQuery) {
                 jQuery(els).css('background-color', 'transparent');
                 setTimeout(function(){
                     jQuery(els).remove();
+                    jQuery('.expresscurate_feedBoxes').masonry();
                 },700);
                 Utils.checkControls(jQuery('.feedListControls .quotes,.feedListControls .remove,.feedListControls .bookmark'));
                 Utils.notDefinedMessage(jQuery('.expresscurate_feed_list .expresscurate_notDefined'),jQuery('.expresscurate_feedBoxes > li'));
@@ -47,6 +48,17 @@ var FeedWall = (function (jQuery) {
     };
 
     var setupFeed = function () {
+        if(jQuery('.expresscurate_feed_list').length || jQuery('.expresscurate_bookmarkBoxes').length || jQuery('.expresscurate_news_container').length){
+            setTimeout(function(){
+                jQuery('.expresscurate_masonryWrap').masonry({
+                    itemSelector: '.expresscurate_masonryItem',
+                    isResizable: true,
+                    isAnimated: true,
+                    'grid-sizer': '.grid-sizer',
+                    gutter:10
+                });
+            },100);
+        }
         if(jQuery('.expresscurate_feed_list').length){
             Utils.notDefinedMessage(jQuery('.expresscurate_feed_list .expresscurate_notDefined'), jQuery('.expresscurate_feedBoxes > li'));
         }

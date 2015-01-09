@@ -25,7 +25,7 @@ class ExpressCurate_FeedManager {
         $curated_links_rss = array();
       }
 
-      $data['url'] =expresscurate_normalise_url($data['url']);
+      $data['url'] = expresscurate_normalise_url($data['url']);
       if (!isset($curated_links_rss[$data['url']])) {
         $rssUrl = $this->checkRss($data['url']);
         if (filter_var($rssUrl, FILTER_VALIDATE_URL)) {
@@ -440,9 +440,8 @@ class ExpressCurate_FeedManager {
       foreach ($bookmarks as $bookmark) {
         $exists_url[] = $bookmark['link'];
       }
-      $parseURL = parse_url($data['url']);
-      $data['url'] =expresscurate_normalise_url($data['url']).$parseURL["path"];
 
+      $data['url'] =expresscurate_normalise_url($data['url'], true);
       if (!in_array($data['url'], $exists_url)) {
 
         $contentManager = new ExpressCurate_ContentManager();
@@ -458,9 +457,14 @@ class ExpressCurate_FeedManager {
           $bookmarks = json_encode($bookmarks);
           update_option('expresscurate_bookmarks', $bookmarks);
         } else {
+            if(isset($article['status'])){
+                $result['status'] = $article['status'];
+                $result['msg'] = $article['msg'];
+            }else{
+                $result['status'] = 'error';
+                $result['msg'] = 'Article does not exists';
+            }
 
-          $result['status'] = $article['status'];
-            $result['msg'] = $article['msg'];
         }
       } else {
         if (isset($data['comment'])) {
@@ -477,6 +481,7 @@ class ExpressCurate_FeedManager {
     } else {
       $result['status'] = 'error';
     }
+
     echo json_encode($result);
     die;
   }
@@ -513,8 +518,7 @@ class ExpressCurate_FeedManager {
   private function collect_bookmark(&$bookmarks, $item, $url = null, $comment = '') {
     if ($url) {
       if (isset($item['result']) && isset($item['result']['title'])) {
-        $parseURL = parse_url($url);
-        $url =expresscurate_normalise_url($url).$parseURL["path"];
+        $url =expresscurate_normalise_url($url, true);
         $bookmark = array();
         $bookmark['link'] = $url;
         $bookmark['domain'] = $item['result']['domain'];

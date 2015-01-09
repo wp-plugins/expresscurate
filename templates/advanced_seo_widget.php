@@ -6,7 +6,7 @@ global $post;
 
 <ul class="tabs">
     <li class="tab-link expresscurate_preventTextSelection green current" data-tab="tab-1">Advanced SEO</li>
- <!--   <li class="tab-link expresscurate_preventTextSelection red" data-tab="tab-2">Sitemap</li>-->
+    <li class="tab-link expresscurate_preventTextSelection red" data-tab="tab-2">Sitemap</li>
 </ul>
 
 <div id="tab-1" class="tab-content current">

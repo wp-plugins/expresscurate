@@ -3178,11 +3178,10 @@
     /*width:1034px;*/
 /*}*/
 .expresscurate_headBorderBottom{
-    max-width: 845px;
     width: 100%;
     /*border-bottom:solid 1px #dddddd;*/
     display: block;
-    margin: 50px 0 0 0;
+    margin: 50px 0 5px 0;
 }
     .expresscurate_headBorderBottom h2{
         padding: 2px 0 !important;
@@ -3458,7 +3457,16 @@
         .expresscurate_feed_dashboard .expresscurate_feedSettingsList li:hover .close{
             display: block;
         }
-    .expresscurate_bookmarks .addNewBookmark,
+    .expresscurate_bookmarks .addNewBookmark{
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        height: 123px;
+        padding: 15px 20px;
+        background-color: #ffffff;
+        margin: 0 0 10px 0;
+        border: solid 1px #e2e2e2;
+    }
     .expresscurate_feed_dashboard .addNewFeed
     {
         /*width: 750px;*/
@@ -3466,16 +3474,12 @@
         box-sizing: border-box;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
-
         height: 130px;
         padding: 15px 20px;
         background-color: #f5f6f6;
         margin-top: 30px;
     }
-    .expresscurate_bookmarks .addNewBookmark{
-        background-color: #ffffff;
-        max-width: 845px;
-    }
+
         .expresscurate_bookmarks .addNewBookmark p,
         .expresscurate_feed_dashboard .addNewFeed p{
             width: 590px;
@@ -3484,7 +3488,12 @@
             .expresscurate_feed_dashboard .addNewFeed p span{
                 color: #bdbdbd;
             }
-        .expresscurate_bookmarks .addBookmark,
+        .expresscurate_bookmarks .addBookmark{
+            width: 100%;
+            height: 35px;
+            margin-top: 10px;
+            position: relative;
+        }
         .expresscurate_feed_dashboard .addFeed{
             width: 590px;
             height: 35px;
@@ -3497,15 +3506,13 @@
             background-color: #f5f6f6;
         }
 /*feed list*/
+.expresscurate_feed_list{
+    height: auto !important;
+}
 @media  (max-width: 1050px) {
     .expresscurate_feed_list,
     .expresscurate_bookmarks{
         width: 90%;
-    }
-    /*.expresscurate_headBorderBottom,*/
-    .expresscurate_feedBoxes > li,
-    .expresscurate_bookmarkBoxes > li{
-        width: auto !important;
     }
     .expresscurate_feed_list .feedListControls,
     .expresscurate_bookmarks .bookmarkListControls{
@@ -3803,31 +3810,40 @@
 .expresscurate_disableInputStyle:focus {
     outline:none;
 }
+
+    .expresscurate_bookmarkBoxes,
+    .expresscurate_feedBoxes,
+    .expresscurate_news_container{
+        width: 100%;
+        position: relative;
+        margin: 0 auto;
+    }
+.expresscurate_bookmarkBoxes,
+.expresscurate_feedBoxes,
+.expresscurate_news_container{
+    font-size: 0;
+}
     .expresscurate_bookmarkBoxes > li,
     .expresscurate_feedBoxes > li,
     .expresscurate_news_container li{
-        width: 815px;
         height: auto;
-        padding: 15px 15px 10px 35px;
+        padding: 13px 15px 30px 35px;
         background-color: #ffffff;
         margin: 0 0 10px 0;
         position: relative;
         font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
-        display: block;
+        display: inline-block;
+        vertical-align: top;
         border: solid 1px #e2e2e2;
         transition: background-color 500ms;
         -webkit-transition: background-color 500ms;
         -moz-transition: background-color 500ms;
         -o-transition: background-color 500ms;
         -ms-transition: background-color 500ms;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
     }
-@media (max-width: 1095px) {
-    .expresscurate_bookmarkBoxes > li,
-    .expresscurate_feedBoxes > li,
-    .expresscurate_news_container li {
-        width: auto;
-    }
-}
         .expresscurate_bookmarkBoxes li > label,
         .expresscurate_feedBoxes li > label{
             border: solid 1px #bdbdbd;
@@ -3958,11 +3974,11 @@
         }
         .expresscurate_bookmarkBoxes .keywords,
         .expresscurate_feedBoxes .keywords{
-            margin: 5px 0 0 0;
+            margin: 5px 0;
         }
         .expresscurate_feedBoxes .keywords{
-            width: 70%;
-            display: inline-block;
+            width: 100%;
+            display: block;
         }
             .expresscurate_bookmarkBoxes .keywords li,
             .expresscurate_feedBoxes .keywords li{
@@ -4006,7 +4022,7 @@
         .expresscurate_feedBoxes .controls{
             position: absolute;
             right: 15px;
-            bottom: 10px;
+            bottom: 5px;
             height: 20px;
             width: auto;
         }
@@ -4045,8 +4061,8 @@
         .expresscurate_feedBoxes .label{
             display: block;
             position: absolute;
-            top:16px;
-            right: 11px;
+            top:14px;
+            right: 15px;
             color: #fff;
             font-size: 12px;
             width: 34px;
@@ -4068,15 +4084,16 @@
         }
         .expresscurate_bookmarkBoxes .comment{
             display: block;
-            margin: 15px 0 0 0;
-            width: 70%;
+            margin: 0 0 5px 0;
+            width: 100%;
+            min-height: 25px;
         }
             .expresscurate_bookmarkBoxes .comment label{
-                background: url("../images/expresscurate_icons.svg") no-repeat 0 -559px;
-                background-size: 20px auto;
                 padding-left: 20px;
                 display: block;
                 width:auto;
+                line-height: 25px;
+                position: relative;
             }
             .expresscurate_bookmarkBoxes .comment label,
             .expresscurate_bookmarkBoxes .comment input{
@@ -4084,9 +4101,21 @@
                 font-size: 13px;
                 color: #aaaaaa;
             }
+            .expresscurate_bookmarkBoxes .comment label:before{
+                content: '';
+                position: absolute;
+                left: 0;
+                top:3px;
+                background: url("../images/expresscurate_icons.svg") no-repeat 0 -558px;
+                background-size: 20px auto;
+                width: 20px;
+                height: 20px;
+            }
             .expresscurate_bookmarkBoxes .comment label.active{
-                background-position:  0 -599px;
                 color: #e69312;
+            }
+            .expresscurate_bookmarkBoxes .comment label.active:before{
+                background-position:  0 -599px;
             }
             .expresscurate_bookmarkBoxes .comment span:hover{
                 color: #e69312;
@@ -4095,7 +4124,8 @@
                 color: #aaaaaa;
                 font-size: 20px;
                 font-weight: bold;
-                vertical-align: sub;
+                line-height: 28px;
+                vertical-align: bottom;
                 display: none;
                 cursor: pointer;
             }
@@ -4104,6 +4134,7 @@
                 border: solid 1px #bdbdbd;
                 width: 90%;
                 padding-right: 20px;
+                height: 25px;
             }
 
 /*sources coll widget*/
@@ -4513,27 +4544,18 @@
     /*.expresscurate_feedSettingsList li, .expresscurate_URL li{*/
         /*width: 92%;*/
     /*}*/
-    .expresscurate_feedBoxes .keywords,
-    .expresscurate_bookmarkBoxes .comment{
-        width: 60%;
-    }
-    .expresscurate_bookmarks .addBookmark, .expresscurate_feed_dashboard .addFeed,
+    .expresscurate_feed_dashboard .addFeed,
     .expresscurate_bookmarks .addNewBookmark p, .expresscurate_feed_dashboard .addNewFeed p{
         width: 80%;
     }
 }
 @media (max-width: 800px) {
-    .expresscurate_bookmarkBoxes .comment input{
+   /* .expresscurate_bookmarkBoxes .comment input{
         width: 80%;
-    }
+    }*/
     .expresscurate_bookmarks .expresscurate_columnsName .title,
     .expresscurate_columnsName .expresscurate_marginRight140{
         margin-right: 50px;
-    }
-    .expresscurate_feedBoxes .keywords,
-    .expresscurate_bookmarkBoxes .comment{
-        margin-bottom: 20px;
-        width: 100%;
     }
 }
 /*activated*/
@@ -4599,7 +4621,7 @@
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    margin: 10px;
+    margin: 5px 0;
     display: inline-block;
     vertical-align: top;
     text-align: left;
@@ -4614,30 +4636,29 @@
 }
 
 @media  (min-width: 1500px){
-    .expresscurate_supportBlock,
-    .expresscurate_keywordsBlock,
-    .expresscurate_smartPublishBlock,
-    .expresscurate_feedBlock,
-    .expresscurate_bookmarksBlock{
-        width: 30%;
+    .grid-sizer,
+    .expresscurate_masonryItem{
+        width: 32%;
+        width: -webkit-calc( ( 100% - 20px ) / 3 );
+        width: -moz-calc( ( 100% - 20px ) / 3 );
+        width: calc( ( 100% - 20px ) / 3 );
     }
 }
+
 @media  (min-width: 800px) and (max-width: 1500px){
-    .expresscurate_keywordsBlock,
-    .expresscurate_supportBlock,
-    .expresscurate_smartPublishBlock,
-    .expresscurate_feedBlock,
-    .expresscurate_bookmarksBlock{
+    .grid-sizer,
+    .expresscurate_masonryItem{
         width: 47%;
+        width: -webkit-calc( ( 100% - 10px ) / 2 );
+        width: -moz-calc( ( 100% - 10px ) / 2 );
+        width: calc( ( 100% - 10px ) / 2 );
     }
 }
 @media  (max-width: 800px){
-    .expresscurate_supportBlock,
-    .expresscurate_keywordsBlock,
-    .expresscurate_smartPublishBlock,
-    .expresscurate_feedBlock,
-    .expresscurate_bookmarksBlock{
-        width: 97%;
+    .expresscurate_masonryItem,
+    .pageDes,
+    .grid-sizer{
+        width: 100%;
     }
 }
 /**/
@@ -4672,6 +4693,9 @@
 
 .expresscurate_news_container{
     margin-top: 30px;
+}
+.expresscurate_sortablePlaceholder{
+    border: dashed 1px #000;
 }
 /*.expresscurate_marginTop30{*/
     /*margin-top: 30px !important;*/

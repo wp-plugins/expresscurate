@@ -2,15 +2,16 @@
 
 /*
   Plugin Name: ExpressCurate
-  Plugin URI: http://www.expresscurate.com/products/wordpress-plugin
-  Description: ExpressCurate simplifies and expedites content curation and provides SEO enhancement and keyword effectiveness monitoring.
-  Version: 2.0.1
+  Plugin URI: http://www.expresscurate.com/products
+  Description: ExpressCurate plugin is a content curation tool for WordPress. It enables you to create and publish high quality content within minutes.
+  Version: 2.0.2
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
   License: GPLv3 or later
   License URI: http://www.gnu.org/licenses/gpl.html
  */
 require_once(sprintf("%s/ExpressCurate_Actions.php", dirname(__FILE__)));
+require_once(sprintf("%s/ExpressCurate_Email.php", dirname(__FILE__)));
 require_once(sprintf("%s/ExpressCurate_FeedManager.php", dirname(__FILE__)));
 require_once(sprintf("%s/ExpressCurate_Sitemap.php", dirname(__FILE__)));
 require_once(sprintf("%s/ExpressCurate_CronManager.php", dirname(__FILE__)));
@@ -82,27 +83,31 @@ if (class_exists('ExpressCurate')) {
     $expresscurate_smart_publish->publish_event();
   }
 
-  function expresscurate_sitemap_generate(){
+  function expresscurate_sitemap_generate() {
       $expresscurate_sitemap = new ExpressCurate_Sitemap();
       $expresscurate_sitemap->generateSitemapScheduled();
   }
 
-  function expresscurate_sitemap_push(){
+  function expresscurate_sitemap_push() {
       $expresscurate_sitemap = new ExpressCurate_Sitemap();
       $expresscurate_sitemap->pushSitemapScheduled();
   }
 
 
-  function expresscurate_normalise_url( $url ){
+  function expresscurate_normalise_url( $url , $fullUrl=false ) {
       if(mb_substr($url, 0, 4) !== 'http'){
           $url = 'http://' . $url;
       }
       $parseURL = parse_url($url);
       $host = $parseURL['host'];
       if(mb_substr($host, 0, 3) == 'www'){
-          $host = preg_replace('/(?:https?:\/\/)?(?:www\.)?(.*)\/?$/i', '$1', $url);
+          $host = preg_replace('/(?:https?:\/\/)?(?:www\.)?(.*)\/?$/i', '$1', $host);
       }
       $url = 'http://' .$host;
+
+      if($fullUrl &&  $parseURL['host'] && $parseURL['path']) {
+          $url = $url.$parseURL['path'];
+      }
       return $url;
   }
 
@@ -120,17 +125,17 @@ if (class_exists('ExpressCurate')) {
   // instantiate the plugin class
   $expresscurate = new ExpressCurate();
 
-  // Add a link to the settings page onto the plugin page
+  // Add a link to the settings page onto the plugin section
   if (isset($expresscurate)) {
-
     // Add the settings link to the plugins page
     function expresscurate_settings_link($links) {
-      $settings_link = '<a href="options-general.php?page=expresscurate_settings">Settings</a> | <a href="http://bit.ly/expresscuratedonate" target="_blank">Donate</a>';
-      array_unshift($links, $settings_link);
+      array_unshift($links, '<a href="http://bit.ly/expresscuratedonate" target="_blank">Donate</a>');
+      array_unshift($links, '<a href="options-general.php?page=expresscurate_settings">Settings</a>');
+      array_unshift($links, '<a href="admin.php?page=expresscurate_support">Support</a>');
       return $links;
     }
 
     $plugin = plugin_basename(__FILE__);
-      add_filter("plugin_action_links_$plugin", 'expresscurate_settings_link');
+    add_filter("plugin_action_links_$plugin", 'expresscurate_settings_link');
   }
 }

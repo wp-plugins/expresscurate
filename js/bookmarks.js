@@ -32,7 +32,7 @@ var Bookmarks = (function (jQuery) {
 
                         data = jQuery.parseJSON(res);
                         if (data.status == 'success') {
-                            li_html = '<li>\
+                            li_html = '<li class="expresscurate_preventTextSelection expresscurate_masonryItem">\
                     <input id="uniqueId" class="checkInput" type="checkbox"/>\
                     <label for="uniqueId" class="expresscurate_preventTextSelection"></label>\
                     <a class="postTitle" href="' + link + '" target="_newtab">' + data.result.title + '</a><br />\
@@ -56,8 +56,9 @@ var Bookmarks = (function (jQuery) {
                 </li>';
                             if (li_html != '') {
                                 jQuery('.expresscurate_bookmarkBoxes').append(li_html);
-                                Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
                                 var lastLi = jQuery('.expresscurate_bookmarkBoxes > li').last();
+                                jQuery('.expresscurate_bookmarkBoxes').masonry( 'appended', lastLi );
+                                Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
                                 lastLi.css('background-color', 'transparent');
                                 jQuery('.addBookmark input').val('');
                                 setTimeout(function () {
@@ -99,6 +100,7 @@ var Bookmarks = (function (jQuery) {
                 jQuery(els).css('background-color', 'transparent');
                 setTimeout(function(){
                     jQuery(els).remove();
+                    jQuery('.expresscurate_bookmarkBoxes').masonry();
                 },700);
                 Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
                 Utils.checkControls(jQuery('.bookmarkListControls .quotes,.bookmarkListControls .remove'));
@@ -125,6 +127,7 @@ var Bookmarks = (function (jQuery) {
                 var data = jQuery.parseJSON(res);
                 if (data.status == 'success') {
                     label.text(input.val()).addClass('active');
+                    jQuery('.expresscurate_bookmarkBoxes').masonry();
                 }
             });
 
@@ -166,6 +169,7 @@ var Bookmarks = (function (jQuery) {
             label.css('display', 'block');
             input.add(close).css('display', 'none');
             label.text('add comment').removeClass('active');
+            jQuery('.expresscurate_bookmarkBoxes').masonry();
         });
         /*checkboxes*/
         jQuery('.expresscurate_bookmarkBoxes li input:checkbox').prop('checked', false);

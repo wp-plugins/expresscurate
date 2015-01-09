@@ -53,7 +53,6 @@ class ExpressCurate_Actions
 
         $this->feedManager = new ExpressCurate_FeedManager();
         // register actions
-
         add_action('admin_init', array(&$this, 'register_settings'));
         add_action('admin_init', array(&$this, 'admin_init'));
         add_action('admin_menu', array(&$this, 'add_menu'));
@@ -78,7 +77,6 @@ class ExpressCurate_Actions
         add_filter('wp_title', array(&$this, 'expresscurate_advanced_seo_update_title'));
     }
 
-
     /**
      * hook into WP's init action hook
      */
@@ -88,7 +86,6 @@ class ExpressCurate_Actions
         add_action('save_post', array(&$this, 'save_post'));
         add_filter('post_updated_messages', array(&$this, 'expresscurate_messages'));
         add_filter('mce_css', array(&$this, 'add_expresscurate_editor_style'));
-        add_filter('show_admin_bar', array(&$this, 'expresscurate_hide_admin_bar'));
         add_filter('show_admin_bar', array(&$this, 'expresscurate_hide_admin_bar'));
         add_action('admin_init', array(&$this, 'expresscurate_load_source'));
 
@@ -162,7 +159,6 @@ class ExpressCurate_Actions
             }
         }
     }
-
     public function register_settings()
     {
         // register plugin's settings
@@ -829,7 +825,7 @@ class ExpressCurate_Actions
         $post_issues = $this->post_analysis($post_content,has_post_thumbnail($post_id));
         if($post_issues > 0){
             $warning = get_option('expresscurate_not_writable_warning');
-            $warning[$post_id] = "You have $post_issues post analytics <a class='expresscurateLink expresscurate_postAnalysis' href='#'> notes</a>. ";
+            $warning[$post_id] = "Post Analyzed. View $post_issues <a class='expresscurateLink expresscurate_postAnalysis' href='#'>recommendations</a>. ";
             update_option('expresscurate_not_writable_warning', $warning);
         }
 
@@ -929,7 +925,7 @@ class ExpressCurate_Actions
         add_submenu_page('expresscurate', 'Settings', 'Settings', 'manage_options', 'expresscurate_settings', array(&$this, 'plugin_settings_page'), '');
         add_submenu_page('expresscurate', 'News', 'News', 'edit_posts', 'expresscurate_news', array(&$this, 'show_expresscurate_news'), '');
         add_submenu_page('expresscurate', 'FAQ', 'FAQ', 'edit_posts', 'expresscurate_faq', array(&$this, 'show_expresscurate_faq_page'), '');
-        add_submenu_page('expresscurate', 'Support', 'Support', 'edit_posts', 'support', array(&$this, 'show_expresscurate_support_page'), '');
+        add_submenu_page('expresscurate', 'Support', 'Support', 'edit_posts', 'expresscurate_support', array(&$this, 'show_expresscurate_support_page'), '');
     }
 
     //Add widget
@@ -1198,13 +1194,13 @@ class ExpressCurate_Actions
     public function expresscurate_admin_print_styles()
     {
         $pluginUrl = plugin_dir_url(__FILE__);
-        wp_enqueue_script('expresscurate_utils', $pluginUrl . 'js/Utils.js', array('jquery','masonry'));
+        wp_enqueue_script('expresscurate_utils', $pluginUrl . 'js/Utils.js', array('jquery','masonry','jquery-ui-sortable'));
         wp_enqueue_script('expresscurate_dialog', $pluginUrl . 'js/Dialog.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
         wp_enqueue_script('expresscurate_settings', $pluginUrl . 'js/Settings.js', array('jquery'));
         wp_enqueue_script('expresscurate_source_collection', $pluginUrl . 'js/sourceCollection.js', array('jquery'));
-        wp_enqueue_script('expresscurate_bookmarks', $pluginUrl . 'js/bookmarks.js', array('jquery'));
+        wp_enqueue_script('expresscurate_bookmarks', $pluginUrl . 'js/bookmarks.js', array('jquery','masonry'));
         wp_enqueue_script('expresscurate_feed_settings', $pluginUrl . 'js/feed/feedSettings.js', array('jquery'));
-        wp_enqueue_script('expresscurate_content_feed', $pluginUrl . 'js/feed/contentFeed.js', array('jquery'));
+        wp_enqueue_script('expresscurate_content_feed', $pluginUrl . 'js/feed/contentFeed.js', array('jquery','masonry'));
 
         wp_enqueue_script('expresscurate_keyword_utils', $pluginUrl . 'js/keywords/KeywordUtils.js', array('jquery'));
         wp_enqueue_script('expresscurate_keywords', $pluginUrl . 'js/keywords/Keywords.js', array('jquery', 'jquery-ui-core', 'jquery-ui-datepicker'));
@@ -1336,7 +1332,7 @@ class ExpressCurate_Actions
         if (isset($_REQUEST['hideadminmenu']) && $_REQUEST['hideadminmenu']=='true') {
             return false;
         }
-        return true;
+        return is_user_logged_in();
     }
 
     public function change_tabs()

@@ -8,12 +8,9 @@ if ($current_user->user_email) {
 $sent = false;
 if ($_POST) {
   if ($_POST['expresscurate_support_email'] && $_POST['expresscurate_support_message']) {
-    add_filter( 'wp_mail_from', function($email){
-	return $_POST['expresscurate_support_email'];
-    });
-    wp_mail('support@expresscurate.com', 'Expresscurate FAQ', $_POST['expresscurate_support_message']);
-    $sent = true;
-    unset($_POST);
+      $expressCurateEmail = new ExpressCurate_Email();
+      $sent =  $expressCurateEmail->sendSupportEmail($_POST['expresscurate_support_email'], 'Expresscurate FAQ',$_POST['expresscurate_support_message']);
+      unset($_POST);
   }
 }
 $feed = ExpressCurate_Actions::getCurationNews('http://news.expresscurate.com/category/faq/feed/');
@@ -63,8 +60,7 @@ $limit = 3;
         <?php
       }
       ?>
-      <form method="post" action=""
-            id="expresscurate_support_form">
+      <form method="post" action=""  id="expresscurate_support_form">
         <input id="expresscurate_support_email" name="expresscurate_support_email" class="inputStyle"
                placeholder="Email"
                value="<?php echo $user_email ?>"/>
