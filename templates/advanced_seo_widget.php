@@ -7,6 +7,7 @@ global $post;
 <ul class="tabs">
     <li class="tab-link expresscurate_preventTextSelection green current" data-tab="tab-1">Advanced SEO</li>
     <li class="tab-link expresscurate_preventTextSelection red" data-tab="tab-2">Sitemap</li>
+    <li class="tab-link expresscurate_preventTextSelection blue" data-tab="tab-3">Social</li>
 </ul>
 
 <div id="tab-1" class="tab-content current">
@@ -214,6 +215,37 @@ global $post;
                 </ul>
             </li>
         </ul>
+    </div>
+</div>
+<div id="tab-3" class="tab-content">
+    <div id="expresscurate_social_widget">
+        <div class="info">
+            <label for="expresscurate_advanced_seo_social_title" class="label">Title</label>
+        </div>
+        <div class="value">
+            <input id="expresscurate_advanced_seo_social_title" class="expresscurate_disableInputStyle" type="text"
+                   name='expresscurate_advanced_seo_social_title'
+                   value="<?php echo get_post_meta($post->ID, 'expresscurate_advanced_seo_social_title', true); ?>">
+        </div>
+        <div class="expresscurate_clear"></div>
+        <div class="info">
+            <label for="expresscurate_advanced_seo_social_shortdesc" class="label">Short Description</label>
+        </div>
+        <div class="value">
+            <input id="expresscurate_advanced_seo_social_shortdesc" class="expresscurate_disableInputStyle" type="text"
+                   name='expresscurate_advanced_seo_social_shortdesc'
+                   value="<?php echo get_post_meta($post->ID, 'expresscurate_advanced_seo_social_shortdesc', true); ?>">
+        </div>
+        <div class="expresscurate_clear"></div>
+        <div class="info">
+            <label for="expresscurate_advanced_seo_social_desc" class="label">Description</label>
+        </div>
+        <div class="value">
+            <input id="expresscurate_advanced_seo_social_desc" class="expresscurate_disableInputStyle" type="text"
+                   name='expresscurate_advanced_seo_social_desc'
+                   value="<?php echo get_post_meta($post->ID, 'expresscurate_advanced_seo_social_desc', true); ?>">
+        </div>
+        <div class="expresscurate_clear"></div>
     </div>
 </div>
 

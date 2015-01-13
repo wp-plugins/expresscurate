@@ -251,7 +251,7 @@ var SEOControl = (function (jQuery) {
         jQuery('.description, .description p').click(function () {
             if (jQuery('.expresscurate_widget_wrapper').length) {
                 jQuery('.description  p , .description .hint').removeClass('expresscurate_displayNone');
-                jQuery('.description').css({'background-color': '#ffc67d'});
+                jQuery('.description').addClass('active');
                 jQuery('.description  .descriptionWrap').removeClass('textareaBorder');
                 jQuery('.description textarea').focus();
             }
@@ -261,7 +261,7 @@ var SEOControl = (function (jQuery) {
             if (jQuery('.expresscurate_widget_wrapper').length) {
                 jQuery('.description  .descriptionWrap').addClass('textareaBorder');
                 jQuery('.description  p , .description .hint').addClass('expresscurate_displayNone');
-                jQuery('.description').css({'background-color': '#ffffff'});
+                jQuery('.description').removeClass('active');
             }
         });
 
@@ -269,7 +269,7 @@ var SEOControl = (function (jQuery) {
             if (jQuery('.expresscurate_widget').length > 0 && !jQuery(e.target).parents('#expresscurate').is('div')) {
                 jQuery('.description  .descriptionWrap').addClass('textareaBorder');
                 jQuery('.description  p , .description .hint').addClass('expresscurate_displayNone');
-                jQuery('.description').css({'background-color': '#ffffff'});
+                jQuery('.description').removeClass('active');
             }
             // hide suggestion list if clicked outside
             if (jQuery(e.target).is('.addKeywords .suggestion') || jQuery(e.target).closest('.addKeywords .suggestion').length) {

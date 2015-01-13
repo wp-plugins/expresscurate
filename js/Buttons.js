@@ -301,7 +301,7 @@ var Buttons = (function (jQuery) {
                     if (jQuery('.expresscurate_widget').length > 0) {
                         jQuery('.description  .descriptionWrap').addClass('textareaBorder');
                         jQuery('.description  p , .description .hint').addClass('expresscurate_displayNone');
-                        jQuery('.description').css({'background-color': '#ffffff'});
+                        jQuery('.description').removeClass('active');
                     }
                 });
                 ed.onNodeChange.add(function (ed) {

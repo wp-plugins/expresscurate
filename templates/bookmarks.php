@@ -72,8 +72,8 @@ $bookmarks = $feedManager->get_bookmarks();
           <label class="<?php if ($item['comment']) {
         echo 'active';
       } ?>" for="comment__<?php echo $i ?>"><?php echo $item['comment'] ? $item['comment'] : 'add comment'; ?></label>
-          <input type="text" class="expresscurate_disableInputStyle" id="comment__<?php echo $i ?>" value="<?php echo $item['comment'] ?>">
-          <span>&#215</span>
+          <input type="text" class="expresscurate_disableInputStyle expresscurate_displayNone" id="comment__<?php echo $i ?>" value="<?php echo $item['comment'] ?>">
+          <span class="expresscurate_displayNone">&#215</span>
         </div>
         <ul class="controls expresscurate_preventTextSelection">
           <li class="curate"><a href="<?php echo get_admin_url() ?>post-new.php?expresscurate_load_source=<?php echo urlencode($item['link']); ?>&expresscurate_load_title=<?php echo urlencode($item['title']); ?>">Curate</a></li>

@@ -21,7 +21,7 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
         </div>
         <div class="left imgContainer">
             <div class="imgIcons">
-                <div class="sizeX">
+                <div class="sizeX active">
                     <div class="tooltipWrap">
                         <span>Large size</span>
                     </div>
@@ -48,17 +48,17 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
                     </div>
                 </div>
 
-                <div class="alignL">
+                <div class="alignL imgAlign">
                     <div class="tooltipWrap">
                         <span>Align left</span>
                     </div>
                 </div>
-                <div class="alignNone">
+                <div class="alignNone active imgAlign">
                     <div class="tooltipWrap">
                         <span>Fit to center</span>
                     </div>
                 </div>
-                <div class="alignR">
+                <div class="alignR imgAlign">
                     <div class="tooltipWrap">
                         <span>Align right</span>
                     </div>

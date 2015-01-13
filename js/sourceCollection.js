@@ -72,21 +72,19 @@ var SourceCollection = (function (jQuery) {
     };
 
     var setupColl = function () {
+        var sourceCollWidget=jQuery('.expresscurate_sources_coll_widget');
         /*hover*/
-        jQuery('.expresscurate_sources_coll_widget').on('hover', 'li.list', function (e) {
+        sourceCollWidget.on('hover', 'li.list', function (e) {
             var deleteButton = jQuery(this).find('.delete'),
                 url = jQuery(this).find('.tooltip a').attr('href'),
-                content = '';
-            if (jQuery('#content').css("display") == "block") {
-                content = jQuery('#content').val();
-            } else {
-                content = tinyMCE.get("content").getContent();
-            }
+                contentWrap=jQuery('#content');
+                content = ((contentWrap.css("display") == "block") ? contentWrap.val() : tinyMCE.get("content").getContent());
+
             var myRegExp = new RegExp('((cite=)|(data-curated-url=))["\']' + url + '["\' ]', 'gmi');
             if (content.match(myRegExp) != null) {
-                deleteButton.css('display', 'none');
+                deleteButton.addClass('expresscurate_displayNone');
             } else
-                deleteButton.css('display', 'inline-block');
+                deleteButton.removeClass('expresscurate_displayNone').addClass('expresscurate_displayInlineBlock');
         });
         /*add*/
         jQuery('.expresscurate_sources_coll_widget .addSource .text').on('click', function () {
@@ -103,7 +101,7 @@ var SourceCollection = (function (jQuery) {
                 jQuery('.expresscurate_sources_coll_widget .addSource').removeClass('addSourceActive');
             }
         });
-        jQuery('.expresscurate_sources_coll_widget').keydown(function (event) {
+        sourceCollWidget.keydown(function (event) {
             if (event.keyCode == 13) {
                 event.preventDefault();
                 return false;
@@ -115,7 +113,7 @@ var SourceCollection = (function (jQuery) {
             }
         });
         var clickDisabled = false;
-        jQuery('.expresscurate_sources_coll_widget').on('click', '.addSourceActive div span span', function (e) {
+        sourceCollWidget.on('click', '.addSourceActive div span span', function (e) {
             if (clickDisabled)
                 return;
             addNew();
@@ -125,19 +123,19 @@ var SourceCollection = (function (jQuery) {
             }, 600);
         });
         /*error*/
-        jQuery('.expresscurate_sources_coll_widget').on('click','.errorM',function(){
+        sourceCollWidget.on('click','.errorM',function(){
             removeError();
         });
-        jQuery('.expresscurate_sources_coll_widget').on('keyup','.errorM input',function(e){
+        sourceCollWidget.on('keyup','.errorM input',function(e){
             removeError();
         });
         /*delete*/
-        jQuery('.expresscurate_sources_coll_widget').on('click touchend', 'li .delete', function () {
+        sourceCollWidget.on('click touchend', 'li .delete', function () {
             var elem=jQuery(this).parents('.expresscurate_sources_coll_widget ul>li');
             deleteSource(elem);
         });
         /*curate*/
-        jQuery('.expresscurate_sources_coll_widget').on('click touchend', 'li .expresscurate_curate', function () {
+        sourceCollWidget.on('click touchend', 'li .expresscurate_curate', function () {
             curate(jQuery(this).parents('li.list'));
         });
 

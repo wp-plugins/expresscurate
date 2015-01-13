@@ -6,17 +6,13 @@ blockquote ul, ol {
 blockquote {
     position: relative;
     padding: 0 20px;
-    margin: 0px 0px 20px 10px;
+    margin: 0 0 20px 10px;
     clear: both;
     border: none !important;
 }
 
 blockquote > * {
     margin-left: 10px;
-}
-
-blockquote > *:first-child {
-    /* padding-top: 20px; */
 }
 
 blockquote:before {

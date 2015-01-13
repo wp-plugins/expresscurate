@@ -12,21 +12,19 @@ var FeedSettings = (function (jQuery) {
                 existed = false;
             if (existedLi.length > 0) {
                 existedLi.each(function (index, value) {
-                    var existedURL = jQuery(value).find('h3').text();
+                    var existedURL = jQuery(value).find('a').text();
                     if (link == existedURL) {
                         existed = true;
                         li_html = '';
                         var addedLi = jQuery(value);
-                        addedLi.css('background-color', '#FCFCFC');
+                        addedLi.addClass('expresscurate_highlight');
                         setTimeout(function () {
-                            addedLi.css('background-color', 'transparent');
+                            addedLi.removeClass('expresscurate_highlight');
                         }, 1000);
-                        return;
                     }
                 });
             }
             if (!existed) {
-
                 jQuery.post('admin-ajax.php?action=expresscurate_feed_add', {url: link}, function (res) {
                     data = jQuery.parseJSON(res);
                     if (data.status == 'success') {
@@ -40,10 +38,10 @@ var FeedSettings = (function (jQuery) {
                         jQuery('.expresscurate_feedSettingsList').append(li_html);
                         Utils.notDefinedMessage(jQuery('.expresscurate_feed_dashboard .expresscurate_notDefined'),jQuery('.expresscurate_feedSettingsList > li'));
                         var lastLi = jQuery('.expresscurate_feedSettingsList li').last();
-                        lastLi.css('background-color', '#FCFCFC');
+                        lastLi.addClass('expresscurate_highlight');
                         jQuery('.addFeed input').val('');
                         setTimeout(function () {
-                            lastLi.css('background-color', 'transparent');
+                            lastLi.removeClass('expresscurate_highlight');
                         }, 1000);
 
                     } else if (data.status == 'nofeed') {
@@ -78,11 +76,14 @@ var FeedSettings = (function (jQuery) {
         jQuery.post('admin-ajax.php?action=expresscurate_feed_delete', {url: link}, function (res) {
             data = jQuery.parseJSON(res);
             if (data.status == 'success') {
-                el.parents('li').remove();
+                var element=el.parents('li');
+                element.addClass('expresscurate_highlight');
+                setTimeout(function () {
+                    element.removeClass('expresscurate_highlight');
+                    element.remove();
+                }, 1000);
                 Utils.notDefinedMessage(jQuery('.expresscurate_feed_dashboard .expresscurate_notDefined'),jQuery('.expresscurate_feedSettingsList > li'));
             }
-            /*else {
-             }*/
         });
     }
 

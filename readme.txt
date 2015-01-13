@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://bit.ly/expresscuratedonate
 Requires at least: 3.9
 Tested up to: 4.1
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -80,7 +80,7 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 
 = How To Get Started =
-[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.0.2.zip "Your favorite content marketing tools") for WordPress.  
+[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.0.3.zip "Your favorite content marketing tools") for WordPress.  
 You can also [download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme") a **free** [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme"). It will give your curated content a modern online news look.
 
 
@@ -127,6 +127,12 @@ You can also [download](http://www.expresscurate.com/p/products/wordpress-theme 
 
 
 == Changelog ==
+
+= 2.0.3 =
+* ereg dependency is removed. This function has been DEPRECATED as of PHP 5.3.0.
+* Job scheduling is improved. In cases when the jobs cannot automatically be setup, a proper message with instructions is now given.
+* Social SEO options.
+* Miscellaneous bug fixes and improvements.
 
 = 2.0.2 =
 * Admin bar issues are fixed.

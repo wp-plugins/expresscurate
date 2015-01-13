@@ -18,11 +18,10 @@ var Bookmarks = (function (jQuery) {
                         existed = true;
                         li_html = '';
                         var addedLi = jQuery(value);
-                        addedLi.css('background-color', 'transparent');
+                        addedLi.addClass('expresscurate_transparent');
                         setTimeout(function () {
-                            addedLi.css('background-color', '#fff');
+                            addedLi.removeClass('expresscurate_transparent');
                         }, 700);
-                        return;
                     }
                 });
             }
@@ -41,8 +40,8 @@ var Bookmarks = (function (jQuery) {
                     <span class="time">Just now</span>\
                     <div class="comment">\
                         <label class="" for="uniqueId">add comment</label>\
-                        <input type="text" class="expresscurate_disableInputStyle" id="uniqueId">\
-                        <span>&#215</span>\
+                        <input type="text" class="expresscurate_disableInputStyle expresscurate_displayNone" id="uniqueId">\
+                        <span class="expresscurate_displayNone">&#215</span>\
                     </div>\
                     <ul class="controls expresscurate_preventTextSelection">\
                         <li><a class="curate" href="post-new.php?expresscurate_load_source=' + link + '">Curate</a></li>\
@@ -57,12 +56,21 @@ var Bookmarks = (function (jQuery) {
                             if (li_html != '') {
                                 jQuery('.expresscurate_bookmarkBoxes').append(li_html);
                                 var lastLi = jQuery('.expresscurate_bookmarkBoxes > li').last();
-                                jQuery('.expresscurate_bookmarkBoxes').masonry( 'appended', lastLi );
+
+                                jQuery('.expresscurate_bookmarkBoxes .addNewBookmark').after(lastLi);
+                                jQuery('.expresscurate_bookmarkBoxes').masonry('destroy').masonry({
+                                    itemSelector: '.expresscurate_masonryItem',
+                                    isResizable: true,
+                                    isAnimated: true,
+                                    columnWidth: '.expresscurate_masonryItem',
+                                    gutter: 10
+                                });
+
                                 Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
-                                lastLi.css('background-color', 'transparent');
+                                lastLi.addClass('expresscurate_transparent');
                                 jQuery('.addBookmark input').val('');
                                 setTimeout(function () {
-                                    lastLi.css('background-color', '#fff');
+                                    lastLi.removeClass('expresscurate_transparent');
                                 }, 700);
                             }
 
@@ -97,13 +105,13 @@ var Bookmarks = (function (jQuery) {
         jQuery.post('admin-ajax.php?action=expresscurate_bookmarks_delete', {items: JSON.stringify(items)}, function (res) {
             var data = jQuery.parseJSON(res);
             if (data.status == 'success') {
-                jQuery(els).css('background-color', 'transparent');
+                jQuery(els).addClass('expresscurate_transparent');
                 setTimeout(function(){
                     jQuery(els).remove();
                     jQuery('.expresscurate_bookmarkBoxes').masonry();
+                    Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
+                    Utils.checkControls(jQuery('.bookmarkListControls li'));
                 },700);
-                Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
-                Utils.checkControls(jQuery('.bookmarkListControls .quotes,.bookmarkListControls .remove'));
             } else {
             }
         });
@@ -115,8 +123,8 @@ var Bookmarks = (function (jQuery) {
             input = elem,
             link = elem.parents('.expresscurate_bookmarkBoxes > li').find('a.url').attr('href'),
             comment = input.val();
-        label.css('display', 'block');
-        input.add(close).css('display', 'none');
+        label.removeClass('expresscurate_displayNone');
+        input.add(close).addClass('expresscurate_displayNone');
         if (!input.val().match(/\S/)) {
             label.text('add comment').removeClass('active');
         } else {
@@ -147,8 +155,9 @@ var Bookmarks = (function (jQuery) {
             var input = jQuery(this).parent('.comment').find('input'),
                 close = jQuery(this).parent('.comment').find('span'),
                 label = jQuery(this);
-            label.css('display', 'none');
-            input.add(close).css('display', 'inline-block');
+            label.addClass('expresscurate_displayNone');
+            input.add(close).removeClass('expresscurate_displayNone').addClass('expresscurate_displayInlineBlock');
+            jQuery('.expresscurate_bookmarkBoxes').masonry();
             if (label.text() !== 'add comment')
                 input.val(label.text());
             else
@@ -166,8 +175,8 @@ var Bookmarks = (function (jQuery) {
             var label = jQuery(this).parent('.comment').find('label'),
                 close = jQuery(this),
                 input = jQuery(this).parent('.comment').find('input');
-            label.css('display', 'block');
-            input.add(close).css('display', 'none');
+            label.removeClass('expresscurate_displayNone');
+            input.add(close).addClass('expresscurate_displayNone');
             label.text('add comment').removeClass('active');
             jQuery('.expresscurate_bookmarkBoxes').masonry();
         });

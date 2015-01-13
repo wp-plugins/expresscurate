@@ -32,10 +32,11 @@ var ExpresscurateDialog = (function (jQuery) {
     };
 
     var displayCuratedImages = function (images) {
-        var img_count = false;
+        var img_count = false,
+            editor = jQuery('.expresscurate_dialog .editor');
         // hide image container
         jQuery('.imgContainer').hide();
-        jQuery('.expresscurate_dialog .editor').css('width', '100%');
+        editor.removeClass('small');
         //
         jQuery.each(images, function (index, value) {
             var img = new Image();
@@ -46,7 +47,7 @@ var ExpresscurateDialog = (function (jQuery) {
                     //images_html += '<li id="tcurated_image_' + index + '" class="tcurated_image" style="background-image: url(' + value + ')" onclick="ExpresscurateDialog.insertDeleteImage(' + index + ')"></li>';
                     jQuery('<li id="tcurated_image_' + index + '" class="tcurated_image" style="background-image: url(' + value + ')" onclick="ExpresscurateDialog.insertDeleteImage(' + index + ')"></li>').appendTo("#curated_images");
                     // show image container
-                    jQuery('.expresscurate_dialog .editor').width(614);
+                    editor.addClass('small');
                     jQuery('.imgContainer').show();
                     //
                 }
@@ -56,7 +57,7 @@ var ExpresscurateDialog = (function (jQuery) {
         setTimeout(function () {
             if (jQuery('ul#curated_images li').length > 0) {
                 jQuery('.content .img').removeClass("noimage");
-                jQuery('.content .img').css('background-image', jQuery('ul#curated_images li').first().css('background-image'))
+                jQuery('.content .img').css('background-image', jQuery('ul#curated_images li').first().css('background-image'));
                 var numberOfImages = jQuery('ul#curated_images li').length;
                 if (numberOfImages > 0) {
                     var counter = jQuery('.expresscurate_dialog .imageCount');
@@ -91,7 +92,6 @@ var ExpresscurateDialog = (function (jQuery) {
         jQuery(text_html).appendTo('#curated_paragraphs');
         var liCount = jQuery('#curated_paragraphs li').length;
         jQuery('.paragraphs_preview').width(liCount * paragraphWidth);
-        jQuery('#curated_paragraphs').css('left', '0');
         buttonsStatus();
     };
 
@@ -270,7 +270,7 @@ var ExpresscurateDialog = (function (jQuery) {
         input.addClass('expresscurate_displayNone');
         close.addClass('expresscurate_displayNone');
         icon.removeClass('expresscurate_displayNone');
-        jQuery('.expresscurate_dialog_search').css('width', '35px');
+        jQuery('.expresscurate_dialog_search').removeClass('active');
         input.val('');
         displayCuratedParagraphs(curatedParagraphs, curatedParagraphs.length, true);
     };
@@ -486,31 +486,16 @@ var ExpresscurateDialog = (function (jQuery) {
 
             jQuery('.sizeS, .sizeM, .sizeX').each(function (i, el) {
                 jQuery(this).click(function (e) {
-                    jQuery('.sizeS, .sizeM, .sizeX').css({
-                        'background-color': '#777777'
-                    });
-                    jQuery(this).css({
-                        'background-color': '#27cfae'
-                    });
+                    jQuery('.sizeS, .sizeM, .sizeX').removeClass('active');
+                    jQuery(this).addClass('active');
                 });
             });
 
-            jQuery('.alignL').click(function (e) {
-                jQuery(this).css('background-position', '-1px -32px');
-                jQuery('.alignNone').css('background-position', '-1px -122px');
-                jQuery('.alignR').css('background-position', '-1px -62px');
+            jQuery('.alignL , .alignR , .alignNone').click(function (e) {
+                jQuery('.imgAlign').removeClass('active');
+                jQuery(this).addClass('active');
+                console.log(jQuery(this));
             });
-            jQuery('.alignR').click(function (e) {
-                jQuery('.alignL').css('background-position', '-1px -2px');
-                jQuery('.alignNone').css('background-position', '-1px -122px');
-                jQuery(this).css('background-position', '-1px -92px');
-            });
-            jQuery('.alignNone').click(function (e) {
-                jQuery('.alignL').css('background-position', '-1px -2px');
-                jQuery(this).css('background-position', '-1px -152px');
-                jQuery('.alignR').css('background-position', '-1px -62px');
-            });
-
             jQuery("#expresscurate_open-modal").click(function (event) {
                 event.preventDefault();
                 openDialog();
@@ -597,7 +582,7 @@ var ExpresscurateDialog = (function (jQuery) {
                 input.removeClass('expresscurate_displayNone');
                 close.removeClass('expresscurate_displayNone');
                 icon.addClass('expresscurate_displayNone');
-                jQuery('.expresscurate_dialog_search').css('width', '190px');
+                jQuery('.expresscurate_dialog_search').addClass('active');
                 input.focus();
             } else {
                 searchInParagraphs(input.val());

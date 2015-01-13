@@ -4,7 +4,7 @@ $feed_list = $feedManager->get_rss_list();
 ?>
 
 <div class="expresscurate_feed_dashboard expresscurate_Styles wrap">
-    <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
+    <div class="expresscurate_headBorderBottom expresscurate_headerPart expresscurate_OpenSansRegular">
         <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
         <h2>RSS Feeds</h2>
         <div class="pageDesc">

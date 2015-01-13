@@ -63,16 +63,6 @@ var Keywords = (function (jQuery) {
         });
         keywords.pop();
         if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length <= 0) {
-            /*if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
-             check_editor = setTimeout(function check() {
-             clearTimeout(check_editor);
-             highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
-             if (highlightedElems.length > 0) {
-             markKeywords(ed, keywords);
-             setTimeout(check, 15000);
-             }
-             }, 1);
-             }*/
             markKeywords(ed, keywords);
         } else {
             highlightedElems.each(function (index, val) {
@@ -105,19 +95,6 @@ var Keywords = (function (jQuery) {
                     ed.controlManager.setActive('markKeywords', true);
                     activeMarkButton = true;
                     markKeywords(ed, keywords);
-                    /*if (jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight').length <= 0) {
-                     if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && jQuery('.expresscurate_widget').length > 0) {
-                     check_editor = setTimeout(function check() {
-                     clearTimeout(check_editor);
-                     if (activeMarkButton) {
-                     definedKeywords = jQuery('#expresscurate_defined_tags').val();
-                     keywords = ((definedKeywords !== '') ? definedKeywords.split(', ') : null);
-                     markKeywords(ed, keywords);
-                     }
-                     setTimeout(check, 15000);
-                     }, 1);
-                     }
-                     }*/
                 } else {
                     highlightedElems.each(function (index, val) {
                         jQuery(val).replaceWith(this.childNodes);
@@ -226,7 +203,7 @@ var Keywords = (function (jQuery) {
         });
 
         jQuery('.usedWordsPart ul').on('click', '.add', function () {
-            jQuery(this).parents('li').css({'background-color': '#f5f6f6'});
+            jQuery(this).parents('li').addClass('expresscurate_highlight');
             jQuery('.expresscurate_keywords_settings .suggestion').remove();
             insertKeywordInKeywordsSettings(KeywordUtils.multipleKeywords(jQuery(this).parent().find('.word'), jQuery('.keywordsPart')), jQuery('.keywordsPart div> ul'));
             jQuery(this).parents('li').fadeOut(1000).remove();
@@ -242,20 +219,6 @@ var Keywords = (function (jQuery) {
                 }
             });
         });
-
-        /*
-         var datePick1 = jQuery('#datepicker1'),
-         datePick2 = jQuery('#datepicker2');
-
-         datePick1.datepicker({
-         dateFormat: "dd.mm.yy"
-         });
-         datePick1.datepicker('setDate', new Date(2014, 0, 1));
-
-         datePick2.datepicker({
-         dateFormat: "dd.mm.yy"
-         });
-         datePick2.datepicker('setDate', new Date());*/
     };
 
     var isSetup = false;
@@ -274,9 +237,4 @@ var Keywords = (function (jQuery) {
         markEditorKeywords: markEditorKeywords
     }
 })(window.jQuery);
-
 Keywords.setup();
-// load KeywordUtils.js and then call setup (ajax request)
-//jQuery.getScript("./KeywordUtils.js", function(){
-//    Keywords.setup();
-//});

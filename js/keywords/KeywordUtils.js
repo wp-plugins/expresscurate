@@ -87,16 +87,17 @@ var KeywordUtils = (function(jQuery){
                     if (jQuery(value).find('span').text().toLowerCase() == text.toLowerCase()){
                         var elem = jQuery(this).closest('.expresscurate_background_wrap');
                         var i = elem.closest('.expresscurate_widget_wrapper').find('.expresscurate_background_wrap').index(elem);
-                        jQuery('.expresscurate_widget_wrapper .expresscurate_background_wrap').eq(i).css('opacity','.7');
+                        jQuery('.expresscurate_widget_wrapper .expresscurate_background_wrap').eq(i).addClass('highlight');
                         setTimeout(function () {
-                            elem.css('opacity','1.0');
+                            elem.removeClass('highlight');
+                            console.log('mta');
                         }, 1000);
                     }
                 }else if (KeywordUtils.justText(jQuery(value).find('.word')).toLowerCase().trim() == keyword.toLowerCase()) {
                     var elem = jQuery(value);
-                    elem.css({'background-color': '#FCFCFC'});
+                    elem.addClass('expresscurate_highlight');
                     setTimeout(function () {
-                        elem.css({'background-color': 'transparent'});
+                        elem.removeClass('expresscurate_highlight');
                     }, 1000);
                 }
             });

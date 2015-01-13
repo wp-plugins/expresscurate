@@ -63,17 +63,19 @@ var Utils = (function (jQuery) {
         },
         /*show/hide controls in content feed and bookmarks*/
         checkControls: function (controls) {
-            var atLeastOneIsChecked = jQuery('.checkInput').is(':checked');
-            var allIsChecked = jQuery('.checkInput:checked').length == jQuery('.checkInput').length;
+            var checkboxes=jQuery('.checkInput'),
+                atLeastOneIsChecked = checkboxes.is(':checked'),
+                allIsChecked = jQuery('.checkInput:checked').length == checkboxes.length,
+                checkControl=jQuery('.expresscurate_controls .check');
             if (atLeastOneIsChecked) {
                 controls.addClass('active');
             } else {
                 controls.removeClass('active');
             }
             if (allIsChecked) {
-                jQuery('.expresscurate_bookmarks .check,.feedListControls .check').addClass('active');
+                checkControl.addClass('active');
             } else {
-                jQuery('.expresscurate_bookmarks .check,.feedListControls .check').removeClass('active');
+                checkControl.removeClass('active');
             }
         },
         /*validation for support and FAQ*/
@@ -111,36 +113,11 @@ var Utils = (function (jQuery) {
         /*loading for bookmarks and feeds*/
         startLoading: function (input, elemToRotate) {
             input.prop('disabled', true);
-            var rotation = 360;
-            elemToRotate.css({
-                '-webkit-transition-duration': '1500ms',
-                'transition-duration': '1500ms',
-                '-webkit-transform': 'rotate(' + rotation + 'deg)',
-                '-moz-transform': 'rotate(' + rotation + 'deg)',
-                '-ms-transform': 'rotate(' + rotation + 'deg)',
-                'transform': 'rotate(' + rotation + 'deg)'
-            });
-            interval = setInterval(function () {
-                rotation += 360;
-                elemToRotate.css({
-                    '-webkit-transform': 'rotate(' + rotation + 'deg)',
-                    '-moz-transform': 'rotate(' + rotation + 'deg)',
-                    '-ms-transform': 'rotate(' + rotation + 'deg)',
-                    'transform': 'rotate(' + rotation + 'deg)'
-                });
-            }, 1500);
+            elemToRotate.addClass('expresscurate_startRotate');
         },
         endLoading: function (input, elemToRotate) {
             input.removeAttr('disabled');
-            clearInterval(interval);
-            elemToRotate.css({
-                '-webkit-transition-duration': '0s',
-                'transition-duration': '0s',
-                '-webkit-transform': 'rotate(0deg)',
-                '-moz-transform': 'rotate(0deg)',
-                '-ms-transform': 'rotate(0deg)',
-                'transform': 'rotate(0deg)'
-            });
+            elemToRotate.removeClass('expresscurate_startRotate');
             input.focus();
         },
 
@@ -189,44 +166,43 @@ var Utils = (function (jQuery) {
             if (!isSetup) {
                 jQuery(document).ready(function () {
                     if (jQuery('.expresscurate_settings').length) {
-                        var tab_id = jQuery('.tabs').attr('data-currenttab');
+                        var tabs=jQuery('.tabs'),
+                            tab_id = tabs.attr('data-currenttab');
                         if (tab_id.length < 1) {
                             tab_id = 'tab-1';
                         }
                         jQuery('ul.tabs li').removeClass('current');
                         jQuery('.tab-content').removeClass('current');
-                        jQuery('.tabs').find('li[data-tab=' + tab_id + ']').addClass('current');
+                        tabs.find('li[data-tab=' + tab_id + ']').addClass('current');
                         jQuery("#" + tab_id).addClass('current');
                     }
-                    /*jQuery('.expresscurate_blocksContainer').sortable({
-                        distance: 12,
-                        forcePlaceholderSize: true,
-                        items: '.item',
-                        tolerance: 'pointer',
-                        start: function (event, ui) {
-                            // jQuery(this).find('> div').removeClass('item');
-                            ui.item.parent().masonry('destroy');
-                            // ui.item.parent().masonry();
-                        },
-                        change: function (event, ui) {
-                            // ui.item.parent().masonry();
-                        },
-                        stop: function (event, ui) {
-                            // jQuery(this).find('> div').addClass('item');
-                            ui.item.parent().masonry();
-                        },
-                        cursor: "move",
-                        placeholder: "expresscurate_sortablePlaceholder",
-                        grid: [ 20, 10 ]
-                    });*/
 
-                    jQuery('.expresscurate_blocksContainer').masonry({
-                        itemSelector: '.expresscurate_masonryItem',
-                        isResizable: true,
-                        isAnimated: true,
-                        columnWidth: '.expresscurate_masonryItem',
-                        gutter: 10
-                    });
+                  /*      jQuery('.expresscurate_blocksContainer').sortable({
+                            distance: 12,
+                            forcePlaceholderSize: true,
+                            items: '.expresscurate_masonryItem',
+                            tolerance: 'pointer',
+                            containment: "parent",
+                            start: function (event, ui) {
+                                ui.item.parent().masonry('destroy');
+                            },
+                            change: function (event, ui) {
+                            },
+                            stop: function (event, ui) {
+                                setTimeout(function(){
+                                    ui.item.parent().masonry({
+                                        itemSelector: '.expresscurate_masonryItem',
+                                        isResizable: true,
+                                        isAnimated: true,
+                                        columnWidth: '.expresscurate_masonryItem',
+                                        gutter: 10
+                                    });
+                                },100);
+                            },
+                            cursor: "move",
+                            placeholder: "expresscurate_sortablePlaceholder",
+                            grid: [ 20, 10 ]
+                        });*/
 
                     if (jQuery('.expresscurate_dashboard_smartPublishing .topPart .target_date').length) {
                         Utils.countDown();
@@ -248,25 +224,17 @@ var Utils = (function (jQuery) {
                     jQuery('#expresscurate_sitemap_post_configure_manually').on('change', function () {
                         var options = jQuery('.expresscurate_sitemap_widget .hiddenOptions');
                         if (jQuery(this).is(':checked')) {
-                            options.css('min-width', options.width() + 'px').removeClass('expresscurate_displayNone').hide().slideDown('slow', function () {
-                                jQuery(this).css('min-width', 'inherit');
-                            });
+                            options.removeClass('expresscurate_displayNone').hide().slideDown('slow');
                         } else {
-                            options.css('min-width', options.width() + 'px').removeClass('expresscurate_displayNone').slideUp('slow', function () {
-                                jQuery(this).css('min-width', 'inherit');
-                            });
+                            options.removeClass('expresscurate_displayNone').slideUp('slow');
                         }
                     });
                     jQuery('#expresscurate_sitemap_post_exclude_from_sitemap').on('change', function () {
                         var options = jQuery('.expresscurate_sitemap_widget .sitemapOption');
                         if (!jQuery(this).is(':checked')) {
-                            options.css('min-width', options.width() + 'px').removeClass('expresscurate_displayNone').hide().slideDown('slow', function () {
-                                jQuery(this).css('min-width', 'inherit');
-                            });
+                            options.removeClass('expresscurate_displayNone').hide().slideDown('slow');
                         } else {
-                            options.css('min-width', options.width() + 'px').removeClass('expresscurate_displayNone').slideUp('slow', function () {
-                                jQuery(this).css('min-width', 'inherit');
-                            });
+                            options.removeClass('expresscurate_displayNone').slideUp('slow');
                         }
                     });
                     isSetup = true;

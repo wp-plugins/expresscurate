@@ -23,7 +23,7 @@ if ($_POST) {
         <h2>ExpressCurate</h2>
         <label></label>
     </div>
-    <div class="expresscurate_blocksContainer">
+    <div class="expresscurate_blocksContainer expresscurate_masonryWrap">
         <div id ='keyWords' class="expresscurate_keywordsBlock expresscurate_masonryItem">
             <label class="label">Keywords Summary</label>
             <?php $this->keywords_widget(); ?>
