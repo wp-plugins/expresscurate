@@ -1,11 +1,13 @@
 var FeedSettings = (function (jQuery) {
     var addFeed = function () {
-        Utils.startLoading(jQuery('.addFeed input'), jQuery('.addFeed span span'));
+        var input=jQuery('.addFeed input'),
+            elemToRotate=jQuery('.addFeed span span');
+        Utils.startLoading(input, elemToRotate);
         jQuery('.errorMessage').remove();
         var message = '';
         var myRegExp = new RegExp(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.|^)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/);
 
-        var link = jQuery('.addFeed input').val(),
+        var link = input.val(),
             li_html = '';
         if (link.match(myRegExp)) {
             var existedLi = jQuery('.expresscurate_feedSettingsList li'),
@@ -67,9 +69,9 @@ var FeedSettings = (function (jQuery) {
         }
         if (message != '') {
             jQuery(".addFeed").after('<span class="errorMessage">' + message + '</span>');
-            Utils.endLoading(jQuery('.addFeed input'), jQuery('.addFeed span span'));
+            Utils.endLoading(input, elemToRotate);
         }
-    }
+    };
     var deleteFeed = function (el) {
         var link = el.parents('li').find('input').val();
 
@@ -85,7 +87,7 @@ var FeedSettings = (function (jQuery) {
                 Utils.notDefinedMessage(jQuery('.expresscurate_feed_dashboard .expresscurate_notDefined'),jQuery('.expresscurate_feedSettingsList > li'));
             }
         });
-    }
+    };
 
     var setupFeedSettings = function () {
         if(jQuery('.expresscurate_feed_dashboard').length){

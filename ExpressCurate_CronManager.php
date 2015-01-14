@@ -22,15 +22,16 @@ class ExpressCurate_CronManager {
      * Activate cron jobs
      */
     public  function schedule_events() {
+        $exec_function_permission_status = get_option('expresscurate_exec_function_permission_status',false);
+        if($exec_function_permission_status != 'error'){
+            if(!$this->check_if_exist($this->websiteUrlCallCronjob)){
+                file_put_contents($this->tmpForCron, $this->websiteUrlCallCronjob.PHP_EOL);
+                exec('crontab '.$this->tmpForCron ,$output);
 
-        if(!$this->check_if_exist($this->websiteUrlCallCronjob)){
-            file_put_contents($this->tmpForCron, $this->websiteUrlCallCronjob.PHP_EOL);
-            exec('crontab '.$this->tmpForCron ,$output);
-
-            // Chech if cron have been added
-            add_action( 'admin_notices',array(&$this,'get_message'));
+                // Chech if cron have been added
+                add_action( 'admin_notices',array(&$this,'get_message'));
+            }
         }
-
         if (!wp_next_scheduled('expresscurate_publish_event')) {
             wp_schedule_event(time(), 'hourly', 'expresscurate_publish_event');
         }
@@ -69,6 +70,25 @@ class ExpressCurate_CronManager {
     }
 
     /**
+     * Get cron message when where is no permission to add cron job
+     */
+    public function get_message() {
+        $message = '';
+        if(!$this->check_if_exist($this->websiteUrlCallCronjob)){
+            $message .= '<div class="update-nag">';
+            $message .= 'You do not have perrmission to add cronjob!</div>';
+        };
+        echo $message;
+    }
+
+    public function set_permission_status() {
+        $status = $_REQUEST['status'];
+        update_option('expresscurate_exec_function_permission_status', $status);
+        $result = array('status'=>'success');
+        echo json_encode($result);die;
+    }
+
+    /**
      * Check if cron job exists
      */
     private function check_if_exist($command) {
@@ -82,13 +102,6 @@ class ExpressCurate_CronManager {
         return false;
     }
 
-    private function get_message() {
-        $message = '';
-        if(!$this->check_if_exist($this->websiteUrlCallCronjob)){
-            $message .= '<div class="update-nag">';
-            $message .= 'You don not have perrmission to add cronjob!</div>';
-        };
-        echo $message;
-    }
+
 
 }

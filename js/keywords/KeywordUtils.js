@@ -89,8 +89,7 @@ var KeywordUtils = (function(jQuery){
                         var i = elem.closest('.expresscurate_widget_wrapper').find('.expresscurate_background_wrap').index(elem);
                         jQuery('.expresscurate_widget_wrapper .expresscurate_background_wrap').eq(i).addClass('highlight');
                         setTimeout(function () {
-                            elem.removeClass('highlight');
-                            console.log('mta');
+                            elem.css('opacity','1.0');
                         }, 1000);
                     }
                 }else if (KeywordUtils.justText(jQuery(value).find('.word')).toLowerCase().trim() == keyword.toLowerCase()) {

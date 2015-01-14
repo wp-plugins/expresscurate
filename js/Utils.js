@@ -201,7 +201,7 @@ var Utils = (function (jQuery) {
                             },
                             cursor: "move",
                             placeholder: "expresscurate_sortablePlaceholder",
-                            grid: [ 20, 10 ]
+                            grid: [ 20, 10 ] //check
                         });*/
 
                     if (jQuery('.expresscurate_dashboard_smartPublishing .topPart .target_date').length) {
@@ -236,6 +236,15 @@ var Utils = (function (jQuery) {
                         } else {
                             options.removeClass('expresscurate_displayNone').slideUp('slow');
                         }
+                    });
+                    jQuery('#exec_function_perm_seen,#cron_setup_manually').on('click',function(){
+                        var status=(jQuery(this).is('#cron_setup_manually'))? 'set' : 'seen';
+                       jQuery.post('admin-ajax.php?action=expresscurate_set_cron_permission_status', {status: status}, function (res) {
+                            var data = jQuery.parseJSON(res);
+                            if (data.status == 'success') {
+                                jQuery(this).parents('div.update-nag').fadeOut(600);//.addClass('expresscurate_displayNone');
+                            }
+                       });
                     });
                     isSetup = true;
                 });

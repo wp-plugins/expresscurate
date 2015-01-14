@@ -1,11 +1,7 @@
 var SEOControl = (function (jQuery) {
     var insertKeywordInWidget = function (keywords, beforeElem) {
-        /*Utils.startLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
-         Utils.endLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
-         jQuery.when(updateKeywords()).done(function () {
-         });*/
         if (keywords.length > 0) {
-            var titleText = jQuery('#titlediv input[name=post_title]').val(),
+            var titleText = jQuery('#titlediv').find('input[name=post_title]').val(),
                 content = jQuery('#content').val(),
                 titleWords = words_in_text(titleText.toLowerCase()),
                 contentWords = words_in_text(content.toLowerCase()),
@@ -50,7 +46,7 @@ var SEOControl = (function (jQuery) {
 
     var updateKeywords = function () {
         var content = jQuery('#content').val(),
-            titleText = jQuery('#titlediv input[name=post_title]').val(),
+            titleText = jQuery('#titlediv').find('input[name=post_title]').val(),
             titleWords = words_in_text(titleText.toLowerCase()),
             contentWords = words_in_text(content.toLowerCase()),
             keywords = KeywordUtils.justText(jQuery('#expresscurate_defined_tags')).toLowerCase().split(', '),
@@ -175,10 +171,8 @@ var SEOControl = (function (jQuery) {
         });
 
         jQuery('.expresscurate_widget').on("click", '.suggestion li', function (e) {
-            var newKeyword = jQuery(this).text(),
-                input = jQuery('.expresscurate_widget .addKeywords input'),
-                text = input.val();
-            text = newKeyword;
+            var input = jQuery('.expresscurate_widget .addKeywords input'),
+                text = jQuery(this).text();
             input.val(text);
             insertKeywordInWidget(KeywordUtils.multipleKeywords(jQuery('.addKeywords input'), jQuery('.statisticsTitle span')), jQuery('.addKeywords'));
             jQuery('.suggestion').remove();
@@ -186,7 +180,8 @@ var SEOControl = (function (jQuery) {
 
         jQuery('#title').on("keyup", function (e) {
             if (e.altKey && e.keyCode == 75) {
-                var keyword = "";
+                var keyword = "",
+                    input=jQuery('.addKeywords input');
                 if (window.getSelection) {
                     keyword = window.getSelection().toString();
                 } else if (document.selection && document.selection.type != "Control") {
@@ -194,8 +189,8 @@ var SEOControl = (function (jQuery) {
                 }
                 if (jQuery('#expresscurate_widget').length && keyword.length > 3) {
                     keyword = keyword.replace(/<[^>]+>[^<]*<[^>]+>|<[^\/]+\/>/ig, "");
-                    jQuery('.addKeywords input').val(keyword);
-                    SEOControl.insertKeywordInWidget(KeywordUtils.multipleKeywords(jQuery('.addKeywords input'), jQuery('.statisticsTitle span')), jQuery('.addKeywords'));
+                    input.val(keyword);
+                    SEOControl.insertKeywordInWidget(KeywordUtils.multipleKeywords(input, jQuery('.statisticsTitle span')), jQuery('.addKeywords'));
                 }
             }
         });
@@ -235,7 +230,7 @@ var SEOControl = (function (jQuery) {
                             includedKeywordsCount++;
                         }
                     }
-                    var keywordsCount = keywords.length;
+                    keywordsCount = keywords.length;
                 }
                 jQuery('.usedKeywordsCount').replaceWith('<p class="usedKeywordsCount"><span class="bold">' + includedKeywordsCount + '</span>' + ' / ' + keywords.length + '</p>');
                 /**/
@@ -333,7 +328,3 @@ var SEOControl = (function (jQuery) {
 (window.jQuery);
 
 SEOControl.setup();
-// load KeywordUtils.js and then call setup (ajax request)
-//jQuery.getScript("./KeywordUtils.js", function(){
-//    SEOControl.setup();
-//});

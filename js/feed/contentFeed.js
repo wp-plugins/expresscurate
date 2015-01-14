@@ -1,16 +1,17 @@
 var FeedWall = (function (jQuery) {
+    var notDefFeed=jQuery('.expresscurate_feed_list .expresscurate_notDefined'),
+        feedItems=jQuery('.expresscurate_feedBoxes > li');
     var bookmark_add = function (els) {
         var items = [];
         jQuery.each(els, function (index, el) {
             items.push(JSON.parse(jQuery(el).find('.expresscurate_feedData').text()));
         });
-
         jQuery.post('admin-ajax.php?action=expresscurate_bookmarks_add', {items: JSON.stringify(items)});
     };
 
     var addFeed = function (el, url) {
         jQuery.post('admin-ajax.php?action=expresscurate_feed_add', {url: url}, function (res) {
-            data = jQuery.parseJSON(res);
+            var data = jQuery.parseJSON(res);
             var statusButton = el.parent().find('.rssStatus'),
                 tooltip = statusButton.find('.tooltip');
             if (data.status == 'success') {
@@ -40,7 +41,7 @@ var FeedWall = (function (jQuery) {
                     jQuery(els).remove();
                     jQuery('.expresscurate_feedBoxes').masonry();
                     Utils.checkControls(jQuery('.feedListControls li'));
-                    Utils.notDefinedMessage(jQuery('.expresscurate_feed_list .expresscurate_notDefined'), jQuery('.expresscurate_feedBoxes > li'));
+                    Utils.notDefinedMessage(notDefFeed,jQuery('.expresscurate_feedBoxes > li'));
                 }, 700);
             } else {
             }
@@ -48,6 +49,7 @@ var FeedWall = (function (jQuery) {
     };
 
     var setupFeed = function () {
+        var feedBoxes=jQuery('.expresscurate_feedBoxes');
         jQuery('.expresscurate_masonryWrap').masonry({
             itemSelector: '.expresscurate_masonryItem',
             isResizable: true,
@@ -57,12 +59,12 @@ var FeedWall = (function (jQuery) {
         });
 
         if (jQuery('.expresscurate_feed_list').length) {
-            Utils.notDefinedMessage(jQuery('.expresscurate_feed_list .expresscurate_notDefined'), jQuery('.expresscurate_feedBoxes > li'));
+            Utils.notDefinedMessage(notDefFeed,jQuery('.expresscurate_feedBoxes > li'));
         }
         jQuery('.expresscurate_feedBoxes li input:checkbox').prop('checked', false);
 
         /*checkboxes*/
-        jQuery('.expresscurate_feedBoxes').on('click', '> li', function (e) {
+        feedBoxes.on('click', '> li', function (e) {
             if (e.target !== this)
                 return;
             var checkbox = jQuery(this).find('.checkInput');
@@ -72,7 +74,7 @@ var FeedWall = (function (jQuery) {
                 checkbox.attr('checked', true);
             Utils.checkControls(jQuery('.feedListControls .quotes,.feedListControls .remove,.feedListControls .bookmark'));
         });
-        jQuery(".expresscurate_feedBoxes").on('change', '.checkInput', function () {
+        feedBoxes.on('change', '.checkInput', function () {
             Utils.checkControls(jQuery('.feedListControls .quotes,.feedListControls .remove,.feedListControls .bookmark'));
         });
         jQuery('.expresscurate_feed_list .check').on('click', function () {
@@ -90,20 +92,20 @@ var FeedWall = (function (jQuery) {
         jQuery('.expresscurate_feed_list .remove').on('click', function () {
             var checked = jQuery(".expresscurate_feedBoxes li input:checkbox:checked");
             deleteFeedItems(checked.parents('.expresscurate_feedBoxes > li'));
-            Utils.notDefinedMessage(jQuery('.expresscurate_feed_list .expresscurate_notDefined'), jQuery('.expresscurate_feedBoxes > li'));
+            Utils.notDefinedMessage(notDefFeed,jQuery('.expresscurate_feedBoxes > li'));
 
         });
-        jQuery('.expresscurate_feedBoxes').on('click', '.controls .hide', function () {
+        feedBoxes.on('click', '.controls .hide', function () {
             var elem = jQuery(this).parents('.expresscurate_feedBoxes > li');
             deleteFeedItems(elem);
-            Utils.notDefinedMessage(jQuery('.expresscurate_feed_list .expresscurate_notDefined'), jQuery('.expresscurate_feedBoxes > li'));
+            Utils.notDefinedMessage(notDefFeed,jQuery('.expresscurate_feedBoxes > li'));
         });
         /*add from top sources*/
         jQuery('.expresscurate_URL').on('click', '.rssStatusAdd', function () {
             addFeed(jQuery(this), jQuery(this).parent().find('.expresscurate_topCuratedURL').text());
         });
         /*bookmark*/
-        jQuery('.expresscurate_feedBoxes').on('click', '.controls .bookmark', function () {
+        feedBoxes.on('click', '.controls .bookmark', function () {
             var elem = jQuery(this).parents('.expresscurate_feedBoxes > li');
             bookmark_add(elem);
             deleteFeedItems(elem);

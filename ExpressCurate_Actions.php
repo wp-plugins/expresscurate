@@ -54,7 +54,7 @@ class ExpressCurate_Actions
         $this->keywords = new ExpressCurate_Keywords();
         $this->smartPublish = new ExpressCurate_SmartPublish();
         $this->sitemap = new ExpressCurate_Sitemap();
-
+        $this->cronManager = new ExpressCurate_CronManager();
         $this->feedManager = new ExpressCurate_FeedManager();
         // register actions
         add_action('admin_init', array(&$this, 'register_settings'));
@@ -127,11 +127,7 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_smart_publish_event', array(&$this->smartPublish, 'publish_event'));
         add_action('wp_ajax_expresscurate_save_sitemap_google_status', array(&$this->sitemap, 'saveSitemapGoogleStatus'));
 
-        // This is for testing ONLY TODO remove this
-        add_action('wp_ajax_expresscurate_email', array(&$this->feedManager, 'send_content_alert'));
 
-
-        //paid
         add_action('wp_ajax_expresscurate_feed_add', array($this->feedManager, 'add_feed'));
         add_action('wp_ajax_expresscurate_feed_delete', array($this->feedManager, 'delete_feed'));
         add_action('wp_ajax_expresscurate_bookmarks_add', array($this->feedManager, 'add_bookmarks'));
@@ -142,16 +138,18 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_add_post_source', array($this->feedManager, 'add_post_source'));
         add_action('wp_ajax_expresscurate_delete_post_source', array($this->feedManager, 'delete_post_source'));
         add_action('wp_ajax_expresscurate_search_feed_bookmark', array($this->feedManager, 'search_feed_bookmark'));
-        //add_action('wp_ajax_expresscurate_get_user_status', array($this->ajaxExportAPI, 'get_user_status'));
         add_action('wp_ajax_expresscurate_get_feed', array($this->ajaxExportAPI, 'get_feed'));
         add_action('wp_ajax_expresscurate_export_api_get_post', array($this->ajaxExportAPI, 'get_post'));
 
         add_action('wp_ajax_expresscurate_sitemap_generate', array($this->sitemap, 'generateSitemapIndex'));
         add_action('wp_ajax_expresscurate_sitemap_submit', array($this->sitemap, 'submitToGoogle'));
 
-        // add_action('wp_ajax_expresscurate_license_revoke', array(&$this, 'revoke_license'));
+        add_action('wp_ajax_expresscurate_set_cron_permission_status', array( $this->cronManager, 'set_permission_status'));
+
+
         add_action('wp_ajax_expresscurate_change_tab_event', array(&$this, 'change_tabs'));
-        //* paid
+
+
 
 
         add_action('wp_dashboard_setup', array(&$this, 'add_dashboard_widgets'));
@@ -174,6 +172,7 @@ class ExpressCurate_Actions
         register_setting('expresscurate-extension-group', 'expresscurate_def_cat');
         register_setting('expresscurate-extension-group', 'expresscurate_def_post_type');
         register_setting('expresscurate-group', 'expresscurate_max_tags');
+     //   register_setting('expresscurate-group', 'expresscurate_max_tags');
         register_setting('expresscurate-keywords-group', 'expresscurate_defined_tags');
         register_setting('expresscurate-group', 'expresscurate_curated_text');
         register_setting('expresscurate-group', 'expresscurate_featured');
@@ -1361,6 +1360,8 @@ class ExpressCurate_Actions
     public function add_dashboard_widgets()
     {
         add_meta_box('dashboard_widget_keywords', 'Keywords Summary', array(&$this, 'keywords_widget'), get_current_screen(), 'side', 'high');
+        add_meta_box('dashboard_widget_keywords_interest_over_time', 'Keywords Interest Over Time', array(&$this, 'keywords_interest_over_time_widget'), get_current_screen(), 'side', 'high');
+        add_meta_box('dashboard_widget_keywords_related_topics', 'Keywords Related Topics', array(&$this, 'keywords_related_topics_widget'), get_current_screen(), 'side', 'high');
 
         if (get_option('expresscurate_publish', '') == "on") {
             add_meta_box('dashboard_widget_smartPublishing', 'Smart Publishing Overview', array(&$this, 'smart_publishing_widget'), get_current_screen(), 'side', 'high');
@@ -1482,16 +1483,26 @@ class ExpressCurate_Actions
         if (strlen(get_option('expresscurate_google_refresh_token')) < 3 && get_option('expresscurate_sitemap_submit') == 'on') {
             $warnings[] = 'Authorise access to Google Webmasters. <a href="'.$expresscurateWebsiteUrl.'/api/getsitemapkey/'.$blogName.'">Authorize </a>  |  <a href="options-general.php?page=expresscurate_settings"> Sitemap Settings </a>';
         }
-
         if(!function_exists('exec')) {
-            $cronjob ='0 * * * *  wget http://yourblogaddress.com > /dev/null 2>&1';
-            $warnings[] = '
+            $exec_function_permission_status = get_option('expresscurate_exec_function_permission_status',false);
+            if(!$exec_function_permission_status || 'error' == $exec_function_permission_status){
+                update_option('expresscurate_exec_function_permission_status','error');
+                $cronjob ='0 * * * *  wget '.get_site_url().' > /dev/null 2>&1';
+                $warnings[] = '
                            ExpressCurate was not able to schedule jobs required for Content Feed. Cause: Function <b>exec()</b> is disabled.
                            Please, enable <b>exec()</b> or add the following cron from the control panel of your hosting:
-            <p style="text-indent: 20px;font-weight: bolder">'.$cronjob.'</p>
+                <p style="text-indent: 20px;font-weight: bolder">'.$cronjob.'</p>
 
-            For more details, contact  <a href="'.get_site_url().'/wp-admin/admin.php?page=expresscurate_support"> Support </a>
-            ';
+                For more details, contact  <a class="expresscurateLink" href="'.get_site_url().'/wp-admin/admin.php?page=expresscurate_support"> Support </a></br></br>
+                <a class="expresscurateLink" href="#" id="exec_function_perm_seen" >Yes I have got it</a> | <a class="expresscurateLink" href="#" id="cron_setup_manually">I have already set it manually</a>
+
+                ';
+            }elseif($exec_function_permission_status == 'set' &&  $_REQUEST['page'] == 'expresscurate_settings' ){
+                $warnings[] = '
+                           You have already set cron job manually from your host.</br>
+                <a class="expresscurateLink" href="#" id="exec_function_perm_seen" >Yes I have got it</a>
+                ';
+            }
         }
 
         if(count($warnings) > 0 ){

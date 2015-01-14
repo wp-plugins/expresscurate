@@ -28,6 +28,16 @@ if ($_POST) {
             <label class="label">Keywords Summary</label>
             <?php $this->keywords_widget(); ?>
         </div>
+        
+        <div id ='keyWordsIntOverTime' class="expresscurate_keywordsBlock expresscurate_masonryItem">
+            <label class="label">Keywords Interest Over Time</label>
+            <?php $this->keywords_interest_over_time_widget(); ?>
+        </div>
+        
+        <div id ='keyWordsRelTopics' class="expresscurate_keywordsBlock expresscurate_masonryItem">
+            <label class="label">Keywords Related Topics</label>
+            <?php $this->keywords_related_topics_widget(); ?>
+        </div>
 
         <?php
         if (get_option('expresscurate_publish', '') == "on") { ?>

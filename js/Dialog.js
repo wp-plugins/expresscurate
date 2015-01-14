@@ -494,7 +494,6 @@ var ExpresscurateDialog = (function (jQuery) {
             jQuery('.alignL , .alignR , .alignNone').click(function (e) {
                 jQuery('.imgAlign').removeClass('active');
                 jQuery(this).addClass('active');
-                console.log(jQuery(this));
             });
             jQuery("#expresscurate_open-modal").click(function (event) {
                 event.preventDefault();

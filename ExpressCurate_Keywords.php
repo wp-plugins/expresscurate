@@ -14,7 +14,7 @@ class ExpressCurate_Keywords {
     if (empty($definedKeyWords)) {
       return false;
     } else {
-      $definedKeywordsArray = explode(',', strtolower(str_replace(' ', '', $definedKeyWords)));
+      $definedKeywordsArray = explode(',', strtolower(trim($definedKeyWords)));
       return $definedKeywordsArray;
     }
   }
@@ -166,6 +166,7 @@ class ExpressCurate_Keywords {
   }
 
     public function get_stats($keywords = array(), $args = false, $post_content = false, $get_posts_count = false) {
+       // var_dump('kuku');die;
         if (!$post_content) {
             $post_content = $this->get_words($args);
         }
@@ -188,7 +189,6 @@ class ExpressCurate_Keywords {
                 preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
                 //str_ireplace(" ".$keyword." ", '', $post_content['content'], $keyword_in[$keyword]['count']);
                 $keyword_in[$keyword]['title'] = 0;
-                // $keyword_in[$keyword]['count'] = ((isset($post_content['words'][$keyword]) || isset($post_content['words']["#".$keyword])) ? $post_content['words'][$keyword] : 0);
                 if ($post_content['total'] !== 0) {
                     $keyword_in[$keyword]['percent'] = round(( $keyword_in[$keyword]['count'] / $post_content['total']) * 100, 2);
                     $keyword_in[$keyword]['posts_count'] = 0;
@@ -235,6 +235,7 @@ class ExpressCurate_Keywords {
 
     public function getKeywordStats($getTopWords = false){
         $publishedPostCount = wp_count_posts()->publish;
+        //var_dump($publishedPostCount);die;
         $stats = array();
         $resultArray = array();
 
@@ -271,8 +272,8 @@ class ExpressCurate_Keywords {
             }
 
             // var_dump($definedKeywordsArray,$words);die;
-        }
-        for ($i = 0; $i < ceil($publishedPostCount / 200); $i++) {
+       }
+        for ($i = 0; $i <= ceil($publishedPostCount / 200); $i++) {
             $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
             if($getTopWords){
                 $keywords = $words;
@@ -297,8 +298,16 @@ class ExpressCurate_Keywords {
         if (!empty($stats[0])) {
             foreach($stats[0] as &$stat){
                 if(is_array($stat)){
-                    $stat['title'] = round(($stat['title_matches']/($stats[0]['total_title_words_count']))*100, 2);
-                    $stat['percent'] = round(($stat['count']/($stats[0]['total_words']))*100, 2);
+                    if(0 !== $stats[0]['total_title_words_count']) {
+                        $stat['title'] = round(($stat['title_matches'] / ($stats[0]['total_title_words_count'])) * 100, 2);
+                    }else{
+                        $stat['title'] = 0 ;
+                    }
+                    if(0 !== $stats[0]['total_words']){
+                        $stat['percent'] = round(($stat['count']/($stats[0]['total_words']))*100, 2);
+                    }else{
+                        $stat['percent'] = 0;
+                    }
                     if ($stat['percent'] < 3) {
                         $color = 'blue';
                     } elseif ($stat['percent'] >= 3 && $stat['percent']<= 5) {
@@ -312,10 +321,13 @@ class ExpressCurate_Keywords {
             unset($stats[0]['total_words']);
             unset($stats[0]['total_title_words_count']);
             $resultArray = $stats[0];
+        }else{
+
         }
 
         return $resultArray;
     }
+
 
   public function array_map($func, $array) {
     $new_array = array();

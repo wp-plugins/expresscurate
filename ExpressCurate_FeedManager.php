@@ -25,7 +25,8 @@ class ExpressCurate_FeedManager {
         $curated_links_rss = array();
       }
 
-      $data['url'] = expresscurate_normalise_url($data['url']);
+      $data['url'] = expresscurate_normalise_url($data['url'],true);
+      $pureUrl = expresscurate_normalise_url($data['url']);
       if (!isset($curated_links_rss[$data['url']])) {
         $rssUrl = $this->checkRss($data['url']);
         if (filter_var($rssUrl, FILTER_VALIDATE_URL)) {
@@ -36,8 +37,8 @@ class ExpressCurate_FeedManager {
                    WHERE meta_key LIKE  '%expresscurate_link_%' AND meta_value LIKE '%" . $data['url'] . "%' GROUP BY post_id");
 
 
-          $curated_links_rss[$data['url']]['feed_url'] = $result['feed_url'] = $rssUrl;
-          $curated_links_rss[$data['url']]['post_count'] = $result['post_count'] = count($metas);
+          $curated_links_rss[$pureUrl]['feed_url'] = $result['feed_url'] = $rssUrl;
+          $curated_links_rss[$pureUrl]['post_count'] = $result['post_count'] = count($metas);
          //  var_dump($curated_links_rss);die;
           $curated_links_rss = json_encode($curated_links_rss);
           update_option('expresscurate_links_rss', $curated_links_rss);
@@ -214,9 +215,10 @@ class ExpressCurate_FeedManager {
     if (strpos($url, 'http') === false) {
       $url = 'http://' . $url;
     }
-
+     // var_dump($url);die;
     $lookup_url = "http://ajax.googleapis.com/ajax/services/feed/lookup?v=1.0&q=" . urlencode($url);
     $result = json_decode(file_get_contents($lookup_url));
+     // var_dump($lookup_url);die;
     if ($result && $result->responseData) {
       return $result->responseData->url;
     } elseif ($result && $result->responseData === null) {

@@ -1,7 +1,9 @@
 var Keywords = (function (jQuery) {
     var colors = ['Red', 'Blue', 'Green', 'Orange', 'LightBlue', 'Yellow', 'LightGreen'];
     var addKeyword = function (keywords, beforeElem) {
-        Utils.startLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
+        var input=jQuery('.addKeywords input'),
+            elemToRotate=jQuery('.addKeywords span span');
+        Utils.startLoading(input, elemToRotate);
         var keywordsToHighlight = keywords;
         keywords = keywords.join(',');
         var keywordHtml = '',
@@ -32,7 +34,7 @@ var Keywords = (function (jQuery) {
                     errorMessage = 'Calculation Error. Please try refreshing this web page.  If the problem persists, <a href="admin.php?page=expresscurate&type=keywords">contact us</a> at support@expresscurate.com'
                 }
             }).always(function () {
-                Utils.endLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
+                Utils.endLoading(input, elemToRotate);
                 jQuery(keywordsToHighlight).each(function (index, value) {
                     KeywordUtils.highlight(value, beforeElem.find('li'));
                 });
@@ -40,7 +42,7 @@ var Keywords = (function (jQuery) {
             });
         } else {
             errorMessage = 'This keyword is too short.  We recommend keywords with at least 3 characters.';
-            Utils.endLoading(jQuery('.addKeywords input'), jQuery('.addKeywords span span'));
+            Utils.endLoading(input, elemToRotate);
         }
         if (errorMessage !== '') {
             jQuery('.addKeywords').after('<p class="expresscurate_errorMessage">' + errorMessage + '</p>');
@@ -58,7 +60,7 @@ var Keywords = (function (jQuery) {
         var ed = tinyMCE.activeEditor;
         var highlightedElems = jQuery(ed.getBody()).find('span.expresscurate_keywordsHighlight');
         var keywords = [];
-        jQuery('#curated_tags li').each(function (index, value) {
+        jQuery('#curated_tags').find('li').each(function (index, value) {
             keywords.push(jQuery(value).text().slice(0, -1).trim());
         });
         keywords.pop();
@@ -147,19 +149,17 @@ var Keywords = (function (jQuery) {
     };
 
     var setupKeywords = function () {
+        var addKeywordInput=jQuery('.expresscurate_keywords_settings .addKeywords input');
         notDefinedMessage(jQuery('.keywordsPart .expresscurate_notDefined'), jQuery('.keywordsPart ul li'));
         notDefinedMessage(jQuery('.usedWordsPart .expresscurate_notDefined'), jQuery('.usedWordsPart ul li'));
-        jQuery('html').on('click', '#expresscurate_keyword_dialog a.button-primary', function () {
+        jQuery('html').on('click', '#expresscurate_keyword_dialog a.button-primary, #expresscurate_keyword_dialog a.cancel', function () {
             tinymce.activeEditor.windowManager.close();
-            jQuery('.expresscurate_widget_wrapper .addKeywords input').focus();
-        });
-        jQuery('html').on('click', '#expresscurate_keyword_dialog a.cancel', function () {
-            tinymce.activeEditor.windowManager.close();
+            addKeywordInput.focus();
         });
         /*autoComplete*/
 
         var autoCompleteRequest;
-        jQuery('.expresscurate_keywords_settings .addKeywords input').on("keyup", function (e) {
+        addKeywordInput.on("keyup", function (e) {
             if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 27) {
                 e.preventDefault();
                 return;
@@ -175,12 +175,12 @@ var Keywords = (function (jQuery) {
 
         });
 
-        KeywordUtils.suggestionsKeyboardNav(jQuery('.expresscurate_keywords_settings .addKeywords input').eq(0));
+        KeywordUtils.suggestionsKeyboardNav(addKeywordInput.eq(0));
 
         jQuery('.expresscurate_keywords_settings').on('click', function (e) {
             if (jQuery(e.target).is('.suggestion li')) {
                 var newKeyword = jQuery(e.target).text(),
-                    input = jQuery('.expresscurate_keywords_settings .addKeywords input'),
+                    input = addKeywordInput,
                     text = input.val();
                 // var lastIndex = text.lastIndexOf(" ");
                 // if(lastIndex > 0){
@@ -190,7 +190,7 @@ var Keywords = (function (jQuery) {
                 text = newKeyword;
                 // }
                 input.val(text);
-                insertKeywordInKeywordsSettings(KeywordUtils.multipleKeywords(jQuery('.addKeywords input'), jQuery('.keywordsPart')), jQuery('.keywordsPart div > ul'));
+                insertKeywordInKeywordsSettings(KeywordUtils.multipleKeywords(addKeywordInput, jQuery('.keywordsPart')), jQuery('.keywordsPart div > ul'));
                 jQuery('.expresscurate_keywords_settings .suggestion').remove();
             } else {
                 jQuery('.expresscurate_keywords_settings .suggestion').remove();
@@ -199,7 +199,7 @@ var Keywords = (function (jQuery) {
         /**/
         jQuery('.expresscurate_keywords_settings .addKeywords span').on('click', function () {
             jQuery('.expresscurate_keywords_settings .suggestion').remove();
-            insertKeywordInKeywordsSettings(KeywordUtils.multipleKeywords(jQuery('.addKeywords input'), jQuery('.keywordsPart')), jQuery('.keywordsPart div > ul'));
+            insertKeywordInKeywordsSettings(KeywordUtils.multipleKeywords(addKeywordInput, jQuery('.keywordsPart')), jQuery('.keywordsPart div > ul'));
         });
 
         jQuery('.usedWordsPart ul').on('click', '.add', function () {
