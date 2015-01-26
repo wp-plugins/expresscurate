@@ -11,7 +11,7 @@ if ($pagenow == 'post-new.php' && $_POST && isset($_POST['expresscurate_bookmark
   $items[0]['title'] = urldecode($_REQUEST['expresscurate_load_title']);
   $is_json = false;
 } else {
-  $items = get_post_meta($post->ID, 'expresscurate_curated_data', true);
+  $items = get_post_meta($post->ID, '_expresscurate_curated_data', true);
   $is_json = false;
   if(!$items){
     $items = array();

@@ -14,7 +14,7 @@ class ExpressCurate_Keywords {
     if (empty($definedKeyWords)) {
       return false;
     } else {
-      $definedKeywordsArray = explode(',', strtolower(trim($definedKeyWords)));
+      $definedKeywordsArray = explode(',', strtolower($definedKeyWords));
       return $definedKeywordsArray;
     }
   }
@@ -75,10 +75,11 @@ class ExpressCurate_Keywords {
   public function add_keyword($keyword, $get_stats = false) {
 
     $defined_tags_arr = array();
-    if ($_REQUEST) {
+    $keywords = array();
+    if(isset($_REQUEST['keywords'])) {
       $keywords = explode(",", $_REQUEST['keywords']);
-      $get_stats = $_REQUEST['get_stats'];
     }
+    $get_stats = $_REQUEST['get_stats'];
     $defined_tags = get_option("expresscurate_defined_tags", '');
     if ($defined_tags) {
       $defined_tags_arr = $this->array_map('trim', explode(",", $defined_tags));

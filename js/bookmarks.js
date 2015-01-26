@@ -1,36 +1,42 @@
 var Bookmarks = (function (jQuery) {
-    var addBookmark = function () {
-        jQuery('.errorMessage').remove();
-        Utils.startLoading(jQuery('.addBookmark input'), jQuery('.addBookmark span span'));
-        //validate url
-        var myRegExp = new RegExp(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/);
+    var $input, $elemToRotate, $bookmarkBoxes, $notDefMessage, $controls;
 
-        var link = jQuery('.addBookmark input').val(),
+    function addBookmark() {
+        //validate url
+        var myRegExp = new RegExp(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/),
+            link = $input.val(),
             li_html = '',
-            message = '';
+            message = '',
+            $existedLi = $bookmarkBoxes.find('li'),
+            existed = false,
+            existedURL,
+            $addedLi;
+        jQuery('.errorMessage').remove();
+        Utils.startLoading($input, $elemToRotate);
+
         if (link.match(myRegExp)) {
-            var existedLi = jQuery('.expresscurate_bookmarkBoxes li'),
-                existed = false;
-            if (existedLi.length > 0) {
-                existedLi.each(function (index, value) {
-                    var existedURL = jQuery(value).find('.postTitle').attr('href');
-                    if (link == existedURL) {
+            if ($existedLi.length > 0) {
+                $existedLi.each(function (index, value) {
+                    existedURL = jQuery(value).find('.postTitle').attr('href');
+                    if (link === existedURL) {
                         existed = true;
                         li_html = '';
-                        var addedLi = jQuery(value);
-                        addedLi.addClass('expresscurate_transparent');
+                        $addedLi = jQuery(value);
+                        $addedLi.addClass('expresscurate_transparent');
                         setTimeout(function () {
-                            addedLi.removeClass('expresscurate_transparent');
+                            $addedLi.removeClass('expresscurate_transparent');
                         }, 700);
                     }
                 });
             }
             if (!existed) {
-                jQuery.post(
-                    'admin-ajax.php?action=expresscurate_bookmark_set', {url: link}, function (res) {
-
-                        data = jQuery.parseJSON(res);
-                        if (data.status == 'success') {
+                jQuery.ajax({
+                    type: 'POST',
+                    url: 'admin-ajax.php?action=expresscurate_bookmark_set',
+                    data: {url: link}
+                }).done(function (res) {
+                        var data = jQuery.parseJSON(res);
+                        if (data.status === 'success') {
                             li_html = '<li class="expresscurate_preventTextSelection expresscurate_masonryItem">\
                     <input id="uniqueId" class="checkInput" type="checkbox"/>\
                     <label for="uniqueId" class="expresscurate_preventTextSelection"></label>\
@@ -53,12 +59,12 @@ var Bookmarks = (function (jQuery) {
                 <div class="expresscurate_clear"></div>\
                     <span class="label label_' + data.result.type + '">' + data.result.type + '</span>\
                 </li>';
-                            if (li_html != '') {
-                                jQuery('.expresscurate_bookmarkBoxes').append(li_html);
-                                var lastLi = jQuery('.expresscurate_bookmarkBoxes > li').last();
+                            if (li_html !== '') {
+                                $bookmarkBoxes.append(li_html);
+                                var $lastLi = $bookmarkBoxes.find('> li').last();
 
-                                jQuery('.expresscurate_bookmarkBoxes .addNewBookmark').after(lastLi);
-                                jQuery('.expresscurate_bookmarkBoxes').masonry('destroy').masonry({
+                                $bookmarkBoxes.find('.addNewBookmark').after($lastLi);
+                                $bookmarkBoxes.masonry('destroy').masonry({
                                     itemSelector: '.expresscurate_masonryItem',
                                     isResizable: true,
                                     isAnimated: true,
@@ -66,128 +72,148 @@ var Bookmarks = (function (jQuery) {
                                     gutter: 10
                                 });
 
-                                Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
-                                lastLi.addClass('expresscurate_transparent');
-                                jQuery('.addBookmark input').val('');
+                                Utils.notDefinedMessage($notDefMessage, $bookmarkBoxes.find(' > li'));
+                                $lastLi.addClass('expresscurate_transparent');
+                                $input.val('');
                                 setTimeout(function () {
-                                    lastLi.removeClass('expresscurate_transparent');
+                                    $lastLi.removeClass('expresscurate_transparent');
                                 }, 700);
                             }
 
-                        } else if (data.status == 'error') {
+                        } else if (data.status === 'error') {
                             message = data.msg;
                             jQuery(".addBookmark").after('<span class="errorMessage">' + message + '</span>');
-                            Utils.endLoading(jQuery('.addBookmark input'), jQuery('.addBookmark span span'));
+                            Utils.endLoading($input, $elemToRotate);
                         }
-                    }).always(function () {
-                        Utils.endLoading(jQuery('.addBookmark input'), jQuery('.addBookmark span span'));
+                    }
+                ).always(function () {
+                        Utils.endLoading($input, $elemToRotate);
                     });
             } else {
                 message = 'This page is already bookmarked.';
             }
-        } else {
+        }
+        else {
             message = 'Invalid URL';
         }
-        if (message != '') {
+        if (message !== '') {
             jQuery(".addBookmark").after('<span class="errorMessage">' + message + '</span>');
-            Utils.endLoading(jQuery('.addBookmark input'), jQuery('.addBookmark span span'));
+            Utils.endLoading($input, $elemToRotate);
         }
+    }
 
-    };
-
-    var bookmarkDelete = function (els) {
-        var items = [];
+    function bookmarkDelete(els) {
+        var items = [],
+            item = {};
         jQuery.each(els, function (index, el) {
-            var item = {};
             item['link'] = jQuery(el).find('.url').attr('href');
             items.push(item);
         });
-        jQuery.post('admin-ajax.php?action=expresscurate_bookmarks_delete', {items: JSON.stringify(items)}, function (res) {
+        jQuery.ajax({
+            type: 'POST',
+            url: 'admin-ajax.php?action=expresscurate_bookmarks_delete',
+            data: {items: JSON.stringify(items)}
+        }).done(function (res) {
             var data = jQuery.parseJSON(res);
-            if (data.status == 'success') {
+            if (data.status === 'success') {
                 jQuery(els).addClass('expresscurate_transparent');
-                setTimeout(function(){
+                setTimeout(function () {
                     jQuery(els).remove();
-                    jQuery('.expresscurate_bookmarkBoxes').masonry();
-                    Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
-                    Utils.checkControls(jQuery('.bookmarkListControls li'));
-                },700);
-            } else {
+                    $bookmarkBoxes.masonry();
+                    Utils.notDefinedMessage($notDefMessage, $bookmarkBoxes.find(' > li'));
+                    Utils.checkControls($controls);
+                }, 700);
             }
         });
-    };
+    }
 
-    var addComment = function (elem) {
-        var label = elem.parent('.comment').find('label'),
-            close = elem.parent('.comment').find('span'),
-            input = elem,
+    function addComment(elem) {
+        var $commentWrap = elem.parent('.comment'),
+            $label = $commentWrap.find('label'),
+            $close = $commentWrap.find('span'),
+            $input = elem,
             link = elem.parents('.expresscurate_bookmarkBoxes > li').find('a.url').attr('href'),
-            comment = input.val();
-        label.removeClass('expresscurate_displayNone');
-        input.add(close).addClass('expresscurate_displayNone');
-        if (!input.val().match(/\S/)) {
-            label.text('add comment').removeClass('active');
-        } else {
-            jQuery.post('admin-ajax.php?action=expresscurate_bookmark_set', {
+            comment = $input.val().trim();
+        $label.removeClass('expresscurate_displayNone');
+        $input.add($close).addClass('expresscurate_displayNone');
+
+        jQuery.ajax({
+            type: 'POST',
+            url: 'admin-ajax.php?action=expresscurate_bookmark_set',
+            data: {
                 url: link,
                 comment: comment
-            }, function (res) {
+            }
+        }).done(function (res) {
+            if (!comment.match(/\S/)) {
+                $label.text('add comment').removeClass('active');
+            } else {
                 var data = jQuery.parseJSON(res);
-                if (data.status == 'success') {
-                    label.text(input.val()).addClass('active');
-                    jQuery('.expresscurate_bookmarkBoxes').masonry();
+                if (data.status === 'success') {
+                    $label.text($input.val()).addClass('active');
+                    $bookmarkBoxes.masonry();
                 }
-            });
+            }
+        });
+    }
 
-        }
-    };
-    var setupBookmarks = function () {
-        if(jQuery('.expresscurate_bookmarks').length){
-            Utils.notDefinedMessage(jQuery('.expresscurate_bookmarks .expresscurate_notDefined'), jQuery('.expresscurate_bookmarkBoxes > li'));
+    function setupBookmarks() {
+        $input = jQuery('.addBookmark input');
+        $elemToRotate = jQuery('.addBookmark span span');
+        $bookmarkBoxes = jQuery('.expresscurate_bookmarkBoxes');
+        $notDefMessage = jQuery('.expresscurate_bookmarks .expresscurate_notDefined');
+        $controls = jQuery('.bookmarkListControls li');
+
+        if (jQuery('.expresscurate_bookmarks').length) {
+            Utils.notDefinedMessage($notDefMessage, $bookmarkBoxes.find(' > li'));
         }
         /*copy URL*/
-        jQuery('.expresscurate_bookmarks .expresscurate_bookmarkBoxes').on('click', 'li .copyURL', function () {
+        $bookmarkBoxes.on('click', 'li .copyURL', function () {
             var text = jQuery(this).parents('.expresscurate_bookmarkBoxes > li').find('.url').attr('href');
             window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
         });
         /*comment*/
-        jQuery('.expresscurate_bookmarkBoxes').on('click', '.comment label', function () {
-            var input = jQuery(this).parent('.comment').find('input'),
-                close = jQuery(this).parent('.comment').find('span'),
-                label = jQuery(this);
-            label.addClass('expresscurate_displayNone');
-            input.add(close).removeClass('expresscurate_displayNone').addClass('expresscurate_displayInlineBlock');
-            jQuery('.expresscurate_bookmarkBoxes').masonry();
-            if (label.text() !== 'add comment')
-                input.val(label.text());
-            else
-                input.val('');
+        $bookmarkBoxes.on('click', '.comment label', function () {
+            var $label = jQuery(this),
+                $commentWrap = $label.parent('.comment'),
+                $input = $commentWrap.find('input'),
+                $close = $commentWrap.find('span');
+            $label.addClass('expresscurate_displayNone');
+            $input.add($close).removeClass('expresscurate_displayNone').addClass('expresscurate_displayInlineBlock');
+            $bookmarkBoxes.masonry();
+            if ($label.text() !== 'add comment') {
+                $input.val($label.text());
+            } else {
+                $input.val('');
+            }
         });
-        jQuery('.expresscurate_bookmarkBoxes').on('keyup', '.comment input', function (e) {
-            if (e.keyCode == 13) {
+        $bookmarkBoxes.on('keyup', '.comment input', function (e) {
+            if (e.keyCode === 13) {
                 addComment(jQuery(this));
             }
         });
-        jQuery('.expresscurate_bookmarkBoxes').on('blur', '.comment input', function (e) {
+        $bookmarkBoxes.on('blur', '.comment input', function () {
             addComment(jQuery(this));
         });
-        jQuery('.expresscurate_bookmarkBoxes').on('click touchend', '.comment span', function () {
-            var label = jQuery(this).parent('.comment').find('label'),
-                close = jQuery(this),
-                input = jQuery(this).parent('.comment').find('input');
-            label.removeClass('expresscurate_displayNone');
-            input.add(close).addClass('expresscurate_displayNone');
-            label.text('add comment').removeClass('active');
-            jQuery('.expresscurate_bookmarkBoxes').masonry();
+        $bookmarkBoxes.on('click touchend', '.comment span', function () {
+            var $close = jQuery(this),
+                $commentWrap = $close.parent('.comment'),
+                $label = $commentWrap.find('label'),
+                $input = $commentWrap.find('input');
+            $label.removeClass('expresscurate_displayNone');
+            $input.add($close).addClass('expresscurate_displayNone');
+            $label.text('add comment').removeClass('active');
+            $bookmarkBoxes.masonry();
         });
         /*checkboxes*/
-        jQuery('.expresscurate_bookmarkBoxes li input:checkbox').prop('checked', false);
-        jQuery(".expresscurate_bookmarkBoxes").on('change', '.checkInput', function () {
-            Utils.checkControls(jQuery('.bookmarkListControls .quotes,.bookmarkListControls .remove'));
+        $bookmarkBoxes.find('li input:checkbox').prop('checked', false);
+        $bookmarkBoxes.on('change', '.checkInput', function () {
+            Utils.checkControls($controls);
         });
-        jQuery('.expresscurate_bookmarkBoxes').on('click', '> li', function (e) {
-            if (e.target !== this)
+        $bookmarkBoxes.on('click', '> li', function (e) {
+            if (e.target !== this) {
                 return;
+            }
             var checkbox = jQuery(this).find('.checkInput');
             if (checkbox.is(':checked')) {
                 checkbox.attr('checked', false);
@@ -195,48 +221,50 @@ var Bookmarks = (function (jQuery) {
             else {
                 checkbox.attr('checked', true);
             }
-            Utils.checkControls(jQuery('.bookmarkListControls .quotes,.bookmarkListControls .remove'));
+            Utils.checkControls($controls);
         });
         jQuery('.expresscurate_bookmarks .check').on('click', function () {
-            var checked = jQuery(".expresscurate_bookmarkBoxes li input:checkbox:checked").length,
-                liCount = jQuery(".expresscurate_bookmarkBoxes > li").length;
+            var checked = $bookmarkBoxes.find('li input:checkbox:checked').length,
+                liCount = $bookmarkBoxes.find(' > li').length,
+                $checkboxes = $bookmarkBoxes.find('li input:checkbox');
             if (checked === liCount) {
-                jQuery('.expresscurate_bookmarkBoxes li input:checkbox').prop('checked', false);
+                $checkboxes.prop('checked', false);
             } else {
-                jQuery('.expresscurate_bookmarkBoxes li input:checkbox').prop('checked', true);
+                $checkboxes.prop('checked', true);
             }
-            Utils.checkControls(jQuery('.bookmarkListControls .quotes,.bookmarkListControls .remove'));
+            Utils.checkControls($controls);
         });
         /*curate*/
         jQuery('.expresscurate_bookmarks .quotes').on('click', function () {
-            var checked = jQuery(".expresscurate_bookmarkBoxes li input:checkbox:checked");
-            if (checked.length == 1) {
-                var title = jQuery(checked[0]).parent().find('a').html();
-                var url = jQuery(checked[0]).parent().find('a').attr('href');
+            var $checked = jQuery(".expresscurate_bookmarkBoxes li input:checkbox:checked");
+            if (checked.length === 1) {
+                var $elem = jQuery($checked[0]).parent().find('a'),
+                    title = $elem.html(),
+                    url = $elem.attr('href');
                 window.location.href = '/wp-admin/post-new.php?expresscurate_load_source=' + url + '&expresscurate_load_title=' + title;
-                Utils.addSources(checked.parents('.expresscurate_bookmarkBoxes > li'), '.expresscurate_bookmarkData');
+                Utils.addSources($checked.parents('.expresscurate_bookmarkBoxes > li'), '.expresscurate_bookmarkData');
                 return false;
             }
         });
         /*delete*/
         jQuery('.expresscurate_bookmarks .remove').on('click', function () {
-            var checked = jQuery(".expresscurate_bookmarkBoxes li input:checkbox:checked");
-            bookmarkDelete(checked.parents('.expresscurate_bookmarkBoxes > li'));
+            var $checked = $bookmarkBoxes.find('li input:checkbox:checked');
+            bookmarkDelete($checked.parents('.expresscurate_bookmarkBoxes > li'));
         });
-        jQuery('.expresscurate_bookmarkBoxes').on('click', '.controls .hide', function () {
-            var elem = jQuery(this).parents('.expresscurate_bookmarkBoxes > li');
-            bookmarkDelete(elem);
+        $bookmarkBoxes.on('click', '.controls .hide', function () {
+            var $elem = jQuery(this).parents('.expresscurate_bookmarkBoxes > li');
+            bookmarkDelete($elem);
         });
         /*add*/
-        jQuery('.addBookmark input').on("keyup", function (e) {
-            if (e.keyCode == 13) {
+        $input.on("keyup", function (e) {
+            if (e.keyCode === 13) {
                 addBookmark();
             }
         });
-        jQuery('.addBookmark span span').on('click', function () {
+        $elemToRotate.on('click', function () {
             addBookmark();
         });
-    };
+    }
 
     var isSetup = false;
 
@@ -250,6 +278,7 @@ var Bookmarks = (function (jQuery) {
             }
         }
     }
-})(window.jQuery);
+})
+(window.jQuery);
 
 Bookmarks.setup();

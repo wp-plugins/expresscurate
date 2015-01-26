@@ -7,7 +7,6 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
       <div class="header">
         <div class="addressbar">
           <input type="text" placeholder="<?php echo __('Insert source URL to start', ExpressCurate_Actions::PLUGIN_FOLDER) ?>" id="expresscurate_source" name="expresscurate_source" value="<?php echo @get_post_meta($post->ID, 'expresscurate_source', true); ?>">
-          <input type="hidden" id="expresscurate_admin_url" value="<?php echo admin_url(); ?>" />
           <button class="load"  id="expresscurate_submit">Load</button>
         </div>
         <div class="title">

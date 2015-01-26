@@ -1,144 +1,125 @@
 var Utils = (function (jQuery) {
-    /* detect  var isChromium = window.chrome,
-     vendorName = window.navigator.vendor;
-     if (isChromium !== null && isChromium !== undefined && vendorName === "Google Inc.") {
-     detectChromeExtension('nldipdepdfjilejlpeeknodkpiajhfkf', myCallbackFunction);
-     }*/
-    var isSetup = false,
-        interval;
-    var detectChromeExtension = function (extensionId, callback) {
-        if (typeof(chrome) !== 'undefined') {
-            var testUrl = 'chrome-extension://' + extensionId + '/app/index.htm';
-            jQuery.ajax({
-                url: testUrl,
-                timeout: 1000,
-                type: 'HEAD',
-                success: function () {
-                    if (typeof(callback) == 'function')
-                        callback.call(this, true);
-                },
-                error: function () {
-                    if (typeof(callback) == 'function')
-                        callback.call(this, false);
-                }
-            });
-        } else {
-            if (typeof(callback) == 'function')
-                callback.call(this, false);
-        }
-    };
-    var myCallbackFunction = function (extensionExists) {
-        if (extensionExists) {
-            console.log('Extension present');
-        } else {
-            console.log('Extension not present');
-        }
-    };
-    return {
-        /*curate from content feed and bookmarks*/
-        addSources: function (list, dataElem) {
-            var items = [];
-            jQuery.each(list, function (index, el) {
-                var item = {};
-                items.push(jQuery(el).find(dataElem).text());
-            });
-            jQuery('#expresscurate_bookmarks_curate_data').val(JSON.stringify(items));
-            jQuery('form#expresscurate_bookmarks_curate').submit();
-        },
-        /*message for empty lists*/
-        notDefinedMessage: function (message, list) {
-            var pageWithControls = (jQuery('.expresscurate_feed_list').length || jQuery('.expresscurate_bookmarks').length) ? true : false;
-            if (list.length > 0) {
-                message.addClass('expresscurate_displayNone');
-                if (pageWithControls) {
-                    jQuery('.expresscurate_controls').removeClass('expresscurate_displayNone');
-                }
-            } else {
-                message.removeClass('expresscurate_displayNone');
-                if (pageWithControls) {
-                    jQuery('.expresscurate_controls li.check').removeClass('active');
-                    jQuery('.expresscurate_controls').addClass('expresscurate_displayNone');
-                }
-            }
-        },
-        /*show/hide controls in content feed and bookmarks*/
-        checkControls: function (controls) {
-            var checkboxes=jQuery('.checkInput'),
-                atLeastOneIsChecked = checkboxes.is(':checked'),
-                allIsChecked = jQuery('.checkInput:checked').length == checkboxes.length,
-                checkControl=jQuery('.expresscurate_controls .check');
-            if (atLeastOneIsChecked) {
-                controls.addClass('active');
-            } else {
-                controls.removeClass('active');
-            }
-            if (allIsChecked) {
-                checkControl.addClass('active');
-            } else {
-                checkControl.removeClass('active');
-            }
-        },
-        /*validation for support and FAQ*/
-        expresscurateSupportSubmit: function () {
-            jQuery('#expresscurate_support_form .expresscurate_errorMessage').remove();
-            var valid_msg = true;
-            var valid_email = true,
-                supportMessage = jQuery("#expresscurate_support_message");
-            var msg = supportMessage.val();
-            if (msg == "" || msg == null) {
-                valid_msg = false;
-                supportMessage.after('<label class="expresscurate_errorMessage">Please enter the message</label>');
-            } else if (msg.length < 3) {
-                valid_msg = false;
-                supportMessage.after('<label class="expresscurate_errorMessage">Message is too short</label>');
-            } else
-                supportMessage.next('.expresscurate_errorMessage').remove();
+    var isSetup = false;
+    /*curate from content feed and bookmarks*/
+    function addSources(list, dataElem) {
+        var items = [];
+        jQuery.each(list, function (index, el) {
+            items.push(jQuery(el).find(dataElem).text());
+        });
+        jQuery('#expresscurate_bookmarks_curate_data').val(JSON.stringify(items));
+        jQuery('form#expresscurate_bookmarks_curate').submit();
+    }
 
-            var supportMail = jQuery("#expresscurate_support_email"),
-                email = supportMail.val();
-            var regularExpression = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    /*message for empty lists*/
+    function notDefinedMessage(message, list) {
+        var pageWithControls = (jQuery('.expresscurate_feed_list').length || jQuery('.expresscurate_bookmarks').length) ? true : false,
+            $controls = jQuery('.expresscurate_controls');
+        if (list.length > 0) {
+            message.addClass('expresscurate_displayNone');
+            if (pageWithControls) {
+                $controls.removeClass('expresscurate_displayNone');
+            }
+        } else {
+            message.removeClass('expresscurate_displayNone');
+            if (pageWithControls) {
+                jQuery('.expresscurate_controls li.check').removeClass('active');
+                $controls.addClass('expresscurate_displayNone');
+            }
+        }
+    }
+
+    /*show/hide controls in content feed and bookmarks*/
+    function checkControls(controls) {
+        var $checkboxes = jQuery('.checkInput'),
+            atLeastOneIsChecked = $checkboxes.is(':checked'),
+            allIsChecked = $checkboxes.find(':checked').length === $checkboxes.length,
+            $checkControl = controls.find('.check');
+        if (atLeastOneIsChecked) {
+            controls.addClass('active');
+        } else {
+            controls.removeClass('active');
+        }
+        if (allIsChecked) {
+            $checkControl.addClass('active');
+        } else {
+            $checkControl.removeClass('active');
+        }
+    }
+
+    /*validation for support and FAQ*/
+    function expresscurateSupportSubmit() {
+        var $form = jQuery('#expresscurate_support_form'),
+            valid_msg = true,
+            $supportMessage = jQuery("#expresscurate_support_message"),
+            msg = $supportMessage.val(),
+            $supportMail = jQuery("#expresscurate_support_email"),
+            email = $supportMail.val(),
+            regularExpression = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             valid_email = regularExpression.test(email);
-            if (email == "" || email == null) {
-                valid_email = false;
-                supportMail.after('<label class="expresscurate_errorMessage">Please enter the email</label>');
-            } else if (!valid_email) {
-                supportMail.after('<label class="expresscurate_errorMessage">Email is not valid</label>');
-            } else
-                supportMail.next('.expresscurate_errorMessage').remove();
-            if (valid_email && valid_msg) {
-                jQuery("#expresscurate_support_form").submit();
-            }
-            return false;
-        },
-        /*loading for bookmarks and feeds*/
-        startLoading: function (input, elemToRotate) {
-            input.prop('disabled', true);
-            elemToRotate.addClass('expresscurate_startRotate');
-        },
-        endLoading: function (input, elemToRotate) {
-            input.removeAttr('disabled');
-            elemToRotate.removeClass('expresscurate_startRotate');
-            input.focus();
-        },
 
-        countDown: function () {
-            if (jQuery('.expresscurate_dashboard_smartPublishing .list > li').length > 0) {
-                var target_date = jQuery('.expresscurate_dashboard_smartPublishing .topPart .target_date').html(),
-                    current_date = jQuery('.expresscurate_dashboard_smartPublishing .topPart .current_date').html();
-                if (target_date && current_date) {
-                    var countDown = jQuery('.expresscurate_dashboard_smartPublishing .topPart .countdown'),
-                        days, hours, minutes, seconds;
-                    target_date = new Date(target_date).getTime();
-                    current_date = new Date(current_date).getTime();
-                    var seconds_left = (target_date - current_date) / 1000;
-                    var intervalID = setInterval(function () {
+        $form.find('.expresscurate_errorMessage').remove();
+
+        if (msg === "" || !msg) {
+            valid_msg = false;
+            $supportMessage.after('<label class="expresscurate_errorMessage">Please enter the message</label>');
+        } else if (msg.length < 3) {
+            valid_msg = false;
+            $supportMessage.after('<label class="expresscurate_errorMessage">Message is too short</label>');
+        } else {
+            $supportMessage.next('.expresscurate_errorMessage').remove();
+        }
+
+        if (email === "" || !email) {
+            valid_email = false;
+            $supportMail.after('<label class="expresscurate_errorMessage">Please enter the email</label>');
+        } else if (!valid_email) {
+            $supportMail.after('<label class="expresscurate_errorMessage">Email is not valid</label>');
+        } else {
+            $supportMail.next('.expresscurate_errorMessage').remove();
+        }
+        if (valid_email && valid_msg) {
+            $form.submit();
+        }
+        return false;
+    }
+
+    /*loading for bookmarks and feeds*/
+    function startLoading(input, elemToRotate) {
+        input.prop('disabled', true);
+        elemToRotate.addClass('expresscurate_startRotate');
+    }
+
+    function endLoading(input, elemToRotate) {
+        input.removeAttr('disabled').focus();
+        elemToRotate.removeClass('expresscurate_startRotate');
+    }
+
+    function countDown() {
+        var $smartPublishingWrap = jQuery('.expresscurate_dashboard_smartPublishing'),
+            target_date = $smartPublishingWrap.find('.target_date').html(),
+            current_date = $smartPublishingWrap.find('.current_date').html(),
+            $countDown = $smartPublishingWrap.find('.countdown'),
+            days, hours, minutes, seconds, seconds_left_temp, seconds_left;
+
+        if ($smartPublishingWrap.find('.list > li').length > 0) {
+            if (target_date && current_date) {
+                target_date = new Date(target_date).getTime();
+                current_date = new Date(current_date).getTime();
+                seconds_left = (target_date - current_date) / 1000;
+
+                (function loop() {
+                    var intervalID = setTimeout(function () {
                         if (seconds_left <= 0) {
-                            jQuery.post(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_smart_publish_event', {url: 'link'}, function (res) {
+                            jQuery.ajax({
+                                type: 'POST',
+                                url: 'admin-ajax.php?action=expresscurate_smart_publish_event',
+                                data: {url: 'link'}
+                            }).done(function (res) {
                                 var data = jQuery.parseJSON(res);
-                                if (data.status == 'success') {
-                                    jQuery("#dashboard_widget_smartPublishing .inside").load(jQuery('#expresscurate_admin_url').val() + 'admin-ajax.php?action=expresscurate_show_smart_publish', function () {
-                                        target_date = jQuery('.expresscurate_dashboard_smartPublishing .topPart .target_date').html();
-                                        current_date = jQuery('.expresscurate_dashboard_smartPublishing .topPart .current_date').html();
+                                if (data.status === 'success') {
+                                    jQuery('#dashboard_widget_smartPublishing').find('.inside').load('admin-ajax.php?action=expresscurate_show_smart_publish', function () {
+                                        target_date = $smartPublishingWrap.find('.target_date').html();
+                                        current_date = $smartPublishingWrap.find('.current_date').html();
                                         target_date = new Date(target_date).getTime();
                                         current_date = new Date(current_date).getTime();
                                         seconds_left = (target_date - current_date) / 1000;
@@ -156,101 +137,146 @@ var Utils = (function (jQuery) {
                         minutes = parseInt(seconds_left_temp / 60);
                         seconds = parseInt(seconds_left_temp % 60);
 
-                        countDown.html(hours + ' <b> : </b>' + minutes + ' <b> : </b>' + seconds);
+                        $countDown.html(hours + ' <b> : </b>' + minutes + ' <b> : </b>' + seconds);
                     }, 1000);
-                }
+                })();
             }
-        },
+        }
+    }
 
+    function setupUtils() {
+        if (jQuery('.expresscurate_settings').length) {
+            var $tabs = jQuery('.tabs'),
+                tab_id = $tabs.attr('data-currenttab');
+            if (tab_id.length < 1) {
+                tab_id = 'tab-1';
+            }
+            jQuery('ul.tabs li').add(jQuery('.tab-content')).removeClass('current');
+            $tabs.find('li[data-tab=' + tab_id + ']').add(jQuery("#" + tab_id)).addClass('current');
+        }
+
+        jQuery('.expresscurate_blocksContainer').sortable({
+            distance: 12,
+            forcePlaceholderSize: true,
+            items: '.expresscurate_masonryItem',
+            tolerance: 'pointer',
+            start: function (event, ui) {
+                ui.item.parent().masonry('destroy');
+            },
+            stop: function (event, ui) {
+                setTimeout(function () {
+                    ui.item.parent().masonry({
+                        itemSelector: '.expresscurate_masonryItem',
+                        isResizable: true,
+                        isAnimated: true,
+                        columnWidth: '.expresscurate_masonryItem',
+                        gutter: 10
+                    });
+                }, 100);
+            },
+            cursor: "move",
+            placeholder: "expresscurate_sortablePlaceholder"
+        });
+
+        if (jQuery('.expresscurate_dashboard_smartPublishing .topPart .target_date').length) {
+            Utils.countDown();
+        }
+        jQuery('.expresscurate_advancedSEO_widget ul.tabs li,.expresscurate ul.tabs li').click(function () {
+            var tab_id = jQuery(this).attr('data-tab');
+
+            jQuery('ul.tabs li').add(jQuery('.tab-content')).removeClass('current');
+            jQuery(this).add(jQuery("#" + tab_id)).addClass('current');
+
+            jQuery.ajax({
+                type: "POST",
+                url: 'admin-ajax.php?action=expresscurate_change_tab_event',
+                data: {tab: tab_id}
+            });
+        });
+        jQuery('#expresscurate_sitemap_post_configure_manually').on('change', function () {
+            var $options = jQuery('.expresscurate_sitemap_widget .hiddenOptions');
+            if (jQuery(this).is(':checked')) {
+                $options.removeClass('expresscurate_displayNone').hide().stop(true, true).slideDown('slow');
+            } else {
+                $options.removeClass('expresscurate_displayNone').stop(true, true).slideUp('slow');
+            }
+        });
+        jQuery('#expresscurate_sitemap_post_exclude_from_sitemap').on('change', function () {
+            var $options = jQuery('.expresscurate_sitemap_widget .sitemapOption');
+            if (!jQuery(this).is(':checked')) {
+                $options.removeClass('expresscurate_displayNone').hide().stop(true, true).slideDown('slow');
+            } else {
+                $options.removeClass('expresscurate_displayNone').stop(true, true).slideUp('slow');
+            }
+        });
+        jQuery('#exec_function_perm_seen,#cron_setup_manually').on('click', function () {
+            var $elem = jQuery(this),
+                status = ($elem.is('#cron_setup_manually')) ? 'set' : 'seen';
+            jQuery.ajax({
+                type: 'POST',
+                url: 'admin-ajax.php?action=expresscurate_set_cron_permission_status',
+                data: {status: status}
+            }).done(function (res) {
+                var data = jQuery.parseJSON(res);
+                if (data.status === 'success') {
+                    $elem.parents('div.notice-warning').fadeOut(600);
+                }
+            });
+        });
+        jQuery('#expresscurate_sitemap_update_permission').on('click', function () {
+            var $elem = jQuery(this),
+                status = 'seen';
+            jQuery.ajax({
+                type: 'POST',
+                url: 'admin-ajax.php?action=expresscurate_set_sitemap_permission_status',
+                data: {status: status}
+            }).done(function (res) {
+                var data = jQuery.parseJSON(res);
+                if (data.status === 'success') {
+                    $elem.parents('div.notice-warning').fadeOut(600);
+                }
+            });
+        });
+        /*layout*/
+        jQuery('.expresscurate_controls .layout').on('click', function () {
+            var $wrap = jQuery('.expresscurate_Styles.wrap'),
+                page = ($wrap.hasClass('expresscurate_feed_list')) ? 'expresscurate_feed_layout' : 'expresscurate_bookmark_layout',
+                layout = '';
+            if ($wrap.hasClass('expresscurate_singleColumn')) {
+                layout = 'grid';
+                $wrap.removeClass('expresscurate_singleColumn');
+            } else {
+                layout = 'single';
+                $wrap.addClass('expresscurate_singleColumn');
+            }
+            jQuery.ajax({
+                type: 'POST',
+                url: 'admin-ajax.php?action=expresscurate_change_layout_event',
+                data: {
+                    page: page,
+                    layout: layout
+                }
+            });
+            jQuery('.expresscurate_masonryWrap').masonry();
+        });
+        isSetup = true;
+    }
+
+    return {
         setup: function () {
             if (!isSetup) {
                 jQuery(document).ready(function () {
-                    if (jQuery('.expresscurate_settings').length) {
-                        var tabs=jQuery('.tabs'),
-                            tab_id = tabs.attr('data-currenttab');
-                        if (tab_id.length < 1) {
-                            tab_id = 'tab-1';
-                        }
-                        jQuery('ul.tabs li').removeClass('current');
-                        jQuery('.tab-content').removeClass('current');
-                        tabs.find('li[data-tab=' + tab_id + ']').addClass('current');
-                        jQuery("#" + tab_id).addClass('current');
-                    }
-
-                  /*      jQuery('.expresscurate_blocksContainer').sortable({
-                            distance: 12,
-                            forcePlaceholderSize: true,
-                            items: '.expresscurate_masonryItem',
-                            tolerance: 'pointer',
-                            containment: "parent",
-                            start: function (event, ui) {
-                                ui.item.parent().masonry('destroy');
-                            },
-                            change: function (event, ui) {
-                            },
-                            stop: function (event, ui) {
-                                setTimeout(function(){
-                                    ui.item.parent().masonry({
-                                        itemSelector: '.expresscurate_masonryItem',
-                                        isResizable: true,
-                                        isAnimated: true,
-                                        columnWidth: '.expresscurate_masonryItem',
-                                        gutter: 10
-                                    });
-                                },100);
-                            },
-                            cursor: "move",
-                            placeholder: "expresscurate_sortablePlaceholder",
-                            grid: [ 20, 10 ] //check
-                        });*/
-
-                    if (jQuery('.expresscurate_dashboard_smartPublishing .topPart .target_date').length) {
-                        Utils.countDown();
-                    }
-                    jQuery('.expresscurate_advancedSEO_widget ul.tabs li,.expresscurate ul.tabs li').click(function () {
-                        var tab_id = jQuery(this).attr('data-tab');
-
-                        jQuery('ul.tabs li').removeClass('current');
-                        jQuery('.tab-content').removeClass('current');
-
-                        jQuery(this).addClass('current');
-                        jQuery("#" + tab_id).addClass('current');
-
-                        //Save tab data
-
-                        jQuery.post('admin-ajax.php?action=expresscurate_change_tab_event', {tab: tab_id}, function (res) {
-                        });
-                    });
-                    jQuery('#expresscurate_sitemap_post_configure_manually').on('change', function () {
-                        var options = jQuery('.expresscurate_sitemap_widget .hiddenOptions');
-                        if (jQuery(this).is(':checked')) {
-                            options.removeClass('expresscurate_displayNone').hide().slideDown('slow');
-                        } else {
-                            options.removeClass('expresscurate_displayNone').slideUp('slow');
-                        }
-                    });
-                    jQuery('#expresscurate_sitemap_post_exclude_from_sitemap').on('change', function () {
-                        var options = jQuery('.expresscurate_sitemap_widget .sitemapOption');
-                        if (!jQuery(this).is(':checked')) {
-                            options.removeClass('expresscurate_displayNone').hide().slideDown('slow');
-                        } else {
-                            options.removeClass('expresscurate_displayNone').slideUp('slow');
-                        }
-                    });
-                    jQuery('#exec_function_perm_seen,#cron_setup_manually').on('click',function(){
-                        var status=(jQuery(this).is('#cron_setup_manually'))? 'set' : 'seen';
-                       jQuery.post('admin-ajax.php?action=expresscurate_set_cron_permission_status', {status: status}, function (res) {
-                            var data = jQuery.parseJSON(res);
-                            if (data.status == 'success') {
-                                jQuery(this).parents('div.update-nag').fadeOut(600);//.addClass('expresscurate_displayNone');
-                            }
-                       });
-                    });
-                    isSetup = true;
+                    setupUtils();
                 });
             }
-        }
-
+        },
+        addSources: addSources,
+        notDefinedMessage: notDefinedMessage,
+        checkControls: checkControls,
+        expresscurateSupportSubmit: expresscurateSupportSubmit,
+        startLoading: startLoading,
+        endLoading: endLoading,
+        countDown: countDown
     }
 })(window.jQuery);
 Utils.setup();

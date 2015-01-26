@@ -3,7 +3,7 @@ $feedManager = new ExpressCurate_FeedManager();
 $bookmarks = $feedManager->get_bookmarks();
 
 ?>
-<div class="expresscurate_bookmarks expresscurate_Styles wrap">
+<div class="expresscurate_bookmarks expresscurate_Styles wrap <?php if(get_option('expresscurate_bookmark_layout', '')=='single'){echo 'expresscurate_singleColumn';} ?>">
   <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
     <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
     <h2>Bookmarks</h2>
@@ -20,6 +20,9 @@ $bookmarks = $feedManager->get_bookmarks();
       <li class="quotes expresscurate_floatRight">
         <span class="tooltip">curate</span>
       </li>
+        <li class="layout expresscurate_floatRight">
+            <span class="tooltip">layout</span>
+        </li>
       <div class="expresscurate_clear"></div>
     </ul>
   </div>
@@ -76,14 +79,14 @@ $bookmarks = $feedManager->get_bookmarks();
           <span class="expresscurate_displayNone">&#215</span>
         </div>
         <ul class="controls expresscurate_preventTextSelection">
-          <li class="curate"><a href="<?php echo get_admin_url() ?>post-new.php?expresscurate_load_source=<?php echo urlencode($item['link']); ?>&expresscurate_load_title=<?php echo urlencode($item['title']); ?>">Curate</a></li>
+          <li class="curate"><a href="<?php echo esc_url(get_admin_url()."post-new.php?expresscurate_load_source=".urlencode($item['link'])."&expresscurate_load_title=".urlencode($item['title'])); ?>">Curate</a></li>
           <li class="separator" >-</li>
           <li class="copyURL">Copy URL</li>
           <li class="separator">-</li>
           <li class="hide">Delete</li>
         </ul>
         <div class="expresscurate_clear"></div>
-        <span class="label label_<?php echo $item['type'];?>"><?php echo $item['type'];?></span>
+        <!--<span class="label label_<?php /*echo $item['type'];*/?>"><?php /*echo $item['type'];*/?></span>-->
       </li>
       <?php
       $i++;

@@ -47,7 +47,7 @@ class ExpressCurate_ContentManager {
     }
     if ($this->_get('check', '') == 1) {
       $data_check = array();
-      $curated_urls = $this->get_meta_values('expresscurate_link_', $url);
+      $curated_urls = $this->get_meta_values('_expresscurate_link_', $url);
       if (isset($curated_urls[0]) && isset($curated_urls[0]['meta_value'])) {
         $data_check["status"] = "notification";
         $data_check["msg"] = "Warning! This page has been curated before";

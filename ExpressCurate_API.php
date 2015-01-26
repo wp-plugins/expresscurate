@@ -17,7 +17,7 @@ function expresscurate_the_source_urls($post_id = null) {
     }
   }
   $exportApi = new ExpressCurate_AjaxExportAPI();
-  $curated_urls = $exportApi->get_meta_values('expresscurate_link_', '', '', $post_id);
+  $curated_urls = $exportApi->get_meta_values('_expresscurate_link_', '', '', $post_id);
   return $curated_urls;
 }
 
@@ -36,7 +36,7 @@ function expresscurate_the_source_url($post_id = null) {
     }
   }
   $exportApi = new ExpressCurate_AjaxExportAPI();
-  $curated_urls = $exportApi->get_meta_values('expresscurate_link_', '', '', $post_id);
+  $curated_urls = $exportApi->get_meta_values('_expresscurate_link_', '', '', $post_id);
   return isset($curated_urls[0]) ? $curated_urls[0] : null;
 }
 

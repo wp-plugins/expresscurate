@@ -29,7 +29,6 @@ global $post;
         $post_keywords = $pre_def_keyword;
     }
     ?>
-    <input type="hidden" id="expresscurate_admin_url" value="<?php echo admin_url(); ?>"/>
     <input type="hidden" id="expresscurate_plugin_dir" value="<?php echo plugin_dir_url(__FILE__); ?>"/>
     <input type="hidden" id="expresscurate_post_id" value="<?php echo $post->ID; ?>"/>
     <textarea id="expresscurate_defined_tags" class="expresscurate_displayNone"

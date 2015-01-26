@@ -1,8 +1,7 @@
-<div class="wrap expresscurate_Styles">
+<div class="expresscurate_Styles wrap ">
     <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
         <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
         <h2>News</h2>
-        <!--<label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sagittis nulla lectus,</label>-->
     </div>
   <div class="expresscurate_news_container">
 <?php

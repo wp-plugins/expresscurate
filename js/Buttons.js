@@ -1,120 +1,101 @@
 var Buttons = (function (jQuery) {
-    /*var getId = function (prefix) {
-        var uniqueId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0,
-                v = c == 'x' ? r : r & 0x3 | 0x8;
-            return v.toString(16);
-        });
-
-        return (prefix || '') + '-' + uniqueId;
-    };
-
-    var getElem = function (node, cssClass) {
-        if (node && node.className && !!~node.className.indexOf(cssClass)) {
-            return node;
-        }
-
-        if (node.parentNode) {
-            return getElem(node.parentNode, cssClass);
-        }
-
-        return false;
-    };*/
-
-    var textboxCommand = function (ed, elem, cssClass, isVal) {
+    function textboxCommand(ed, elem, cssClass, isVal) {
         var id = elem,
-            texboxElem = ed.getDoc().createElement('DIV'),
-            activeElem;
+            $textboxElem = ed.getDoc().createElement('DIV'),
+            $activeElem,
+            $node = jQuery(ed.selection.getNode()),
+            selectedId = $node.parents('div[class*=expresscurate]').attr('id') || $node.parents('div[class*=annotat]').attr('id'),
+            nodeIsBox = $node.is('div') && $node.attr('class') && ($node.attr('class').indexOf('expresscurate') > -1 || $node.attr('class').indexOf('annotat') > -1),
+            nodeIsWrapped = $node.parents('div[class*=expresscurate]').length > 0 || $node.parents('div[class*=annotat]').length > 0,
+            content = '';
         if (isVal) {
-            texboxElem.id = id;
-            texboxElem.className = cssClass;
-            texboxElem.innerHTML = '<p class="placeholder">Add your annotation</p>';
+            $textboxElem.id = id;
+            $textboxElem.className = cssClass;
+            $textboxElem.innerHTML = '<p class="placeholder">Add your annotation</p>';
 
-            ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
-            activeElem = jQuery(ed.selection.getNode()).parents('div').eq(0).attr('id');
-            ed.controlManager.setActive(activeElem, true);
-            var placeholders = tinyMCE.activeEditor.dom.select('p.placeholder');
-            ed.selection.select(placeholders[placeholders.length - 1]);
+            ed.execCommand('mceInsertContent', true, $textboxElem.outerHTML);
+            $activeElem = jQuery(ed.selection.getNode()).parents('div').eq(0).attr('id');
+            ed.controlManager.setActive($activeElem, true);
+            var $placeholders = tinyMCE.activeEditor.dom.select('p.placeholder');
+            ed.selection.select($placeholders[$placeholders.length - 1]);
 
         } else {
-            var node = jQuery(ed.selection.getNode()),
-                selectedId = jQuery(node).parents('div[class*=expresscurate]').attr('id') || jQuery(node).parents('div[class*=annotat]').attr('id'),
-                nodeIsBox = jQuery(node).is('div') && jQuery(node).attr('class') && (jQuery(node).attr('class').indexOf('expresscurate') > -1 || jQuery(node).attr('class').indexOf('annotat') > -1),
-                nodeIsWrapped = jQuery(node).parents('div[class*=expresscurate]').length > 0 || jQuery(node).parents('div[class*=annotat]').length>0;
-
-            if (node.is('div') && jQuery(node).attr('class') && (jQuery(node).attr('class').indexOf('expresscurate')>-1 || jQuery(node).attr('class').indexOf('annotat')>-1) && jQuery(node).attr('id')==elem) {
-                node.before(node.html());
-                node.remove();
-            } else if (nodeIsWrapped && selectedId == elem) {
-                if (jQuery(node).html() == '<p>&nbsp;</p>') {
-                    jQuery(node).html('');
-                    jQuery(node).remove();
+            if ($node.is('div') && $node.attr('class') && ($node.attr('class').indexOf('expresscurate') > -1 || $node.attr('class').indexOf('annotat') > -1) && $node.attr('id') === elem) {
+                $node.before($node.html());
+                $node.remove();
+            } else if (nodeIsWrapped && selectedId === elem) {
+                if ($node.html() === '<p>&nbsp;</p>') {
+                    $node.html('');
+                    $node.remove();
                 } else {
-                    unWrap(node, elem);
+                    unWrap($node, elem);
                 }
                 ed.controlManager.setActive(elem, false);
                 ed.selection.setCursorLocation(0);
 
             } else {
-                var content = '';
                 if (nodeIsBox) {
-                    content = node.html();
-                    node.remove();
+                    content = $node.html();
+                    $node.remove();
                 } else if (nodeIsWrapped) {
-                    content = node.parents('div').eq(0).html();
-                    node.parents('div').eq(0).remove();
+                    content = $node.parents('div').eq(0).html();
+                    $node.parents('div').eq(0).remove();
                 } else {
                     content = ed.selection.getContent();
                 }
-                texboxElem.id = id;
-                texboxElem.className = cssClass;
-                texboxElem.innerHTML = content;
-                ed.execCommand('mceInsertContent', true, texboxElem.outerHTML);
-                activeElem = id;
 
-                ed.controlManager.setActive(activeElem, true);
+                $textboxElem.id = id;
+                $textboxElem.className = cssClass;
+                $textboxElem.innerHTML = content;
+                ed.execCommand('mceInsertContent', true, $textboxElem.outerHTML);
+                $activeElem = id;
+                ed.controlManager.setActive($activeElem, true);
             }
         }
-    };
+    }
 
-    var unWrap = function (elem, elemId) {
-        var wrapper = elem.parents('div#' + elemId + '');
-        if (elem.index() == 0) {
-            wrapper.before(elem);
-        } else if (wrapper.children().length == elem.index() + 1) {
-            wrapper.after(elem);
+    function unWrap(elem, elemId) {
+        var $wrapper = elem.parents('div#' + elemId + '');
+        if (elem.index() === 0) {
+            $wrapper.before(elem);
+        } else if ($wrapper.children().length === elem.index() + 1) {
+            $wrapper.after(elem);
         } else {
-            var divhtml = wrapper.html(),
-                divElem = jQuery(elem);
-
+            var divhtml = $wrapper.html();
             var myps = divhtml.split(elem.html());
-            wrapper.after(wrapper.clone().html(myps[1])).html(myps[0]).after(elem);
-            if (elem.prev().children('blockquote').html() == '')
+            $wrapper.after($wrapper.clone().html(myps[1])).html(myps[0]).after(elem);
+            if (elem.prev().children('blockquote').html() === '') {
                 elem.prev().children('blockquote').remove();
+            }
         }
-        if (elem.next().text() == '')
+        if (elem.next().text() === '') {
             elem.next().remove();
-        if (elem.prev().text() == '')
+        }
+        if (elem.prev().text() === '') {
             elem.prev().remove();
-    };
+        }
+    }
 
-    var noFollow = function (ed) {
-        var elem = jQuery(ed.selection.getNode());
-        if (elem.is('a')) {
-            if (elem.attr('rel') == 'nofollow') {
-                elem.removeAttr('rel');
+    function noFollow(ed) {
+        var $elem = jQuery(ed.selection.getNode());
+        if ($elem.is('a')) {
+            if ($elem.attr('rel') === 'nofollow') {
+                $elem.removeAttr('rel');
                 ed.controlManager.setActive('noFollow', true);
             } else {
-                elem.attr('rel', 'nofollow');
+                $elem.attr('rel', 'nofollow');
                 ed.controlManager.setActive('noFollow', false);
             }
         }
-    };
-    var wordCount = function (ed) {
-        var lengthMessage, lengthColor;
+    }
 
-        var content = ((jQuery('#content').css("display") == "block") ? jQuery('#content').val() : tinyMCE.get("content").getContent()),
-            wordsCount = /*jQuery('#wp-word-count .word-count').text() ||*/ SEOControl.words_in_text(content).length;
+    function wordCount(ed) {
+        var lengthMessage, lengthColor,
+            $contentWrap = jQuery('#content'),
+            content = (($contentWrap.css("display") === "block") ? $contentWrap.val() : tinyMCE.get("content").getContent()),
+            wordsCount = SEOControl.words_in_text(content).length,
+            messageHtml;
+
         if (wordsCount < 700) {
             lengthColor = 'red';
             lengthMessage = 'Your post is currently ' + wordsCount + ' word long.  The optimal post length is 700-1,600 words.';
@@ -129,15 +110,14 @@ var Buttons = (function (jQuery) {
         if (jQuery(content).is('blockquote')) {
             var div = document.createElement('div');
             div.innerHTML = content;
-            var blockquotes = jQuery(div).find('blockquote'),
+            var $blockquotes = jQuery(div).find('blockquote'),
                 wordsInBlockquotes = 0;
-            blockquotes.each(function (index, val) {
+            $blockquotes.each(function (index, val) {
                 wordsInBlockquotes += SEOControl.words_in_text(jQuery(val).text()).length;
             });
             var quotationPersent = Math.round((wordsInBlockquotes / wordsCount) * 100),
                 quotationMessage = (quotationPersent > 20) ? "The quotation from the original source currently constitutes " + quotationPersent + "% your post.  Anything over 20% can be considered lower quality content." : "Good work! There is no more than 20% quotation used in the post.",
                 quotationColor = (quotationPersent > 20) ? 'red' : 'green';
-
         } else {
             quotationColor = 'blue';
             quotationMessage = 'There is no quotation.';
@@ -146,35 +126,51 @@ var Buttons = (function (jQuery) {
             quotationColor = 'blue';
             quotationMessage = 'There is no quotation.';
         }
-
-        var messageHtml='<p class="lengthSuggestion ' + lengthColor + '">' + lengthMessage + '</p>\
+        messageHtml = '<p class="lengthSuggestion ' + lengthColor + '">' + lengthMessage + '</p>\
                                     <p class="lengthSuggestion  ' + quotationColor + '">' + quotationMessage + '</p>';
 
 
-        var imagesInPost =jQuery(content).find('img').length ? true: false,
-            videoInPost=tinyMCE.get('content').getContent().indexOf('[embed]')>-1;
-        messageHtml+=(!imagesInPost && !videoInPost)? '<p class="lengthSuggestion red">Your post currently doesn’t have an image(video). Adding a media is a good way to improve conversion rates by creating visual associations with your posts.</p>': '';
-        messageHtml +=jQuery('.attachment-post-thumbnail').length ? '' :'<p class="lengthSuggestion red">Your post currently doesn’t have a featured image. Adding a featured image is a good way to improve conversion rates by creating visual associations with your posts.</p>';
+        var imagesInPost = jQuery(content).find('img').length ? true : false,
+            videoInPost = tinyMCE.get('content').getContent().indexOf('[embed]') > -1;
+        messageHtml += (!imagesInPost && !videoInPost) ? '<p class="lengthSuggestion red">Your post currently doesn’t have an image(video). Adding a media is a good way to improve conversion rates by creating visual associations with your posts.</p>' : '';
+        messageHtml += jQuery('.attachment-post-thumbnail').length ? '' : '<p class="lengthSuggestion red">Your post currently doesn’t have a featured image. Adding a featured image is a good way to improve conversion rates by creating visual associations with your posts.</p>';
 
-            ed.windowManager.open({
-                title: 'Post Analysis',
-                id: 'expresscurate_wordCount_dialog',
-                width: 450,
-                html: messageHtml
-            });
-    };
-    var addKeyword =function(){
-        if(tinymce.activeEditor.selection.getContent().length > 3 && jQuery('#expresscurate_widget').length){
+        /*var defindKeywords=jQuery('#expresscurate_defined_tags').val(), inTitle,inContent,inSEOTitle,inSocialTitle;
+         if(defindKeywords.length<2){
+         messageHtml += '<p class="lengthSuggestion red">Your post currently doesn’t have a keyword.</p>';
+         }else{
+         var KeywordsArr=defindKeywords.split(', ');
+         jQuery(KeywordsArr).each(function(index, value){
+         var keyword=value.trim();
+
+         inTitle=jQuery('input[name=post_title]').val().indexOf(keyword)>-1;
+         inContent=jQuery(content).text().indexOf(keyword)>-1;
+         inSEOTitle=jQuery('#expresscurate_advanced_seo_title').val().indexOf(keyword)>-1;
+         inSocialTitle=jQuery('#expresscurate_advanced_seo_social_title').val().indexOf(keyword)>-1;
+         });
+         }*/
+        ed.windowManager.open({
+            title: 'Post Analysis',
+            id: 'expresscurate_wordCount_dialog',
+            width: 450,
+            html: messageHtml
+        });
+
+    }
+
+    function addKeyword() {
+        if (tinymce.activeEditor.selection.getContent().length > 3 && jQuery('#expresscurate_widget').length) {
             var keyword = tinymce.activeEditor.selection.getContent(),
-                input=jQuery('.addKeywords input');
+                $input = jQuery('.addKeywords input');
             keyword = keyword.replace(/<[^>]+>[^<]*<[^>]+>|<[^\/]+\/>/ig, "");
-            input.val(keyword);
-            SEOControl.insertKeywordInWidget(KeywordUtils.multipleKeywords(input, undefined), jQuery('.addKeywords'));
+            $input.val(keyword);
+            SEOControl.insertKeywordInWidget(KeywordUtils.multipleKeywords($input, undefined), jQuery('.addKeywords'));
         }
-    };
-    var setupButtons = function () {
-        jQuery('html').on('click','.expresscurate_postAnalysis',function(){
-           wordCount(tinymce.activeEditor);
+    }
+
+    function setupButtons() {
+        jQuery('html').on('click', '.expresscurate_postAnalysis', function () {
+            wordCount(tinymce.activeEditor);
         });
         tinymce.create('tinymce.plugins.expresscurate', {
             /**
@@ -187,8 +183,6 @@ var Buttons = (function (jQuery) {
              */
 
             init: function (ed, url) {
-                // if(ed.id != 'expresscurate_insight_editor' && ed.id != 'expresscurate_content_editor') {
-                //if (ed.id != 'expresscurate_content_editor') {
                 ed.addButton('annotation', {
                     title: 'Add Annotation (Alt + A | Ctrl + Up)',
                     cmd: 'annotation',
@@ -229,42 +223,48 @@ var Buttons = (function (jQuery) {
                     cmd: 'addKeyword',
                     classes: "btn expresscurateCostom expresscurateAddKeyword"
                 });
-                //  }
 
                 ed.onKeyDown.add(function (ed, e) {
-                    if (e.altKey && e.keyCode == 75) {
+                    if (e.altKey && e.keyCode === 75) {
                         addKeyword();
-                    }else if ((e.altKey && e.keyCode == 76) || (e.ctrlKey && e.keyCode == 37)) {     // alt+l|Ctrl+left
+                    }
+                    if ((e.altKey && e.keyCode === 76) || (e.ctrlKey && e.keyCode === 37)) {     // alt+l|Ctrl+left
                         e.returnValue = false;
                         textboxCommand(ed, 'lefttextbox', 'expresscurate_fl_text_box');
                         e.preventDefault();
                         return false;
-                    } else if ((e.altKey && e.keyCode == 82 ) || (e.ctrlKey && e.keyCode == 39)) {     // alt+r|Ctrl+right
+                    }
+                    if ((e.altKey && e.keyCode === 82 ) || (e.ctrlKey && e.keyCode === 39)) {     // alt+r|Ctrl+right
                         e.returnValue = false;
                         textboxCommand(ed, 'righttextbox', 'expresscurate_fr_text_box');
                         e.preventDefault();
                         return false;
-                    } else if ((e.altKey && e.keyCode == 74 ) || (e.ctrlKey && e.keyCode == 40)) {     // alt+j|Ctrl+down
+                    }
+                    if ((e.altKey && e.keyCode === 74 ) || (e.ctrlKey && e.keyCode === 40)) {     // alt+j|Ctrl+down
                         e.returnValue = false;
                         textboxCommand(ed, 'justifytextbox', 'expresscurate_justify_text_box');
                         e.preventDefault();
                         return false;
-                    } else if ((e.altKey && e.keyCode == 65) || (e.ctrlKey && e.keyCode == 38)) {     // alt+a |Ctrl+up
+                    }
+                    if ((e.altKey && e.keyCode === 65) || (e.ctrlKey && e.keyCode === 38)) {     // alt+a |Ctrl+up
                         e.returnValue = false;
                         textboxCommand(ed, 'annotation', 'expresscurate_annotate');
                         e.preventDefault();
                         return false;
-                    } else if (e.altKey && e.keyCode == 72) {     // alt+h
+                    }
+                    if (e.altKey && e.keyCode === 72) {     // alt+h
                         e.returnValue = false;
                         Keywords.markEditorKeywords();
                         e.preventDefault();
                         return false;
-                    } else if (e.altKey && e.keyCode == 70) {     // alt+f
+                    }
+                    if (e.altKey && e.keyCode === 70) {     // alt+f
                         e.returnValue = false;
                         noFollow(ed);
                         e.preventDefault();
                         return false;
-                    } else if (e.altKey && e.keyCode == 87) {     // alt+w
+                    }
+                    if (e.altKey && e.keyCode === 87) {     // alt+w
                         e.returnValue = false;
                         wordCount(ed);
                         e.preventDefault();
@@ -272,13 +272,12 @@ var Buttons = (function (jQuery) {
                     }
                 });
 
-                ed.onLoadContent.add(function (ed, o) {
+                ed.onLoadContent.add(function (ed) {
                     var dom = tinymce.activeEditor.dom;
                     var divElements = dom.select('div[class*=expresscurate]');
                     dom.setStyle(divElements, 'height', 'auto');
 
-                    // if(ed.id == 'expresscurate_insight_editor' || ed.id == 'expresscurate_content_editor') {
-                    if (ed.id == 'expresscurate_content_editor') {
+                    if (ed.id === 'expresscurate_content_editor') {
                         ed.controlManager.buttons && ed.controlManager.buttons.blockquote && ed.controlManager.buttons.blockquote.remove() ||
                         ed.controlManager.controls && ed.controlManager.controls.content_blockquote && ed.controlManager.controls.content_blockquote.remove();
                     }
@@ -297,51 +296,53 @@ var Buttons = (function (jQuery) {
                         }
                     });
                 });
-                ed.onClick.add(function (ed, e) {
+                ed.onClick.add(function () {
+                    var $description = jQuery('.description');
                     if (jQuery('.expresscurate_widget').length > 0) {
-                        jQuery('.description  .descriptionWrap').addClass('textareaBorder');
-                        jQuery('.description  p , .description .hint').addClass('expresscurate_displayNone');
-                        jQuery('.description').removeClass('active');
+                        $description.find('.descriptionWrap').addClass('textareaBorder');
+                        $description.find('p').add($description.find('.hint')).addClass('expresscurate_displayNone');
+                        $description.removeClass('active');
                     }
                 });
                 ed.onNodeChange.add(function (ed) {
                     ed.controlManager.setActive('noFollow', false);
-                    var node, elem = jQuery(ed.selection.getNode());
-                    node = elem;
+                    var $elem = jQuery(ed.selection.getNode()),
+                        $node = $elem,
+                        nodeIsWrapped = $node.parents('div[class*=expresscurate]').length > 0 || $node.parents('div[class*=annotat]').length > 0;
 
-                    var nodeIsWrapped = jQuery(node).parents('div[class*=expresscurate]').length > 0 || jQuery(node).parents('div[class*=annotat]').length>0;
                     if (nodeIsWrapped) {
-                        node = jQuery(node).parents('div[class*=expresscurate]')  || jQuery(node).parents('div[class*=annotat]');
+                        $node = $node.parents('div[class*=expresscurate]') || $node.parents('div[class*=annotat]');
                     }
-                    if (elem.is('a')) {
-                        if (elem.attr('rel') == 'nofollow') {
+                    if ($elem.is('a')) {
+                        if ($elem.attr('rel') === 'nofollow') {
                             ed.controlManager.setActive('noFollow', false);
                         } else {
                             ed.controlManager.setActive('noFollow', true);
                         }
                     }
-                    ed.controlManager.setDisabled('noFollow', ed.selection.getNode().nodeName != 'A');
+                    ed.controlManager.setDisabled('noFollow', ed.selection.getNode().nodeName !== 'A');
 
-                    var cssClass = jQuery(node).attr('class'),
+                    var cssClass = $node.attr('class'),
                         activeButton = ' ';
-                    if (cssClass == 'expresscurate_fl_text_box')
+                    if (cssClass === 'expresscurate_fl_text_box') {
                         activeButton = 'lefttextbox';
-                    else if (cssClass == 'expresscurate_fr_text_box')
+                    } else if (cssClass === 'expresscurate_fr_text_box') {
                         activeButton = 'righttextbox';
-                    else if (cssClass == 'expresscurate_justify_text_box')
+                    } else if (cssClass === 'expresscurate_justify_text_box') {
                         activeButton = 'justifytextbox';
-                    else if (cssClass == 'expresscurate_annotate' || cssClass == 'annotate')
+                    } else if (cssClass === 'expresscurate_annotate' || cssClass === 'annotate') {
                         activeButton = 'annotation';
+                    }
                     ed.controlManager.setActive('lefttextbox', false);
                     ed.controlManager.setActive('righttextbox', false);
                     ed.controlManager.setActive('justifytextbox', false);
                     ed.controlManager.setActive('annotation', false);
-                    if (activeButton != ' ')
+                    if (activeButton !== ' ') {
                         ed.controlManager.setActive(activeButton, true);
+                    }
                 });
 
-                // if(ed.id != 'expresscurate_insight_editor' && ed.id != 'expresscurate_content_editor') {
-                if (ed.id != 'expresscurate_content_editor') {
+                if (ed.id !== 'expresscurate_content_editor') {
                     //lefttextbox
                     ed.addCommand('lefttextbox', function () {
                         textboxCommand(ed, 'lefttextbox', 'expresscurate_fl_text_box');
@@ -378,11 +379,9 @@ var Buttons = (function (jQuery) {
              * but you sometimes need to create more complex controls like listboxes, split buttons etc then this
              * method can be used to create those.
              *
-             * @param {String} n Name of the control to create.
-             * @param {tinymce.ControlManager} cm Control manager to use inorder to create new control.
              * @return {tinymce.ui.Control} New control instance or null if no control was created.
              */
-            createControl: function (n, cm) {
+            createControl: function () {
                 return null;
             },
             /**
@@ -407,7 +406,7 @@ var Buttons = (function (jQuery) {
 
         // Register plugin
         tinymce.PluginManager.add('expresscurate', tinymce.plugins.expresscurate);
-    };
+    }
 
     var isSetup = false;
 
@@ -419,7 +418,6 @@ var Buttons = (function (jQuery) {
             }
         }
     }
-})
-(window.jQuery);
+})(window.jQuery);
 
 Buttons.setup();

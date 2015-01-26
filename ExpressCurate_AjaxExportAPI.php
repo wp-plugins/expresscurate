@@ -137,7 +137,7 @@ class ExpressCurate_AjaxExportAPI {
     if (!$data['url']) {
       $data_check = array('status' => "error", 'msg' => "Data is empty!");
     }
-    $curated_urls = $this->get_meta_values('expresscurate_link_', $data['url']);
+    $curated_urls = $this->get_meta_values('_expresscurate_link_', $data['url']);
     if (isset($curated_urls[0]) && isset($curated_urls[0]['meta_value'])) {
       $data_check["status"] = "notification";
       $data_check["msg"] = "This page is already curated!";
@@ -310,6 +310,17 @@ class ExpressCurate_AjaxExportAPI {
     echo json_encode($result);
     die;
   }
+
+  public function generate_sitemap() {
+      $sitemap = new ExpressCurate_Sitemap();
+      if($sitemap->generateSitemap()){
+          echo json_encode(array('status' => 'success'));
+      }else{
+          echo json_encode(array('status' => 'error'));
+      }
+      die;
+  }
+
 
 }
 

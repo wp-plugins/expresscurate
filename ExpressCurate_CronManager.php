@@ -6,7 +6,7 @@ class ExpressCurate_CronManager {
     /**
      * Construct the plugin object
      */
-    private $websiteUrlCallCronjob = null;
+    public  $websiteUrlCallCronjob = null;
 
     private $tmpForCron = null;
 
@@ -27,9 +27,6 @@ class ExpressCurate_CronManager {
             if(!$this->check_if_exist($this->websiteUrlCallCronjob)){
                 file_put_contents($this->tmpForCron, $this->websiteUrlCallCronjob.PHP_EOL);
                 exec('crontab '.$this->tmpForCron ,$output);
-
-                // Chech if cron have been added
-                add_action( 'admin_notices',array(&$this,'get_message'));
             }
         }
         if (!wp_next_scheduled('expresscurate_publish_event')) {
@@ -69,17 +66,6 @@ class ExpressCurate_CronManager {
         }
     }
 
-    /**
-     * Get cron message when where is no permission to add cron job
-     */
-    public function get_message() {
-        $message = '';
-        if(!$this->check_if_exist($this->websiteUrlCallCronjob)){
-            $message .= '<div class="update-nag">';
-            $message .= 'You do not have perrmission to add cronjob!</div>';
-        };
-        echo $message;
-    }
 
     public function set_permission_status() {
         $status = $_REQUEST['status'];
@@ -91,7 +77,7 @@ class ExpressCurate_CronManager {
     /**
      * Check if cron job exists
      */
-    private function check_if_exist($command) {
+    public function check_if_exist($command) {
         exec('crontab -l', $crontab);
         if(isset($crontab) && is_array($crontab)){
             $crontab = array_flip($crontab);

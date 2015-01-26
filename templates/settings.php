@@ -125,14 +125,7 @@ $expresscurate_seo = get_option('expresscurate_seo', '') == "on" ? 'On' : 'Off';
         ?>" name="expresscurate_publisher"/>
         <a class="expresscurateLink verifyPublisherLink expresscurate_marginleft10" href="http://www.google.com/webmasters/tools/richsnippets?url=<?php echo bloginfo('url') ?>&user_profile=<?php echo get_option('expresscurate_publisher'); ?>"
             target="_blank">Verify publisher</a>
-    </div>
-</li>
-<li>
-    <div id="publisherTwitterWrap" class=" <?php
-    if ($expresscurate_seo == 'Off') {
-        echo 'expresscurate_displayNone';
-    }
-    ?> />">
+        <br/>
         <label for="expresscurate_publisher_twitter" class="title">Publisher (Twitter)<span class="description  ">You can link content you publish on this blog to your company or personal Twitter profile.
                 <a href="https://plus.google.com/authorship" target="_blank">More Info</a>.</label></span>
 

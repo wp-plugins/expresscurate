@@ -311,7 +311,6 @@
                             text-transform: capitalize;
                         }
                     .expresscurate_keywords_settings .usedWordsPart ul li .wordWrap{
-                        /*display: inline-table;*/
                         display: inline-block;
                         height: 40px;
                     }
@@ -651,7 +650,7 @@
     .expresscurate_bookmarks .addBookmark span,
     .expresscurate_feed_dashboard .addFeed span,
     .expresscurate_keywords_settings .addKeywords span{
-        height: 35px;
+        height: 34px;
         width: 35px;
         display: inline-block;
         background-color: #1cbb9f;
@@ -820,7 +819,6 @@
         -moz-transition: background-color 500ms ;
         -o-transition: background-color 500ms ;
         -ms-transition: background-color 500ms ;
-        /*width: 715px;*/
         height: 40px;
         padding: 0 60px 0 10px;
         margin: 0;
@@ -1596,7 +1594,6 @@
     font-size: 14px;
     height: 39px;
     margin-top: 1px;
-    /*margin-right: 4px;*/
     width: 83px;
 }
 
@@ -1638,7 +1635,7 @@
     background: #bcbcbc;
     height: 47px;
     line-height: 44px;
-    width: 0px;
+    width: 0;
     text-align: center;
     text-decoration: none;
     color: #ffffff;
@@ -2424,12 +2421,8 @@
     display: inline-block;
     margin: 5px 0;
     clear: both;
-    /*width: 200px;*/
     text-align: right;
 }
-/*#expresscurate_advancedSEO_widget .label{
-    padding-right: 10px;
-}*/
 .expresscurate_sitemap_widget .label{
     display: inline-block;
 }
@@ -2739,7 +2732,7 @@
     border: 2px solid #1cbb9f;
     background-color: #ffffff;
     color: #1cbb9f;
-
+    font-weight: normal;
     transition: all .3s ease-out;
     -moz-transition: all .3s ease-out;
     -webkit-transition: all .3s ease-out;
@@ -2783,7 +2776,6 @@
     height: 24px;
     line-height: 24px;
     padding: 0 10px;
-    /*background-color: #1cbb9f;*/
     color: #1cbb9f;
     border-radius: 3px;
     text-decoration: none;
@@ -3011,7 +3003,6 @@
     }
         .expresscurate_support .block,
         .expresscurate_faq .block{
-    /*.expresscurate_trendingPosts .block*/
             display: inline-block;
             width: 430px;
             min-height: 300px;
@@ -3148,7 +3139,6 @@
         margin-top: 35px;
     }
         .expresscurate_faq .questionBox{
-        /*.expresscurate_trendingPosts .questionBox{*/
             box-sizing: border-box;
             -moz-box-sizing: border-box;
             -webkit-box-sizing: border-box;
@@ -3174,7 +3164,6 @@
             padding: 0;
         }
            .expresscurate_faq .questionBox span{
-          /* .expresscurate_trendingPosts .questionBox span{*/
                display: table-cell;
                vertical-align: middle;
            }
@@ -3200,16 +3189,11 @@
         background-color: #fff;
         overflow: hidden;
     }
-/*.expresscurate_faq .expresscurate_headBorderBottom,*/
-/*.expresscurate_support .expresscurate_headBorderBottom{*/
-    /*width:1034px;*/
-/*}*/
 .expresscurate_headerPart{
     max-width: 845px;
 }
 .expresscurate_headBorderBottom{
     width: 100%;
-    /*border-bottom:solid 1px #dddddd;*/
     display: block;
     margin: 50px 0 5px 0;
 }
@@ -3234,14 +3218,6 @@
     .expresscurate_support .block label.publicRevolution{
         width: 100%;
     }
-    /*.expresscurate_support .block span{
-       display: block;
-       line-height: 30px;
-   }
-  /* presscurate_support .block .feedbackButton, .expresscurate_faq .block .askButton{
-       display: block;
-       margin: 0 auto;
-   }*/
     .expresscurate_support .block .send, .expresscurate_faq .block .send{
         margin-top: 10px;
     }
@@ -3261,10 +3237,6 @@
     .expresscurate_support .block div{
         margin-bottom: 10px;
     }
-    /*.expresscurate_faq .expresscurate_headBorderBottom,*/
-    /*.expresscurate_support .expresscurate_headBorderBottom{*/
-        /*width: 91.5%;*/
-    /*}*/
 }
 
 @media (max-width: 1330px) and (min-width: 1000px) {
@@ -3273,7 +3245,6 @@
     }
 
     .expresscurate_faq .questionBox {
-        /*, .expresscurate_trendingPosts .questionBox{*/
         width: auto;
     }
 
@@ -3281,16 +3252,7 @@
         width: 100%;
     }
 }
-@media (max-width: 1330px) and (min-width: 1024px){
-    /*.expresscurate_headBorderBottom{*/
-        /*width: 790px;*/
-    /*}*/
-}
-@media (max-width: 1024px) and (min-width: 899px){
-    /*.expresscurate_headBorderBottom{*/
-        /*width: auto;*/
-    /*}*/
-}
+
 @media (max-width: 1000px){
     .expresscurate_faq .inlineBlock{
         width: 100%;
@@ -3313,7 +3275,7 @@
         margin-right: 2%;
         text-align: left;
     }
-    .expresscurate_faq .questionBox{/* .expresscurate_trendingPosts .questionBox{*/
+    .expresscurate_faq .questionBox{
         text-align: left;
     }
     .expresscurate_faq .moreQuestions{
@@ -3328,8 +3290,6 @@
     .expresscurate_faq .block{
         width: 37% !important;
         margin: 35px 0.8% 0 0;
-        /*padding-right: 5%;*/
-        /*padding-left: 5%;*/
         padding: 16px 4%;
         min-height: 298px;
     }
@@ -3343,11 +3303,10 @@
     .expresscurate_faq .block.questions{
         width: 46% !important;
         padding: 0;
-        /*margin: 0 auto;*/
         margin-right: 0;
         text-align: center;
     }
-    .expresscurate_faq .questionBox{ /*.expresscurate_trendingPosts .questionBox{*/
+    .expresscurate_faq .questionBox{
         text-align: left;
         width: 100%;
         box-sizing: border-box;
@@ -3361,31 +3320,21 @@
         width: 98%;
         margin: 0 2% 6px 0;
     }
-
-    /*.expresscurate_headBorderBottom {*/
-        /*width: auto;*/
-    /*}*/
-    /*.expresscurate_faq .expresscurate_headBorderBottom,*/
-    /*.expresscurate_support .expresscurate_headBorderBottom{*/
-        /*width: 92.3%*/
-    /*}*/
 }
 @media (max-width: 767px){
     .expresscurate_support .block,
     .expresscurate_faq .block{
         width: 90% !important;
-        /*margin: 40px 0 0 0;*/
         padding-right: 5%;
         padding-left: 5%;
     }
     .expresscurate_faq .questions{
         width: 100% !important;
         padding: 0;
-        /*margin: 0 auto;*/
         margin: 35px 0 0 0;
         text-align: center;
     }
-    .expresscurate_faq .questionBox{ /*.expresscurate_trendingPosts .questionBox{*/
+    .expresscurate_faq .questionBox{
         text-align: left;
     }
     .expresscurate_faq .moreQuestions{
@@ -3398,19 +3347,12 @@
     .expresscurate_faq .inlineBlock:nth-child(2n){
         margin: 0 0 2% 1%;
     }
-
-    /*.expresscurate_headBorderBottom {*/
-        /*width: 100%;*/
-    /*}*/
 }
 @media (max-width: 530px){
     .expresscurate_faq .inlineBlock, .expresscurate_faq .inlineBlock:nth-child(2n){
         width: 98%;
         margin: 0 2% 2% 0;
     }
-    /*.expresscurate_headBorderBottom {*/
-        /*width: 98%;*/
-    /*}*/
     .expresscurate_support .block{
         width: 88%!important;
     }
@@ -3471,6 +3413,31 @@
         color: #989898;
     }
 /*feed_dashboard and bookmarks*/
+.expresscurate_singleColumn .addNewBookmark,
+.expresscurate_singleColumn.wrap,
+.expresscurate_singleColumn .expresscurate_masonryWrap >li{
+    width: 850px;
+    display: block;
+}
+.expresscurate_Styles.wrap .expresscurate_controls{
+    transition: width 2000ms;
+    -webkit-transition: width 2000ms;
+    -moz-transition: width 2000ms;
+    -o-transition: width 2000ms;
+    -ms-transition: width 2000ms;
+}
+
+@media (max-width: 1124px){
+    .expresscurate_singleColumn .addNewBookmark,
+    .expresscurate_singleColumn .expresscurate_masonryWrap,
+    .expresscurate_singleColumn .expresscurate_masonryWrap >li{
+        width: 100%;
+    }
+
+    .expresscurate_singleColumn.expresscurate_bookmarks{
+        width: auto;
+    }
+}
 .expresscurate_feed_dashboard{
     min-width: 550px;
 }
@@ -3499,7 +3466,6 @@
     }
     .expresscurate_feed_dashboard .addNewFeed
     {
-        /*width: 750px;*/
         width: 100%;
         box-sizing: border-box;
         -moz-box-sizing: border-box;
@@ -3530,8 +3496,7 @@
             margin-top: 10px;
             position: relative;
         }
-        .expresscurate_bookmarks .addBookmark input,
-        /*.expresscurate_feed_dashboard .addFeed input,*/{
+        .expresscurate_bookmarks .addBookmark input{
             padding-left: 15px;
             background-color: #f5f6f6;
         }
@@ -3540,36 +3505,26 @@
     height: auto !important;
 }
 @media  (max-width: 1050px) {
-    .expresscurate_feed_list,
-    .expresscurate_bookmarks{
-        width: 90%;
-    }
-    .expresscurate_feed_list .feedListControls,
-    .expresscurate_bookmarks .bookmarkListControls{
+
+    .expresscurate_controls{
         height: auto !important;
     }
     .expresscurate_feedBoxes li label,
     .expresscurate_bookmarkBoxes li label{
         max-width: 80% !important;
     }
-    /*.expresscurate_columnsName{*/
-        /*width: 98.6%;*/
-        /*padding: 0 0 0 1.4%;*/
-    /*}*/
 }
 .expresscurate_feed_list .expresscurate_headBorderBottom,
 .expresscurate_bookmarks .expresscurate_headBorderBottom{
     padding-bottom: 10px;
     margin-bottom: 15px;
 }
-    .expresscurate_bookmarks .bookmarkListControls,
-    .expresscurate_feed_list .feedListControls{
+    .expresscurate_controls{
         margin: 35px 0 0 0;
         padding: 0;
         height: 35px;
     }
-        .expresscurate_bookmarks .bookmarkListControls li,
-        .expresscurate_feed_list .feedListControls li{
+        .expresscurate_controls li{
             display: inline-block;
             width: 50px;
             height: 30px;
@@ -3587,9 +3542,19 @@
             -ms-transition: background-color 400ms;
 
         }
-            .expresscurate_bookmarks .bookmarkListControls .check,
-            .expresscurate_feed_list .feedListControls .check{
-              /*  border: solid 1px #dddddd;*/
+        .expresscurate_controls li.layout{
+            background-image: url("../images/view.svg");
+            background-color: transparent;
+            background-size: 50px auto;
+            margin: 0 10px 0 0;
+        }
+        .expresscurate_news_container .expresscurate_controls{
+            margin-bottom: 10px;
+        }
+            .expresscurate_news_container .expresscurate_controls .layout{
+                margin: 0;
+            }
+            .expresscurate_controls .check{
                 height: 30px;
                 width: 50px;
                 margin-left: 10px;
@@ -3600,96 +3565,75 @@
                 cursor: pointer;
                 border: solid 1px #25bfa1;
             }
-.expresscurate_bookmarks .bookmarkListControls .check.active,
-.expresscurate_feed_list .feedListControls .check.active{
+.expresscurate_controls .check.active{
     background-position: -104px -75px;
     background-color: #1cbb9f;
 }
-            .expresscurate_bookmarks .bookmarkListControls .quotes.active:hover,
-            .expresscurate_bookmarks .bookmarkListControls .remove.active:hover,
-            .expresscurate_feed_list .feedListControls .quotes.active:hover,
-            .expresscurate_feed_list .feedListControls .bookmark.active:hover,
-            .expresscurate_feed_list .feedListControls .remove.active:hover{
+            .expresscurate_controls li.active:hover{
                 background-color: #1cbb9f;
                 border-color: #1cbb9f;
                 cursor: pointer;
             }
-.expresscurate_bookmarks .bookmarkListControls .quotes.active,
-.expresscurate_bookmarks .bookmarkListControls .remove.active,
-.expresscurate_feed_list .feedListControls .quotes.active,
-.expresscurate_feed_list .feedListControls .bookmark.active,
-.expresscurate_feed_list .feedListControls .remove.active{
+.expresscurate_controls li.active{
     border-color: #1cbb9f;
 }
 .expresscurate_feed_list .feedListControls .quotes{
     border-right: none;
 }
-.expresscurate_bookmarks .bookmarkListControls .remove,
-.expresscurate_feed_list .feedListControls .remove{
+.expresscurate_controls .remove{
     background-position: -52px 7px;
     border-left: none;
 }
-            .expresscurate_bookmarks .bookmarkListControls .quotes,
-            .expresscurate_feed_list .feedListControls .quotes{
+
+            .expresscurate_controls .quotes{
                 background-position: 19px 8px;
             }
-            .expresscurate_feed_list .feedListControls .bookmark{
+            .expresscurate_controls .bookmark{
                 background-position: -15px 7px;
             }
-            .expresscurate_bookmarks .bookmarkListControls .remove,
-            .expresscurate_feed_list .feedListControls .remove{
+            .expresscurate_controls .remove{
                 background-position: -50px 8px;
             }
 
-            .expresscurate_bookmarks .bookmarkListControls .quotes.active:hover,
-            .expresscurate_feed_list .feedListControls .quotes.active:hover{
+            .expresscurate_controls .quotes.active:hover{
                 background-position: 19px -59px;
                 background-color: #1cbb9f;
                 border-color: #1cbb9f;
             }
-            .expresscurate_feed_list .feedListControls .bookmark.active:hover{
+            .expresscurate_controls .bookmark.active:hover{
                 background-position: -15px -60px;
                 background-color: #1cbb9f;
                 border-color: #1cbb9f;
             }
-            .expresscurate_bookmarks .bookmarkListControls .remove.active:hover,
-            .expresscurate_feed_list .feedListControls .remove.active:hover{
+            .expresscurate_controls .remove.active:hover{
                 background-position: -50px -59px;
                 background-color: #1cbb9f;
                 border-color: #1cbb9f;
             }
 
-            .expresscurate_bookmarks .bookmarkListControls .quotes.active,
-            .expresscurate_feed_list .feedListControls .quotes.active{
+            .expresscurate_controls .quotes.active{
                 background-position: 19px -25px;
             }
-            .expresscurate_feed_list .feedListControls .bookmark.active{
+            .expresscurate_controls .bookmark.active{
                 background-position: -15px -26px;
             }
-            .expresscurate_bookmarks .bookmarkListControls .remove.active,
-            .expresscurate_feed_list .feedListControls .remove.active{
+            .expresscurate_controls .remove.active{
                 background-position: -50px -25px;
             }
 
-.expresscurate_bookmarks .bookmarkListControls li:hover .tooltip,
-.expresscurate_feed_list .feedListControls li:hover .tooltip{
+.expresscurate_controls li:hover .tooltip{
     visibility:visible;
     opacity:1;
     transition-delay:0.3s;
 }
-.expresscurate_bookmarks .bookmarkListControls li.check .tooltip,
-.expresscurate_feed_list .feedListControls li.check .tooltip {
+.expresscurate_controls li.check .tooltip {
     left:-25%;
     left: -webkit-calc(50% - 60px);
     left: -moz-calc(50% - 60px);
     left: calc(50% - 60px);
     width: 100px;
 }
-.expresscurate_bookmarks .bookmarkListControls li.quotes .tooltip,
-.expresscurate_feed_list .feedListControls li.quotes .tooltip,
-.expresscurate_bookmarks .bookmarkListControls li.remove .tooltip,
-.expresscurate_feed_list .feedListControls li.bookmark .tooltip,
-.expresscurate_feed_list .feedListControls li.remove .tooltip {
+.expresscurate_controls li .tooltip {
     left:-1%;
     left: -webkit-calc(50% - 46px);
     left: -moz-calc(50% - 46px);
@@ -3697,15 +3641,7 @@
     width: 70px;
 }
 
-.expresscurate_bookmarks .bookmarkListControls li.quotes .tooltip:before,
-.expresscurate_feed_list .feedListControls li.quotes .tooltip:before,
-.expresscurate_bookmarks .bookmarkListControls li.remove .tooltip:before,
-.expresscurate_feed_list .feedListControls li.bookmark .tooltip:before,
-.expresscurate_feed_list .feedListControls li.remove .tooltip:before {
-    left:40px;
-}
-.expresscurate_bookmarks .bookmarkListControls li .tooltip,
-.expresscurate_feed_list .feedListControls li .tooltip {
+.expresscurate_controls li .tooltip {
     position: absolute;
     border: none;
     border-radius: 3px;
@@ -3727,9 +3663,8 @@
 .expresscurate_feedBoxes > li .keywords .tooltip {
     position: absolute;
     border: none;
-    /*border: 1px solid #d2d0d9;*/
     border-radius: 3px;
-    background: #000;/*eae9ef;*/
+    background: #000;
     bottom: -80px;
     left:-25%;
     left: -webkit-calc(50% - 50px);
@@ -3759,7 +3694,7 @@
     font-family: OpenSans-Light, Verdana, Geneva, sans-serif;
     font-size: 13px;
     line-height: 13px;
-    color: #d3d3d3;/*45555f;*/
+    color: #d3d3d3;
     vertical-align: top;
     display: inline-block;
     margin: 5px 0;
@@ -3799,16 +3734,13 @@
 .expresscurate_bookmarkBoxes > li .keywords .inContent p,
 .expresscurate_feedBoxes > li .keywords .inContent p{
     font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
-    color: #fff;/*2b353b;*/
+    color: #fff;
     font-size: 13px;
     line-height: 18px;
 }
-.expresscurate_bookmarks .bookmarkListControls li .tooltip:before,
-.expresscurate_feed_list .feedListControls li .tooltip:before,
+.expresscurate_controls li .tooltip:before,
 .expresscurate_bookmarkBoxes > li .keywords .tooltip:before,
 .expresscurate_feedBoxes > li .keywords .tooltip:before{
-/*.expresscurate_bookmarkBoxes > li .keywords .tooltip:after,
-.expresscurate_feedBoxes > li .keywords .tooltip:after {*/
     content: "";
     position: absolute;
     width: 0;
@@ -3817,12 +3749,15 @@
     border-color: transparent;
     border-top: 0;
 }
-.expresscurate_bookmarks .bookmarkListControls li .tooltip:before,
-.expresscurate_feed_list .feedListControls li .tooltip:before{
+.expresscurate_controls li .tooltip:before{
     top: -5px;
-    left: 55px;
+    left: 40px;
     border-bottom-color: #000;
     border-width: 5px;
+}
+
+.expresscurate_controls  li.check .tooltip:before{
+    left:55px;
 }
 .expresscurate_feedBoxes > li .keywords .tooltip:before,
 .expresscurate_bookmarkBoxes > li .keywords .tooltip:before {
@@ -3830,13 +3765,6 @@
     left: 44px;
     border-width: 5px;
 }
-/*.expresscurate_bookmarkBoxes > li .keywords .tooltip:after,
-.expresscurate_feedBoxes > li .keywords .tooltip:after {
-    top: -5px;
-    left: 55px;
-    border-bottom-color: #eae9ef;
-    border-width: 5px;
-}*/
 .expresscurate_disableInputStyle:focus {
     outline:none;
 }
@@ -3855,7 +3783,7 @@
 }
     .expresscurate_bookmarkBoxes > li,
     .expresscurate_feedBoxes > li,
-    .expresscurate_news_container li{
+    .expresscurate_news_container .expresscurate_masonryWrap > li{
         height: auto;
         padding: 13px 15px 30px 35px;
         background-color: #ffffff;
@@ -3917,17 +3845,7 @@
             background: url("../images/expresscurate_icons.svg") no-repeat 0px -641px;
             background-size: 20px auto;
         }
-/*.expresscurate_bookmarkBoxes li .time:before,
-.expresscurate_feedBoxes li .time:before{
 
-    position: absolute;
-    display: block;
-    width: 15px;
-    height: 15px;
-    top: 1px;
-    left: -20px;
-    content: '';
-}*/
 .expresscurate_news_container li .description {
     margin: 0;
     color: #717171 !important;
@@ -3997,7 +3915,6 @@
             }
         .expresscurate_bookmarkBoxes .keywords li:hover .tooltip,
         .expresscurate_feedBoxes .keywords li:hover .tooltip{
-           /* display: block;*/
             visibility:visible;
             opacity:1;
             transition-delay:0.3s;
@@ -4293,6 +4210,7 @@
                         font-size: 13px;
                         display: block;
                         color:#fff;
+                        white-space: nowrap;
                     }
         .expresscurate_sources_coll_widget li.addSource{
             background-color: #1cbb9f;
@@ -4487,7 +4405,6 @@
             visibility:hidden;
             opacity:0;
             transition:visibility 0s linear 0.3s,opacity 0.3s linear;
-            /*display: none;*/
         }
         .expresscurate_dashboard_smartPublishing .list li:hover .publish,
         .expresscurate_dashboard_bookmarks .list li:hover .curate,
@@ -4675,6 +4592,22 @@
         width: calc( ( 100% - 10px ) / 2 );
     }
 }
+@media  (min-width: 800px){
+    .expresscurate_controls li.layout{
+        border: solid 1px #1cbb9f;
+        background-position: -17px 8px;
+    }
+    .expresscurate_controls li.layout:hover{
+        background-color: #1cbb9f;
+        background-position: -17px -27px;
+    }
+    .expresscurate_singleColumn .expresscurate_controls li.layout{
+        background-position: 18px 8px;
+    }
+    .expresscurate_singleColumn .expresscurate_controls li.layout:hover{
+        background-position: 19px -27px;
+    }
+}
 @media  (max-width: 800px){
     .expresscurate_sortablePlaceholder,
     .expresscurate_masonryItem,
@@ -4684,6 +4617,9 @@
     }
     .expresscurate_blocksContainer .expresscurate_masonryItem{
         margin: 0 0 10px;
+    }
+    .expresscurate_controls .layout{
+        display: none;
     }
 }
 /**/

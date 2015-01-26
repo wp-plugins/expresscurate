@@ -12,7 +12,7 @@ class ExpressCurate_Sitemap
 
     public function generateSitemapScheduled(){
         $intervalInDays = null;
-        $lastGenerationDate = 0;
+        //$lastGenerationDate = 0;
         switch(get_option('expresscurate_sitemap_generation_interval')) {
             case 'daily': $intervalInDays = 1;
                 break;
@@ -26,7 +26,7 @@ class ExpressCurate_Sitemap
         }
         $lastGenerationDate = get_option('expresscurate_sitemap_generation_last_date');
         if (floor(date('Y-m-d H:i:s') - strtotime($lastGenerationDate)/(60*60*24) ) >= $intervalInDays) {
-            $this->generateSitemapIndex();
+            $this->generateSitemap();
         }
 
 
@@ -54,16 +54,12 @@ class ExpressCurate_Sitemap
 
     }
 
-    public function generateSitemapIndex(){
-        $this->generateSitemap();
-    }
-
-    public function generateSitemap(){
+    public function generateSitemap()
+    {
         $header = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         $body = '';
         $footer = '</urlset>';
 
-        //$posts_and_pages = array_merge(get_posts(),get_pages());
         $posts_and_pages = array();
         $publishedPostCount = wp_count_posts()->publish;
 
@@ -71,40 +67,53 @@ class ExpressCurate_Sitemap
             $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
             $postsAndPages = array_merge(get_posts($args), get_pages($args));
             foreach ($postsAndPages as $item) {
-                $posts_and_pages[] = array('ID'=> $item->ID,'modified'=>$item->post_modified_gmt);
+                $posts_and_pages[] = array('ID' => $item->ID, 'modified' => $item->post_modified_gmt);
             }
         }
         foreach ($posts_and_pages as $item) {
-            $skipPost = get_post_meta($item['ID'],'expresscurate_sitemap_post_exclude_from_sitemap',true);
-
-            if (empty($skipPost)){
+            $skipPost = get_post_meta($item['ID'], '_expresscurate_sitemap_post_exclude_from_sitemap', true);
+            if (empty($skipPost)) {
                 $changeFrequency = get_option('expresscurate_sitemap_default_changefreq');
                 $priority = get_option('expresscurate_sitemap_priority_manual_value');
 
-                $configureManually = get_post_meta($item['ID'],'expresscurate_sitemap_post_configure_manually',true);
+                $configureManually = get_post_meta($item['ID'], '_expresscurate_sitemap_post_configure_manually', true);
 
-                if (!empty($configureManually)){
-                    $changeFrequency = get_post_meta($item['ID'], 'expresscurate_sitemap_post_frequency',true);
-                    $priority = get_post_meta($item['ID'], 'expresscurate_sitemap_post_priority',true);
+                if (!empty($configureManually)) {
+                    $changeFrequency = get_post_meta($item['ID'], '_expresscurate_sitemap_post_frequency', true);
+                    $priority = get_post_meta($item['ID'], '_expresscurate_sitemap_post_priority', true);
                 }
-
+                $lastMod = gmdate('Y-m-d', strtotime($item['modified']));
                 $body .= '<url>
-                        <loc>'.get_permalink($item['ID']).'</loc>
-                        <lastmod>'.$item['modified'].'</lastmod>
-                        <changefreq>'.$changeFrequency.'</changefreq>
-                        <priority>'.$priority.'</priority>
-                        </url>';
+                            <loc>' . get_permalink($item['ID']) . '</loc>
+                            <lastmod>' . $lastMod . '</lastmod>
+                            <changefreq>' . $changeFrequency . '</changefreq>
+                            <priority>' . $priority . '</priority>
+                          </url>';
+
             }
 
         }
         $path = get_home_path();
-        $file = fopen($path.'sitemap.xml','w');
-        fwrite($file,$header.$body.$footer);
-        fclose($file);
-        $this->addToRobots();
-        update_option('expresscurate_sitemap_generation_last_date',date('Y-m-d H:i:s'));
 
-        echo json_encode(array('status'=>'success'));die;
+        $file = fopen($path . 'sitemap.xml', 'w');
+        if($file){
+            fwrite($file, $header . $body . $footer);
+            fclose($file);
+            $this->addToRobots();
+            update_option('expresscurate_sitemap_generation_last_date', date('Y-m-d H:i:s'));
+            return true;
+        }
+        return false;
+
+    }
+
+    public function isExists(){
+        $path = get_home_path();
+        $file = file_exists($path . 'sitemap.xml');
+        if($file){
+            return true;
+        }
+        return false;
     }
 
     public function saveSitemapGoogleStatus(){
@@ -116,6 +125,41 @@ class ExpressCurate_Sitemap
         update_option('expresscurate_sitemap_submit',$status);
     }
 
+    public function submitToGoogle()
+    {
+        $googleAuth = new ExpressCurate_GoogleAuth();
+        $submitToWebmastersStatus = get_option('expresscurate_sitemap_submit');
+        if ($submitToWebmastersStatus) {
+            $response = $googleAuth->getAccessToken();
+            if ($response) {
+                $response = $googleAuth->submit_sitemap(get_site_url(), get_site_url() . '/sitemap.xml');
+                 return $response;
+            } else {
+                // @TODO notify user to get key
+            }
+       }
+    }
+
+    public function errorMessage(){
+        $homeUrl = get_site_url();
+        $sitemmapPath = $homeUrl . '/sitemap.xml';
+        $message = '<div class="update-nag">';
+        $message .=  '
+                          ExpressCurate tries to generate sitemap but it was not able to write sitemap. Please, grant write access to file
+                    <p style="text-indent: 20px;font-weight: bolder">'.$sitemmapPath.'</p>
+                    <a class="expresscurateLink"  href="'.$homeUrl.'/wp-admin/admin.php?page=expresscurate_settings"  > Sitemap settings</a>
+                    ';
+        $message .= '</div>';
+        echo $message;
+    }
+
+    public function set_permission_status() {
+        $status = $_REQUEST['status'];
+        update_option('expresscurate_sitemap_update_permission', $status);
+        $result = array('status'=>'success');
+        echo json_encode($result);die;
+    }
+
     private function addToRobots(){
         $path = get_home_path();
         $file = fopen($path.'robots.txt','w');
@@ -123,24 +167,4 @@ class ExpressCurate_Sitemap
         fclose($file);
     }
 
-
-    public function submitToGoogle()
-    {
-        $googleAuth = new ExpressCurate_GoogleAuth();
-        settings_fields('expresscurate-sitemap-group');
-        do_settings_sections('expresscurate-sitemap-group');
-
-        if (get_option('expresscurate_sitemap_submit_webmasters') == 'on') {
-
-            $accessToken = $googleAuth->getAccessToken();
-            if ($accessToken) {
-                $oauth = new ExpressCurate_GoogleAuth();
-                $oauth->accessToken = $accessToken;
-                $response = $oauth->submit_sitemap(get_site_url(), get_site_url() . '/sitemap.xml');
-                 return $response;
-            } else {
-                // @TODO notify user to get key
-            }
-        }
-    }
 }

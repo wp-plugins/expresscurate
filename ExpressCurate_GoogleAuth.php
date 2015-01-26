@@ -8,7 +8,7 @@ class ExpressCurate_GoogleAuth
     protected $accessTokenUrl = null;
     protected $redirectUri= null;
     const WALL_URL = 'https://www.expresscurate.com/';
-/// const WALL_URL = 'http://192.168.0.154:3000/';
+    //const WALL_URL = 'http://192.168.0.78:3000/';
     const ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v3/token';
 
 
@@ -30,7 +30,7 @@ class ExpressCurate_GoogleAuth
         $info = curl_getinfo($ch);
         if($info['http_code']>=200 && $info['http_code']<300 && 0 == $info['download_content_length']){
             $response = array('status'=> 0 ,'massage'=>'Sucsessully submited' );
-        }if($info['http_code']== 401){
+        }elseif($info['http_code']== 401){
         $decodedResponse = json_decode($response, true);
         $response = array('status'=> 1 ,'massage'=>$decodedResponse['error'] );
     } else{
@@ -52,9 +52,9 @@ class ExpressCurate_GoogleAuth
     public function getAccessToken() {
         $this->getUserCredentials();
         $refreshToken = get_option('expresscurate_google_refresh_token',false);
-        return $this->exchangeCodeToAccessToken($refreshToken);
-        $key = get_option('expresscurate_google_refresh_token',false);
+ 	return $this->exchangeCodeToAccessToken($refreshToken);
     }
+
     private function exchangeCodeToAccessToken($refreshToken)
     {
         if($refreshToken){
@@ -62,10 +62,10 @@ class ExpressCurate_GoogleAuth
                 . "&client_secret=" . $this->client_secret
                 . "&grant_type=refresh_token"
                 . "&refresh_token=" .$refreshToken;
-            $accessTokenDataJson = $this->do_request(self::ACCESS_TOKEN_URL, 'POST', $postVals);
+            $accessTokenDataJson = $this->do_request_for_token(self::ACCESS_TOKEN_URL, 'POST', $postVals);
             $accessTokenData = json_decode($accessTokenDataJson, true);
             $this->accessToken = $accessTokenData['access_token'];
-            return $accessTokenData;
+            return true;
         }else{
             return false;
         }
@@ -73,7 +73,7 @@ class ExpressCurate_GoogleAuth
     private function getUserCredentials()
     {
         $url = self::WALL_URL ."api/getgoogleclient";
-        $json = $this->do_request($url, 'POST',array());
+        $json = $this->do_request_for_token($url, 'POST',array());
         $date = json_decode($json);
         $this->client_id = $date->client_id;
         $this->client_secret = $date->client_secret;
@@ -95,8 +95,8 @@ class ExpressCurate_GoogleAuth
             CURLOPT_TIMEOUT => 5,
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_SSL_VERIFYPEER => false
-            //CURLOPT_HEADER => 1,
         );
+
         if ('POST' === strtoupper($requestType)) {
             $options[CURLOPT_POST] = true;
         }
@@ -107,7 +107,25 @@ class ExpressCurate_GoogleAuth
         if($redirectUrl){
             wp_redirect( $redirectUrl, 301 );
         }
-       // var_dump('hgh'.$response);die;
+        return $response;
+    }
+
+    private function do_request_for_token($url,$requestType, $data) {
+        $ch = curl_init();
+        $options = array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_ENCODING => "UTF-8",
+            CURLOPT_AUTOREFERER => true,
+            CURLOPT_CONNECTTIMEOUT => 20,
+            CURLOPT_TIMEOUT => 20,
+            CURLOPT_SSL_VERIFYPEER => false
+        );
+
+        curl_setopt_array($ch, $options);
+        $response = curl_exec($ch);
         return $response;
     }
 }

@@ -3,7 +3,7 @@ $content_list = array();
 $feedManager = new ExpressCurate_FeedManager();
 $content_list = $feedManager->get_feed_list();
 ?>
-<div class="expresscurate_feed_list expresscurate_Styles wrap">
+<div class="expresscurate_feed_list expresscurate_Styles wrap <?php if(get_option('expresscurate_feed_layout', '')=='single'){echo 'expresscurate_singleColumn';} ?>">
     <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
         <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
 
@@ -28,6 +28,9 @@ $content_list = $feedManager->get_feed_list();
             <li class="quotes expresscurate_floatRight">
                 <span class="tooltip">curate</span>
             </li>
+            <li class="layout expresscurate_floatRight">
+                <span class="tooltip">layout</span>
+            </li>
             <div class="expresscurate_clear"></div>
         </ul>
     </div>
@@ -48,8 +51,10 @@ $content_list = $feedManager->get_feed_list();
                 <a class="postTitle" href="<?php echo $item['link'] ?>"
                    target="_newtab"><?php echo $item['title'] ?></a><br/>
                 <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
-          <span class="curatedBy">/<?php echo $item['curated'] ? 'curated by' : 'author'; ?>
-              <span><?php echo $item['author']; ?></span> /</span>
+              <?php if(isset($item['author']) && '' != $item['author']){ ?>
+                <span class="curatedBy">/<?php echo $item['curated'] ? 'curated by' : 'author'; ?>
+                    <span><?php echo $item['author']; ?></span> /</span>
+                <?php  }?>
                 <span
                     class="time"><?php echo human_time_diff(strtotime($item['date']), current_time('timestamp')) . ' ago'; ?></span></br>
                 <?php if (count($item['keywords'])) { ?>
@@ -76,7 +81,7 @@ $content_list = $feedManager->get_feed_list();
 
                 <ul class="controls expresscurate_preventTextSelection">
                     <li class="curate"><a
-                            href="<?php echo get_admin_url() ?>post-new.php?expresscurate_load_source=<?php echo urlencode($item['link']); ?>&expresscurate_load_title=<?php echo urlencode($item['title']); ?>">Curate</a>
+                            href="<?php echo esc_url(get_admin_url()."post-new.php?expresscurate_load_source=".urlencode($item['link'])."&expresscurate_load_title=".urlencode($item['title'])); ?>">Curate</a>
                     </li>
                     <li class="separator">-</li>
                     <li class="bookmark">Bookmark</li>
@@ -84,7 +89,7 @@ $content_list = $feedManager->get_feed_list();
                     <li class="hide">Delete</li>
                 </ul>
                 <div class="expresscurate_clear"></div>
-                <span class="label label_<?php echo $item['type'] ?>"><?php echo $item['type'] ?></span>
+                <!--<span class="label label_<?php /*echo $item['type'] */?>"><?php /*echo $item['type'] */?></span>-->
             </li>
 
             <?php $i++;

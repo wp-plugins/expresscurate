@@ -18,6 +18,7 @@ class ExpressCurate_FeedManager {
     $data = $_REQUEST;
     if ($data['url']) {
       $result = array();
+      $data['url'] = trim($data['url']);
       $curated_links_rss = get_option('expresscurate_links_rss', '');
       if ($curated_links_rss) {
         $curated_links_rss = json_decode($curated_links_rss, true);
@@ -26,19 +27,19 @@ class ExpressCurate_FeedManager {
       }
 
       $data['url'] = expresscurate_normalise_url($data['url'],true);
-      $pureUrl = expresscurate_normalise_url($data['url']);
-      if (!isset($curated_links_rss[$data['url']])) {
-        $rssUrl = $this->checkRss($data['url']);
+      $rssUrl = $this->getRssUrl($data['url']);
+      if (!isset($curated_links_rss[$rssUrl])) {
+        $rssUrl = $this->getRssUrl($data['url']);
         if (filter_var($rssUrl, FILTER_VALIDATE_URL)) {
           $result['status'] = 'success';
           $metas = $wpdb->get_results(
                   "SELECT post_id
                    FROM $wpdb->postmeta
-                   WHERE meta_key LIKE  '%expresscurate_link_%' AND meta_value LIKE '%" . $data['url'] . "%' GROUP BY post_id");
+                   WHERE meta_key LIKE  '%_expresscurate_link_%' AND meta_value LIKE '%" . $data['url'] . "%' GROUP BY post_id");
 
 
-          $curated_links_rss[$pureUrl]['feed_url'] = $result['feed_url'] = $rssUrl;
-          $curated_links_rss[$pureUrl]['post_count'] = $result['post_count'] = count($metas);
+          $curated_links_rss[$rssUrl]['feed_url'] = $result['feed_url'] = $rssUrl;
+          $curated_links_rss[$rssUrl]['post_count'] = $result['post_count'] = count($metas);
          //  var_dump($curated_links_rss);die;
           $curated_links_rss = json_encode($curated_links_rss);
           update_option('expresscurate_links_rss', $curated_links_rss);
@@ -61,7 +62,6 @@ class ExpressCurate_FeedManager {
     $result = array();
     $data = $_REQUEST;
     if ($data['url']) {
-      $data['url'] = expresscurate_normalise_url($data['url'])  ;
       $curated_links_rss = get_option('expresscurate_links_rss', '');
       if ($curated_links_rss) {
         $curated_links_rss = json_decode($curated_links_rss, true);
@@ -96,100 +96,183 @@ class ExpressCurate_FeedManager {
     die;
   }
 
-  public function get_curated_links() {
-    $curated_links = array();
-    $date_after = '';
-    $curated_links_rss = get_option('expresscurate_links_rss', '');
-    if ($curated_links_rss) {
-      $curated_links_rss = json_decode($curated_links_rss, true);
-    } else {
-      $curated_links_rss = array();
-    }
-    $top_sources_rss = get_option('expresscurate_top_sources_rss', '');
 
-    if ($top_sources_rss) {
-      $top_sources_rss = json_decode($top_sources_rss, true);
-      $date_after = strtotime($top_sources_rss['date']) . "&";
-    } else {
-      $top_sources_rss = array();
-      $top_sources_rss['links'] = array();
-    }
-
-    $curated_posts_query = new WP_Query("meta_key=is_expresscurate&meta_value=1&posts_per_page=-1&" . $date_after . "order=DESC");
-
-    if ($curated_posts_query->have_posts()) {
-      $i = 0;
-      while ($curated_posts_query->have_posts()) {
-        $curated_posts_query->the_post();
-        $meta_values = get_post_meta(get_the_ID());
-        // var_dump($meta_values);
-        foreach ($meta_values as $key => $value) {
-          if (preg_match('/expresscurate_link_\d/', $key)) {
-            if ($meta_values[$key][0]) {
-              $normalised_url = expresscurate_normalise_url($meta_values[$key][0]);
-              $domain = parse_url($normalised_url);
-              if (preg_match('/(?P<subdomain>.<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain['host'], $regs)) {
-                $curated_links[$i]['link'] = expresscurate_normalise_url($regs['domain']);
-              } else {
-                $curated_links[$i]['link'] = $normalised_url;
-              }
-              $curated_links[$i]['post_id'] = get_the_ID();
-            }
-            $i++;
-          }
-        }
-      }
-    }
-    wp_reset_postdata();
-
-    foreach ($curated_links as $key => $top_link) {
-      $feed_url = false;
-      if (isset($top_sources_rss['links'][$top_link['link']])) {
-        $top_sources_rss['links'][$top_link['link']]['post_ids'][] = $top_link['post_id'];
-       //var_dump($top_link['link']);
-        if (isset($curated_links_rss[$top_link['link']])) {
-          $feed_status = 'rssStatusYes';
-          $feed_url = $curated_links_rss[$top_link['link']]['feed_url'];
+    public function get_curated_links() {
+        $curated_links = array();
+        $date_after = '';
+        $curated_links_rss = get_option('expresscurate_links_rss', '');
+        if ($curated_links_rss) {
+            $curated_links_rss = json_decode($curated_links_rss, true);
         } else {
-          if (isset($top_sources_rss['links'][$top_link['link']]['feed_options']) && isset($top_sources_rss['links'][$top_link['link']]['feed_options']['checked']) && $top_sources_rss['links'][$top_link['link']]['feed_options']['checked'] == 1) {
-            $feed_status = $top_sources_rss['links'][$top_link['link']]['feed_options']['feed_status'];
-          } else {
-            $feed_url = $this->checkRss($top_link['link']);
-            if ($feed_url) {
-              //if (1 == 1) {
-              $feed_status = 'rssStatusAdd';
-            } else {
-              $feed_status = 'rssStatusNo';
-            }
-            $checked = 1;
-          }
+            $curated_links_rss = array();
         }
-        $checked = 1;
-        $top_sources_rss['links'][$top_link['link']]['feed_options'] = array('feed_url' => $feed_url, 'feed_status' => $feed_status, 'checked' => 1, 'type' => 'feed');
-      } else {
-        if (isset($top_sources_rss['links'][$top_link['link']]['feed_options']) && isset($top_sources_rss['links'][$top_link['link']]['feed_options']['checked']) && $top_sources_rss['links'][$top_link['link']]['feed_options']['checked'] == 1) {
-          $feed_status = $top_sources_rss['links'][$top_link['link']]['feed_options']['feed_status'];
+        $top_sources_rss = get_option('expresscurate_top_sources_rss', '');
+
+        if ($top_sources_rss) {
+            $top_sources_rss = json_decode($top_sources_rss, true);
+            $date_after = strtotime($top_sources_rss['date']) . "&";
         } else {
-          if ($feed_url = $this->checkRss($top_link['link'])) {
-            //if (1 == 1) {
-            $feed_status = 'rssStatusAdd';
-          } else {
-            $feed_status = 'rssStatusNo';
-          }
-          $checked = 1;
+            $top_sources_rss = array();
+            $top_sources_rss['links'] = array();
         }
-        $top_sources_rss['links'][$top_link['link']] = array('post_ids' => array($top_link['post_id']), 'feed_options' => array('feed_url' => $feed_url, 'feed_status' => $feed_status, 'checked' => $checked, 'type' => 'feed'));
-      }
-      $top_sources_rss['links'][$top_link['link']]['post_ids'] = array_unique($top_sources_rss['links'][$top_link['link']]['post_ids']);
-      $top_sources_rss['links'][$top_link['link']]['post_count'] = count($top_sources_rss['links'][$top_link['link']]['post_ids']);
+
+        $curated_posts_query = new WP_Query("meta_key=_is_expresscurate&meta_value=1&posts_per_page=-1&" . $date_after . "order=DESC");
+
+        if ($curated_posts_query->have_posts()) {
+            $i = 0;
+            while ($curated_posts_query->have_posts()) {
+                $curated_posts_query->the_post();
+                $meta_values = get_post_meta(get_the_ID());
+                // var_dump($meta_values);
+                foreach ($meta_values as $key => $value) {
+                    if (preg_match('/_expresscurate_link_\d/', $key)) {
+                        if ($meta_values[$key][0]) {
+                            $normalised_url = expresscurate_normalise_url($meta_values[$key][0]);
+                            $domain = parse_url($normalised_url);
+                            if (preg_match('/(?P<subdomain>.<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain['host'], $regs)) {
+                                $curated_links[$i]['link'] = expresscurate_normalise_url($regs['domain']);
+                            } else {
+                                $curated_links[$i]['link'] = $normalised_url;
+                            }
+                            $curated_links[$i]['post_id'] = get_the_ID();
+                        }
+                        $i++;
+                    }
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        foreach ($curated_links as $key => $top_link) {
+            $websiteUrl = $top_link['link'];
+            $rssUrl = $this->getRssUrl($websiteUrl);
+            if ($rssUrl && isset($curated_links_rss[$rssUrl])) {
+                $feed_status = 'rssStatusYes';
+            }else {
+                if ($rssUrl) {
+                    $feed_status = 'rssStatusAdd';
+                } else {
+                    $feed_status = 'rssStatusNo';
+                }
+            }
+            $top_sources_rss['links'][$websiteUrl] = array(
+                                                            'post_ids' => array($top_link['post_id']),
+                                                            'feed_options' => array(
+                                                                                    'feed_url' => $rssUrl,
+                                                                                    'feed_status' => $feed_status,
+                                                                                    'type' => 'feed')
+                                                            );
+            $top_sources_rss['links'][$websiteUrl]['post_ids'] = array_unique($top_sources_rss['links'][$websiteUrl]['post_ids']);
+            $top_sources_rss['links'][$websiteUrl]['post_count'] = count($top_sources_rss['links'][$websiteUrl]['post_ids']);
+        }
+
+        @uasort($top_sources_rss['links'], array($this, "sort_by_count"));
+        $top_sources_rss['date'] = date('Y-m-d H:i:s');
+        $top_sources_rss_save = json_encode($top_sources_rss);
+        update_option('expresscurate_top_sources_rss', $top_sources_rss_save);
+        return $top_sources_rss;
     }
 
-    @uasort($top_sources_rss['links'], array($this, "sort_by_count"));
-    $top_sources_rss['date'] = date('Y-m-d H:i:s');
-    $top_sources_rss_save = json_encode($top_sources_rss);
-    update_option('expresscurate_top_sources_rss', $top_sources_rss_save);
-    return $top_sources_rss;
-  }
+
+
+//
+//  public function get_curated_links2() {
+//    $curated_links = array();
+//    $date_after = '';
+//    $curated_links_rss = get_option('expresscurate_links_rss', '');
+//    if ($curated_links_rss) {
+//      $curated_links_rss = json_decode($curated_links_rss, true);
+//    } else {
+//      $curated_links_rss = array();
+//    }
+//    $top_sources_rss = get_option('expresscurate_top_sources_rss', '');
+//
+//    if ($top_sources_rss) {
+//      $top_sources_rss = json_decode($top_sources_rss, true);
+//      $date_after = strtotime($top_sources_rss['date']) . "&";
+//    } else {
+//      $top_sources_rss = array();
+//      $top_sources_rss['links'] = array();
+//    }
+//
+//    $curated_posts_query = new WP_Query("meta_key=_is_expresscurate&meta_value=1&posts_per_page=-1&" . $date_after . "order=DESC");
+//
+//    if ($curated_posts_query->have_posts()) {
+//      $i = 0;
+//      while ($curated_posts_query->have_posts()) {
+//        $curated_posts_query->the_post();
+//        $meta_values = get_post_meta(get_the_ID());
+//        // var_dump($meta_values);
+//        foreach ($meta_values as $key => $value) {
+//          if (preg_match('/_expresscurate_link_\d/', $key)) {
+//            if ($meta_values[$key][0]) {
+//              $normalised_url = expresscurate_normalise_url($meta_values[$key][0]);
+//              $domain = parse_url($normalised_url);
+//              if (preg_match('/(?P<subdomain>.<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain['host'], $regs)) {
+//                $curated_links[$i]['link'] = expresscurate_normalise_url($regs['domain']);
+//              } else {
+//                $curated_links[$i]['link'] = $normalised_url;
+//              }
+//              $curated_links[$i]['post_id'] = get_the_ID();
+//            }
+//            $i++;
+//          }
+//        }
+//      }
+//    }
+//    wp_reset_postdata();
+//
+//    foreach ($curated_links as $key => $top_link) {
+//     $rssUrl = $this->getRssUrl($top_link['link']);
+//       if($rssUrl){
+//           $top_link['link'] = $rssUrl;
+//       }
+//      $feed_url = false;
+//      if (isset($top_sources_rss['links'][$top_link['link']])) {
+//        $top_sources_rss['links'][$top_link['link']]['post_ids'][] = $top_link['post_id'];
+//        if (isset($curated_links_rss[$top_link['link']])) {
+//          $feed_status = 'rssStatusYes';
+//          $feed_url = $curated_links_rss[$top_link['link']]['feed_url'];
+//        } else {
+//          if (isset($top_sources_rss['links'][$top_link['link']]['feed_options']) && isset($top_sources_rss['links'][$top_link['link']]['feed_options']['checked']) && $top_sources_rss['links'][$top_link['link']]['feed_options']['checked'] == 1) {
+//            $feed_status = $top_sources_rss['links'][$top_link['link']]['feed_options']['feed_status'];
+//          } else {
+//            $feed_url = $this->getRssUrl($top_link['link']);
+//            if ($feed_url) {
+//              //if (1 == 1) {
+//              $feed_status = 'rssStatusAdd';
+//            } else {
+//              $feed_status = 'rssStatusNo';
+//            }
+//            $checked = 1;
+//          }
+//        }
+//        $checked = 1;
+//        $top_sources_rss['links'][$top_link['link']]['feed_options'] = array('feed_url' => $feed_url, 'feed_status' => $feed_status, 'checked' => 1, 'type' => 'feed');
+//      } else {
+//        if (isset($top_sources_rss['links'][$top_link['link']]['feed_options']) && isset($top_sources_rss['links'][$top_link['link']]['feed_options']['checked']) && $top_sources_rss['links'][$top_link['link']]['feed_options']['checked'] == 1) {
+//          $feed_status = $top_sources_rss['links'][$top_link['link']]['feed_options']['feed_status'];
+//        } else {
+//          if ($feed_url = $this->getRssUrl($top_link['link'])) {
+//            //if (1 == 1) {
+//            $feed_status = 'rssStatusAdd';
+//          } else {
+//            $feed_status = 'rssStatusNo';
+//          }
+//          $checked = 1;
+//        }
+//        $top_sources_rss['links'][$top_link['link']] = array('post_ids' => array($top_link['post_id']), 'feed_options' => array('feed_url' => $feed_url, 'feed_status' => $feed_status, 'checked' => $checked, 'type' => 'feed'));
+//      }
+//      $top_sources_rss['links'][$top_link['link']]['post_ids'] = array_unique($top_sources_rss['links'][$top_link['link']]['post_ids']);
+//      $top_sources_rss['links'][$top_link['link']]['post_count'] = count($top_sources_rss['links'][$top_link['link']]['post_ids']);
+//    }
+//
+//    @uasort($top_sources_rss['links'], array($this, "sort_by_count"));
+//    $top_sources_rss['date'] = date('Y-m-d H:i:s');
+//    $top_sources_rss_save = json_encode($top_sources_rss);
+//    update_option('expresscurate_top_sources_rss', $top_sources_rss_save);
+//    return $top_sources_rss;
+//  }
 
   public function get_feed_list() {
     $content = get_option('expresscurate_feed_content', '');
@@ -211,7 +294,7 @@ class ExpressCurate_FeedManager {
     return $curated_links_rss;
   }
 
-  public function checkRss($url) {
+  public function getRssUrl($url) {
     if (strpos($url, 'http') === false) {
       $url = 'http://' . $url;
     }
@@ -333,14 +416,12 @@ class ExpressCurate_FeedManager {
               $diff = $story_date - $starting_date;
           }
           if(!$date || ($date && $diff >= 0)){
-              if(!empty($keywords)) {
-                  if($type = 'wall') {
-                      $story_array['type'] = $story['channel'];
-                  } else {
-                      $story_array['type'] = 'feed';
-                  }
-                  $feed_array[$link] = $story_array;
+              if($type = 'wall') {
+                  $story_array['type'] = $story['channel'];
+              } else {
+                  $story_array['type'] = 'feed';
               }
+              $feed_array[$link] = $story_array;
           }
 
       }
@@ -655,7 +736,7 @@ class ExpressCurate_FeedManager {
     $data = $_REQUEST;
     $result = array();
     if (isset($data['post_id']) && isset($data['url'])) {
-      $items = get_post_meta($data['post_id'], 'expresscurate_curated_data', true);
+      $items = get_post_meta($data['post_id'], '_expresscurate_curated_data', true);
       $exists = array();
       if ($items) {
         foreach ($items as $key => $item) {
@@ -671,7 +752,7 @@ class ExpressCurate_FeedManager {
         if ($article['status'] == 'success') {
           $result['result'] = array('title' => $article['result']['title'], 'link' => $data['url'], 'domain' => $article['result']['domain']);
           $items[] = $result['result'];
-          update_post_meta($data['post_id'], 'expresscurate_curated_data', $items);
+          update_post_meta($data['post_id'], '_expresscurate_curated_data', $items);
         }
       }
     } else {
@@ -686,7 +767,7 @@ class ExpressCurate_FeedManager {
     $result = array();
     if (isset($data['post_id']) && isset($data['item'])) {
       $item_for_delete = json_decode(stripslashes($data['item']), true);
-      $items = get_post_meta($data['post_id'], 'expresscurate_curated_data', true);
+      $items = get_post_meta($data['post_id'], '_expresscurate_curated_data', true);
       $exists = array();
       if ($items) {
         foreach ($items as $key => $item) {
@@ -696,7 +777,7 @@ class ExpressCurate_FeedManager {
           }
         }
       }
-      update_post_meta($data['post_id'], 'expresscurate_curated_data', $items);
+      update_post_meta($data['post_id'], '_expresscurate_curated_data', $items);
       $result['status'] = 'success';
     } else {
       $result['status'] = 'error';

@@ -4,7 +4,6 @@ $words_stats = $keywords->getKeywordStats(true);
 $keywords_stats = $keywords->getKeywordStats();
 ?>
 <div class="expresscurate_keywords_settings expresscurate_Styles wrap">
-    <input type="hidden" id="expresscurate_admin_url" value="<?php echo admin_url(); ?>"/>
     <input type="hidden" id="expresscurate_plugin_dir" value="<?php echo plugin_dir_url(__FILE__); ?>"/>
     <label>Keywords Dashboard</label>
     <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions?

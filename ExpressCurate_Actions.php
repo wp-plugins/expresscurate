@@ -10,6 +10,7 @@ require_once 'ExpressCurate_Keywords.php';
 require_once 'ExpressCurate_ContentManager.php';
 require_once 'ExpressCurate_Sitemap.php';
 require_once 'ExpressCurate_FeedManager.php';
+require_once 'ExpressCurate_Tags.php';
 
 class ExpressCurate_Actions
 {
@@ -56,6 +57,7 @@ class ExpressCurate_Actions
         $this->sitemap = new ExpressCurate_Sitemap();
         $this->cronManager = new ExpressCurate_CronManager();
         $this->feedManager = new ExpressCurate_FeedManager();
+        
         // register actions
         add_action('admin_init', array(&$this, 'register_settings'));
         add_action('admin_init', array(&$this, 'admin_init'));
@@ -108,6 +110,8 @@ class ExpressCurate_Actions
         }
 
         add_action('admin_footer', array(&$this, 'add_inline_popup_content'));
+        add_action('admin_footer', array(&$this, 'expresscurate_anonymous_tracking'));
+
         add_action('wp_ajax_expresscurate_export_api_get_terms', array($this->ajaxExportAPI, 'get_terms'));
         add_action('wp_ajax_expresscurate_export_api_check_auth', array($this->ajaxExportAPI, 'check_auth'));
         add_action('wp_ajax_expresscurate_export_api_check_images', array($this->ajaxExportAPI, 'check_images'));
@@ -141,13 +145,15 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_get_feed', array($this->ajaxExportAPI, 'get_feed'));
         add_action('wp_ajax_expresscurate_export_api_get_post', array($this->ajaxExportAPI, 'get_post'));
 
-        add_action('wp_ajax_expresscurate_sitemap_generate', array($this->sitemap, 'generateSitemapIndex'));
+        add_action('wp_ajax_expresscurate_sitemap_generate', array($this->ajaxExportAPI, 'generate_sitemap'));
         add_action('wp_ajax_expresscurate_sitemap_submit', array($this->sitemap, 'submitToGoogle'));
+        add_action('wp_ajax_expresscurate_set_sitemap_permission_status', array( $this->sitemap, 'set_permission_status'));
 
         add_action('wp_ajax_expresscurate_set_cron_permission_status', array( $this->cronManager, 'set_permission_status'));
 
 
         add_action('wp_ajax_expresscurate_change_tab_event', array(&$this, 'change_tabs'));
+        add_action('wp_ajax_expresscurate_change_layout_event', array(&$this, 'change_layout'));
 
 
 
@@ -160,9 +166,18 @@ class ExpressCurate_Actions
                 add_action('post_submitbox_misc_actions', array($this, 'expresscurate_publish_box'));
             }
         }
+        add_action('transition_post_status',array(&$this,'status_changes'),10,3);
+        add_action( 'update_option_permalink_structure' , array(&$this,'permalink_changes'), 10, 2 );
         if ($_REQUEST['page'] == 'expresscurate_settings' ) {
             $cronManager = new ExpressCurate_CronManager();
             $cronManager->schedule_events();
+
+            // Generate sitemap
+            $seo = get_option('expresscurate_seo');
+            $sitemap = new ExpressCurate_Sitemap();
+            if('on' == $seo && !$sitemap->isExists()){
+                $sitemap->generateSitemap();
+            }
         }
     }
     public function register_settings()
@@ -318,6 +333,14 @@ class ExpressCurate_Actions
         <?php
         }
     }
+    
+    public function expresscurate_anonymous_tracking()
+    {
+         require_once 'ExpressCurate_Tracker.php';
+         
+         $tracker = ExpressCurate_Tracker::getInstance();
+         $tracker->track();
+    }
 
 // Register the column
     function curated_column_register($columns)
@@ -330,7 +353,7 @@ class ExpressCurate_Actions
     {
         if ('curated' != $column_name)
             return;
-        $curated = get_post_meta($post_id, 'is_expresscurate', true);
+        $curated = get_post_meta($post_id, '_is_expresscurate', true);
         if ($curated == 1) {
             $curated = '<em>' . __('Yes', self::PLUGIN_FOLDER) . '</em>';
         } else {
@@ -348,9 +371,9 @@ class ExpressCurate_Actions
 
     public function curated_column_orderby($vars)
     {
-        if (isset($vars['orderby']) && 'is_expresscurated' == $vars['orderby']) {
+        if (isset($vars['orderby']) && '_is_expresscurated' == $vars['orderby']) {
             $vars = array_merge($vars, array(
-                'meta_key' => 'is_expresscurate',
+                'meta_key' => '_is_expresscurate',
                 'orderby' => 'meta_value_num'
             ));
         }
@@ -397,9 +420,9 @@ class ExpressCurate_Actions
 
     /*    public function smart_publish_column_orderby($vars)
         {
-            if (isset($vars['orderby']) && 'is_expresscurated' == $vars['orderby']) {
+            if (isset($vars['orderby']) && '_is_expresscurated' == $vars['orderby']) {
                 $vars = array_merge($vars, array(
-                    'meta_key' => 'is_expresscurate',
+                    'meta_key' => '_is_expresscurate',
                     'orderby' => 'meta_value_num'
                 ));
             }
@@ -443,26 +466,26 @@ class ExpressCurate_Actions
         include(sprintf("%s/templates/dialog.php", dirname(__FILE__)));
     }
 
-    private function checkOpenTag($matches)
-    {
-        if (strpos($matches[0], '<') === false) {
-            return $matches[0];
-        } else {
-            return '<strong>' . $matches[1] . '</strong>' . $this->doReplace($matches[2]);
-        }
-    }
-
-    private function doReplace($html)
-    {
-        return preg_replace_callback('/(\b' . $this->word . '\b)(.*?>)/i', array(&$this, 'checkOpenTag'), $html);
-    }
-
-    public function replace($html, $word)
-    {
-        $this->word = $word;
-
-        return $this->doReplace($html);
-    }
+//    private function checkOpenTag($matches)
+//    {
+//        if (strpos($matches[0], '<') === false) {
+//            return $matches[0];
+//        } else {
+//            return '<strong>' . $matches[1] . '</strong>' . $this->doReplace($matches[2]);
+//        }
+//    }
+//
+//    private function doReplace($html)
+//    {
+/*        return preg_replace_callback('/(\b' . $this->word . '\b)(.*?>)/i', array(&$this, 'checkOpenTag'), $html);*/
+//    }
+//
+//    public function replace($html, $word)
+//    {
+//        $this->word = $word;
+//
+//        return $this->doReplace($html);
+//    }
 
     public function generate_tags($post_id)
     {
@@ -491,12 +514,13 @@ class ExpressCurate_Actions
         }
 
         $content_tags = array();
-        preg_match_all('/\s(?<!\w)(?=[^>]*(<|$))#\w+/iu', $post_content, $content_tags);
+        // Find all hashtags in text
+        preg_match_all('/\s(?!<\w)(?=[^>]*(<|$))#\w+/iu', $post_content, $content_tags);
 
         foreach ($content_tags[0] as $content_tag) {
 
             $content_tag_insert = str_replace("#", "", trim($content_tag));
-//adding content tag to post tags if not exists
+    //adding content tag to post tags if not exists
             if (!in_array($content_tag_insert, $post_tags)) {
                 wp_set_post_tags($post_id, strtolower($content_tag_insert), true);
             }
@@ -504,10 +528,10 @@ class ExpressCurate_Actions
         if ($defined_tags && count($defined_tags)) {
             foreach ($defined_tags as $defined_tag) {
                 $defined_tag_insert = trim($defined_tag);
-                $defined_tag_insert = str_replace('/\s+/', '[ ]', $defined_tag_insert);
+                $defined_tag_insert = preg_replace('/\s+/', '[ ]', $defined_tag_insert);
                 //$defined_tag_insert = preg_replace('/\s+/', '|', $defined_tag_insert);
-//adding defined tag to post tags if tag exists in posttitle or post content
-                preg_match("/(?<!\w)(?=[^>]*(<|$))" . $defined_tag_insert . "(\W|$)/i", $post_content, $tag_in_content);
+                //adding defined tag to post tags if tag exists in posttitle or post content
+                preg_match("/(?!<\w)(?=[^>]*(<|$))" . $defined_tag_insert . "(\W|$)/i", $post_content, $tag_in_content);
                 if ((isset($tag_in_content[0]) || strpos($the_post->title, $defined_tag_insert)) && !in_array($defined_tag_insert, $post_tags)) {
                     wp_set_post_tags($post_id, $defined_tag_insert, true);
                 }
@@ -519,7 +543,7 @@ class ExpressCurate_Actions
         if ($tags && count($count_tags)) {
             $sorted_tags = array();
             foreach ($tags as $tag) {
-                $tag_name = str_replace('/\s+/', '[ ]', $tag->name);
+                $tag_name = preg_replace('/\s+/', '[ ]', $tag->name);
                 $sorted_tags[$tag_name]["count_words"] = str_word_count($tag_name);
                 $sorted_tags[$tag_name]["name"] = $tag_name;
                 $sorted_tags[$tag_name]["id"] = $tag->term_id;
@@ -531,14 +555,14 @@ class ExpressCurate_Actions
 
 
             foreach ($tags as $tag) {
-                $tag_name = str_replace('/\s+/', '[ ]', $tag["name"]);
+                $tag_name = preg_replace('/\s+/', '[ ]', $tag["name"]);
                 $post_content = $tagsObj->createTag($post_content, $tag_name, $tag["id"]);
             }//end tags
         }
         return $post_content;
     }
 
-    public function get_metas($post_id = '', $meta = 'expresscurate_link_%', $type = 'post', $status = 'publish')
+    public function get_metas($post_id = '', $meta = '_expresscurate_link_%', $type = 'post', $status = 'publish')
     {
         global $wpdb;
         $metas = array();
@@ -561,6 +585,38 @@ class ExpressCurate_Actions
         return $metas;
     }
 
+
+    public function status_changes($new_status,$old_status,$post){
+        if(("publish" == $old_status &&  "publish" != $new_status) || ("publish" == $new_status && "publish" != $old_status)){
+            $this->generate_sitemap();
+        }
+    }
+
+    public function permalink_changes( $old_permalink, $new_permalink )
+    {
+        if( $old_permalink!= $new_permalink){
+            $this->generate_sitemap();
+        }
+    }
+
+
+    public function generate_sitemap(){
+        global $post;
+
+        $sitemapUpdateFrequency = get_option('expresscurate_sitemap_generation_interval');
+        $seo = get_option('expresscurate_seo');
+
+        if('always' == $sitemapUpdateFrequency && 'on' == $seo){
+            $sitemap = new ExpressCurate_Sitemap();
+            $response = $sitemap->generateSitemap();
+            if(!$response){
+                $warning = get_option('expresscurate_not_writable_warning');
+                $warning[$post->ID]['sitemap'] =  ' ExpressCurate tries to generate sitemap but it was not able to write sitemap.';
+                update_option('expresscurate_not_writable_warning', $warning);
+
+            }
+        }
+    }
     /**
      * Save the metaboxes for this custom post type
      */
@@ -580,7 +636,8 @@ class ExpressCurate_Actions
             return;
         $upload_dir = wp_upload_dir();
 
-// get the content of the post
+
+        // get the content of the post
         if (get_option('expresscurate_smart_tagging') == "on") {
             $post_content = $this->generate_tags($post_id);
         } else {
@@ -608,32 +665,29 @@ class ExpressCurate_Actions
         if (get_option('expresscurate_seo', '') == 'on') {
             $expresscurate_description = isset($_POST['expresscurate_description']) ? $_POST['expresscurate_description'] : '';
             update_post_meta($post_id, '_expresscurate_description', $expresscurate_description);
-
-
             // Advanced SEO part
             $expresscurate_advanced_seo_title = isset($_POST['expresscurate_advanced_seo_title']) ? $_POST['expresscurate_advanced_seo_title'] : '';
             $expresscurate_advanced_seo_canonical_url = isset($_POST['expresscurate_advanced_seo_canonical_url']) ? $_POST['expresscurate_advanced_seo_canonical_url'] : '';
-            $expresscurate_advanced_seo_nofollow = isset($_POST['expresscurate_advanced_seo_nofollow']) ? $_POST['expresscurate_advanced_seo_nofollow'] : '';
-            $expresscurate_advanced_seo_noindex = isset($_POST['expresscurate_advanced_seo_noindex']) ? $_POST['expresscurate_advanced_seo_noindex'] : '';
+            $expresscurate_advanced_seo_nofollow = isset($_POST['expresscurate_advanced_seo_nofollow_value']) ? $_POST['expresscurate_advanced_seo_nofollow_value'] : 'on';
+            $expresscurate_advanced_seo_noindex = isset($_POST['expresscurate_advanced_seo_noindex_value']) ? $_POST['expresscurate_advanced_seo_noindex_value'] : 'on';
 
-
-            update_post_meta($post_id, 'expresscurate_advanced_seo_title', esc_attr($expresscurate_advanced_seo_title));
-            update_post_meta($post_id, 'expresscurate_advanced_seo_canonical_url', esc_attr($expresscurate_advanced_seo_canonical_url));
-            update_post_meta($post_id, 'expresscurate_advanced_seo_nofollow', esc_attr($expresscurate_advanced_seo_nofollow));
-            update_post_meta($post_id, 'expresscurate_advanced_seo_noindex', esc_attr($expresscurate_advanced_seo_noindex));
+            update_post_meta($post_id, '_expresscurate_advanced_seo_title', esc_attr($expresscurate_advanced_seo_title));
+            update_post_meta($post_id, '_expresscurate_advanced_seo_canonical_url', esc_attr($expresscurate_advanced_seo_canonical_url));
+            update_post_meta($post_id, '_expresscurate_advanced_seo_nofollow', esc_attr($expresscurate_advanced_seo_nofollow));
+            update_post_meta($post_id, '_expresscurate_advanced_seo_noindex', esc_attr($expresscurate_advanced_seo_noindex));
             
             // social part
             $expresscurate_advanced_seo_social_title = isset($_POST['expresscurate_advanced_seo_social_title']) ? $_POST['expresscurate_advanced_seo_social_title'] : '';
             $expresscurate_advanced_seo_social_shortdesc = isset($_POST['expresscurate_advanced_seo_social_shortdesc']) ? $_POST['expresscurate_advanced_seo_social_shortdesc'] : '';
             $expresscurate_advanced_seo_social_desc = isset($_POST['expresscurate_advanced_seo_social_desc']) ? $_POST['expresscurate_advanced_seo_social_desc'] : '';
             
-            update_post_meta($post_id, 'expresscurate_advanced_seo_social_title', esc_attr($expresscurate_advanced_seo_social_title));
-            update_post_meta($post_id, 'expresscurate_advanced_seo_social_shortdesc', esc_attr($expresscurate_advanced_seo_social_shortdesc));
-            update_post_meta($post_id, 'expresscurate_advanced_seo_social_desc', esc_attr($expresscurate_advanced_seo_social_desc));
+            update_post_meta($post_id, '_expresscurate_advanced_seo_social_title', esc_attr($expresscurate_advanced_seo_social_title));
+            update_post_meta($post_id, '_expresscurate_advanced_seo_social_shortdesc', esc_attr($expresscurate_advanced_seo_social_shortdesc));
+            update_post_meta($post_id, '_expresscurate_advanced_seo_social_desc', esc_attr($expresscurate_advanced_seo_social_desc));
         }
 
         //Sitemap Settings
-        $expresscurate_sitemap_post_configure_manually = isset($_POST['expresscurate_sitemap_post_configure_manually']) ? $_POST['expresscurate_sitemap_post_configure_manually'] : '';
+        $expresscurate_sitemap_post_configure_manually = isset($_POST['expresscurate_sitemap_post_configure_manually']) ? $_POST['expresscurate_sitemap_post_configure_manually'] : false;
 
         if ($expresscurate_sitemap_post_configure_manually) {
 
@@ -644,25 +698,27 @@ class ExpressCurate_Actions
                 $expresscurate_sitemap_post_sitemap_update = isset($_POST['expresscurate_sitemap_post_sitemap_update']) ? $_POST['expresscurate_sitemap_post_sitemap_update'] : '';
                 $expresscurate_sitemap_post_google_update = isset($_POST['expresscurate_sitemap_post_google_update']) ? $_POST['expresscurate_sitemap_post_google_update'] : '';
                 $expresscurate_sitemap_post_frequency = isset($_POST['expresscurate_sitemap_post_frequency']) ? $_POST['expresscurate_sitemap_post_frequency'] : '';
-                // $expresscurate_sitemap_post_default_priority = isset($_POST['expresscurate_sitemap_post_default_priority']) ? $_POST['expresscurate_sitemap_post_default_priority'] : '';
                 $expresscurate_sitemap_post_priority = isset($_POST['expresscurate_sitemap_post_priority']) ? $_POST['expresscurate_sitemap_post_priority'] : '';
 
-                update_post_meta($post_id, 'expresscurate_sitemap_post_configure_manually', esc_attr($expresscurate_sitemap_post_configure_manually));
-                update_post_meta($post_id, 'expresscurate_sitemap_post_exclude_from_sitemap', esc_attr($expresscurate_sitemap_post_exclude_from_sitemap));
-                update_post_meta($post_id, 'expresscurate_sitemap_post_sitemap_update', esc_attr($expresscurate_sitemap_post_sitemap_update));
-                update_post_meta($post_id, 'expresscurate_sitemap_post_google_update', esc_attr($expresscurate_sitemap_post_google_update));
-                update_post_meta($post_id, 'expresscurate_sitemap_post_frequency', esc_attr($expresscurate_sitemap_post_frequency));
+              //  $expresscurate_sitemap_post_priority = ("auto-draft"!==get_post_status( $post_id )) ? $expresscurate_sitemap_post_priority : get_option('expresscurate_sitemap_priority_manual_value');
+               // $expresscurate_sitemap_post_frequency = ("auto-draft"!==get_post_status( $post_id )) ? $expresscurate_sitemap_post_frequency : get_option('expresscurate_sitemap_default_changefreq');
+
+                update_post_meta($post_id, '_expresscurate_sitemap_post_configure_manually', esc_attr($expresscurate_sitemap_post_configure_manually));
+                update_post_meta($post_id, '_expresscurate_sitemap_post_exclude_from_sitemap', esc_attr($expresscurate_sitemap_post_exclude_from_sitemap));
+                update_post_meta($post_id, '_expresscurate_sitemap_post_sitemap_update', esc_attr($expresscurate_sitemap_post_sitemap_update));
+                update_post_meta($post_id, '_expresscurate_sitemap_post_google_update', esc_attr($expresscurate_sitemap_post_google_update));
+                update_post_meta($post_id, '_expresscurate_sitemap_post_frequency', esc_attr($expresscurate_sitemap_post_frequency));
                 // update_post_meta($post_id, 'expresscurate_sitemap_post_default_priority', esc_attr($expresscurate_sitemap_post_default_priority));
-                update_post_meta($post_id, 'expresscurate_sitemap_post_priority', esc_attr($expresscurate_sitemap_post_priority));
+                update_post_meta($post_id, '_expresscurate_sitemap_post_priority', esc_attr($expresscurate_sitemap_post_priority));
 
 
             } else {
-                update_post_meta($post_id, 'expresscurate_sitemap_post_configure_manually', esc_attr($expresscurate_sitemap_post_configure_manually));
-                update_post_meta($post_id, 'expresscurate_sitemap_post_exclude_from_sitemap', esc_attr($expresscurate_sitemap_post_exclude_from_sitemap));
+                update_post_meta($post_id, '_expresscurate_sitemap_post_configure_manually', esc_attr($expresscurate_sitemap_post_configure_manually));
+                update_post_meta($post_id, '_expresscurate_sitemap_post_exclude_from_sitemap', esc_attr($expresscurate_sitemap_post_exclude_from_sitemap));
             }
 
         } else {
-            update_post_meta($post_id, 'expresscurate_sitemap_post_configure_manually', esc_attr($expresscurate_sitemap_post_configure_manually));
+            update_post_meta($post_id, '_expresscurate_sitemap_post_configure_manually', esc_attr($expresscurate_sitemap_post_configure_manually));
         }
 
         //source part
@@ -674,7 +730,7 @@ class ExpressCurate_Actions
                 $expresscurate_sources_meta_value[$i]['link'] = $curated_data['link'];
                 $expresscurate_sources_meta_value[$i]['domain'] = $curated_data['domain'];
             }
-            update_post_meta($post_id, 'expresscurate_curated_data', wp_slash($expresscurate_sources_meta_value));
+            update_post_meta($post_id, '_expresscurate_curated_data', wp_slash($expresscurate_sources_meta_value));
         }
         $image_made_featured = get_post_meta($post_id, '_expresscurate_image_made_featured', true);
         if ($image_made_featured && strlen($image_made_featured) > 0) {
@@ -693,7 +749,7 @@ class ExpressCurate_Actions
             $upload_dir_writable = is_writable($upload_dir['path']);
             if (!$upload_dir_writable) {
                 $warning = get_option('expresscurate_not_writable_warning');
-                $warning[$post_id] = "Your upload dir is not writable";
+                $warning[$post_id]['upload'] = "Your upload dir is not writable";
                 update_option('expresscurate_not_writable_warning', $warning);
             }
 
@@ -792,11 +848,13 @@ class ExpressCurate_Actions
                 // end writable if
             }
             // end curated image count if
+
+
         }
 
         preg_match_all('/\sdata-curated-url\s*=\s*(["\'])((?:\\.|(?!\1).)*)\1/i', $post_content, $curated_links);
 
-        $curated_links_meta = $this->get_metas($post_id); //get_post_meta($post_id, 'expresscurate_links');
+        $curated_links_meta = $this->get_metas($post_id); //get_post_meta($post_id, '_expresscurate_links');
         if (!$curated_links_meta) {
             $curated_links_meta = array();
         } else {
@@ -804,7 +862,7 @@ class ExpressCurate_Actions
 
             // delete metas
             foreach ($curated_links_meta as $i => $curated_links_meta) {
-                delete_post_meta($post_id, 'expresscurate_link_' . $i, $curated_links_meta);
+                delete_post_meta($post_id, '_expresscurate_link_' . $i, $curated_links_meta);
             }
         }
 
@@ -814,9 +872,9 @@ class ExpressCurate_Actions
             }
             array_unique($curated_links_meta);
             foreach ($curated_links_meta as $i => $curated_links_meta) {
-                update_post_meta($post_id, 'expresscurate_link_' . $i, $curated_links_meta);
+                update_post_meta($post_id, '_expresscurate_link_' . $i, $curated_links_meta);
             }
-            update_post_meta($post_id, 'is_expresscurate', 1);
+            update_post_meta($post_id, '_is_expresscurate', 1);
         }
 
         $curated_post = array(
@@ -842,7 +900,7 @@ class ExpressCurate_Actions
         $post_issues = $this->post_analysis($post_content,has_post_thumbnail($post_id));
         if($post_issues > 0){
             $warning = get_option('expresscurate_not_writable_warning');
-            $warning[$post_id] = "Post Analyzed. View $post_issues <a class='expresscurateLink expresscurate_postAnalysis' href='#'>recommendations</a>. ";
+            $warning[$post_id]['analyzed'] = "Post Analyzed. View $post_issues <a class='expresscurateLink expresscurate_postAnalysis' href='#'>recommendations</a>. ";
             update_option('expresscurate_not_writable_warning', $warning);
         }
 
@@ -895,16 +953,21 @@ class ExpressCurate_Actions
     public function expresscurate_messages($m)
     {
         global $post;
-        $notice = get_option('expresscurate_not_writable_warning');
-        if (empty($notice))
+        $notices = get_option('expresscurate_not_writable_warning');
+        if (empty($notices))
             return $m;
-        foreach ($notice as $post_id => $mm) {
+        foreach ($notices as $post_id => $mm) {
+
             if ($post->ID == $post_id) {
-                foreach ($m['post'] as $i => $message) {
-                    $m['post'][$i] = $message . '<div id="message" class="error"><p>' . $mm . '</p></div>';
+                $notice = '';
+                foreach($mm as $key){
+                    $notice =  $notice . '<div id="message" class="error"><p>'.$key.'</p></div>';
                 }
-                unset($notice[$post_id]);
-                update_option('expresscurate_not_writable_warning', $notice);
+                foreach ($m['post'] as $i => $message) {
+                    $m['post'][$i] = $message . $notice;
+                }
+                unset($notices[$post_id]);
+                update_option('expresscurate_not_writable_warning', $notices);
                 break;
             }
         }
@@ -995,7 +1058,7 @@ class ExpressCurate_Actions
         $title = $default_title;
         if (is_single() || is_page()) {
             $post_id = $post->ID;
-            $title = get_post_meta($post_id, 'expresscurate_advanced_seo_title', true);
+            $title = get_post_meta($post_id, '_expresscurate_advanced_seo_title', true);
             $title = !empty($title) ? $title . ' | ' : '';
         }
         echo $title;
@@ -1005,7 +1068,7 @@ class ExpressCurate_Actions
     {
         global $post;
         $post_id = $post->ID;
-        $canonical_url = get_post_meta($post_id, 'expresscurate_advanced_seo_canonical_url', true);
+        $canonical_url = get_post_meta($post_id, '_expresscurate_advanced_seo_canonical_url', true);
         $canonical_url = !empty($canonical_url) ? $canonical_url : get_permalink($post_id);
 
         echo "<link rel='canonical' href='$canonical_url'>";
@@ -1081,8 +1144,8 @@ class ExpressCurate_Actions
 
     private function add_expresscurate_advanced_seo_metas($post_id, &$meta_string)
     {
-        $nofollow = get_post_meta($post_id, 'expresscurate_advanced_seo_nofollow', true) == 'on' ? 'NOFOLLOW' : '';
-        $noindex = get_post_meta($post_id, 'expresscurate_advanced_seo_noindex', true) == 'on' ? 'NOINDEX' : '';
+        $nofollow = get_post_meta($post_id, '_expresscurate_advanced_seo_nofollow', true) == 'on' ? 'NOFOLLOW' : '';
+        $noindex = get_post_meta($post_id, '_expresscurate_advanced_seo_noindex', true) == 'on' ? 'NOINDEX' : '';
         if (!empty($nofollow) || !empty($noindex)) {
             $meta_string .= sprintf("<meta name=\"ROBOTS\" content=\"%s\" />\n", implode(', ', array_filter(array($nofollow, $noindex))));
         }
@@ -1090,16 +1153,16 @@ class ExpressCurate_Actions
     
     private function add_expresscurate_social_metas($post_id, &$meta_string)
     {
-        $title = get_post_meta($post_id, 'expresscurate_advanced_seo_social_title', true);
+        $title = get_post_meta($post_id, '_expresscurate_advanced_seo_social_title', true);
         if(empty($title)) {
-            $title = get_post_meta($post_id, 'expresscurate_advanced_seo_title', true);
+            $title = get_post_meta($post_id, '_expresscurate_advanced_seo_title', true);
         }
         if($title) {
             $title = esc_attr($title);
         }
         
-        $shortdesc = esc_attr(get_post_meta($post_id, 'expresscurate_advanced_seo_social_shortdesc', true));
-        $desc = esc_attr(get_post_meta($post_id, 'expresscurate_advanced_seo_social_desc', true));
+        $shortdesc = esc_attr(get_post_meta($post_id, '_expresscurate_advanced_seo_social_shortdesc', true));
+        $desc = esc_attr(get_post_meta($post_id, '_expresscurate_advanced_seo_social_desc', true));
         
         $featuredImageID = get_post_thumbnail_id($post_id);
         if($featuredImageID) {
@@ -1179,6 +1242,10 @@ class ExpressCurate_Actions
 
         // Render the settings template
         include(sprintf("%s/templates/settings.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'settings';
     }
 
     public function plugin_sitemap_page()
@@ -1195,6 +1262,10 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         include(sprintf("%s/templates/news.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'news';
     }
 
     public function show_expresscurate_websites()
@@ -1203,6 +1274,10 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         include(sprintf("%s/templates/websites.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'top-sources';
     }
 
     public function show_expresscurate_keywords()
@@ -1211,6 +1286,10 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         include(sprintf("%s/templates/keywords.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'keywords';
     }
 
     public function show_expresscurate_feed_dashboard()
@@ -1219,6 +1298,10 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         include(sprintf("%s/templates/feed_dashboard.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'content-feed';
     }
 
 
@@ -1228,6 +1311,10 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         include(sprintf("%s/templates/feed_list.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'rss-feeds';
     }
 
     public function show_expresscurate_bookmarks()
@@ -1237,15 +1324,22 @@ class ExpressCurate_Actions
         }
 
         include(sprintf("%s/templates/bookmarks.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'bookmarks';
     }
 
-    public function show_expresscurate_dashboard(){
+    public function show_expresscurate_dashboard() {
         if (!current_user_can('edit_posts')) {
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
 
         include(sprintf("%s/templates/dashboard.php", dirname(__FILE__)));
 
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'dashboard';
     }
 
     public function show_expresscurate_support_page()
@@ -1255,6 +1349,10 @@ class ExpressCurate_Actions
         }
 
         include(sprintf("%s/templates/support.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'support';
     }
 
 
@@ -1264,6 +1362,10 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         include(sprintf("%s/templates/license.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'license';
     }
 
     public function show_expresscurate_smart_publish_page()
@@ -1281,6 +1383,10 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         include(sprintf("%s/templates/faq.php", dirname(__FILE__)));
+        
+        // init page tracking
+        global $expresscurate_track_page;
+        $expresscurate_track_page = 'faq';
     }
 
     public function expresscurate_admin_print_styles()
@@ -1451,12 +1557,23 @@ class ExpressCurate_Actions
     {
         $_SESSION['settings_current_tab'] = $_POST['tab'];
     }
-
+    public function change_layout()
+    {
+        $page = $_POST['page'];
+        $layout = $_POST['layout'];
+        update_option($page, $layout);
+    }
 
     public function check_plugins() {
 
         $warnings = array();
         $extWarnings = array();
+        $cronManager = new ExpressCurate_CronManager();
+        $homeUrl = get_site_url();
+
+        $homePath = get_home_path();
+
+
         if (!extension_loaded(self::PCRE)) {
             $extWarnings[] = self::PCRE;
         }
@@ -1481,22 +1598,39 @@ class ExpressCurate_Actions
         $blogName = urlencode(urlencode(get_bloginfo('url')));
         $expresscurateWebsiteUrl = self::EXPRESSCURATE_URL;
         if (strlen(get_option('expresscurate_google_refresh_token')) < 3 && get_option('expresscurate_sitemap_submit') == 'on') {
-            $warnings[] = 'Authorise access to Google Webmasters. <a href="'.$expresscurateWebsiteUrl.'/api/getsitemapkey/'.$blogName.'">Authorize </a>  |  <a href="options-general.php?page=expresscurate_settings"> Sitemap Settings </a>';
+            $warnings[] = '<p>Authorise access to Google Webmasters. <a class="expresscurateLink" href="'.$expresscurateWebsiteUrl.'api/getsitemapkey/'.$blogName.'">Authorize </a>  |  <a class="expresscurateLink" href="options-general.php?page=expresscurate_settings"> Sitemap Settings </a></p>';
         }
-        if(!function_exists('exec')) {
-            $exec_function_permission_status = get_option('expresscurate_exec_function_permission_status',false);
+
+        //Check cron permission
+
+        //update_option('expresscurate_exec_function_permission_status',false);
+        $exec_function_permission_status = get_option('expresscurate_exec_function_permission_status',false);
+        $doesExecCommandExist = function_exists('exec');
+        $doesCronPermissionExist = $cronManager->check_if_exist($cronManager->websiteUrlCallCronjob);
+        if(!$doesExecCommandExist || $doesCronPermissionExist) {
             if(!$exec_function_permission_status || 'error' == $exec_function_permission_status){
                 update_option('expresscurate_exec_function_permission_status','error');
-                $cronjob ='0 * * * *  wget '.get_site_url().' > /dev/null 2>&1';
-                $warnings[] = '
+                $cronjob ='0 * * * *  wget '.$homeUrl.' > /dev/null 2>&1';
+                if(!$doesExecCommandExist){
+                    $warnings[] = '
                            ExpressCurate was not able to schedule jobs required for Content Feed. Cause: Function <b>exec()</b> is disabled.
                            Please, enable <b>exec()</b> or add the following cron from the control panel of your hosting:
-                <p style="text-indent: 20px;font-weight: bolder">'.$cronjob.'</p>
+                    <p style="text-indent: 20px;font-weight: bolder">'.$cronjob.'</p>
 
-                For more details, contact  <a class="expresscurateLink" href="'.get_site_url().'/wp-admin/admin.php?page=expresscurate_support"> Support </a></br></br>
-                <a class="expresscurateLink" href="#" id="exec_function_perm_seen" >Yes I have got it</a> | <a class="expresscurateLink" href="#" id="cron_setup_manually">I have already set it manually</a>
+                    For more details, contact  <a class="expresscurateLink" href="'.$homeUrl.'/wp-admin/admin.php?page=expresscurate_support"> Support </a></br></br>
+                    <a class="expresscurateLink" href="#" id="exec_function_perm_seen" >Yes I have got it</a> | <a class="expresscurateLink" href="#" id="cron_setup_manually">I have already set it manually</a>
 
-                ';
+                    ';
+                }elseif(!$doesCronPermissionExist){
+                    $warnings[] = '
+                          You do not have perrmission to add cronjob! Please add following cron from the control panel of your hosting:
+                    <p style="text-indent: 20px;font-weight: bolder">'.$cronjob.'</p>
+
+                    For more details, contact  <a class="expresscurateLink" href="'.$homeUrl.'/wp-admin/admin.php?page=expresscurate_support"> Support </a></br></br>
+                    <a class="expresscurateLink" href="#" id="exec_function_perm_seen" >Yes I have got it</a> | <a class="expresscurateLink" href="#" id="cron_setup_manually">I have already set it manually</a>
+
+                    ';
+                }
             }elseif($exec_function_permission_status == 'set' &&  $_REQUEST['page'] == 'expresscurate_settings' ){
                 $warnings[] = '
                            You have already set cron job manually from your host.</br>
@@ -1505,61 +1639,31 @@ class ExpressCurate_Actions
             }
         }
 
-        if(count($warnings) > 0 ){
-            $message = '<div class="update-nag">';
-            foreach($warnings as $warning){
-                $message .= $warning;
+        // Check sitemap update permission
+        $sitemmapPath = $homePath . 'sitemap.xml';
+        $sitemmapUrl = $homeUrl . '/sitemap.xml';
+        $seo = get_option('expresscurate_seo');
+        $expresscurateSitemapUpdatePermission = get_option('expresscurate_sitemap_update_permission',false);
+        if('on' == $seo  && (!$expresscurateSitemapUpdatePermission || $expresscurateSitemapUpdatePermission == 'error')) {
+            if(file_exists($sitemmapPath) && !is_writable($sitemmapPath)){
+                update_option('expresscurate_sitemap_update_permission','error');
+                $warnings[] =  '<p>
+                           ExpressCurate was not able to write sitemap. Please, grant write access to file
+                    <p style="text-indent: 20px;font-weight: bolder">'.$sitemmapUrl.'</p>
+                    <a class="expresscurateLink"  href="'.$homeUrl.'/wp-admin/admin.php?page=expresscurate_settings"  > Sitemap settings</a> | <a class="expresscurateLink" href="#" id="expresscurate_sitemap_update_permission">Ignore</a>
+                    </p>';
             }
-            $message .= '</div>';
+        }
+
+        if(count($warnings) > 0 ){
+            $message = '';
+            foreach($warnings as $warning){
+                $message .= '<div class="notice notice-warning">'.$warning.'</div>';
+            }
+
             echo $message;
         }
 
-
     }
-
-}
-
-class Expresscurate_Tags
-{
-
-    private function checkOpenTag($matches)
-    {
-        if ((strpos($matches[3], '</a') < strpos($matches[3], '<a')) || strpos($matches[3], '.') !== false) {
-            return $matches[0];
-        } else {
-            return '<a class="expresscurate_contentTags" href="' . get_tag_link($this->tag_id) . '">#' . strtolower($matches[0]) . '</a>';
-        }
-    }
-
-    private function doReplace($html)
-    {
-        return preg_replace_callback('/(\b' . $this->word . '\b)(?=[^>]*(<|$))(?=(.*?>))/Uuis', array(&$this, 'checkOpenTag'), $html, 1);
-    }
-
-    public function createTag($html, $word, $tag_id)
-    {
-        $this->word = str_replace('/', '\/', $word);
-        $this->tag_id = $tag_id;
-        return $this->doReplace($html);
-    }
-
-    public function removeTagLinks($html)
-    {
-        $tagLinks = '/<a class="expresscurate_contentTags".*?>(.*?)<\/a>/i';
-        $html = preg_replace($tagLinks, '$1', $html);
-        preg_match_all('/\s(?<!\w)(?=[^>]*(<|$))#\w+/iu', $html, $tags);
-        foreach ($tags[0] as $tag) {
-            $html = str_replace($tag, str_replace('#', '', $tag), $html);
-        }
-        return $html;
-    }
-
-    public function removeHighlights($html)
-    {
-        $spans = '/<span class="expresscurate_keywordsHighlight .*?">(.*?)<\/span>/uis';
-        return preg_replace($spans, '$1', $html);
-    }
-
-
 }
 

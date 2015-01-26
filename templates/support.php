@@ -13,7 +13,7 @@ $sent = false;
 if ($_POST) {
     if ($_POST['expresscurate_support_email'] && $_POST['expresscurate_support_message']) {
         $expressCurateEmail = new ExpressCurate_Email();
-        $sent =  $expressCurateEmail->sendSupportEmail($_POST['expresscurate_support_email'], 'Plugin feedback', $_POST['expresscurate_support_message']);
+        $sent =  $expressCurateEmail->sendSupportEmail($_POST['expresscurate_support_email'], 'Plugin feedback',stripslashes($_POST['expresscurate_support_message']));
         unset($_POST);
     }
 }

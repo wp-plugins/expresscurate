@@ -7,7 +7,7 @@
 <ul>
 <li>
     <div class="title submitSitemapWrap">
-            <a class="generate <?php if (strlen(get_option('expresscurate_google_refresh_token')) < 3) {echo 'expresscurate_displayNone'; }?>"  id="submitSiteMap" href="#">Submit Sitemap</a>
+            <a class="generate <?php if (strlen(get_option('expresscurate_google_refresh_token')) < 3) {echo 'expresscurate_displayNone'; }else {echo 'generated';}?>"  id="submitSiteMap" href="#">Submit Sitemap</a>
     </div>
         <a class="generate" id="generateSiteMap" href="#">Generate Sitemap</a>
 </li>
@@ -74,65 +74,69 @@
 <!--        </option>-->
 <!--    </select>-->
 <!--</li>-->
+<?php
+    $priority = (get_option('expresscurate_sitemap_priority_manual_value'))?get_option('expresscurate_sitemap_priority_manual_value'):"0.8";
+    $frequency = (get_option('expresscurate_sitemap_default_changefreq'))?get_option('expresscurate_sitemap_default_changefreq'):"never";
+?>
 <li>
     <p class="title">Sitemap manual priority value<span class="description ">Please select the priority for new posts in your sitemap</span></p>
     <select class="controls" name="expresscurate_sitemap_priority_manual_value">
         <option value="0.1" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.1') {
+        if ($priority == '0.1' ) {
             echo 'selected="selected"';
         }
         ?>>0.1
         </option>
         <option value="0.2" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.2') {
+        if ($priority == '0.2') {
             echo 'selected="selected"';
         }
         ?>>0.2
         </option>
         <option value="0.3" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.3') {
+        if ($priority == '0.3') {
             echo 'selected="selected"';
         }
         ?>>0.3
         </option>
         <option value="0.4" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.4') {
+        if ($priority == '0.4') {
             echo 'selected="selected"';
         }
         ?>>0.4
         </option>
         <option value="0.5" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.5') {
+        if ($priority == '0.5') {
             echo 'selected="selected"';
         }
         ?>>0.5
         </option>
         <option value="0.6" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.6') {
+        if ($priority == '0.6') {
             echo 'selected="selected"';
         }
         ?>>0.6
         </option>
         <option value="0.7" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.7') {
+        if ($priority == '0.7') {
             echo 'selected="selected"';
         }
         ?>>0.7
         </option>
-        <option value="0.8" selected <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.8') {
+        <option value="0.8" <?php
+        if ($priority == '0.8') {
             echo 'selected="selected"';
         }
         ?>>0.8
         </option>
         <option value="0.9" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '0.9') {
+        if ($priority == '0.9') {
             echo 'selected="selected"';
         }
         ?>>0.9
         </option>
         <option value="1" <?php
-        if (get_option('expresscurate_sitemap_priority_manual_value') == '1') {
+        if ($priority == '1') {
             echo 'selected="selected"';
         }
         ?>>1
@@ -143,21 +147,21 @@
     <p class="title">Sitemap default changefreq<span class="description ">Please select the sitemap changefreq value for your new posts</span></p>
     <select class="controls" name="expresscurate_sitemap_default_changefreq">
         <option value="always" <?php
-        if (get_option('expresscurate_sitemap_default_changefreq') == 'always') {
+        if ( $frequency == 'always') {
             echo 'selected="selected"';
         }
         ?>>always
         </option>
 
         <option value="hourly" <?php
-        if (get_option('expresscurate_sitemap_default_changefreq') == 'hourly') {
+        if ( $frequency == 'hourly') {
             echo 'selected="selected"';
         }
         ?>>hourly
         </option>
 
         <option value="daily" <?php
-        if (get_option('expresscurate_sitemap_default_changefreq') == 'daily') {
+        if ( $frequency == 'daily') {
             echo 'selected="selected"';
         }
         ?>>daily
@@ -165,7 +169,7 @@
 
 
         <option value="weekly" <?php
-        if (get_option('expresscurate_sitemap_default_changefreq') == 'weekly') {
+        if ( $frequency == 'weekly') {
             echo 'selected="selected"';
         }
         ?>>weekly
@@ -173,14 +177,14 @@
 
 
         <option value="monthly" <?php
-        if (get_option('expresscurate_sitemap_default_changefreq') == 'monthly') {
+        if ( $frequency == 'monthly') {
             echo 'selected="selected"';
         }
         ?>>monthly
         </option>
 
         <option value="hourly" <?php
-        if (get_option('expresscurate_sitemap_default_changefreq') == 'hourly') {
+        if ( $frequency == 'hourly') {
             echo 'selected="selected"';
         }
         ?>>hourly
@@ -188,14 +192,14 @@
 
 
         <option value="yearly" <?php
-        if (get_option('expresscurate_sitemap_default_changefreq') == 'yearly') {
+        if ( $frequency == 'yearly') {
             echo 'selected="selected"';
         }
         ?>>yearly
         </option>
 
-        <option value="never" selected <?php
-        if (get_option('expresscurate_sitemap_default_changefreq') == 'never') {
+        <option value="never" <?php
+        if ( $frequency == 'never') {
             echo 'selected="selected"';
         }
         ?>>never
