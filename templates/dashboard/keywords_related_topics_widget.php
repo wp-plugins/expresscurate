@@ -2,19 +2,19 @@
 $keywords = new ExpressCurate_Keywords();
 $keywordsArray = $keywords->getKeywords();
 
-$keywordsProcessed = array();
-foreach($keywordsArray as $keyword) {
-    $keyword = trim($keyword);
-    $keywordsProcessed[] = preg_replace('/\s+/i', '+', $keyword);
+if(!empty($keywordsArray)){
+    $keywordsProcessed = array();
+    foreach($keywordsArray as $keyword) {
+        $keyword = trim($keyword);
+        $keywordsProcessed[] = preg_replace('/\s+/i', '+', $keyword);
+    }
+    $query = implode(',', $keywordsProcessed);
 }
-
-$query = implode(',', $keywordsProcessed);
-
 ?>
 
 <div class="expresscurate_dashboard expresscurate_Styles dashboard_widget_keywords_related_topics">
   <div>
-      <?php if (sizeof($keywordsArray) != 0) {?>
+      <?php if(!empty($keywordsArray)) {?>
               <script type="text/javascript" src="//www.google.com/trends/embed.js?hl=en-US&q=<?php echo $query; ?>&cmpt=q&tz&tz&content=1&cid=TOP_ENTITIES_0_0&export=5"></script>
   
       <?php } else { ?>

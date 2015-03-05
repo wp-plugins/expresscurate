@@ -1,4 +1,5 @@
 <?php
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
 class ExpressCurate_Email
 {
@@ -13,7 +14,7 @@ class ExpressCurate_Email
         $email = ob_get_clean();
 
         $wpUsers = get_users();
-        $headers = 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        $headers = 'Content-type: text/html; charset=utf-8' . "\r\n";
         foreach ($wpUsers as $user) {
             @wp_mail($user->user_email, 'ExpressCurate Content Alert', $email, $headers);
         }

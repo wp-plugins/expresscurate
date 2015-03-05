@@ -1,6 +1,6 @@
 <?php
 
-require_once 'ExpressCurate_AjaxExportAPI.php';
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
 /*
  * Returnes source urls of all posts if $post_id is not defined

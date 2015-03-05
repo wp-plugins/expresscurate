@@ -22,7 +22,6 @@ if ($_POST) {
 <div class="expresscurate_support expresscurate_Styles wrap">
     <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
         <h2>Support</h2>
-        <!--<label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sagittis nulla lectus,</label>-->
     </div>
   <h2 class="expresscurate_displayNone"> Support</h2>
   <div class="">
@@ -52,9 +51,11 @@ if ($_POST) {
               id="expresscurate_support_form">
           <input id="expresscurate_support_email" name="expresscurate_support_email" class="inputStyle" placeholder="Email"
                  value="<?php echo $user_email ?>"/>
+            <label for="expresscurate_support_email" class="expresscurate_errorMessage"></label>
           <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
                     placeholder="<?php echo $msg_placeholder?>"></textarea>
-          <a class="feedbackButton send greenBackground" href="#" onclick="Utils.expresscurateSupportSubmit();">Send</a>
+            <label for="expresscurate_support_message" class="expresscurate_errorMessage"></label>
+          <a class="feedbackButton send greenBackground" href="#" onclick="ExpressCurateUtils.expresscurateSupportSubmit();">Send</a>
         </form>
     </div>
   </div>

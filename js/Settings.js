@@ -1,4 +1,4 @@
-var Settings = (function (jQuery) {
+var ExpressCurateSettings = (function ($) {
     var isSetup = false;
 
     function showHideOptions(slider, control) {
@@ -10,8 +10,8 @@ var Settings = (function (jQuery) {
     }
 
     function connectSelectOptions() {
-        var $alertFrequencySelect = jQuery('#expresscurate_content_alert_frequency'),
-            selectedValue = parseInt(jQuery('#expresscurate_pull_hours_interval').val()),
+        var $alertFrequencySelect = $('#expresscurate_content_alert_frequency'),
+            selectedValue = parseInt($('#expresscurate_pull_hours_interval').val()),
             $selectedFrequency = $alertFrequencySelect.find("option:selected");
         $alertFrequencySelect.find('option').prop('disabled', false).filter(function () {
             return (this.value < selectedValue);
@@ -22,55 +22,81 @@ var Settings = (function (jQuery) {
     }
 
     function setupSettings() {
-        var $submitSitemap = jQuery('.expresscurate #submitSiteMap');
-        if (jQuery('input[name=expresscurate_post_status]:checked').val() === 'draft') {
-            jQuery('#expresscurate_publish_div').show();
+        var $submitSitemap = $('.expresscurate #submitSiteMap');
+        if ($('input[name=expresscurate_post_status]:checked').val() === 'draft') {
+            $('#expresscurate_publish_div').show();
         }
         connectSelectOptions();
-        jQuery('input[name=expresscurate_post_status]').change(function () {
-            var $publishDiv = jQuery('#expresscurate_publish_div');
-            if (jQuery('input[name=expresscurate_post_status]:checked').val() === 'draft') {
+
+        /*post default status*/
+        $('input[name=expresscurate_post_status]').change(function () {
+            var $publishDiv = $('#expresscurate_publish_div');
+            if ($('input[name=expresscurate_post_status]:checked').val() === 'draft') {
                 $publishDiv.stop(true, true).slideDown('slow');
             } else {
-                jQuery('#expresscurate_publish_no').attr('checked', true);
+                $('#expresscurate_publish_no').attr('checked', true);
                 $publishDiv.stop(true, true).slideUp('slow');
             }
 
         });
-        jQuery('#expresscurate_publish').on('change', function () {
-            showHideOptions(jQuery('#smartPublishingWrap'), jQuery(this));
+        /*settings page traching*/
+        $('#tab-1').on('change','input',function(){
+            ExpressCurateUtils.track('/settings/general');
         });
+        $('#tab-2').on('change','input, select',function(){
+            ExpressCurateUtils.track('/settings/smartpublishing');
+        });
+        $('#tab-3').on('change','input, select',function(){
+            ExpressCurateUtils.track('/settings/sitemap');
+        });
+        $('#tab-4').on('change','input',function(){
+            ExpressCurateUtils.track('/settings/extension');
+        });
+        $('#tab-5').on('change','input, select',function(){
+            ExpressCurateUtils.track('/settings/feed');
+        });
+        /*smart publishing*/
+        $('#expresscurate_publish').on('change', function () {
+            showHideOptions($('#smartPublishingWrap'), $(this));
+        });
+
         /*feed*/
-        jQuery('#expresscurate_enable_content_alert').on('change', function () {
-            showHideOptions(jQuery('.emailAlertSlider'), jQuery(this));
+        $('#expresscurate_enable_content_alert').on('change', function () {
+            showHideOptions($('.emailAlertSlider'), $(this));
         });
-        jQuery('#expresscurate_pull_hours_interval').on('change', function () {
+        $('#expresscurate_pull_hours_interval').on('change', function () {
             connectSelectOptions();
         });
+
         /*sitemap*/
-        jQuery('#expresscurate_sitemap_submit').on('change', function () {
-            showHideOptions(jQuery('.sitemapUpdateFrequency'), jQuery(this));
+        $('#expresscurate_sitemap_submit').on('change', function () {
+            showHideOptions($('.sitemapUpdateFrequency'), $(this));
             var status = '',
-                $submitSitemap = jQuery('.expresscurate #submitSiteMap');
-            if (jQuery(this).is(':checked') && $submitSitemap.hasClass('generated')) {
-                status = 'on';
+                $submitSitemap = $('.expresscurate #submitSiteMap'),
+                $autorize=$('.getApiKey');
+            status=($(this).is(':checked'))?'on':'off';
+            if ($(this).is(':checked') && $submitSitemap.hasClass('generated')) {
                 $submitSitemap.removeClass('expresscurate_displayNone');
             } else {
-                status = 'off';
                 $submitSitemap.addClass('expresscurate_displayNone');
             }
-            jQuery.ajax({
+            if($submitSitemap.hasClass('generated')){
+                $autorize.addClass('expresscurate_displayNone');
+            }else{
+                $autorize.removeClass('expresscurate_displayNone');
+            }
+            $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_save_sitemap_google_status',
                 data: {status: status}
             });
         });
-        jQuery('.expresscurate #generateSiteMap').on('click', function () {
-            jQuery.ajax({
+        $('.expresscurate #generateSiteMap').on('click', function () {
+            $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_sitemap_generate'
             }).done(function (res) {
-                var data = jQuery.parseJSON(res);
+                var data = $.parseJSON(res);
                 if (data.status === 'success') {
                     $submitSitemap.removeClass('expresscurate_displayNone').addClass('generated');
                 } else {
@@ -79,39 +105,40 @@ var Settings = (function (jQuery) {
             });
         });
         $submitSitemap.on('click', function () {
-            jQuery.ajax({
+            $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_sitemap_submit'
             }).done(function (res) {
-                var data = jQuery.parseJSON(res);
+                var data = $.parseJSON(res);
                 if (data.status === 'success') {
                     $submitSitemap.removeClass('expresscurate_displayNone').addClass('generated');
                 }
             });
         });
-        /**/
-        jQuery('#expresscurate_seo').click(function () {
-            var $slider = jQuery('#publisherWrap'),
-                $sitemapTab = jQuery('#sitemapTab');
-            if (jQuery(this).is(':checked')) {
-                $slider.removeClass('expresscurate_displayNone').hide().slideDown('slow');
+
+        /*SEO settings*/
+        $('#expresscurate_seo').click(function () {
+            var $this=$(this),
+                $slider = $('#publisherWrap'),
+                $sitemapTab = $('#sitemapTab');
+            showHideOptions($slider,$this);
+            if ($this.is(':checked')) {
                 $sitemapTab.removeClass('expresscurate_displayNone');
             } else {
-                $slider.stop(true, true).slideUp('slow');
                 $sitemapTab.addClass('expresscurate_displayNone');
             }
         });
-        jQuery('input[name=expresscurate_publisher]').bind("change paste keyup", function () {
-            var href = jQuery(this).next('span').children('a').attr('href'),
+        $('input[name=expresscurate_publisher]').bind("change paste keyup", function () {
+            var href = $(this).next('span').children('a').attr('href'),
                 rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
-            jQuery(this).next('span').children('a').attr('href', rest + jQuery(this).val());
+            $(this).next('span').children('a').attr('href', rest + $(this).val());
         });
     }
 
     return {
         setup: function () {
             if (!isSetup) {
-                jQuery(document).ready(function () {
+                $(document).ready(function () {
                     setupSettings();
                     isSetup = true;
                 });
@@ -120,4 +147,4 @@ var Settings = (function (jQuery) {
     }
 })(window.jQuery);
 
-Settings.setup();
+ExpressCurateSettings.setup();

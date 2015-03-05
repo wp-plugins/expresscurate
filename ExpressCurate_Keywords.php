@@ -1,4 +1,5 @@
 <?php
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
 /*
   Author: ExpressCurate
@@ -9,12 +10,27 @@
 
 class ExpressCurate_Keywords {
 
+
+    private static $instance;
+
+    function __construct() {
+        // action shall be added from actions controller
+    }
+
+    public static function getInstance() {
+        if ( ! ( self::$instance instanceof self ) ) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
   public function getKeywords() {
     $definedKeyWords = get_option('expresscurate_defined_tags', true);
     if (empty($definedKeyWords)) {
       return false;
     } else {
-      $definedKeywordsArray = explode(',', strtolower($definedKeyWords));
+      $definedKeywordsArray = explode(',', mb_strtolower($definedKeyWords,"UTF-8"));
       return $definedKeywordsArray;
     }
   }
@@ -26,11 +42,14 @@ class ExpressCurate_Keywords {
     $post_titles = '';
     if ($args === false && $new_post === false) {
       $posts = array();
-        $publishedPostCount = wp_count_posts()->publish;
+
+       /* $publishedPostCount = wp_count_posts()->publish;
         for ($i = 0; $i < ceil($publishedPostCount / 200); $i++) {
             $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
             $posts = array_merge($posts, get_posts($args)) ;
-        }
+        }*/
+
+        $posts = $this->post_handling_by_portion('posts');
     }
     if (isset($args['id'])) {
       $post = get_post($args['id']);
@@ -49,25 +68,24 @@ class ExpressCurate_Keywords {
         $post_titles = $new_post['title'];
       }
     }
+      $post_text = strip_tags($post_text);
+      $post_text = preg_replace('/&(amp;)?#?[a-z0-9]+;/', '-', $post_text);
+      $post_text = preg_replace('/\b(' . implode('|', $stop_words) . ')\b/iu', '', $post_text);
+      $post_text = preg_replace('/\b[^\s]{1,2}\b/iu', '', $post_text);
+      $post_text = preg_replace("/[\",.':;\\-\\=\\+\\)\\?\\!\\&\\(\\}\\{\\[\\]\\@]/u", "", $post_text);
+      $post_words = array_count_values(preg_split('~[^\p{L}\p{N}\']+~u',$post_text));
+      unset($post_words['']);
+      $post_words = $this->array_map_keys('mb_strtolower', $post_words,'UTF-8');
+      $post_words = array_filter($post_words);
 
-    $post_text = strip_tags($post_text);
-    $post_text = preg_replace('/\b(' . implode('|', $stop_words) . ')\b/iu', '', $post_text);
-    $post_text = preg_replace('/\b[^\s]{1,2}\b/i', '', $post_text);
-    $post_text = preg_replace("/[\",.':;\\-\\=\\+\\)\\?\\!\\&\\(\\}\\{\\[\\]\\@]/", "", $post_text);
-    $post_words = array_count_values(str_word_count($post_text, 1));
-    $post_words = $this->array_map_keys('strtolower', $post_words);
-    $post_words = array_change_key_case($post_words, CASE_LOWER);
-    $post_words = array_filter($post_words);
+//      unset($post_words[null]);
+//      unset($post_words[' ']);
+//      unset($post_words['\'']);
+/*      unset($post_words['-']);
+      unset($post_words['nbsp']);*/
+      arsort($post_words);
 
-    unset($post_words[null]);
-    unset($post_words['']);
-    unset($post_words['\'']);
-    unset($post_words[' ']);
-    unset($post_words['-']);
-    unset($post_words['nbsp']);
-    arsort($post_words);
-
-    $total = array_sum($post_words);
+      $total = array_sum($post_words);
     $result = array('titles' => $post_titles, 'content' => $post_text, 'posts' => $post_arr, 'words' => $post_words, 'total' => $total, 'stopwords' => $stop_words);
     return $result;
   }
@@ -93,7 +111,7 @@ class ExpressCurate_Keywords {
         $keyword = str_replace("\\'", '', $keyword);
         $keyword = str_replace("\\\\", '', $keyword);        
         if (strlen($keyword) > 2) {
-          if (preg_grep("/\b" . $keyword . "\b\w+/i", $defined_tags_arr)) {
+          if (preg_grep("/\b" . $keyword . "\b\w+/iu", $defined_tags_arr)) {
             $result = array('status' => "warning", 'msg' => __($keyword . ' is already defined'));
           } else {
             if ($defined_tags) {
@@ -167,7 +185,6 @@ class ExpressCurate_Keywords {
   }
 
     public function get_stats($keywords = array(), $args = false, $post_content = false, $get_posts_count = false) {
-       // var_dump('kuku');die;
         if (!$post_content) {
             $post_content = $this->get_words($args);
         }
@@ -206,7 +223,6 @@ class ExpressCurate_Keywords {
                     $keyword_in[$keyword]['posts_count'] = 0;
                 }
                 $count = 0;
-//        $post_titles = strlen($post_content['titles']);
                 preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['titles'], -1, $count);
                 $keyword_in[$keyword]['title_matches']  = $count;
                 if ($count > 0) {
@@ -234,19 +250,44 @@ class ExpressCurate_Keywords {
         return $keyword_in;
     }
 
-    public function getKeywordStats($getTopWords = false){
+    public function post_handling_by_portion($state,$getTopWords=false,$words=null){
         $publishedPostCount = wp_count_posts()->publish;
-        //var_dump($publishedPostCount);die;
+        $expresscurate_posts_number = get_option('expresscurate_posts_number');
+        $max_reported = ((!empty($expresscurate_posts_number))?get_option('expresscurate_posts_number'):100);
+        $number_of_post = min($publishedPostCount, $max_reported);
+        $iteration = min($publishedPostCount,200);
+        for ($i = 0; $i < $number_of_post; $i+=$iteration) {
+            $args = array('status' => 'published', 'numberposts' => min($i + $number_of_post, $max_reported), 'offset' => 0);
+            if($state=="words"){
+                $wordsPart = $this->get_words($args, false);
+                $portions[] = $wordsPart['words'];
+            }
+            else if($state=="stats"){
+                if($getTopWords){
+                    $keywords = $words;
+                } else {
+                    $keywords = false;
+                }
+                $portions[] = $this->get_stats($keywords, $args, false, true);
+            }
+            else if($state=="posts"){  $posts = array_merge($posts, get_posts($args)); }
+        }
+        return $portions;
+    }
+
+    public function getKeywordStats($getTopWords = false){
         $stats = array();
         $resultArray = array();
 
         if($getTopWords) {
             $words = array();
-            for ($i = 0; $i < ceil($publishedPostCount / 200); $i++) {
+
+            /*for ($i = 0; $i < ceil($publishedPostCount / 200); $i++) {
                 $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
                 $wordsPart = $this->get_words($args, false);
                 $words[] = $wordsPart['words'];
-            }
+            }*/
+            $words = $this->post_handling_by_portion('words');
             if (!empty($words)) {
                 for ($i = 1; $i < count($words); $i++) {
                     foreach ($words[$i] as $word => $count){
@@ -272,17 +313,12 @@ class ExpressCurate_Keywords {
                 }
             }
 
-            // var_dump($definedKeywordsArray,$words);die;
        }
-        for ($i = 0; $i <= ceil($publishedPostCount / 200); $i++) {
+/*        for ($i = 0; $i <= ceil($publishedPostCount / 200); $i++) {
             $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
-            if($getTopWords){
-                $keywords = $words;
-            } else {
-                $keywords = false;
-            }
-            $stats[] = $this->get_stats($keywords, $args, false, true);
-        }
+
+        }*/
+        $stats = $this->post_handling_by_portion('stats',$getTopWords,$words);
 
         if(count($stats) > 1) {
             for ($i = 1; $i < count($stats); $i++){
@@ -338,10 +374,10 @@ class ExpressCurate_Keywords {
     return $new_array;
   }
 
-  public function array_map_keys($func, $array) {
+  public function array_map_keys($func, $array,$utf8) {
     $new_array = array();
     foreach ($array as $key => $value) {
-      $new_array[call_user_func($func, $key)] = $value;
+        $new_array[call_user_func($func, $key,$utf8)] = $value;
     }
     return $new_array;
   }

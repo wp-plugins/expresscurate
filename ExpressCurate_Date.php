@@ -1,5 +1,5 @@
 <?php
-
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 /**
  * Class responsible for date formatting
  *

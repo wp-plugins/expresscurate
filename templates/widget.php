@@ -2,9 +2,10 @@
 global $post;
 ?>
 <a name="expresscurate" id="expresscurate" xmlns="http://www.w3.org/1999/html"></a>
-<div id="expresscurate_widget_wrapper" class="expresscurate_widget_wrapper expresscurate_Styles expresscurate_preventTextSelection">
+<div id="expresscurate_widget_wrapper"
+     class="expresscurate_widget_wrapper expresscurate_Styles expresscurate_preventTextSelection">
     <label>Keywords <span class="rotate"><a href="#"></a></span>
-        <span class="mark" onclick="Keywords.markEditorKeywords();return false;"><span>mark keywords</span></span>
+        <span class="mark" onclick="ExpressCurateKeywords.markEditorKeywords();return false;"><span>mark keywords</span></span>
     </label>
     <?php
     $keywords = new ExpressCurate_Keywords();
@@ -37,17 +38,19 @@ global $post;
     <div class="addKeywords">
         <input type="text" placeholder="Add Keywords" class="expresscurate_disableInputStyle"/>
         <span class=""><span></span></span>
+        <ul class="suggestion"></ul>
     </div>
+    <p class="expresscurate_errorMessage"></p>
 </div>
 <div class="clear"></div>
 <?php
 $seo = get_option('expresscurate_seo', '') == 'on';
 if ($seo) {
-?>
-<div class="description">
-    <label for="description">Description</label>
+    ?>
+    <div class="description">
+        <label for="description">Description</label>
 
-    <div class="descriptionWrap textareaBorder">
+        <div class="descriptionWrap textareaBorder">
         <textarea id="description" class="expresscurate_disableInputStyle"
                   name="expresscurate_description"><?php
             if (strlen($pre_def_description) > 3 && get_post_meta($post->ID, '_expresscurate_description', true) == '') {
@@ -57,23 +60,36 @@ if ($seo) {
             }
             ?>
         </textarea>
+        </div>
+        <div class="hint expresscurate_displayNone borderRight">
+            <span>characters left</span>
+
+            <p class="lettersCount"><span class="bold">156</span> / 156</p>
+            <span class="tooltip">The meta description will be limited to 156 chars.</span>
+        </div>
+        <div class="hint expresscurate_displayNone">
+            <span>keywords</span>
+
+            <p class="usedKeywordsCount"><span class="bold">0</span> / 0</p>
+            <span class="tooltip">It'll be better to use keywords in meta description.</span>
+        </div>
+
+        <p class="expresscurate_displayNone">The meta description tag is intented to be a brief and concise summary of
+            your
+            page's content.</p>
     </div>
-    <div class="hint expresscurate_displayNone borderRight">
-        <span>characters left</span>
 
-        <p class="lettersCount"><span class="bold">156</span> / 156</p>
-        <span class="tooltip">The meta description will be limited to 156 chars.</span>
+    <a href="#expresscurate_advancedSEO_widget" class="expresscurate_moveToAdvanced">Advanced SEO</a>
+<?php } ?>
+<script type="text/html" id="tmpl-SEOControlCenter">
+    <div class="expresscurate_background_wrap expresscurate_preventTextSelection">
+        <span class="close">&#215</span>
+        <div class="statisticsTitle expresscurate_{{data.color}}"><span>{{data.keyword}}</span></div>
+        <div class="statistics {{data.inTitle}} borderRight">
+            <div class="center">title</div>
+        </div>
+        <div class="statistics">
+            <div class="center">content<span>{{data.inContent}}%</span></div>
+        </div>
     </div>
-    <div class="hint expresscurate_displayNone">
-        <span>keywords</span>
-
-        <p class="usedKeywordsCount"><span class="bold">0</span> / 0</p>
-        <span class="tooltip">It'll be better to use keywords in meta description.</span>
-    </div>
-
-    <p class="expresscurate_displayNone">The meta description tag is intented to be a brief and concise summary of your
-        page's content.</p>
-</div>
-
-<a href="#expresscurate_advancedSEO_widget" class="expresscurate_moveToAdvanced">Advanced SEO</a>
-<?php }  ?>
+</script>

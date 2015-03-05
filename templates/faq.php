@@ -64,9 +64,11 @@ $limit = 3;
         <input id="expresscurate_support_email" name="expresscurate_support_email" class="inputStyle"
                placeholder="Email"
                value="<?php echo $user_email ?>"/>
+        <label for="expresscurate_support_email" class="expresscurate_errorMessage"></label>
         <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
                   placeholder="Question"></textarea>
-        <a class="askButton send greenBackground" href="#" onclick="Utils.expresscurateSupportSubmit();">Ask</a>
+        <label for="expresscurate_support_message" class="expresscurate_errorMessage"></label>
+        <a class="askButton send greenBackground" href="#" onclick="ExpressCurateUtils.expresscurateSupportSubmit();">Ask</a>
       </form>
     </div>
   </div>

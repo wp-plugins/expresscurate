@@ -1,26 +1,27 @@
-var KeywordUtils = (function (jQuery) {
+var ExpressCurateKeywordUtils = (function ($) {
     var autoCompleteRequest;
 
     function checkKeyword(text, listName) {
         if (text !== '') {
-            jQuery('.expresscurate_errorMessage').remove();
             text = text.replace(/[,.;:?!]+/g, '').trim();
-            var $defTags = jQuery('textarea[name=expresscurate_defined_tags]'),
-                defVal = KeywordUtils.justText($defTags).replace(/\s{2,}/g, ' '),
-                $widget = jQuery('#expresscurate_widget'),
+            var $defTags = $('textarea[name=expresscurate_defined_tags]'),
+                defVal = justText($defTags).replace(/\s{2,}/g, ' '),
+                $widget = $('#expresscurate_widget'),
+                $errorMessage=$widget.find('.expresscurate_errorMessage'),
                 defValArr = defVal.split(', '),
                 rslt;
+            $errorMessage.remove();
             if (text.length < 3 && $widget.length) {
-                jQuery('.addKeywords').after('<p class="expresscurate_errorMessage">This keyword is too short.  We recommend keywords with at least 3 characters.</p>');
+                $errorMessage.text('This keyword is too short.  We recommend keywords with at least 3 characters.');
             } else {
                 rslt = null;
                 for (var i = 0; i < defValArr.length; i++) {
                     if (defValArr[i].toLowerCase() === text.toLowerCase()) {
                         rslt = (i + 1);
                         if ($widget.length > 0) {
-                            KeywordUtils.highlight(text, $widget.find(' .statisticsTitle'));
+                            highlight(text, $widget.find(' .statisticsTitle'));
                         } else if (listName !== undefined) {
-                            KeywordUtils.highlight(text, listName.find('div > ul li'));
+                            highlight(text, listName.find('div > ul li'));
                         }
                         text = '';
                         break;
@@ -35,6 +36,7 @@ var KeywordUtils = (function (jQuery) {
                     } else {
                         s = defVal + ', ' + text;
                     }
+
                     $defTags.val(s);
                     $defTags.text(s);
                     if (listName) {
@@ -52,7 +54,7 @@ var KeywordUtils = (function (jQuery) {
             result = [];
 
         if (el.is('span')) {
-            keywords = KeywordUtils.justText(el);
+            keywords = justText(el);
         } else {
             keywords = el.val();
             el.val('');
@@ -60,19 +62,18 @@ var KeywordUtils = (function (jQuery) {
 
         arr = keywords.split(/,|:|;|[\\.]/);
         for (var i = 0; i < arr.length; i++) {
-            var checked_keyword = KeywordUtils.checkKeyword(arr[i], listName);
-            if (checked_keyword.length > 0) {
-                result.push(checked_keyword);
+            var checkedKeyword = checkKeyword(arr[i], listName);
+            if (checkedKeyword.length > 0) {
+                result.push(checkedKeyword);
             }
         }
-
         return result;
     }
 
     function close(keyword, elemToRemove) {
-        var $defTags = jQuery('textarea[name=expresscurate_defined_tags]'),
-            newVal = KeywordUtils.justText($defTags).toLocaleLowerCase();
-        var lastChar = '';
+        var $defTags = $('textarea[name=expresscurate_defined_tags]'),
+            newVal = justText($defTags).toLocaleLowerCase(),
+            lastChar = '';
 
         newVal = newVal.replace(keyword.toLocaleLowerCase(), '');
         newVal = newVal.replace(', ,', ',');
@@ -83,6 +84,7 @@ var KeywordUtils = (function (jQuery) {
         if (newVal.match(/^, /)) {
             newVal = newVal.slice(2);
         }
+
         $defTags.val(newVal);
         $defTags.html(newVal);
         elemToRemove.remove();
@@ -91,18 +93,19 @@ var KeywordUtils = (function (jQuery) {
     function highlight(text, li) {
         var keyword = text,
             $elem, i;
+
         li.each(function (index, value) {
-            if (jQuery(value).is('#expresscurate_widget .statisticsTitle')) {
-                if (jQuery(value).find('span').text().toLowerCase() === text.toLowerCase()) {
-                    $elem = jQuery(this).closest('.expresscurate_background_wrap');
+            if ($(value).is('#expresscurate_widget .statisticsTitle')) {
+                if ($(value).find('span').text().toLowerCase() === text.toLowerCase()) {
+                    $elem = $(this).closest('.expresscurate_background_wrap');
                     i = $elem.closest('.expresscurate_widget_wrapper').find('.expresscurate_background_wrap').index($elem);
-                    jQuery('.expresscurate_widget_wrapper .expresscurate_background_wrap').eq(i).addClass('highlight');
+                    $('.expresscurate_widget_wrapper .expresscurate_background_wrap').eq(i).addClass('highlight');
                     setTimeout(function () {
                         $elem.css('opacity', '1.0');
                     }, 1000);
                 }
-            } else if (KeywordUtils.justText(jQuery(value).find('.word')).toLowerCase().trim() === keyword.toLowerCase()) {
-                $elem = jQuery(value);
+            } else if (justText($(value).find('.word')).toLowerCase().trim() === keyword.toLowerCase()) {
+                $elem = $(value);
                 $elem.addClass('expresscurate_highlight');
                 setTimeout(function () {
                     $elem.removeClass('expresscurate_highlight');
@@ -125,26 +128,28 @@ var KeywordUtils = (function (jQuery) {
 
     function keywordsSuggestions(input) {
         if (input.val().length > 1) {
-            var li_html = '',
-                text = input.val();
+            var liHTML = '',
+                text = input.val(),
+                $autoComplete=$('.suggestion');
             if (autoCompleteRequest && autoCompleteRequest.readystate !== 4) {
                 autoCompleteRequest.abort();
-                jQuery('.addKeywords .suggestion').remove();
+                $autoComplete.find('li').remove();
             }
-            autoCompleteRequest = jQuery.ajax({
+
+            autoCompleteRequest = $.ajax({
                 type: 'GET',
                 url: 'admin-ajax.php?action=expresscurate_keywords_get_suggestions',
                 data: {
                     term: text
                 }
             }).done(function (res) {
-                var data = jQuery.parseJSON(res);
-                jQuery.each(data.slice(0, 3), function (key, value) {
-                    li_html += '<li>' + value + '</li>';
+                var data = $.parseJSON(res);
+                $.each(data.slice(0, 3), function (key, value) {
+                    liHTML += '<li>' + value + '</li>';
                 });
-                if (li_html.length > 0) {
-                    jQuery('.addKeywords .suggestion').remove();
-                    jQuery('.addKeywords').append('<ul class="suggestion">' + li_html + '</ul>');
+                if (liHTML.length > 0) {
+                    $autoComplete.find('li').remove();
+                    $autoComplete.append(liHTML);
                 }
             });
         }
@@ -152,7 +157,7 @@ var KeywordUtils = (function (jQuery) {
 
     function suggestionsKeyboardNav(input) {
         // keyboard navigation start
-        var $input = jQuery(input);
+        var $input = $(input);
 
         var getKey = function (e) {
             if (window.event) {

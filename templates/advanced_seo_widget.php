@@ -1,12 +1,14 @@
 <?php
 global $post;
+$sitemap = new ExpressCurate_Sitemap();
+$sitemapFrequencyArray =$sitemap->getSitemapFrequencyTagArray();
 ?>
 
 <div class="container expresscurate_Styles expresscurate_advancedSEO_widget">
 
 <ul class="tabs">
-    <li class="tab-link expresscurate_preventTextSelection green current" data-tab="tab-1">Advanced SEO</li>
-    <li class="tab-link expresscurate_preventTextSelection red" data-tab="tab-2">Sitemap</li>
+    <li class="tab-link expresscurate_preventTextSelection green current" data-tab="tab-1">General</li>
+    <li class="tab-link expresscurate_preventTextSelection red <?php if(get_option('expresscurate_sitemap_update_permission') == 'error') echo 'disabled';?>" data-tab="tab-2">Sitemap</li>
     <li class="tab-link expresscurate_preventTextSelection blue" data-tab="tab-3">Social</li>
 </ul>
 
@@ -93,50 +95,16 @@ global $post;
                                 <span class="gray-italic desc">Please select frequency for posts in sitemap</span>
                             </div>
                             <div class="value">
+                                <?php $expresscurate_sitemap_post_frequency = get_post_meta($post->ID, '_expresscurate_sitemap_post_frequency', true) ?>
                                 <select name="expresscurate_sitemap_post_frequency"
                                         id="expresscurate_sitemap_post_frequency">
-                                    <option value="always" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_frequency', true) == 'always') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>always
-                                    </option>
-                                    <option value="hourly" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_frequency', true) == 'hourly') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Hourly
-                                    </option>
-                                    <option value="daily" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_frequency', true) == 'daily') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Daily
-                                    </option>
-                                    <option value="weekly" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_frequency', true) == 'weekly') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Weekly
-                                    </option>
-                                    <option value="monthly" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_frequency', true) == 'monthly') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Monthly
-                                    </option>
-                                    <option value="yearly" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_frequency', true) == 'yearly') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Yearly
-                                    </option>
-                                    <option value="never" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_frequency', true) == 'never') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Never
-                                    </option>
+                                    <?php foreach($sitemapFrequencyArray as $key=>$val) {
+                                        echo '<option value="' . $key . '"';
+                                        if ($key == $expresscurate_sitemap_post_frequency) {
+                                            echo ' selected="selected"';
+                                        }
+                                        echo '>' . $val . '</option>';
+                                    }?>
                                 </select>
                             </div>
                             <div class="expresscurate_clear"></div>
@@ -147,68 +115,16 @@ global $post;
                                 <span class="gray-italic desc">Please select priority for posts in sitemap</span>
                             </div>
                             <div class="value">
+                                <?php $expresscurate_sitemap_post_priority = get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) ?>
                                 <select name="expresscurate_sitemap_post_priority"
                                         id="expresscurate_sitemap_post_priority">
-                                    <option value="0.1" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.1') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.1
-                                    </option>
-                                    <option value="0.2" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.2') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.2
-                                    </option>
-                                    <option value="0.3" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.3') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.3
-                                    </option>
-                                    <option value="0.4" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.4') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.4
-                                    </option>
-                                    <option value="0.5" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.5') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.5
-                                    </option>
-                                    <option value="0.6" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.6') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.6
-                                    </option>
-                                    <option value="0.7" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.7') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.7
-                                    </option>
-                                    <option value="0.8" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.8') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.8
-                                    </option>
-                                    <option value="0.9" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '0.9') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>0.9
-                                    </option>
-                                    <option value="1" <?php
-                                    if (get_post_meta($post->ID, '_expresscurate_sitemap_post_priority', true) == '1') {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>1
-                                    </option>
+                                    <?php for($i=0.1; $i<=1; $i=$i+0.1) {
+                                        echo '<option value="'.$i.'"';
+                                        if ($i == $expresscurate_sitemap_post_priority) {
+                                            echo ' selected="selected"';
+                                        }
+                                        echo '>'.$i.'</option>';
+                                    }?>
                                 </select>
                             </div>
                             <div class="expresscurate_clear"></div>

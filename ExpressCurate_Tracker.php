@@ -1,4 +1,5 @@
 <?php
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
 /*
   Author: ExpressCurate
@@ -12,9 +13,11 @@ class ExpressCurate_Tracker {
     private static $instance;
 
     private $pages = array();
+    private $paths = array();
+    private $hash;
 
     function __construct() {
-        // action shall be added from actions controller
+        $this->hash = site_url();
     }
 
     public static function getInstance() {
@@ -25,18 +28,28 @@ class ExpressCurate_Tracker {
         return self::$instance;
     }
     
+    public function getSiteHash() {
+        return $this->hash;
+    }
+    
     public function trackPage($page) {
         $this->pages[] = $page;
+    }
+    
+    public function trackPath($path) {
+        $this->paths[] = $path;
     }
 
     public function track() {
          global $expresscurate_track_page;
-         
+         global $pagenow;
          // create hash to keep tracking anonymous
-         $hash = md5( site_url() );
+         
          ?>
          
          <script type="text/javascript">
+         var expresscurate_track_hash = '<?php echo $hash; ?>';
+
          if (typeof ga !== 'function') {
              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -46,15 +59,18 @@ class ExpressCurate_Tracker {
          
          ga('create', 'UA-47364718-4', 'auto', {
              'name': 'expresscurate',
-             'cookieDomain': 'none',
-             //'cookieDomain': 'tracking.expresscurate.com',
+             //'cookieDomain': 'none',
+             'cookieDomain': 'tracking.expresscurate.com',
              'cookieName': 'expresscurate',
-             //'cookieExpires': 20000
+             'cookieExpires': 20000
          });
          ga('expresscurate.set', 'forceSSL', true);
          ga('expresscurate.set', 'anonymizeIp', true);
          ga('expresscurate.send', 'pageview', {
-             'page': '/site/<?php echo $hash; ?>'
+             'page': '/site/<?php echo $this->hash; ?>'
+         });
+         ga('expresscurate.send', 'pageview', {
+             'page': '/site/wp/<?php echo $this->hash; ?>'
          });
          <?php if ($expresscurate_track_page) {?>
          ga('expresscurate.send', 'pageview', {
@@ -69,8 +85,28 @@ class ExpressCurate_Tracker {
          ga('expresscurate.send', 'pageview', {
              'page': '/page/<?php echo $page; ?>'
          });
+         ga('expresscurate.send', 'pageview',{
+             'page': '/action/wp/<?php echo $page; ?>/open';
+         });
          <?php } } ?>
          
+         <?php
+         if (!empty($this->paths)) {
+             foreach($this->paths as $path) {
+         ?>
+         ga('expresscurate.send', 'pageview', {
+             'page': '<?php echo $path; ?>'
+         });
+         <?php } }
+         if((get_option('expresscurate_post_status') && get_option('expresscurate_post_status')=="publish") && ($pagenow=="post-new.php" || $pagenow=="post.php")){
+             ?>
+             ga('expresscurate.send', 'pageview', {
+                 'page': '/post-edit/publish'
+             });
+         <?php
+            update_option('expresscurate_post_status','');
+         }
+         ?>
          </script>
          <?php
     }

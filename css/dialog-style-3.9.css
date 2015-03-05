@@ -2,14 +2,14 @@ div[aria-describedby="expresscurate_dialog"]{
     padding: 0 !important;
     border-radius: 0 !important;
     border:none;
-    z-index: 2147483647 !important;
+    z-index: 100091 !important;
 }
 .ui-widget-overlay{
     font-weight: normal;
     opacity:.6 !important;
     background: #000 !important;
     position: fixed;
-    z-index: 2147483646;
+    z-index: 100090;
 }
 div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar{
 	padding: 0;
@@ -20,7 +20,6 @@ div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar{
 	border:none;
     border-radius: 0;
     background-color: #222222;
-
 }
 div[aria-describedby="expresscurate_dialog"] .ui-dialog-title{
 	display: block;

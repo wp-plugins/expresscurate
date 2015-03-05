@@ -1,5 +1,5 @@
 <?php
-require_once 'ExpressCurate_GoogleAuth.php';
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 /**
  * Created by PhpStorm.
  * User: armen
@@ -9,6 +9,19 @@ require_once 'ExpressCurate_GoogleAuth.php';
 class ExpressCurate_Sitemap
 {
 
+    private static $instance;
+
+    function __construct() {
+        // action shall be added from actions controller
+    }
+
+    public static function getInstance() {
+        if ( ! ( self::$instance instanceof self ) ) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
 
     public function generateSitemapScheduled(){
         $intervalInDays = null;
@@ -56,52 +69,59 @@ class ExpressCurate_Sitemap
 
     public function generateSitemap()
     {
-        $header = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        $body = '';
-        $footer = '</urlset>';
+        $homePath = get_home_path();
+        $sitemmapPath = $homePath . 'sitemap.xml';
+        $expresscurateSitemapUpdatePermission = get_option('expresscurate_sitemap_update_permission',false);
+        if($expresscurateSitemapUpdatePermission !='seen' && $expresscurateSitemapUpdatePermission != 'error') {
+            if (is_writable($sitemmapPath)) {
+                $header = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+                $body = '';
+                $footer = '</urlset>';
 
-        $posts_and_pages = array();
-        $publishedPostCount = wp_count_posts()->publish;
+                $posts_and_pages = array();
+                $publishedPostCount = wp_count_posts()->publish;
 
-        for ($i = 0; $i < ceil($publishedPostCount / 200); $i++) {
-            $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
-            $postsAndPages = array_merge(get_posts($args), get_pages($args));
-            foreach ($postsAndPages as $item) {
-                $posts_and_pages[] = array('ID' => $item->ID, 'modified' => $item->post_modified_gmt);
-            }
-        }
-        foreach ($posts_and_pages as $item) {
-            $skipPost = get_post_meta($item['ID'], '_expresscurate_sitemap_post_exclude_from_sitemap', true);
-            if (empty($skipPost)) {
-                $changeFrequency = get_option('expresscurate_sitemap_default_changefreq');
-                $priority = get_option('expresscurate_sitemap_priority_manual_value');
-
-                $configureManually = get_post_meta($item['ID'], '_expresscurate_sitemap_post_configure_manually', true);
-
-                if (!empty($configureManually)) {
-                    $changeFrequency = get_post_meta($item['ID'], '_expresscurate_sitemap_post_frequency', true);
-                    $priority = get_post_meta($item['ID'], '_expresscurate_sitemap_post_priority', true);
+                for ($i = 0; $i < ceil($publishedPostCount / 200); $i++) {
+                    $args = array('status' => 'published', 'numberposts' => 200, 'offset' => $i * 200);
+                    $postsAndPages = array_merge(get_posts($args), get_pages($args));
+                    foreach ($postsAndPages as $item) {
+                        $posts_and_pages[] = array('ID' => $item->ID, 'modified' => $item->post_modified_gmt);
+                    }
                 }
-                $lastMod = gmdate('Y-m-d', strtotime($item['modified']));
-                $body .= '<url>
+                foreach ($posts_and_pages as $item) {
+                    $skipPost = get_post_meta($item['ID'], '_expresscurate_sitemap_post_exclude_from_sitemap', true);
+                    if (empty($skipPost)) {
+                        $changeFrequency = get_option('expresscurate_sitemap_default_changefreq');
+                        $priority = get_option('expresscurate_sitemap_priority_manual_value');
+
+                        $configureManually = get_post_meta($item['ID'], '_expresscurate_sitemap_post_configure_manually', true);
+
+                        if (!empty($configureManually)) {
+                            $changeFrequency = get_post_meta($item['ID'], '_expresscurate_sitemap_post_frequency', true);
+                            $priority = get_post_meta($item['ID'], '_expresscurate_sitemap_post_priority', true);
+                        }
+                        $lastMod = gmdate('Y-m-d', strtotime($item['modified']));
+                        $body .= '<url>
                             <loc>' . get_permalink($item['ID']) . '</loc>
                             <lastmod>' . $lastMod . '</lastmod>
                             <changefreq>' . $changeFrequency . '</changefreq>
                             <priority>' . $priority . '</priority>
                           </url>';
 
+                    }
+
+                }
+                $path = get_home_path();
+
+                $file = fopen($path . 'sitemap.xml', 'w');
+                if ($file) {
+                    fwrite($file, $header . $body . $footer);
+                    fclose($file);
+                    $this->addToRobots();
+                    update_option('expresscurate_sitemap_generation_last_date', date('Y-m-d H:i:s'));
+                    return true;
+                }
             }
-
-        }
-        $path = get_home_path();
-
-        $file = fopen($path . 'sitemap.xml', 'w');
-        if($file){
-            fwrite($file, $header . $body . $footer);
-            fclose($file);
-            $this->addToRobots();
-            update_option('expresscurate_sitemap_generation_last_date', date('Y-m-d H:i:s'));
-            return true;
         }
         return false;
 
@@ -158,6 +178,17 @@ class ExpressCurate_Sitemap
         update_option('expresscurate_sitemap_update_permission', $status);
         $result = array('status'=>'success');
         echo json_encode($result);die;
+    }
+
+    public function getSitemapFrequencyTagArray(){
+        return array('always'=>'Always',
+            'hourly'=>'Hourly',
+            'daily'=>'Daily',
+            'weekly'=>'Weekly',
+            'monthly'=>'Monthly',
+            'yearly'=>'Yearly',
+            'never'=>'Never'
+        );
     }
 
     private function addToRobots(){

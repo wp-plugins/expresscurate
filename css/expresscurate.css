@@ -447,43 +447,6 @@
                                 border-radius: 0;
                                 z-index: 100;
                             }
-
-                            .expresscurate_keywords_settings .usedWordsPart .blockTitle .titleTooltip {
-                                display: none;
-                                position: absolute;
-                                top: -5px;
-                                left: 140px;
-                                width: 200px;
-                                height: 36px;
-                                font-size: 14px;
-                                font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
-                                line-height: 34px;
-                                background: #000;
-                                color: #fff;
-                                -moz-border-radius: 0;
-                                -webkit-border-radius: 0;
-                                border-radius: 0;
-                                padding-left: 10px;
-                            }
-
-                            .expresscurate_keywords_settings .usedWordsPart .blockTitle:hover .titleTooltip {
-                                display: block;
-                            }
-
-                            .expresscurate_keywords_settings .add span:before ,
-                           .expresscurate_keywords_settings .usedWordsPart .blockTitle .titleTooltip:before{
-                                content: '';
-                                display: block;
-                                width: 0;
-                                height: 0;
-                                position: absolute;
-                                border-top: 18px solid transparent;
-                                border-bottom: 18px solid transparent;
-                                border-right: 18px solid #000;
-                                left: -18px;
-                                top: 0;
-                            }
-
                             .expresscurate_keywords_settings .add:hover span{
                                 display: block;
                             }
@@ -1117,7 +1080,7 @@
     }
 @media (min-width: 851px){
     .expresscurate_background_wrap{
-       width: 46% !important;
+       width: 45% !important;
     }
 }
 .expresscurate_background_wrap {
@@ -1722,7 +1685,9 @@
 .expresscurate_dialog .controls .tags li:hover{
     background-color: #27cfae;
 }
-
+.expresscurate_dialog .controls .tags li.curated_heading{
+    text-transform: uppercase;
+}
 .expresscurate_dialog .controls .paragraphs_preview li {
     display: inline-block;
     width: 72px;
@@ -1932,7 +1897,7 @@
     left:0;
     margin: 0;
     padding: 0;
-    z-index: 2147483647;
+    z-index: 2147483644;
 }
     .expresscurate_dialog .autoComplete li{
         height: 35px;
@@ -2180,7 +2145,7 @@
     height: 6px;
     left: 32px;
 }
-.expresscurate_dialog .alignL, .expresscurate_dialog .alignNone, .expresscurate_dialog .alignR{
+.expresscurate_dialog .alignleft, .expresscurate_dialog .alignnone, .expresscurate_dialog .alignright{
     position: absolute;
     width: 14px;
     height: 10px;
@@ -2189,25 +2154,25 @@
     bottom: 10px;
     cursor: pointer;
 }
-.expresscurate_dialog .alignL{
+.expresscurate_dialog .alignleft{
     background-position: -1px -2px;
     right: 45px;
 }
-.expresscurate_dialog .alignL.active{
+.expresscurate_dialog .alignleft.active{
     background-position: -1px -32px;
 }
-.expresscurate_dialog .alignNone{
+.expresscurate_dialog .alignnone{
     background-position:-1px -122px;
     right: 26px;
 }
-.expresscurate_dialog .alignNone.active{
+.expresscurate_dialog .alignnone.active{
     background-position: -1px -152px;
 }
-.expresscurate_dialog .alignR{
+.expresscurate_dialog .alignright{
     background-position: -1px -62px;
     right: 7px;
 }
-.expresscurate_dialog .alignR.active{
+.expresscurate_dialog .alignright.active{
     background-position: -1px -92px;
 }
 
@@ -2244,11 +2209,11 @@
     left: -16px;
 }
 
-.expresscurate_dialog .alignL .tooltipWrap > span{
+.expresscurate_dialog .alignleft .tooltipWrap > span{
     width: 70px;
     left: -28px;
 }
-.expresscurate_dialog .alignNone .tooltipWrap > span{
+.expresscurate_dialog .alignnone .tooltipWrap > span{
     width: 84px;
     left: -35px;
 }
@@ -2268,8 +2233,8 @@
 
 .expresscurate_dialog .tooltipWrap > span:before{
     content: "";
-    height: 0px;
-    width: 0px;
+    height: 0;
+    width: 0;
     border-bottom: 5px solid rgba(0, 0, 0, .8);
     border-top: 5px solid transparent;
     border-left: 5px solid transparent;
@@ -2282,9 +2247,9 @@
     position: absolute;
     background: none;
 }
-.expresscurate_dialog .alignL:hover .tooltipWrap,
-.expresscurate_dialog .alignR:hover .tooltipWrap,
-.expresscurate_dialog .alignNone:hover .tooltipWrap,
+.expresscurate_dialog .alignleft:hover .tooltipWrap,
+.expresscurate_dialog .alignright:hover .tooltipWrap,
+.expresscurate_dialog .alignnone:hover .tooltipWrap,
 .expresscurate_dialog .sizeX:hover .tooltipWrap,
 .expresscurate_dialog .sizeM:hover .tooltipWrap,
 .expresscurate_dialog .sizeS:hover .tooltipWrap,
@@ -2370,6 +2335,7 @@
     }
 .expresscurate .tab-content{
     background-color: #fff;
+    min-height: 600px;
 }
         .expresscurate_advancedSEO_widget .tab-content.current,
         .expresscurate .tab-content.current{
@@ -2541,10 +2507,13 @@
     margin: 20px ;
     padding: 0 0 0 15px;
     display: block;
+    white-space: normal;
 }
 #expresscurate_wordCount_dialog{
     max-height: 210px !important;
     height: auto !important;
+    max-width: 700px !important;
+    white-space: normal;
 }
 #expresscurate_wordCount_dialog .lengthSuggestion:before{
     display: inline-block;
@@ -2788,16 +2757,18 @@
     background-color: #1cbb9f;
     color: #ffffff;
 }
-
 .expresscurate .centerSave{
     margin: 20px;
     max-width: 790px;
     border-top: solid 1px rgb(240, 240, 240);
 }
-
 .expresscurate .tab-content > div{
     min-height: 70vh;
     max-width: 700px;
+}
+.expresscurate_advancedSEO_widget .tab-link.disabled,
+.expresscurate .tab-link.disabled{
+    color: #b1b1b1;
 }
 .expresscurate #tab-1 > div{
     max-width: 850px;
@@ -3024,6 +2995,7 @@
             color: #e84c3d !important;
             font-size: 13px !important;
             line-height: 16px;
+            width: auto !important;
         }
         #expresscurate_widget .expresscurate_errorMessage{
             margin-left: 7px;
@@ -3110,6 +3082,9 @@
                 box-shadow: none;
                 padding:0 20px;
             }
+                .expresscurate_supportBlock textarea{
+                    margin-top: 20px !important;
+                }
                 .expresscurate_supportBlock input,
             .expresscurate_support .block input,
             .expresscurate_faq .block input{
@@ -3123,13 +3098,13 @@
                 padding: 10px 20px  !important;
                 overflow: hidden;
                 height: 150px;
-                margin: 15px 0 0 1px;
+                margin: 5px 0 0 0;
             }
             .expresscurate_supportBlock .send,
             .expresscurate_support .block .send,
             .expresscurate_faq .block .send{
                 float: right;
-                margin: 15px 0 0 0;
+                margin: 10px 0 0 0;
             }
 
     .expresscurate_faq .questions{
@@ -3195,7 +3170,7 @@
 .expresscurate_headBorderBottom{
     width: 100%;
     display: block;
-    margin: 50px 0 5px 0;
+    margin: 50px 0 0 0;
 }
     .expresscurate_headBorderBottom h2{
         padding: 2px 0 !important;
@@ -3419,13 +3394,6 @@
     width: 850px;
     display: block;
 }
-.expresscurate_Styles.wrap .expresscurate_controls{
-    transition: width 2000ms;
-    -webkit-transition: width 2000ms;
-    -moz-transition: width 2000ms;
-    -o-transition: width 2000ms;
-    -ms-transition: width 2000ms;
-}
 
 @media (max-width: 1124px){
     .expresscurate_singleColumn .addNewBookmark,
@@ -3514,16 +3482,29 @@
         max-width: 80% !important;
     }
 }
-.expresscurate_feed_list .expresscurate_headBorderBottom,
-.expresscurate_bookmarks .expresscurate_headBorderBottom{
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+.expresscurate_headBorderBottom .controlsWrap.fixedControls{
+      position: fixed;
+      background-color: #F1F1F1;
+      z-index: 1000;
+      left:inherit;
+      width: inherit;
+}
+@media (max-width:782px) {
+    .expresscurate_headBorderBottom .controlsWrap.fixedControls{
+        top:0;
+    }
+}
+@media (min-width:782px) {
+    .expresscurate_headBorderBottom .controlsWrap.fixedControls{
+        top:30px;
+    }
 }
     .expresscurate_controls{
-        margin: 35px 0 0 0;
-        padding: 0;
-        height: 35px;
+        padding: 12px 0;
+        margin: 0;
+        height: 32px;
     }
+
         .expresscurate_controls li{
             display: inline-block;
             width: 50px;
@@ -3535,11 +3516,11 @@
             cursor: default;
             position: relative;
             border: solid 1px #dddddd;
-            transition: background-color 400ms;
+            /*transition: background-color 400ms;
             -webkit-transition: background-color 400ms;
             -moz-transition: background-color 400ms;
             -o-transition: background-color 400ms;
-            -ms-transition: background-color 400ms;
+            -ms-transition: background-color 400ms;*/
 
         }
         .expresscurate_controls li.layout{
@@ -3547,6 +3528,7 @@
             background-color: transparent;
             background-size: 50px auto;
             margin: 0 10px 0 0;
+            cursor: pointer !important;
         }
         .expresscurate_news_container .expresscurate_controls{
             margin-bottom: 10px;
@@ -3781,6 +3763,7 @@
 .expresscurate_news_container{
     font-size: 0;
 }
+
     .expresscurate_bookmarkBoxes > li,
     .expresscurate_feedBoxes > li,
     .expresscurate_news_container .expresscurate_masonryWrap > li{
@@ -4270,13 +4253,13 @@
                 border: none;
                 box-shadow: none;
                 margin: 15px 0 0 0;
-                line-height: 20px;
+                line-height: 17px;
             }
             .expresscurate_sources_coll_widget li.addSourceActive .errorM{
                 position: absolute;
                 height: 100%;
                 top: 0;
-                width: 1px;
+                width: 0;
                 background-color: #e96154;
                 opacity: .9;
                 color: #fff;
@@ -4577,7 +4560,6 @@
         width: -moz-calc( ( 100% - 20px ) / 3 );
         width: calc( ( 100% - 20px ) / 3 );
     }
-
 }
 .expresscurate_blocks .ui-sortable-helper  {
    opacity: .5;
@@ -4662,6 +4644,10 @@
 .expresscurate_marginTop20{
     margin-top: 20px !important;
 }
+.expresscurate_marginTop50{
+    margin-top: 50px !important;
+}
+
 .expresscurate_marginTop15{
     margin-top: 15px !important;
     display: block;
@@ -4722,6 +4708,9 @@
 }
 .mce-expresscurateFollow.mce-disabled{
     background-position: center -317px !important;
+}
+.expresscurateSocial{
+    background-position: center -78px !important;
 }
 .expresscurate_borderNone{
     border: none !important;

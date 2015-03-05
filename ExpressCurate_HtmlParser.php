@@ -1,4 +1,5 @@
 <?php
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
 /*
   Author: ExpressCurate
@@ -107,6 +108,7 @@ class ExpressCurate_HtmlParser {
 
   public function getHtml() {
     $this->doRequest();
+    mb_convert_encoding($this->html, 'HTML-ENTITIES', "UTF-8");
     if (strlen($this->html) > 3) {
       $this->title = $this->getTitle();
       $this->keywords = $this->getKeywords();
@@ -292,9 +294,10 @@ class ExpressCurate_HtmlParser {
     $user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36';
     $file_get_enabled = preg_match('/1|yes|on|true/i', ini_get('allow_url_fopen'));
     if ($file_get_enabled) {
-      $options = array('http' => array('user_agent' => $user_agent));
-      $context = stream_context_create($options);
+        $options = (preg_match("/(^https:\/\/)/i", $url, $options)!=false)?array('ssl' => array('verify_peer'=> false,"verify_peer_name"=>false)):array('http' => array('user_agent' => $user_agent));
+        $context = stream_context_create($options);
       $content = @file_get_contents($url, false, $context);
+       // $content = mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8");
       $http_status = $http_response_header;
 
       if(!empty($http_response_header)) {
@@ -331,6 +334,7 @@ class ExpressCurate_HtmlParser {
     } elseif (is_callable('curl_init')) {
       $ch = curl_init($url);
       //curl_setopt($ch, CURLOPT_HEADER, 1);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
       curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: text/xml;charset=\"utf-8\""));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -387,7 +391,8 @@ class ExpressCurate_HtmlParser {
       $keywordsString =  get_option('expresscurate_defined_tags');
       $blogKeywords = !empty($keywordsString)? explode(', ', $keywordsString) : array();
       $this->doRequest();
-      $dom = new DOMDocument();
+      mb_convert_encoding($this->html, 'HTML-ENTITIES', "UTF-8");
+      $dom = new DOMDocument('1.0', 'UTF-8');
 
       @$dom->loadHTML($this->html);
       $finder = new DomXPath($dom);
@@ -427,10 +432,13 @@ class ExpressCurate_HtmlParser {
       foreach($blogKeywords as $keyword) {
           $count = 0;
           $inTitle = 'No';
-          foreach($articleArray as $word){
+         /* foreach($articleArray as $word){
               if (mb_strtolower($word) == mb_strtolower($keyword)){
                $count++;
               }
+          }*/
+          if (in_array(mb_strtolower($keyword), $articleArray)){
+              $count++;
           }
           foreach($titleArray as $titleWord){
               if (mb_strtolower($titleWord) == mb_strtolower($keyword)){
@@ -450,29 +458,43 @@ class ExpressCurate_HtmlParser {
     function getTextBetweenTags($tag, $html, $strict=0)
     {
         /*** a new dom object ***/
-        $dom = new domDocument;
-
+//        $dom = new domDocument;
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->strictErrorChecking = FALSE ;
+        $html = mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' );
+        libxml_use_internal_errors(true);
         /*** load the html into the object ***/
         if($strict==1) {
-            $dom->loadXML($html);
+            @$dom->loadXML($html);
+            $loadHTML = true;
         } else {
             $dom->loadHTML($html);
+            if(count(libxml_get_errors())>0){
+                update_option("expresscurate_html_error","Unable to load malstructered HTML. Please edit html structure and save again");
+            }
+            else {
+                $loadHTML = true;
+                update_option("expresscurate_html_error",'');
+            }
+
         }
 
-        /*** discard white space ***/
-        $dom->preserveWhiteSpace = false;
+        if($loadHTML){
+            /*** discard white space ***/
+            $dom->preserveWhiteSpace = false;
 
-        /*** the tag by its tag name ***/
-        $content = $dom->getElementsByTagname($tag);
+            /*** the tag by its tag name ***/
+            $content = $dom->getElementsByTagname($tag);
 
-        /*** the array to return ***/
-        $out = array();
-        foreach ($content as $item) {
-            /*** add node value to the out array ***/
-            $out[] = $item->nodeValue;
+            /*** the array to return ***/
+            $out = array();
+            foreach ($content as $item) {
+                /*** add node value to the out array ***/
+                $out[] = $item->nodeValue;
+            }
+            /*** return the results ***/
+            return $out;
         }
-        /*** return the results ***/
-        return $out;
     }
 
 

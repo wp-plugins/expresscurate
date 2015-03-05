@@ -1,4 +1,6 @@
 <?php
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
+
 class ExpressCurate_GoogleAuth
 {
     public $accessToken;

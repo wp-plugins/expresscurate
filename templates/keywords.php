@@ -2,6 +2,7 @@
 $keywords = new ExpressCurate_Keywords();
 $words_stats = $keywords->getKeywordStats(true);
 $keywords_stats = $keywords->getKeywordStats();
+
 ?>
 <div class="expresscurate_keywords_settings expresscurate_Styles wrap">
     <input type="hidden" id="expresscurate_plugin_dir" value="<?php echo plugin_dir_url(__FILE__); ?>"/>
@@ -22,24 +23,28 @@ $keywords_stats = $keywords->getKeywordStats();
                 <label class="colTitle expresscurate_margin30 expresscurate_floatRight">in title</label>
 
                 <div class="expresscurate_clear"></div>
-                <label class="expresscurate_displayNone expresscurate_notDefined">Add your keywords in the box below.</label>
+                <label class="expresscurate_displayNone expresscurate_notDefined">Add your keywords in the box
+                    below.</label>
                 <ul>
                     <?php
-                    foreach ($keywords_stats as $word => $stat) {
-                        unset($post_content['words'][$word]);
-                        ?>
-                        <li>
-                            <span class="color expresscurate_<?php echo $stat['color']; ?>"></span>
-                            <span class="word"><?php echo $word ?> </span>
-                            <a class="addPost"
-                               href="<?php echo admin_url(); ?>post-new.php?post_title=<?php echo urlencode("TODO: define post title using '" . $word . "'") ?>&content=<?php echo urlencode("TODO: write content using '" . $word . "'"); ?>&expresscurate_keyword=<?php echo $word; ?>">+
-                                add post</a>
-                            <span class="expresscurate_floatRight postCount"><?php echo $stat['posts_count']; ?></span>
-                            <span class="remove hover expresscurate_floatRight"></span>
-                            <span class="count expresscurate_floatRight"><?php echo $stat['percent']; ?>%</span>
-                            <span class="inTitle expresscurate_floatRight"><?php echo $stat['title']; ?> %</span>
-                        </li>
-                    <?php } ?>
+                    if(!empty($keywords_stats)){
+                        foreach ($keywords_stats as $word => $stat) {
+                            unset($post_content['words'][$word]);
+                            ?>
+                            <li>
+                                <span class="color expresscurate_<?php echo $stat['color']; ?>"></span>
+                                <span class="word"><?php echo $word ?> </span>
+                                <a class="addPost"
+                                   href="<?php echo admin_url(); ?>post-new.php?post_title=<?php echo urlencode("TODO: define post title using '" . $word . "'") ?>&content=<?php echo urlencode("TODO: write content using '" . $word . "'"); ?>&expresscurate_keyword=<?php echo $word; ?>">+
+                                    add post</a>
+                                <span class="expresscurate_floatRight postCount"><?php echo $stat['posts_count']; ?></span>
+                                <span class="remove hover expresscurate_floatRight"></span>
+                                <span class="count expresscurate_floatRight"><?php echo $stat['percent']; ?>%</span>
+                                <span class="inTitle expresscurate_floatRight"><?php echo $stat['title']; ?>%</span>
+                            </li>
+                        <?php }
+                    }
+                    ?>
                 </ul>
             </div>
             <div class="legend expresscurate_floatLeft">
@@ -50,7 +55,9 @@ $keywords_stats = $keywords->getKeywordStats();
                 <span id="red" class="expresscurate_red"></span>
                 <label for="red">>5%<span>Too many occurances</span></label>
             </div>
-            <a href="https://www.google.com/alerts" class="googleAlert expresscurateLink expresscurate_floatRight">Create Google Alert</a>
+            <a href="https://www.google.com/alerts" class="googleAlert expresscurateLink expresscurate_floatRight">Create
+                Google Alert</a>
+
             <div class="expresscurate_clear"></div>
             <div class="addNewKeyword">
                 <label for="addKeyword">Add new keyword</label>
@@ -64,45 +71,61 @@ $keywords_stats = $keywords->getKeywordStats();
                     <ul class="suggestion">
                     </ul>
                 </div>
+                <p class="expresscurate_errorMessage"></p>
                 <div class="expresscurate_clear"></div>
                 <p><span>Recommendation: </span>avoid using stop words like: </br>
                     ain’t, all, is, at, on, which, etc. </p>
-                <!--<a href="#">Manage stopwords</a>-->
             </div>
         </div>
         <div class="usedWordsPart">
-            <label class="blockTitle">Top words<!--<span class="titleTooltip">Most frequently used words</span>--></label>
+            <label class="blockTitle">Top words</label>
 
             <div class="expresscurate_clear"></div>
-            <div class="expresscurate_topWordsDesc">List of most frequently used words in your blog.  Pick the “+” sign to turn them into target keywords.</div>
+            <div class="expresscurate_topWordsDesc">List of most frequently used words in your blog. Pick the “+” sign
+                to turn them into target keywords.
+            </div>
 
             <label class="colTitle expresscurate_margin35 expresscurate_floatRight">in content</label>
             <label class="colTitle expresscurate_margin35 expresscurate_floatRight">in title</label>
-            <label class="expresscurate_displayNone expresscurate_notDefined">There is no top words data at this time.  Please check again later.</label>
+            <label class="expresscurate_displayNone expresscurate_notDefined">There is no top words data at this time.
+                Please check again later.</label>
             <ul>
                 <?php
-                $i = 0;
-                foreach ($words_stats as $word => $stat) {
-                    if ($stat['percent'] >= 1 && $i < 15) {
-                        ?>
-                        <li>
-                            <span class="color expresscurate_<?php echo $stat['color'] ?>"></span>
+                if(!empty($words_stats)){
+                    $i = 0;
+                    foreach ($words_stats as $word => $stat) {
+                        if ($stat['percent'] >= 1 && $i < 15) {
+                            ?>
+                            <li>
+                                <span class="color expresscurate_<?php echo $stat['color'] ?>"></span>
 
-                            <div class="wordWrap">
+                                <div class="wordWrap">
                                 <span
                                     class="word"><?php echo $word; ?></span>
-                            </div>
-                            <span class="inTitle"><?php echo $stat['title']; ?> %</span>
-                            <span class="add hover expresscurate_floatRight"><!--<span>make keyword</span>--></span>
-                            <span class="count expresscurate_floatRight"><?php echo $stat['percent']; ?>%</span>
-                        </li>
-                    <?php
+                                </div>
+                                <span class="inTitle"><?php echo $stat['title']; ?>%</span>
+                                <span class="add hover expresscurate_floatRight"></span>
+                                <span class="count expresscurate_floatRight"><?php echo $stat['percent']; ?>%</span>
+                            </li>
+                        <?php
+                        }
+                        $i++;
                     }
-                    $i++;
                 }
                 ?>
             </ul>
         </div>
         <div class="expresscurate_clear"></div>
     </div>
+    <script type="text/html" id="tmpl-keywordsSettings">
+        <li>
+            <span class="color expresscurate_{{data.color}}"></span>
+            <span class="word">{{data.keyword}}</span>
+            <a class="addPost" href="{{data.url}}">add post</a>
+            <span class="expresscurate_floatRight postCount">{{data.posts_count}}</span>
+            <span class="remove hover expresscurate_floatRight">&#215</span>
+            <span class="count expresscurate_floatRight">{{data.percent}}%</span>
+            <span class="inTitle expresscurate_floatRight">{{data.title}}%</span>
+        </li>
+    </script>
 </div>

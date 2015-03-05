@@ -47,17 +47,17 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
                     </div>
                 </div>
 
-                <div class="alignL imgAlign">
+                <div class="alignleft imgAlign">
                     <div class="tooltipWrap">
                         <span>Align left</span>
                     </div>
                 </div>
-                <div class="alignNone active imgAlign">
+                <div class="alignnone active imgAlign">
                     <div class="tooltipWrap">
                         <span>Fit to center</span>
                     </div>
                 </div>
-                <div class="alignR imgAlign">
+                <div class="alignright imgAlign">
                     <div class="tooltipWrap">
                         <span>Align right</span>
                     </div>
@@ -94,6 +94,7 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
       <input type="hidden" value="<?php echo get_option('expresscurate_curated_text', 'Curated from'); ?>" id="expresscurate_from" name="expresscurate_from"/>
       <input type="hidden" value="<?php echo get_option('expresscurate_autosummary', 5); ?>" id="expresscurate_autosummary" name="expresscurate_autosummary"/>
       <ul class="labels" id="curated_tags">
+          <li class="markButton expresscurate_preventTextSelection"><span>mark keywords</span></li>
       </ul>
       <div class="clear"></div>
       <button class="curate right" id="expresscurate_insert" onclick="return false;"><?php echo __('Curate into post', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
@@ -105,4 +106,35 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
   <img src="<?php echo plugin_dir_url(__FILE__); ?>../images/loading.gif" id="img-load" />
 </div>
 
-
+<script type="text/html" id="tmpl-dialogCuratedImage">
+    <li id="tcurated_image_{{data.index}}" class="tcurated_image" data-id="{{data.index}}" style="background-image: url({{data.url}})"></li>
+</script>
+<script type="text/html" id="tmpl-dialogCuratedParagraphs">
+    <li id="tcurated_text_{{data.index}}" title="{{data.title}}" class="tcurated_text expresscurate_tag_{{data.tag}}" data-id="{{data.index}}">{{data.title}}</li>
+</script>
+<script type="text/html" id="tmpl-dialogCuratedtags">
+    <li class="curated_post_tag"  id="curated_post_tag_{{data.index}}"><span class="tag">{{data.tag}}</span><a href="#" class="remove" data-id="{{data.index}}"></a></li>
+</script>
+<script type="text/html" id="tmpl-dialogMarkButton">
+    <li class="markButton expresscurate_preventTextSelection"><span>mark keywords</span></li>
+</script>
+<script type="text/html" id="tmpl-dialogInsertTags">
+    <li class="curated_post_tag" id="curated_post_tag_{{data.index}}"><a href="#" data-id="{{data.index}}">X</a><span>{{data.tag}}</span></li>
+</script>
+<script type="text/html" id="tmpl-dialogSearchParagraphs">
+    <li class="expresscurate_preventTextSelection expresscurate_dialog_shortPar expresscurate_shortParInactiveColor">
+        <label>Short Paragraphs</label>
+        <span class="shortPButton shortPButtonInactive"><span></span></span>
+    </li>
+    <li class="expresscurate_preventTextSelection expresscurate_dialog_search">
+        <input class="expresscurate_disableInputStyle expresscurate_displayNone"/>
+        <span class="close expresscurate_displayNone"></span>
+        <span class="icon"></span>
+    </li>
+</script>
+<script type="text/html" id="tmpl-dialogCuratedHeadings">
+    <li class="curated_heading" id="curated_heading_{{data.index}}"  data-tag="{{data.index}}" title="{{data.content}}">{{data.index}}</li>
+</script>
+<script type="text/html" id="tmpl-dialogCuratedDescription">
+    <li id="curated_description" title="{{data}}">Description</li>
+</script>

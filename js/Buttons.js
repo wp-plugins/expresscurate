@@ -1,24 +1,28 @@
-var Buttons = (function (jQuery) {
+var ExpressCurateButtons = (function ($) {
     function textboxCommand(ed, elem, cssClass, isVal) {
         var id = elem,
-            $textboxElem = ed.getDoc().createElement('DIV'),
+            $textboxElem,
             $activeElem,
-            $node = jQuery(ed.selection.getNode()),
+            $node = $(ed.selection.getNode()),
             selectedId = $node.parents('div[class*=expresscurate]').attr('id') || $node.parents('div[class*=annotat]').attr('id'),
             nodeIsBox = $node.is('div') && $node.attr('class') && ($node.attr('class').indexOf('expresscurate') > -1 || $node.attr('class').indexOf('annotat') > -1),
             nodeIsWrapped = $node.parents('div[class*=expresscurate]').length > 0 || $node.parents('div[class*=annotat]').length > 0,
             content = '';
-        if (isVal) {
-            $textboxElem.id = id;
-            $textboxElem.className = cssClass;
-            $textboxElem.innerHTML = '<p class="placeholder">Add your annotation</p>';
 
-            ed.execCommand('mceInsertContent', true, $textboxElem.outerHTML);
-            $activeElem = jQuery(ed.selection.getNode()).parents('div').eq(0).attr('id');
+        ExpressCurateUtils.track('/post/content/text-boxes');
+
+        if (isVal) {
+            $textboxElem = $('<div/>', {
+                id: id,
+                addClass: cssClass,
+                html: '<p class="placeholder">Add your annotation</p>'
+            });
+
+            ed.execCommand('mceInsertContent', true, $textboxElem.wrap('<span/>').parent().html());
+            $activeElem = $(ed.selection.getNode()).parents('div').eq(0).attr('id');
             ed.controlManager.setActive($activeElem, true);
             var $placeholders = tinyMCE.activeEditor.dom.select('p.placeholder');
             ed.selection.select($placeholders[$placeholders.length - 1]);
-
         } else {
             if ($node.is('div') && $node.attr('class') && ($node.attr('class').indexOf('expresscurate') > -1 || $node.attr('class').indexOf('annotat') > -1) && $node.attr('id') === elem) {
                 $node.before($node.html());
@@ -32,7 +36,6 @@ var Buttons = (function (jQuery) {
                 }
                 ed.controlManager.setActive(elem, false);
                 ed.selection.setCursorLocation(0);
-
             } else {
                 if (nodeIsBox) {
                     content = $node.html();
@@ -43,11 +46,12 @@ var Buttons = (function (jQuery) {
                 } else {
                     content = ed.selection.getContent();
                 }
-
-                $textboxElem.id = id;
-                $textboxElem.className = cssClass;
-                $textboxElem.innerHTML = content;
-                ed.execCommand('mceInsertContent', true, $textboxElem.outerHTML);
+                $textboxElem = $('<div/>', {
+                    id: id,
+                    addClass: cssClass,
+                    html: content
+                });
+                ed.execCommand('mceInsertContent', true, $textboxElem.wrap('<span/>').parent().html());
                 $activeElem = id;
                 ed.controlManager.setActive($activeElem, true);
             }
@@ -77,7 +81,7 @@ var Buttons = (function (jQuery) {
     }
 
     function noFollow(ed) {
-        var $elem = jQuery(ed.selection.getNode());
+        var $elem = $(ed.selection.getNode());
         if ($elem.is('a')) {
             if ($elem.attr('rel') === 'nofollow') {
                 $elem.removeAttr('rel');
@@ -87,33 +91,53 @@ var Buttons = (function (jQuery) {
                 ed.controlManager.setActive('noFollow', false);
             }
         }
+
+        ExpressCurateUtils.track('/post/content/seo/follow');
+    }
+
+    function getInfo() {
+        return {
+            longname: "Recent Posts",
+            author: 'Konstantinos Kouratoras',
+            authorurl: 'http://www.kouratoras.gr',
+            infourl: 'http://www.smashingmagazine.com',
+            version: "1.0"
+        };
     }
 
     function wordCount(ed) {
+        ExpressCurateUtils.track('/post/content/seo/analytics');
+
         var lengthMessage, lengthColor,
-            $contentWrap = jQuery('#content'),
+            $contentWrap = $('#content'),
             content = (($contentWrap.css("display") === "block") ? $contentWrap.val() : tinyMCE.get("content").getContent()),
-            wordsCount = SEOControl.words_in_text(content).length,
+            wordsCount = ExpressCurateSEOControl.wordsInText(content).length,
             messageHtml;
 
-        if (wordsCount < 700) {
-            lengthColor = 'red';
-            lengthMessage = 'Your post is currently ' + wordsCount + ' word long.  The optimal post length is 700-1,600 words.';
-        } else if (wordsCount >= 700 && wordsCount <= 1600) {
-            lengthColor = 'green';
-            lengthMessage = 'Post length is ' + wordsCount + '. Good work! (The recommended length is 700-1600 words).';
-        } else {
-            lengthColor = 'red';
-            lengthMessage = 'The post has ' + wordsCount + ' words, which is longer than the recommended 700-1600 word.';
+
+        switch (true) {
+            case wordsCount < 700:
+                lengthColor = 'red';
+                lengthMessage = 'Your post is currently ' + wordsCount + ' word long.  The optimal post length is 700-1,600 words.';
+                break;
+            case (wordsCount >= 700 && wordsCount <= 1600):
+                lengthColor = 'green';
+                lengthMessage = 'Post length is ' + wordsCount + '. Good work! (The recommended length is 700-1600 words).';
+                break;
+            case wordsCount > 1600:
+                lengthColor = 'red';
+                lengthMessage = 'The post has ' + wordsCount + ' words, which is longer than the recommended 700-1600 word.';
+                break;
         }
 
-        if (jQuery(content).is('blockquote')) {
-            var div = document.createElement('div');
-            div.innerHTML = content;
-            var $blockquotes = jQuery(div).find('blockquote'),
+        if ($(content).is('blockquote')) {
+            var $div = $('<div/>', {
+                html: content
+            });
+            var $blockquotes = $div.find('blockquote'),
                 wordsInBlockquotes = 0;
             $blockquotes.each(function (index, val) {
-                wordsInBlockquotes += SEOControl.words_in_text(jQuery(val).text()).length;
+                wordsInBlockquotes += ExpressCurateSEOControl.wordsInText($(val).text()).length;
             });
             var quotationPersent = Math.round((wordsInBlockquotes / wordsCount) * 100),
                 quotationMessage = (quotationPersent > 20) ? "The quotation from the original source currently constitutes " + quotationPersent + "% your post.  Anything over 20% can be considered lower quality content." : "Good work! There is no more than 20% quotation used in the post.",
@@ -122,54 +146,40 @@ var Buttons = (function (jQuery) {
             quotationColor = 'blue';
             quotationMessage = 'There is no quotation.';
         }
-        if (jQuery(content).is('blockquote') && quotationPersent == 0) {
+        if ($(content).is('blockquote') && quotationPersent == 0) {
             quotationColor = 'blue';
             quotationMessage = 'There is no quotation.';
         }
         messageHtml = '<p class="lengthSuggestion ' + lengthColor + '">' + lengthMessage + '</p>\
-                                    <p class="lengthSuggestion  ' + quotationColor + '">' + quotationMessage + '</p>';
+         <p class="lengthSuggestion  ' + quotationColor + '">' + quotationMessage + '</p>';
 
 
-        var imagesInPost = jQuery(content).find('img').length ? true : false,
+        var imagesInPost = $(content).find('img').length ? true : false,
             videoInPost = tinyMCE.get('content').getContent().indexOf('[embed]') > -1;
         messageHtml += (!imagesInPost && !videoInPost) ? '<p class="lengthSuggestion red">Your post currently doesn’t have an image(video). Adding a media is a good way to improve conversion rates by creating visual associations with your posts.</p>' : '';
-        messageHtml += jQuery('.attachment-post-thumbnail').length ? '' : '<p class="lengthSuggestion red">Your post currently doesn’t have a featured image. Adding a featured image is a good way to improve conversion rates by creating visual associations with your posts.</p>';
+        messageHtml += $('.attachment-post-thumbnail').length ? '' : '<p class="lengthSuggestion red">Your post currently doesn’t have a featured image. Adding a featured image is a good way to improve conversion rates by creating visual associations with your posts.</p>';
 
-        /*var defindKeywords=jQuery('#expresscurate_defined_tags').val(), inTitle,inContent,inSEOTitle,inSocialTitle;
-         if(defindKeywords.length<2){
-         messageHtml += '<p class="lengthSuggestion red">Your post currently doesn’t have a keyword.</p>';
-         }else{
-         var KeywordsArr=defindKeywords.split(', ');
-         jQuery(KeywordsArr).each(function(index, value){
-         var keyword=value.trim();
-
-         inTitle=jQuery('input[name=post_title]').val().indexOf(keyword)>-1;
-         inContent=jQuery(content).text().indexOf(keyword)>-1;
-         inSEOTitle=jQuery('#expresscurate_advanced_seo_title').val().indexOf(keyword)>-1;
-         inSocialTitle=jQuery('#expresscurate_advanced_seo_social_title').val().indexOf(keyword)>-1;
-         });
-         }*/
         ed.windowManager.open({
             title: 'Post Analysis',
             id: 'expresscurate_wordCount_dialog',
             width: 450,
             html: messageHtml
         });
-
     }
 
     function addKeyword() {
-        if (tinymce.activeEditor.selection.getContent().length > 3 && jQuery('#expresscurate_widget').length) {
+        if (tinymce.activeEditor.selection.getContent().length > 3 && $('#expresscurate_widget').length) {
             var keyword = tinymce.activeEditor.selection.getContent(),
-                $input = jQuery('.addKeywords input');
+                $input = $('.addKeywords input');
             keyword = keyword.replace(/<[^>]+>[^<]*<[^>]+>|<[^\/]+\/>/ig, "");
             $input.val(keyword);
-            SEOControl.insertKeywordInWidget(KeywordUtils.multipleKeywords($input, undefined), jQuery('.addKeywords'));
+            ExpressCurateSEOControl.insertKeywordInWidget(ExpressCurateKeywordUtils.multipleKeywords($input, undefined), $('.addKeywords'));
         }
     }
 
     function setupButtons() {
-        jQuery('html').on('click', '.expresscurate_postAnalysis', function () {
+
+        $('html').on('click', '.expresscurate_postAnalysis', function () {
             wordCount(tinymce.activeEditor);
         });
         tinymce.create('tinymce.plugins.expresscurate', {
@@ -182,7 +192,51 @@ var Buttons = (function (jQuery) {
              * @param {string} url Absolute URL to where the plugin is located.
              */
 
+            visualizeShortcode: function (co) {
+                return co.replace(/\[facebook([^\]]*)\]/g, function (a, b) {
+                    return '<img src="" class="expresscurate_FacebookEmbed" title="facebook' + tinymce.DOM.encode(b) + '" />';
+                });
+            },
+
+            recoverShortcode: function (co) {
+                function getAttr(s, n) {
+                    n = new RegExp(n + '=\"([^\"]+)\"', 'g').exec(s);
+                    return n ? tinymce.DOM.decode(n[1]) : '';
+                }
+
+                return co.replace(/(?:<p[^>]*>)*(<img[^>]+>)(?:<\/p>)*/g, function (a, im) {
+                    var cls = getAttr(im, 'class');
+                    if (cls.indexOf('expresscurate_FacebookEmbed') != -1){
+                        return '<p>[' + tinymce.trim(getAttr(im, 'title')) + ']</p>';
+                    }
+                    return a;
+                });
+            },
             init: function (ed, url) {
+               /* var t = this;
+                t.url = url;
+                //replace shortcode before editor content set
+                ed.onBeforeSetContent.add(function (ed, o) {
+                    o.content = t.visualizeShortcode(o.content);
+                });
+                //replace shortcode as its inserted into editor
+                ed.onExecCommand.add(function (ed, cmd) {
+                    if (cmd === 'mceInsertContent') {
+                        tinyMCE.activeEditor.setContent(t.visualizeShortcode(tinyMCE.activeEditor.getContent()));
+                    }
+                });
+                //replace the image back to shortcode on save
+                ed.onPostProcess.add(function (ed, o) {
+                    if (o.get)
+                        o.content = t.recoverShortcode(o.content);
+                });*/
+
+                // Register buttons - trigger above command when clicked
+                ed.addButton('sochalPost', {
+                    title: 'Insert social post',
+                    cmd: 'sochalPost',
+                    classes: "btn expresscurateCostom expresscurateAnnotate"
+                });
                 ed.addButton('annotation', {
                     title: 'Add Annotation (Alt + A | Ctrl + Up)',
                     cmd: 'annotation',
@@ -223,7 +277,50 @@ var Buttons = (function (jQuery) {
                     cmd: 'addKeyword',
                     classes: "btn expresscurateCostom expresscurateAddKeyword"
                 });
-
+               /* ed.addButton('sochalPost', {
+                    title: 'Add post',
+                    icon: 'icon expresscurateSocial mce-expresscurateCostom',
+                    type: 'menubutton',
+                    cmd: 'sochalPost',
+                    menu: [
+                        {
+                            text: 'facebook',
+                            icon: 'icon expresscurateSocial mce-expresscurateCostom',
+                            onclick: function () {
+                                ed.windowManager.open({
+                                    title: 'Facebook embed',
+                                    body: [{
+                                        type: 'textbox',
+                                        name: 'facebookEmbed'
+                                    }],
+                                    onsubmit: function (e) {
+                                        var $elem=$(e.data.facebookEmbed)[2],
+                                            url=$($elem).data('href');
+                                        ed.insertContent('[facebook src="'+url+'"]');
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            text: 'twitter',
+                            icon: 'icon expresscurateSocial mce-expresscurateCostom',
+                            onclick: function () {
+                                ed.windowManager.open({
+                                    title: 'Twitter embed',
+                                    body: [{
+                                        type: 'textbox',
+                                        name: 'twitterEmbed'
+                                    }],
+                                    onsubmit: function (e) {
+                                        var $elem=$(e.data.twitterEmbed)[0],
+                                            url=$($elem).find('> a').attr('href');
+                                        ed.insertContent('[embed]'+url+'[/embed]');
+                                    }
+                                });
+                            }
+                        }
+                    ]
+                });*/
                 ed.onKeyDown.add(function (ed, e) {
                     if (e.altKey && e.keyCode === 75) {
                         addKeyword();
@@ -254,7 +351,7 @@ var Buttons = (function (jQuery) {
                     }
                     if (e.altKey && e.keyCode === 72) {     // alt+h
                         e.returnValue = false;
-                        Keywords.markEditorKeywords();
+                        ExpressCurateKeywords.markEditorKeywords();
                         e.preventDefault();
                         return false;
                     }
@@ -273,32 +370,32 @@ var Buttons = (function (jQuery) {
                 });
 
                 ed.onLoadContent.add(function (ed) {
-                    var dom = tinymce.activeEditor.dom;
-                    var divElements = dom.select('div[class*=expresscurate]');
+                    var dom = tinymce.activeEditor.dom,
+                        divElements = dom.select('div[class*=expresscurate]');
                     dom.setStyle(divElements, 'height', 'auto');
 
                     if (ed.id === 'expresscurate_content_editor') {
                         ed.controlManager.buttons && ed.controlManager.buttons.blockquote && ed.controlManager.buttons.blockquote.remove() ||
                         ed.controlManager.controls && ed.controlManager.controls.content_blockquote && ed.controlManager.controls.content_blockquote.remove();
                     }
-                    jQuery(dom.select('div[id*=textbox]')).each(function (index, val) {
-                        var id = jQuery(val).attr('id');
+                    $(dom.select('div[id*=textbox]')).each(function (index, val) {
+                        var id = $(val).attr('id');
                         if (id.indexOf('-') > -1) {
                             id = id.substring(0, id.indexOf('-'));
-                            jQuery(val).attr('id', id);
+                            $(val).attr('id', id);
                         }
                     });
-                    jQuery(dom.select('div[id*=annotation]')).each(function (index, val) {
-                        var id = jQuery(val).attr('id');
+                    $(dom.select('div[id*=annotation]')).each(function (index, val) {
+                        var id = $(val).attr('id');
                         if (id.indexOf('-') > -1) {
                             id = id.substring(0, id.indexOf('-'));
-                            jQuery(val).attr('id', id);
+                            $(val).attr('id', id);
                         }
                     });
                 });
                 ed.onClick.add(function () {
-                    var $description = jQuery('.description');
-                    if (jQuery('.expresscurate_widget').length > 0) {
+                    var $description = $('.description');
+                    if ($('.expresscurate_widget').length > 0) {
                         $description.find('.descriptionWrap').addClass('textareaBorder');
                         $description.find('p').add($description.find('.hint')).addClass('expresscurate_displayNone');
                         $description.removeClass('active');
@@ -306,7 +403,7 @@ var Buttons = (function (jQuery) {
                 });
                 ed.onNodeChange.add(function (ed) {
                     ed.controlManager.setActive('noFollow', false);
-                    var $elem = jQuery(ed.selection.getNode()),
+                    var $elem = $(ed.selection.getNode()),
                         $node = $elem,
                         nodeIsWrapped = $node.parents('div[class*=expresscurate]').length > 0 || $node.parents('div[class*=annotat]').length > 0;
 
@@ -324,15 +421,23 @@ var Buttons = (function (jQuery) {
 
                     var cssClass = $node.attr('class'),
                         activeButton = ' ';
-                    if (cssClass === 'expresscurate_fl_text_box') {
-                        activeButton = 'lefttextbox';
-                    } else if (cssClass === 'expresscurate_fr_text_box') {
-                        activeButton = 'righttextbox';
-                    } else if (cssClass === 'expresscurate_justify_text_box') {
-                        activeButton = 'justifytextbox';
-                    } else if (cssClass === 'expresscurate_annotate' || cssClass === 'annotate') {
-                        activeButton = 'annotation';
+
+                    switch (cssClass) {
+                        case 'expresscurate_fl_text_box':
+                            activeButton = 'lefttextbox';
+                            break;
+                        case 'expresscurate_fr_text_box':
+                            activeButton = 'righttextbox';
+                            break;
+                        case'expresscurate_justify_text_box':
+                            activeButton = 'justifytextbox';
+                            break;
+                        case 'expresscurate_annotate':
+                        case 'annotate':
+                            activeButton = 'annotation';
+                            break;
                     }
+
                     ed.controlManager.setActive('lefttextbox', false);
                     ed.controlManager.setActive('righttextbox', false);
                     ed.controlManager.setActive('justifytextbox', false);
@@ -360,7 +465,7 @@ var Buttons = (function (jQuery) {
                         textboxCommand(ed, 'annotation', 'expresscurate_annotate', val);
                     });
                     ed.addCommand('markKeywords', function () {
-                        Keywords.markEditorKeywords();
+                        ExpressCurateKeywords.markEditorKeywords();
                     });
                     ed.addCommand('noFollow', function () {
                         noFollow(ed);
@@ -398,11 +503,11 @@ var Buttons = (function (jQuery) {
                 };
             }
         });
+
         QTags.addButton('annotation', 'Annotation', '<div id="annotation" class="expresscurate_annotate"><p>&nbsp;', '</p></div>', '', 'Add Annotation');
         QTags.addButton('lefttextbox', 'Left-Box', '<div id="lefttextbox" class="expresscurate_fl_text_box"><p>&nbsp;', '</p></div>', '', 'Add Left-Box');
         QTags.addButton('justifytextbox', 'Center-Box', '<div id="justifytextbox" class="expresscurate_justify_text_box"><p>&nbsp;', '</p></div>', '', 'Add Center-Box');
         QTags.addButton('righttextbox', 'Right-Box', '<div id="righttextbox" class="expresscurate_fr_text_box"><p>&nbsp;', '</p></div>', '', 'Add Right-Box');
-
 
         // Register plugin
         tinymce.PluginManager.add('expresscurate', tinymce.plugins.expresscurate);
@@ -420,4 +525,4 @@ var Buttons = (function (jQuery) {
     }
 })(window.jQuery);
 
-Buttons.setup();
+ExpressCurateButtons.setup();

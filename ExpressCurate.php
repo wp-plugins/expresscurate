@@ -4,30 +4,31 @@
   Plugin Name: ExpressCurate
   Plugin URI: http://www.expresscurate.com/products
   Description: ExpressCurate plugin is a content curation tool for WordPress. It enables you to create and publish high quality content within minutes.
-  Version: 2.0.5
+  Version: 2.0.6
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
   License: GPLv3 or later
   License URI: http://www.gnu.org/licenses/gpl.html
  */
-require_once(sprintf("%s/ExpressCurate_Actions.php", dirname(__FILE__)));
-require_once(sprintf("%s/ExpressCurate_Email.php", dirname(__FILE__)));
-require_once(sprintf("%s/ExpressCurate_FeedManager.php", dirname(__FILE__)));
-require_once(sprintf("%s/ExpressCurate_Sitemap.php", dirname(__FILE__)));
-require_once(sprintf("%s/ExpressCurate_CronManager.php", dirname(__FILE__)));
+
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
+
 
 class ExpressCurate {
 
   /**
    * Construct the plugin object
    */
-  public function __construct() {
 
+
+  public function __construct() {
     // Initialize Settings
     $expresscurate_actions = new ExpressCurate_Actions();
     $expresscurate_actions->add_options();
 
   }
+
+
 
   /**
    * Activate the plugin
@@ -56,6 +57,7 @@ class ExpressCurate {
   }
 
 }
+
 
 if (class_exists('ExpressCurate')) {
   // Installation and uninstallation hooks
@@ -92,6 +94,7 @@ if (class_exists('ExpressCurate')) {
       $expresscurate_sitemap = new ExpressCurate_Sitemap();
       $expresscurate_sitemap->pushSitemapScheduled();
   }
+
 
 
   function expresscurate_normalise_url( $url , $fullUrl=false ) {

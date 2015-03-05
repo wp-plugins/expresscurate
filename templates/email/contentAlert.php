@@ -35,10 +35,9 @@
                                     style="font-family: 'Open Sans', sans-serif;background-color: #f0f0f0;padding: 17px 20px;">
                                     <a class="logo"
                                        style="font-family: 'Open Sans', sans-serif;text-decoration: none;outline: none;display: block;margin-right: 20px;float: left;height: 36px;width: 36px;border-radius: 18px;">
-                                        <!--<img src="http://www.expresscurate.com/images/email/content_notification/logo.png">-->
-                                        <img
-                                            src="http://getfavicon.appspot.com/<?= get_bloginfo('url') ?>?defaulticon=lightpng"
+                                        <img src="http://grabicon.com/icon?domain=<?= get_bloginfo('url') ?>&origin=<?= get_bloginfo('url') ?>"
                                             style="font-family: 'Open Sans', sans-serif;">
+                                        <!--<img src="http://www.expresscurate.com/images/email/content_notification/logo.png">-->
                                     </a>
 
                                     <div

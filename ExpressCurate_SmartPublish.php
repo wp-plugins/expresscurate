@@ -1,5 +1,7 @@
 <?php
 
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
+
 /*
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
@@ -9,6 +11,20 @@
 
 class ExpressCurate_SmartPublish
 {
+
+    private static $instance;
+
+    function __construct() {
+        // action shall be added from actions controller
+    }
+
+    public static function getInstance() {
+        if ( ! ( self::$instance instanceof self ) ) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
 
     //publish posts curated by chrome extension
     public function publish_event()

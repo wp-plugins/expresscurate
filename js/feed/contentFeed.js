@@ -1,27 +1,34 @@
-var FeedWall = (function (jQuery) {
+var ExpressCurateFeedWall = (function ($) {
     var $notDefFeed, $feedControls, $masonryWrap, $feedBoxes;
 
-    function bookmark_add(els) {
+    function bookmarkAdd(els) {
+        ExpressCurateUtils.track('/content-feed/bookmark');
+
         var items = [];
-        jQuery.each(els, function (index, el) {
-            items.push(JSON.parse(jQuery(el).find('.expresscurate_feedData').text()));
+
+        $.each(els, function (index, el) {
+            items.push(JSON.parse($(el).find('.expresscurate_feedData').text()));
         });
-        jQuery.ajax({
+        $.ajax({
             type: 'POST',
             url: 'admin-ajax.php?action=expresscurate_bookmarks_add',
             data: {items: JSON.stringify(items)}
         });
     }
 
+    /*add feed from top Sources*/
     function addFeed(el, url) {
-        jQuery.ajax({
+        ExpressCurateUtils.track('/top-sources/subscribe-rss');
+
+        $.ajax({
             type: 'POST',
             url: 'admin-ajax.php?action=expresscurate_feed_add',
             data: {url: url}
         }).done(function (res) {
-            var data = jQuery.parseJSON(res),
+            var data = $.parseJSON(res),
                 $statusButton = el.parent().find('.rssStatus'),
                 $tooltip = $statusButton.find('.tooltip');
+
             if (data.status === 'success') {
                 $statusButton.removeClass('rssStatusAdd').addClass('rssStatusYes');
                 $tooltip.html('Subscribed');
@@ -35,34 +42,38 @@ var FeedWall = (function (jQuery) {
     }
 
     function deleteFeedItems(els) {
+        ExpressCurateUtils.track('/content-feed/delete');
+
         var items = [];
-        jQuery.each(els, function (index, el) {
-            var item = jQuery(el).find('textarea').val();
+
+        $.each(els, function (index, el) {
+            var item = $(el).find('textarea').val();
             items.push(item);
         });
-        jQuery.ajax({
+        $.ajax({
             type: 'POST',
             url: 'admin-ajax.php?action=expresscurate_delete_feed_content_items',
             data: {items: JSON.stringify(items)}
         }).done(function (res) {
-            var data = jQuery.parseJSON(res);
+            var data = $.parseJSON(res);
+
             if (data.status === 'success') {
-                jQuery(els).addClass('expresscurate_transparent');
+                $(els).addClass('expresscurate_transparent');
                 setTimeout(function () {
-                    jQuery(els).remove();
+                    $(els).remove();
                     $masonryWrap.masonry();
-                    Utils.checkControls($feedControls);
-                    Utils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
+                    ExpressCurateUtils.checkControls($feedControls);
+                    ExpressCurateUtils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
                 }, 700);
             }
         });
     }
 
     function setupFeed() {
-        $notDefFeed = jQuery('.expresscurate_feed_list .expresscurate_notDefined');
-        $feedControls = jQuery('.feedListControls li');
-        $masonryWrap = jQuery('.expresscurate_masonryWrap');
-        $feedBoxes = jQuery('.expresscurate_feedBoxes');
+        $notDefFeed = $('.expresscurate_feed_list .expresscurate_notDefined');
+        $feedControls = $('.feedListControls li');
+        $masonryWrap = $('.expresscurate_masonryWrap');
+        $feedBoxes = $('.expresscurate_feedBoxes');
         $masonryWrap.masonry({
             itemSelector: '.expresscurate_masonryItem',
             isResizable: true,
@@ -71,8 +82,8 @@ var FeedWall = (function (jQuery) {
             gutter: 10
         });
 
-        if (jQuery('.expresscurate_feed_list').length) {
-            Utils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
+        if ($('.expresscurate_feed_list').length) {
+            ExpressCurateUtils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
         }
         $feedBoxes.find('li input:checkbox').prop('checked', false);
 
@@ -81,68 +92,79 @@ var FeedWall = (function (jQuery) {
             if (e.target !== this) {
                 return;
             }
-            var $checkbox = jQuery(this).find('.checkInput');
+            var $checkbox = $(this).find('.checkInput');
+
             if ($checkbox.is(':checked'))
                 $checkbox.attr('checked', false);
             else
                 $checkbox.attr('checked', true);
-            Utils.checkControls($feedControls);
+            ExpressCurateUtils.checkControls($feedControls);
         });
         $feedBoxes.on('change', '.checkInput', function () {
-            Utils.checkControls($feedControls);
+            ExpressCurateUtils.checkControls($feedControls);
         });
-        jQuery('.expresscurate_feed_list .check').on('click', function () {
+        $('.expresscurate_feed_list .check').on('click', function () {
             var $checked = $feedBoxes.find('li input:checkbox:checked').length,
                 liCount = $feedBoxes.find(' > li').length,
                 $allCheckboxes = $feedBoxes.find('li input:checkbox');
+
             if ($checked === liCount) {
                 $allCheckboxes.prop('checked', false);
             } else {
                 $allCheckboxes.prop('checked', true);
             }
-            Utils.checkControls($feedControls);
+            ExpressCurateUtils.checkControls($feedControls);
         });
+
         /*delete*/
-        jQuery('.expresscurate_feed_list .remove').on('click', function () {
+        $('.expresscurate_feed_list .remove').on('click', function () {
             var $checked = $feedBoxes.find('li input:checkbox:checked');
             deleteFeedItems($checked.parents('.expresscurate_feedBoxes > li'));
-            Utils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
+            ExpressCurateUtils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
 
         });
         $feedBoxes.on('click', '.controls .hide', function () {
-            var $elem = jQuery(this).parents('.expresscurate_feedBoxes > li');
+            var $elem = $(this).parents('.expresscurate_feedBoxes > li');
             deleteFeedItems($elem);
-            Utils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
+            ExpressCurateUtils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
         });
+
         /*add from top sources*/
-        jQuery('.expresscurate_URL').on('click', '.rssStatusAdd', function () {
-            addFeed(jQuery(this), jQuery(this).parent().find('.expresscurate_topCuratedURL').text());
+        $('.expresscurate_URL').on('click', '.rssStatusAdd', function () {
+            addFeed($(this), $(this).parent().find('.expresscurate_topCuratedURL').text());
         });
+
         /*bookmark*/
         $feedBoxes.on('click', '.controls .bookmark', function () {
-            var $elem = jQuery(this).parents('.expresscurate_feedBoxes > li');
-            bookmark_add($elem);
+            var $elem = $(this).parents('.expresscurate_feedBoxes > li');
+            bookmarkAdd($elem);
             deleteFeedItems($elem);
         });
-        jQuery('.feedListControls').on('click', '.bookmark', function () {
+        $('.feedListControls').on('click', '.bookmark', function () {
             var $checked = $feedBoxes.find('li input:checkbox:checked'),
                 $elems = $checked.parents('.expresscurate_feedBoxes > li');
-            bookmark_add($elems);
+            bookmarkAdd($elems);
             deleteFeedItems($elems);
         });
+
         /*curate*/
-        jQuery('.expresscurate_feed_list .quotes').on('click', function () {
+        $('.expresscurate_feed_list .quotes').on('click', function () {
+            ExpressCurateUtils.track('/content-feed/curate');
+
             var $checked = $feedBoxes.find('li input:checkbox:checked');
+
             if ($checked.length === 1) {
-                var $elem = jQuery($checked[0]).parent().find('a'),
+                var $elem = $($checked[0]).parent().find('a'),
                     title = $elem.html(),
-                    url = $elem.attr('href');
-                window.location.href = '/wp-admin/post-new.php?expresscurate_load_source=' + url + '&expresscurate_load_title=' + title;
-                Utils.addSources($checked.parents('.expresscurate_feedBoxes > li'), '.expresscurate_feedData');
+                    url =  window.btoa(encodeURIComponent($elem.attr('href')));
+                window.location.href = $('#adminUrl').val() + 'post-new.php?expresscurate_load_source=' + url + '&expresscurate_load_title=' + title;
+            } else if ($checked.length > 1) {
+                ExpressCurateUtils.addSources($checked.parents('.expresscurate_feedBoxes > li'), '.expresscurate_feedData');
                 return false;
             }
         });
-        jQuery(window).on('load', function () {
+
+        $(window).on('load', function () {
             $masonryWrap.masonry();
         });
     }
@@ -152,7 +174,7 @@ var FeedWall = (function (jQuery) {
     return {
         setup: function () {
             if (!isSetup) {
-                jQuery(document).ready(function () {
+                $(document).ready(function () {
                     setupFeed();
                     isSetup = true;
                 });
@@ -161,4 +183,4 @@ var FeedWall = (function (jQuery) {
     }
 })(window.jQuery);
 
-FeedWall.setup();
+ExpressCurateFeedWall.setup();

@@ -1,4 +1,7 @@
 <?php
+
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
+
 class Expresscurate_Tags
 {
 

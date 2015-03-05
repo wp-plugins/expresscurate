@@ -23,20 +23,22 @@ if (isset($posts['posts'])) {
   </div>
 
   <ul class="list">
-      <label class="<?php if (sizeof($posts_list) != 0) {echo 'expresscurate_displayNone';} ?>expresscurate_notDefined">There is no post to publish.</label>
-
     <?php
-    foreach ($posts_list as $i => $post) {
-      ?>
-      <li>
-        <a target="_blank" href="<?php echo $post->guid ?>"><?php echo get_the_title($post->ID); ?></a>
-        <span class="time"> <?php echo date('H:i', round(strtotime($posts['next_post_date']) + (60 * 60 * ($i) * get_option('expresscurate_hours_interval')))) ?></span>
-        <a class="publish" href="<?php echo get_edit_post_link($post->ID); ?>">publish</a>
-      </li>
+    if (!empty($posts_list)){
+      foreach ($posts_list as $i => $post) {
+        ?>
+        <li>
+          <a target="_blank" href="<?php echo $post->guid ?>"><?php echo get_the_title($post->ID); ?></a>
+          <span class="time"> <?php echo date('H:i', round(strtotime($posts['next_post_date']) + (60 * 60 * ($i) * get_option('expresscurate_hours_interval')))) ?></span>
+          <a class="publish" href="<?php echo get_edit_post_link($post->ID); ?>">publish</a>
+        </li>
 
-      <?php
-    }
+        <?php
+      }
+    } else {
     ?>
+       <label class="expresscurate_notDefined">There is no post to publish.</label>
+    <?php } ?>
 
   </ul>
         <a class="settingsLink" href="admin.php?page=expresscurate_settings">Settings</a>

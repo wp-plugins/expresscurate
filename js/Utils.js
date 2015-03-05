@@ -1,28 +1,30 @@
-var Utils = (function (jQuery) {
+var ExpressCurateUtils = (function ($) {
     var isSetup = false;
     /*curate from content feed and bookmarks*/
     function addSources(list, dataElem) {
         var items = [];
-        jQuery.each(list, function (index, el) {
-            items.push(jQuery(el).find(dataElem).text());
+        $.each(list, function (index, el) {
+            items.push($(el).find(dataElem).text());
         });
-        jQuery('#expresscurate_bookmarks_curate_data').val(JSON.stringify(items));
-        jQuery('form#expresscurate_bookmarks_curate').submit();
+        $('#expresscurate_bookmarks_curate_data').val(JSON.stringify(items));
+        $('form#expresscurate_bookmarks_curate').submit();
+        ga('expresscurate.send', 'event', 'button', 'click', 'curate');
     }
 
     /*message for empty lists*/
     function notDefinedMessage(message, list) {
-        var pageWithControls = (jQuery('.expresscurate_feed_list').length || jQuery('.expresscurate_bookmarks').length) ? true : false,
-            $controls = jQuery('.expresscurate_controls');
+        var pageWithControls = ($('.expresscurate_feed_list').length || $('.expresscurate_bookmarks').length) ? true : false,
+            $controls = $('.expresscurate_controls');
         if (list.length > 0) {
             message.addClass('expresscurate_displayNone');
             if (pageWithControls) {
                 $controls.removeClass('expresscurate_displayNone');
+                ExpressCurateBookmarks.fixedMenu();
             }
         } else {
             message.removeClass('expresscurate_displayNone');
             if (pageWithControls) {
-                jQuery('.expresscurate_controls li.check').removeClass('active');
+                $('.expresscurate_controls li.check').removeClass('active');
                 $controls.addClass('expresscurate_displayNone');
             }
         }
@@ -30,7 +32,7 @@ var Utils = (function (jQuery) {
 
     /*show/hide controls in content feed and bookmarks*/
     function checkControls(controls) {
-        var $checkboxes = jQuery('.checkInput'),
+        var $checkboxes = $('.checkInput'),
             atLeastOneIsChecked = $checkboxes.is(':checked'),
             allIsChecked = $checkboxes.find(':checked').length === $checkboxes.length,
             $checkControl = controls.find('.check');
@@ -48,36 +50,34 @@ var Utils = (function (jQuery) {
 
     /*validation for support and FAQ*/
     function expresscurateSupportSubmit() {
-        var $form = jQuery('#expresscurate_support_form'),
-            valid_msg = true,
-            $supportMessage = jQuery("#expresscurate_support_message"),
+        var $form = $('#expresscurate_support_form'),
+            validMsg = true,
+            $supportMessage = $("#expresscurate_support_message"),
             msg = $supportMessage.val(),
-            $supportMail = jQuery("#expresscurate_support_email"),
+            $supportMail = $("#expresscurate_support_email"),
             email = $supportMail.val(),
             regularExpression = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            valid_email = regularExpression.test(email);
+            validEmail = regularExpression.test(email),
+            $messageError = $('label[for="expresscurate_support_message"]'),
+            $mailError = $('label[for="expresscurate_support_email"]');
 
-        $form.find('.expresscurate_errorMessage').remove();
+        $form.find('.expresscurate_errorMessage').text('');
 
         if (msg === "" || !msg) {
-            valid_msg = false;
-            $supportMessage.after('<label class="expresscurate_errorMessage">Please enter the message</label>');
+            validMsg = false;
+            $messageError.text('Please enter the message');
         } else if (msg.length < 3) {
-            valid_msg = false;
-            $supportMessage.after('<label class="expresscurate_errorMessage">Message is too short</label>');
-        } else {
-            $supportMessage.next('.expresscurate_errorMessage').remove();
+            validMsg = false;
+            $messageError.text('Message is too short');
         }
 
         if (email === "" || !email) {
-            valid_email = false;
-            $supportMail.after('<label class="expresscurate_errorMessage">Please enter the email</label>');
-        } else if (!valid_email) {
-            $supportMail.after('<label class="expresscurate_errorMessage">Email is not valid</label>');
-        } else {
-            $supportMail.next('.expresscurate_errorMessage').remove();
+            validEmail = false;
+            $mailError.text('Please enter the email');
+        } else if (!validEmail) {
+            $mailError.text('Email is not valid');
         }
-        if (valid_email && valid_msg) {
+        if (validEmail && validMsg) {
             $form.submit();
         }
         return false;
@@ -94,48 +94,54 @@ var Utils = (function (jQuery) {
         elemToRotate.removeClass('expresscurate_startRotate');
     }
 
+    /*add template*/
+    function getTemplate(templateName, data) {
+        var template = wp.template(templateName);
+        return template(data);
+    }
+
     function countDown() {
-        var $smartPublishingWrap = jQuery('.expresscurate_dashboard_smartPublishing'),
-            target_date = $smartPublishingWrap.find('.target_date').html(),
-            current_date = $smartPublishingWrap.find('.current_date').html(),
+        var $smartPublishingWrap = $('.expresscurate_dashboard_smartPublishing'),
+            targetDate = $smartPublishingWrap.find('.target_date').html(),
+            currentDate = $smartPublishingWrap.find('.current_date').html(),
             $countDown = $smartPublishingWrap.find('.countdown'),
-            days, hours, minutes, seconds, seconds_left_temp, seconds_left;
+            days, hours, minutes, seconds, secondsLeftTemp, secondsLeft;
 
         if ($smartPublishingWrap.find('.list > li').length > 0) {
-            if (target_date && current_date) {
-                target_date = new Date(target_date).getTime();
-                current_date = new Date(current_date).getTime();
-                seconds_left = (target_date - current_date) / 1000;
+            if (targetDate && currentDate) {
+                targetDate = new Date(targetDate).getTime();
+                currentDate = new Date(currentDate).getTime();
+                secondsLeft = (targetDate - currentDate) / 1000;
 
                 (function loop() {
                     var intervalID = setTimeout(function () {
-                        if (seconds_left <= 0) {
-                            jQuery.ajax({
+                        if (secondsLeft <= 0) {
+                            $.ajax({
                                 type: 'POST',
                                 url: 'admin-ajax.php?action=expresscurate_smart_publish_event',
                                 data: {url: 'link'}
                             }).done(function (res) {
-                                var data = jQuery.parseJSON(res);
+                                var data = $.parseJSON(res);
                                 if (data.status === 'success') {
-                                    jQuery('#dashboard_widget_smartPublishing').find('.inside').load('admin-ajax.php?action=expresscurate_show_smart_publish', function () {
-                                        target_date = $smartPublishingWrap.find('.target_date').html();
-                                        current_date = $smartPublishingWrap.find('.current_date').html();
-                                        target_date = new Date(target_date).getTime();
-                                        current_date = new Date(current_date).getTime();
-                                        seconds_left = (target_date - current_date) / 1000;
+                                    $('#dashboard_widget_smartPublishing').find('.inside').load('admin-ajax.php?action=expresscurate_show_smart_publish', function () {
+                                        targetDate = $smartPublishingWrap.find('.target_date').html();
+                                        currentDate = $smartPublishingWrap.find('.current_date').html();
+                                        targetDate = new Date(targetDate).getTime();
+                                        currentDate = new Date(currentDate).getTime();
+                                        secondsLeft = (targetDate - currentDate) / 1000;
                                         clearInterval(intervalID);
-                                        Utils.countDown();
+                                        countDown();
                                     });
                                 }
                             });
                         }
-                        seconds_left--;
-                        days = parseInt(seconds_left / 86400);
-                        seconds_left_temp = seconds_left % 86400;
-                        hours = parseInt(seconds_left_temp / 3600);
-                        seconds_left_temp = seconds_left_temp % 3600;
-                        minutes = parseInt(seconds_left_temp / 60);
-                        seconds = parseInt(seconds_left_temp % 60);
+                        secondsLeft--;
+                        days = parseInt(secondsLeft / 86400);
+                        secondsLeftTemp = secondsLeft % 86400;
+                        hours = parseInt(secondsLeftTemp / 3600);
+                        secondsLeftTemp = secondsLeftTemp % 3600;
+                        minutes = parseInt(secondsLeftTemp / 60);
+                        seconds = parseInt(secondsLeftTemp % 60);
 
                         $countDown.html(hours + ' <b> : </b>' + minutes + ' <b> : </b>' + seconds);
                     }, 1000);
@@ -144,18 +150,56 @@ var Utils = (function (jQuery) {
         }
     }
 
-    function setupUtils() {
-        if (jQuery('.expresscurate_settings').length) {
-            var $tabs = jQuery('.tabs'),
-                tab_id = $tabs.attr('data-currenttab');
-            if (tab_id.length < 1) {
-                tab_id = 'tab-1';
-            }
-            jQuery('ul.tabs li').add(jQuery('.tab-content')).removeClass('current');
-            $tabs.find('li[data-tab=' + tab_id + ']').add(jQuery("#" + tab_id)).addClass('current');
+    function track(action, curate) {
+        /*ga('expresscurate.send', 'pageview', {
+         'page': '/site/' + expresscurate_track_hash
+         });
+         ga('expresscurate.send', 'pageview', {
+         'page': '/site/wp/' + expresscurate_track_hash
+         });*/
+        if (curate) {
+            ga('expresscurate.send', 'pageview', {
+                'page': '/site/curate/' + expresscurate_track_hash
+            });
         }
+        ga('expresscurate.send', 'pageview', {
+            'page': '/action/wp' + action
+        });
+    }
 
-        jQuery('.expresscurate_blocksContainer').sortable({
+    function setupUtils() {
+        var pathname = window.location.pathname,
+            postOldStatus,
+            postNewStatus;
+        if (pathname.match(/\/edit.php$/, 'gmi')) {
+            $(document).on('focus', 'select[name="_status"]', function () {
+                postOldStatus = this.value;
+            });
+            $(document).on('change', 'select[name="_status"]', function () {
+                postNewStatus = this.value;
+                if (postOldStatus !== postNewStatus && postNewStatus === 'publish') {
+                    track('/post-edit/publish');
+                    postOldStatus = postOldStatus = null;
+                }
+            });
+
+        }
+        /*settings page tabs*/
+        if ($('.expresscurate_settings').length) {
+            var $tabs = $('.tabs'),
+                tabID = $tabs.attr('data-currenttab'),
+                currentTab;
+            if (tabID.length < 1) {
+                tabID = 'tab-1';
+            }
+            currentTab = $tabs.find('li[data-tab=' + tabID + ']');
+            if (tabID && !currentTab.hasClass('disabled')) {
+                $('ul.tabs li').add($('.tab-content')).removeClass('current');
+                currentTab.add($("#" + tabID)).addClass('current');
+            }
+        }
+        /*expressCurate dashboard*/
+        $('.expresscurate_blocksContainer').sortable({
             distance: 12,
             forcePlaceholderSize: true,
             items: '.expresscurate_masonryItem',
@@ -173,83 +217,130 @@ var Utils = (function (jQuery) {
                         gutter: 10
                     });
                 }, 100);
+                var order = [];
+                $('.expresscurate_blocksContainer > div').each(function (index, value) {
+                    order.push($(this).attr('id'));
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: 'admin-ajax.php?action=dashboard_items_order',
+                    data: {item_order: order}
+                });
             },
             cursor: "move",
             placeholder: "expresscurate_sortablePlaceholder"
         });
 
-        if (jQuery('.expresscurate_dashboard_smartPublishing .topPart .target_date').length) {
-            Utils.countDown();
+        if ($('.expresscurate_dashboard_smartPublishing .topPart .target_date').length) {
+            countDown();
         }
-        jQuery('.expresscurate_advancedSEO_widget ul.tabs li,.expresscurate ul.tabs li').click(function () {
-            var tab_id = jQuery(this).attr('data-tab');
+        /*tabs*/
+        $('.expresscurate_advancedSEO_widget ul.tabs li,.expresscurate ul.tabs li').click(function () {
+            var $this = $(this),
+                tabID = $this.attr('data-tab');
+            if (!$this.hasClass('disabled')) {
+                $('ul.tabs li').add($('.tab-content')).removeClass('current');
+                $this.add($("#" + tabID)).addClass('current');
 
-            jQuery('ul.tabs li').add(jQuery('.tab-content')).removeClass('current');
-            jQuery(this).add(jQuery("#" + tab_id)).addClass('current');
-
-            jQuery.ajax({
-                type: "POST",
-                url: 'admin-ajax.php?action=expresscurate_change_tab_event',
-                data: {tab: tab_id}
-            });
+                $.ajax({
+                    type: "POST",
+                    url: 'admin-ajax.php?action=expresscurate_change_tab_event',
+                    data: {tab: tabID}
+                });
+            }
         });
-        jQuery('#expresscurate_sitemap_post_configure_manually').on('change', function () {
-            var $options = jQuery('.expresscurate_sitemap_widget .hiddenOptions');
-            if (jQuery(this).is(':checked')) {
+        /*Advanced SEO tracking*/
+        $('.expresscurate_sitemap_widget').on('change', 'input , select', function () {
+            track('/seo-advanced/sitemap');
+        });
+        $('#expresscurate_social_widget input').on('change', function () {
+            track('/seo-advanced/social');
+        });
+        $('#expresscurate_advancedSEO_widget input').on('change', function () {
+            track('/seo-advanced/general');
+        });
+        /*dashboard tracking*/
+        $('.expresscurate_keywordsBlock, #keyWordsIntOverTime, #keyWordsRelTopics').on('click', '.settingsLink', function () {
+            track('/dashboard/linkkeywordsettings');
+        });
+        $('.expresscurate_bookmarksBlock').on('click', '.settingsLink', function () {
+            track('/dashboard/linkbookmarks');
+        });
+        $('.expresscurate_feedBlock').on('click', '.settingsLink', function () {
+            track('/dashboard/linkcontentfeed');
+        });
+        $('.expresscurate_dashboard_smartPublishing').on('click', '.settingsLink', function () {
+            if ($(this).attr('href').contains('page=expresscurate_settings')) {
+                track('/dashboard/linksettings');
+            } else {
+                track('/dashboard/linkdraftedposts');
+            }
+
+        });
+        /*sitemap*/
+        $('#expresscurate_sitemap_post_configure_manually').on('change', function () {
+            var $options = $('.expresscurate_sitemap_widget .hiddenOptions');
+            if ($(this).is(':checked')) {
                 $options.removeClass('expresscurate_displayNone').hide().stop(true, true).slideDown('slow');
             } else {
                 $options.removeClass('expresscurate_displayNone').stop(true, true).slideUp('slow');
             }
         });
-        jQuery('#expresscurate_sitemap_post_exclude_from_sitemap').on('change', function () {
-            var $options = jQuery('.expresscurate_sitemap_widget .sitemapOption');
-            if (!jQuery(this).is(':checked')) {
+        $('#expresscurate_sitemap_post_exclude_from_sitemap').on('change', function () {
+            var $options = $('.expresscurate_sitemap_widget .sitemapOption');
+            if (!$(this).is(':checked')) {
                 $options.removeClass('expresscurate_displayNone').hide().stop(true, true).slideDown('slow');
             } else {
                 $options.removeClass('expresscurate_displayNone').stop(true, true).slideUp('slow');
             }
         });
-        jQuery('#exec_function_perm_seen,#cron_setup_manually').on('click', function () {
-            var $elem = jQuery(this),
+        /*cron messages*/
+        $('#exec_function_perm_seen,#cron_setup_manually').on('click', function () {
+            var $elem = $(this),
                 status = ($elem.is('#cron_setup_manually')) ? 'set' : 'seen';
-            jQuery.ajax({
+            $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_set_cron_permission_status',
                 data: {status: status}
             }).done(function (res) {
-                var data = jQuery.parseJSON(res);
+                var data = $.parseJSON(res);
                 if (data.status === 'success') {
                     $elem.parents('div.notice-warning').fadeOut(600);
                 }
             });
         });
-        jQuery('#expresscurate_sitemap_update_permission').on('click', function () {
-            var $elem = jQuery(this),
+        $('#expresscurate_sitemap_update_permission').on('click', function () {
+            var $elem = $(this),
                 status = 'seen';
-            jQuery.ajax({
+            $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_set_sitemap_permission_status',
                 data: {status: status}
             }).done(function (res) {
-                var data = jQuery.parseJSON(res);
+                var data = $.parseJSON(res);
                 if (data.status === 'success') {
                     $elem.parents('div.notice-warning').fadeOut(600);
                 }
             });
         });
+
         /*layout*/
-        jQuery('.expresscurate_controls .layout').on('click', function () {
-            var $wrap = jQuery('.expresscurate_Styles.wrap'),
+        $('.expresscurate_controls .layout').on('click', function () {
+            var $wrap = $('.expresscurate_Styles.wrap'),
                 page = ($wrap.hasClass('expresscurate_feed_list')) ? 'expresscurate_feed_layout' : 'expresscurate_bookmark_layout',
-                layout = '';
+                layout = '',
+                $layoutTooltip = $('.expresscurate_controls li.layout .tooltip'),
+                $masonryWrap = $('.expresscurate_masonryWrap');
             if ($wrap.hasClass('expresscurate_singleColumn')) {
                 layout = 'grid';
                 $wrap.removeClass('expresscurate_singleColumn');
+                $layoutTooltip.text('view as list');
             } else {
                 layout = 'single';
                 $wrap.addClass('expresscurate_singleColumn');
+                $layoutTooltip.text('view as grid');
             }
-            jQuery.ajax({
+            $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_change_layout_event',
                 data: {
@@ -257,7 +348,8 @@ var Utils = (function (jQuery) {
                     layout: layout
                 }
             });
-            jQuery('.expresscurate_masonryWrap').masonry();
+            $('.expresscurate_controls').width($masonryWrap.width());
+            $masonryWrap.masonry();
         });
         isSetup = true;
     }
@@ -265,7 +357,7 @@ var Utils = (function (jQuery) {
     return {
         setup: function () {
             if (!isSetup) {
-                jQuery(document).ready(function () {
+                $(document).ready(function () {
                     setupUtils();
                 });
             }
@@ -276,7 +368,9 @@ var Utils = (function (jQuery) {
         expresscurateSupportSubmit: expresscurateSupportSubmit,
         startLoading: startLoading,
         endLoading: endLoading,
-        countDown: countDown
+        countDown: countDown,
+        getTemplate: getTemplate,
+        track: track
     }
 })(window.jQuery);
-Utils.setup();
+ExpressCurateUtils.setup();
