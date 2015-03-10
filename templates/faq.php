@@ -68,7 +68,7 @@ $limit = 3;
         <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
                   placeholder="Question"></textarea>
         <label for="expresscurate_support_message" class="expresscurate_errorMessage"></label>
-        <a class="askButton send greenBackground" href="#" onclick="ExpressCurateUtils.expresscurateSupportSubmit();">Ask</a>
+        <a class="askButton send greenBackground" href="#">Ask</a>
       </form>
     </div>
   </div>

@@ -249,6 +249,9 @@ var ExpressCurateSEOControl = (function ($) {
                 ExpressCurateKeywords.markEditorKeywords();
             }
         });
+        $('#expresscurate_widget_wrapper .mark').on('click', function (e) {
+                ExpressCurateKeywords.markEditorKeywords();
+        });
 
         /*insert keyword in content*/
         $widgetWraper.on('dblclick', '.statisticsTitle', function () {/*doubletap*/

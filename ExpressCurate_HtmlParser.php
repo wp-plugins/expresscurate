@@ -14,6 +14,7 @@ class ExpressCurate_HtmlParser {
   private $url;
   private $domain;
   private $fragment;
+  private $protocol;
   private $path;
   private $html;
   private $title = null;
@@ -29,6 +30,7 @@ class ExpressCurate_HtmlParser {
         $this->domain = 'http://' . parse_url($this->url, PHP_URL_HOST);
         $this->path = 'http://' . parse_url($this->url, PHP_URL_HOST) . "/" . $path . "/";
         $this->fragment = parse_url($this->url, PHP_URL_FRAGMENT);
+        $this->protocol = parse_url($this->url, PHP_URL_SCHEME);
     }
 
   }
@@ -124,7 +126,9 @@ class ExpressCurate_HtmlParser {
     $this->html = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $this->html);
 //$this->html = preg_replace('/[\r|\n]+/msi', '', $this->html);
     $this->html = preg_replace('/<--[\S\s]*?-->/msi', '', $this->html);
-    $this->html = preg_replace('/<noscript[^>]*>[\S\s]*?' .
+    /*$this->html = preg_replace('/<noscript[^>]*>[\S\s]*?' .
+            '<\/noscript>/msi', '', $this->html);*/
+    $this->html = preg_replace('/<noscript[^>]*>[\s]*?' .
             '<\/noscript>/msi', '', $this->html);
     $this->html = preg_replace('~>\s+<~', '><', $this->html);
     $this->html = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $this->html);
@@ -156,7 +160,12 @@ class ExpressCurate_HtmlParser {
         if (strpos($src, 'http://') !== false || strpos($src, 'https://') !== false) {
           $src = $src;
         } else if (strpos($src, '//') === 0) {
-          $src = $this->fragment . $src;
+          if(isset($this->fragment)){
+              $src = $this->fragment . $src;
+          }
+          else{
+              $src = $this->protocol.":" . $src;
+          }
         } elseif (strpos($src, '/') === 0) {
           $src = $this->domain . $src;
         } else {

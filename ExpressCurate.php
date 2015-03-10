@@ -4,7 +4,7 @@
   Plugin Name: ExpressCurate
   Plugin URI: http://www.expresscurate.com/products
   Description: ExpressCurate plugin is a content curation tool for WordPress. It enables you to create and publish high quality content within minutes.
-  Version: 2.0.6
+  Version: 2.0.7
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
   License: GPLv3 or later

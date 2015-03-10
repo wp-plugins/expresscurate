@@ -780,7 +780,7 @@ class ExpressCurate_FeedManager
             $end = strtotime(date('Y-m-d'));
             foreach ($bookmarks as $key => $bookmark) {
                 $date_array = date_parse($bookmark['bookmark_date']);
-                $bookmark_date = strtotime(date('Y-m-d', mktime($date_array['month'], $date_array['day'], $date_array['year'])));
+                $bookmark_date = strtotime(date('Y-m-d', mktime(0,0,0,$date_array['month'], $date_array['day'], $date_array['year'])));
                 if ($bookmark_date >= $start && $bookmark_date <= $end) {
                     $count++;
                 }

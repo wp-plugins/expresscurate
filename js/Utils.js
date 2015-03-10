@@ -151,12 +151,16 @@ var ExpressCurateUtils = (function ($) {
     }
 
     function track(action, curate) {
-        /*ga('expresscurate.send', 'pageview', {
-         'page': '/site/' + expresscurate_track_hash
-         });
-         ga('expresscurate.send', 'pageview', {
-         'page': '/site/wp/' + expresscurate_track_hash
-         });*/
+        if (!siteSendAnalytics) {
+            ga('expresscurate.send', 'pageview', {
+                'page': '/site/' + expresscurate_track_hash
+            });
+        }
+        if (!siteWpSendAnalytics) {
+            ga('expresscurate.send', 'pageview', {
+                'page': '/site/wp/' + expresscurate_track_hash
+            });
+        }
         if (curate) {
             ga('expresscurate.send', 'pageview', {
                 'page': '/site/curate/' + expresscurate_track_hash
@@ -184,6 +188,10 @@ var ExpressCurateUtils = (function ($) {
             });
 
         }
+        /*support submit*/
+        $('#expresscurate_support_form').on('click', '.feedbackButton, .askButton', function () {
+            expresscurateSupportSubmit();
+        });
         /*settings page tabs*/
         if ($('.expresscurate_settings').length) {
             var $tabs = $('.tabs'),

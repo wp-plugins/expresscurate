@@ -22,7 +22,7 @@ blockquote:before {
     height: 23px;
     position: absolute;
     display: inline-block;
-    background-position: 0 0;
+    background-position: 0 10px;
     content: "";
     clear: both;
     transform:rotate(180deg);

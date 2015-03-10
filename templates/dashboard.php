@@ -78,7 +78,7 @@ if ($_POST) {
                                         <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
                                                   placeholder="Message"></textarea>
                                                   <label for="expresscurate_support_message" class="expresscurate_errorMessage"></label>
-                                                <a class="feedbackButton send greenBackground" href="#" onclick="ExpressCurateUtils.expresscurateSupportSubmit();">Send</a>
+                                                <a class="feedbackButton send greenBackground" href="#">Send</a>
                                             </form>
                                         </div>
                                     </div>';
@@ -141,7 +141,7 @@ if ($_POST) {
                     <textarea class="inputStyle" name="expresscurate_support_message" id="expresscurate_support_message"
                               placeholder="Message"></textarea>
                             <label for="expresscurate_support_message" class="expresscurate_errorMessage"></label>
-                            <a class="feedbackButton send greenBackground" href="#" onclick="ExpressCurateUtils.expresscurateSupportSubmit();">Send</a>
+                            <a class="feedbackButton send greenBackground" href="#">Send</a>
                         </form>
                     </div>
                 </div>

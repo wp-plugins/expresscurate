@@ -6,7 +6,7 @@ $feedManager = new ExpressCurate_FeedManager();
     <ul class="list">
         <?php
         $feeds = $feedManager->get_feed_list();
-        if(!empty($feeds)){
+        if(!empty($feeds) && !empty($feeds['content'])){
             $content_list = array_slice($feeds['content'], 0, 5);
             $i = 0;
             foreach ($content_list as $key => $item) {
@@ -22,6 +22,7 @@ $feedManager = new ExpressCurate_FeedManager();
         }
         ?>
     </ul>
-
-    <a class="settingsLink" href="admin.php?page=expresscurate_feed_list">More Content</a>
+    <?php  if(!empty($feeds) && !empty($feeds['content'])){ ?>
+        <a class="settingsLink" href="admin.php?page=expresscurate_feed_list">More Content(<?php echo count($feeds['content']); ?>)</a>
+    <?php  } ?>
 </div>

@@ -1,9 +1,13 @@
 <?php
 $feedManager = new ExpressCurate_FeedManager();
 $bookmarks = $feedManager->get_bookmarks();
+if (!empty($bookmarks)){
+    $sorted_bookmarks = array_reverse($bookmarks);
+}
 $last_7_days = $feedManager->count_bookmarks_by_days($bookmarks, 7);
 $bookmarks_count = count($bookmarks);
-$bookmarks = array_slice($bookmarks, 0, 5);
+$sorted_bookmarks = array_slice($sorted_bookmarks, 0, 5);
+
 ?>
 <div class="expresscurate_dashboard expresscurate_Styles expresscurate_dashboard_bookmarks ">
     <div class="topPart">
@@ -19,9 +23,9 @@ $bookmarks = array_slice($bookmarks, 0, 5);
 
     <ul class="list">
         <?php
-        if (!empty($bookmarks)) {
+        if (!empty($sorted_bookmarks)) {
             $i = 0;
-            foreach ($bookmarks as $key => $item) {
+            foreach ($sorted_bookmarks as $key => $item) {
                 ?>
                 <li>
                     <a href="<?php echo $item['link'] ?>" target="_newtab"><?php echo $item['title'] ?></a>

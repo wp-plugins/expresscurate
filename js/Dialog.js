@@ -78,7 +78,7 @@ var ExpresscurateDialog = (function ($) {
         $paragraphsContainer.width(paragraphs.length * paragraphWidth);
         $.each(paragraphs, function (index, value) {
             if (value['value'].length > shortestParagraphLength) {
-                $sorted[index] = value['value'];
+                $sorted.push(value['value']);
             }
         });
         $.each($sorted, function (index, value) {
@@ -567,12 +567,10 @@ var ExpresscurateDialog = (function ($) {
         $('#expresscurate_submit').click(function () {
             $("#expresscurate_loading").show();
             submitExpresscurateForm();
-            $(document).ajaxComplete(function () {
-
-            });
         });
         $('#expresscurate_source').keypress(function (e) {
             if (e.keyCode === 13 || e.keyCode === 40) {
+                $("#expresscurate_loading").show();
                 submitExpresscurateForm();
                 return false;
             }

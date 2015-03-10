@@ -2510,7 +2510,6 @@
     white-space: normal;
 }
 #expresscurate_wordCount_dialog{
-    max-height: 210px !important;
     height: auto !important;
     max-width: 700px !important;
     white-space: normal;

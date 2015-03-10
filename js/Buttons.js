@@ -159,12 +159,31 @@ var ExpressCurateButtons = (function ($) {
         messageHtml += (!imagesInPost && !videoInPost) ? '<p class="lengthSuggestion red">Your post currently doesn’t have an image(video). Adding a media is a good way to improve conversion rates by creating visual associations with your posts.</p>' : '';
         messageHtml += $('.attachment-post-thumbnail').length ? '' : '<p class="lengthSuggestion red">Your post currently doesn’t have a featured image. Adding a featured image is a good way to improve conversion rates by creating visual associations with your posts.</p>';
 
+        var arrOutboundLinks = false,
+            arrInboundLink = false;
+        $(tinyMCE.activeEditor.dom.getRoot()).find('a').each(
+            function () {
+                var link = getRootUrl($(this).attr("href")),
+                    patIfRelative = /^https?:\/\//i;
+                if (!patIfRelative.test(link) || link == getRootUrl(window.location)) {
+                    arrInboundLink = true;
+                } else {
+                    arrOutboundLinks = true;
+                }
+            });
+        messageHtml += arrInboundLink ? '' : '<p class="lengthSuggestion blue">This page contains no inbound links, add some where appropriate.</p>';
+        messageHtml += arrOutboundLinks ? '' : '<p class="lengthSuggestion blue">This page contains no outbound links, add some where appropriate.</p>';
+
         ed.windowManager.open({
             title: 'Post Analysis',
             id: 'expresscurate_wordCount_dialog',
             width: 450,
             html: messageHtml
         });
+    }
+
+    function getRootUrl(url) {
+        return url.toString().replace(/^(.*\/\/[^\/?#]*).*$/, "$1");
     }
 
     function addKeyword() {
@@ -206,30 +225,30 @@ var ExpressCurateButtons = (function ($) {
 
                 return co.replace(/(?:<p[^>]*>)*(<img[^>]+>)(?:<\/p>)*/g, function (a, im) {
                     var cls = getAttr(im, 'class');
-                    if (cls.indexOf('expresscurate_FacebookEmbed') != -1){
+                    if (cls.indexOf('expresscurate_FacebookEmbed') != -1) {
                         return '<p>[' + tinymce.trim(getAttr(im, 'title')) + ']</p>';
                     }
                     return a;
                 });
             },
             init: function (ed, url) {
-               /* var t = this;
-                t.url = url;
-                //replace shortcode before editor content set
-                ed.onBeforeSetContent.add(function (ed, o) {
-                    o.content = t.visualizeShortcode(o.content);
-                });
-                //replace shortcode as its inserted into editor
-                ed.onExecCommand.add(function (ed, cmd) {
-                    if (cmd === 'mceInsertContent') {
-                        tinyMCE.activeEditor.setContent(t.visualizeShortcode(tinyMCE.activeEditor.getContent()));
-                    }
-                });
-                //replace the image back to shortcode on save
-                ed.onPostProcess.add(function (ed, o) {
-                    if (o.get)
-                        o.content = t.recoverShortcode(o.content);
-                });*/
+                /* var t = this;
+                 t.url = url;
+                 //replace shortcode before editor content set
+                 ed.onBeforeSetContent.add(function (ed, o) {
+                 o.content = t.visualizeShortcode(o.content);
+                 });
+                 //replace shortcode as its inserted into editor
+                 ed.onExecCommand.add(function (ed, cmd) {
+                 if (cmd === 'mceInsertContent') {
+                 tinyMCE.activeEditor.setContent(t.visualizeShortcode(tinyMCE.activeEditor.getContent()));
+                 }
+                 });
+                 //replace the image back to shortcode on save
+                 ed.onPostProcess.add(function (ed, o) {
+                 if (o.get)
+                 o.content = t.recoverShortcode(o.content);
+                 });*/
 
                 // Register buttons - trigger above command when clicked
                 ed.addButton('sochalPost', {
@@ -277,50 +296,6 @@ var ExpressCurateButtons = (function ($) {
                     cmd: 'addKeyword',
                     classes: "btn expresscurateCostom expresscurateAddKeyword"
                 });
-               /* ed.addButton('sochalPost', {
-                    title: 'Add post',
-                    icon: 'icon expresscurateSocial mce-expresscurateCostom',
-                    type: 'menubutton',
-                    cmd: 'sochalPost',
-                    menu: [
-                        {
-                            text: 'facebook',
-                            icon: 'icon expresscurateSocial mce-expresscurateCostom',
-                            onclick: function () {
-                                ed.windowManager.open({
-                                    title: 'Facebook embed',
-                                    body: [{
-                                        type: 'textbox',
-                                        name: 'facebookEmbed'
-                                    }],
-                                    onsubmit: function (e) {
-                                        var $elem=$(e.data.facebookEmbed)[2],
-                                            url=$($elem).data('href');
-                                        ed.insertContent('[facebook src="'+url+'"]');
-                                    }
-                                });
-                            }
-                        },
-                        {
-                            text: 'twitter',
-                            icon: 'icon expresscurateSocial mce-expresscurateCostom',
-                            onclick: function () {
-                                ed.windowManager.open({
-                                    title: 'Twitter embed',
-                                    body: [{
-                                        type: 'textbox',
-                                        name: 'twitterEmbed'
-                                    }],
-                                    onsubmit: function (e) {
-                                        var $elem=$(e.data.twitterEmbed)[0],
-                                            url=$($elem).find('> a').attr('href');
-                                        ed.insertContent('[embed]'+url+'[/embed]');
-                                    }
-                                });
-                            }
-                        }
-                    ]
-                });*/
                 ed.onKeyDown.add(function (ed, e) {
                     if (e.altKey && e.keyCode === 75) {
                         addKeyword();
