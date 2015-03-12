@@ -20,11 +20,8 @@ class ExpressCurate_Util {
     }
 
 
-    public static function tmpname($postfix = '.tmp', $prefix = 'tmp', $dir = null) {
+    public static function tmpname($prefix = 'tmp', $dir = null) {
         // validate arguments
-        if (! (isset($postfix) && is_string($postfix))) {
-            return false;
-        }
         if (! (isset($prefix) && is_string($prefix))) {
             return false;
         }
@@ -39,23 +36,9 @@ class ExpressCurate_Util {
                 return false;
             }
 
-            // tack on the extension
-            $newFileName = $sysFileName . $postfix;
-            if ($sysFileName == $newFileName) {
-                return $sysFileName;
-            }
-
-            $newFileCreated =  @link($sysFileName, $newFileName);
-            if ($newFileCreated) {
-                return $newFileName;
-            }
-
-            unlink ($sysFileName);
-        }catch (Exception $e){
+            return $sysFileName;
+        } catch (Exception $e) {
             return false;
         }
-
-
-        return false;
     }
 }

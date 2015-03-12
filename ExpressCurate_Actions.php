@@ -190,8 +190,7 @@ class ExpressCurate_Actions
         add_action('transition_post_status', array(&$this, 'status_changes'), 10, 3);
         add_action('update_option_permalink_structure', array(&$this, 'permalink_changes'), 10, 2);
         if ($_REQUEST['page'] == 'expresscurate_settings') {
-            $cronManager = new ExpressCurate_CronManager();
-            $cronManager->schedule_events();
+            $this->cronManager->schedule_events();
 
             // Generate sitemap
             $seo = get_option('expresscurate_seo');
@@ -1638,7 +1637,6 @@ class ExpressCurate_Actions
 
         $warnings = array();
         $extWarnings = array();
-        $cronManager = new ExpressCurate_CronManager();
         $homeUrl = get_site_url();
 
         $homePath = get_home_path();

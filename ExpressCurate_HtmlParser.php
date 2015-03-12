@@ -128,8 +128,7 @@ class ExpressCurate_HtmlParser {
     $this->html = preg_replace('/<--[\S\s]*?-->/msi', '', $this->html);
     /*$this->html = preg_replace('/<noscript[^>]*>[\S\s]*?' .
             '<\/noscript>/msi', '', $this->html);*/
-    $this->html = preg_replace('/<noscript[^>]*>[\s]*?' .
-            '<\/noscript>/msi', '', $this->html);
+    $this->html = preg_replace('/(<noscript[^>]*>|<\/noscript>)/msi', '', $this->html);
     $this->html = preg_replace('~>\s+<~', '><', $this->html);
     $this->html = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $this->html);
     $this->html = mb_convert_encoding($this->html, 'HTML-ENTITIES', "UTF-8");
@@ -463,6 +462,28 @@ class ExpressCurate_HtmlParser {
 
       return $this->keywords;
   }
+
+   public function isMediaExists(){
+       $dom = new DOMDocument('1.0', 'UTF-8');
+       @$dom->loadHTML($this->html);
+       $xpath = new DomXPath($dom);
+       $this->removeElementsByTagName('script', $dom);
+       $this->removeElementsByTagName('style', $dom);
+       $this->removeElementsByTagName('link', $dom);
+       $imgTags = $xpath->query("//img");
+       $img_array = array();
+       foreach ($imgTags as $t) {
+           $src = $t->getAttribute('src');
+           $img_array[] = $src;
+       }
+       $obj = $xpath->query("//node()[(name()='iframe' or name()='video' or name()='source' or name()= 'object' or name()='embed') and (contains(@src,'youtube.com') or contains(@src ,'vimeo.com') or contains(@src,'youtu.be'))]");
+       $videoArrays = array();
+       foreach($obj as $objs){
+           array_push($videoArrays,$objs->getAttribute('src'));
+       }
+       $mediaTags = array("images"=>count($img_array),"videos"=>count($videoArrays));
+       return $mediaTags;
+   }
 
     function getTextBetweenTags($tag, $html, $strict=0)
     {

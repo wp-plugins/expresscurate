@@ -23,6 +23,6 @@ $feedManager = new ExpressCurate_FeedManager();
         ?>
     </ul>
     <?php  if(!empty($feeds) && !empty($feeds['content'])){ ?>
-        <a class="settingsLink" href="admin.php?page=expresscurate_feed_list">More Content(<?php echo count($feeds['content']); ?>)</a>
+        <a class="settingsLink" href="admin.php?page=expresscurate_feed_list">More Content (<?php echo count($feeds['content']); ?>)</a>
     <?php  } ?>
 </div>

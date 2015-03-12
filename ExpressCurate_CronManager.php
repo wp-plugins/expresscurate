@@ -12,13 +12,7 @@ class ExpressCurate_CronManager {
 
     public  $websiteUrlCallCronjob = null;
 
-    private $tmpForCron = null;
-
     public function __construct() {
-        $temp_file =  ExpressCurate_Util::tmpname('.tmp', 'cron');
-
-        $this->tmpForCron = $temp_file;
-
         $this->websiteUrlCallCronjob ='0 * * * *  wget  '.get_site_url().' > /dev/null 2>&1';
     }
 
@@ -45,9 +39,11 @@ class ExpressCurate_CronManager {
                 ExpressCurate_Util::exec('crontab -l' ,$output);
                 $output = implode(PHP_EOL, $output);
                 $output = $output . PHP_EOL . $this->websiteUrlCallCronjob . PHP_EOL;
-                file_put_contents($this->tmpForCron, $output);
-                ExpressCurate_Util::exec('crontab ' . $this->tmpForCron, $output);
-                unlink($this->tmpForCron);
+                
+                $tempFile =  ExpressCurate_Util::tmpname('cron');
+                file_put_contents($tempFile, $output);
+                ExpressCurate_Util::exec('crontab ' . $tempFile, $output);
+                unlink($tempFile);
             }
         }
 
@@ -79,21 +75,20 @@ class ExpressCurate_CronManager {
         wp_clear_scheduled_hook('expresscurate_sitemap_generate');
         wp_clear_scheduled_hook('expresscurate_sitemap_push');
 
-        if($this->check_if_exist($this->websiteUrlCallCronjob)){
-            ExpressCurate_Util::exec('crontab -l' ,$output);
-            $output = implode(PHP_EOL,$output);
-            $newCron = str_replace($this->websiteUrlCallCronjob,"",$output);
-            file_put_contents($this->tmpForCron, $newCron.PHP_EOL);
-            ExpressCurate_Util::exec('crontab '.$this->tmpForCron);
-            unlink($this->tmpForCron);
+        if($this->check_if_exist($this->websiteUrlCallCronjob)) {
+            ExpressCurate_Util::exec('crontab -l', $output);
+            $output = implode(PHP_EOL, $output);
+            $output = str_replace($this->websiteUrlCallCronjob, "", $output) . PHP_EOL;
+            
+            $tempFile =  ExpressCurate_Util::tmpname('cron');
+            file_put_contents($tempFile, $output);
+            ExpressCurate_Util::exec('crontab ' . $tempFile);
+            unlink($tempFile);
         }
     }
 
 
     public function set_permission_status() {
-//        $status = $_REQUEST['status'];
-//        update_option('expresscurate_exec_function_permission_status', $status);
-
         $status = $_REQUEST['status'] === 'seen' ? 'ignore' : 'manual';
         update_option('expresscurate_cronjob_status', $status);
 

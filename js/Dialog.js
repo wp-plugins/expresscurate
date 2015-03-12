@@ -30,7 +30,10 @@ var ExpresscurateDialog = (function ($) {
     }
 
     function displayCuratedImages(images) {
-        var $editor = $('.expresscurate_dialog .editor');
+        var $editor = $('.expresscurate_dialog .editor'),
+            count = images.length,
+            validImgCount = 0,
+            $counter = $('.expresscurate_dialog .imageCount');
         $('.imgContainer').hide();
         $editor.removeClass('small');
 
@@ -42,33 +45,34 @@ var ExpresscurateDialog = (function ($) {
                 height = this.height;
                 width = this.width;
                 if (width > 150 && height > 100) {
+                    validImgCount++;
                     var data = {
                         index: index,
                         url: value
                     };
                     $('#curated_images').append(ExpressCurateUtils.getTemplate('dialogCuratedImage', data));
+                    $counter.text('1/' + validImgCount).removeClass('expresscurate_displayNone');
                     // show image container
                     $editor.addClass('small');
                     $('.imgContainer').show();
                 }
             };
             img.src = value;
-        });
-        setTimeout(function () {
-            var $curatedImages = $('ul#curated_images li'),
-                numberOfImages = $curatedImages.length,
-                $counter = $('.expresscurate_dialog .imageCount'),
-                errorHTML = '';
-            if (numberOfImages > 0) {
-                $('.content .img').removeClass("noimage").css('background-image', $curatedImages.first().css('background-image'));
-                $counter.text('1/' + numberOfImages).removeClass('expresscurate_displayNone');
-            } else {
-                errorHTML = '<div class="error">No image (of 120x100 or higher res) found in the original article.</div>';
-                $('#expresscurate_post_form').before(errorHTML);
+            if (index === images.length - 1) {
+                setTimeout(function () {
+                    var $curatedImages = $('ul#curated_images li'),
+                        numberOfImages = $curatedImages.length,
+                        errorHTML = '';
+                    if (numberOfImages > 0) {
+                        $('.content .img').removeClass("noimage").css('background-image', $curatedImages.first().css('background-image'));
+                    } else {
+                        errorHTML = '<div class="error">No image (of 120x100 or higher res) found in the original article.</div>';
+                        $('#expresscurate_post_form').before(errorHTML);
+                    }
+                }, 300);
             }
-        }, 300);
+        });
     }
-
     function displayCuratedParagraphs(paragraphs, count, shortPar) {
         var $paragraphsContainer = $('.paragraphs_preview'),
             textHTML = '',
@@ -147,7 +151,7 @@ var ExpresscurateDialog = (function ($) {
             };
             keywordsHTML += ExpressCurateUtils.getTemplate('dialogCuratedtags', data);
         });
-        keywordsHTML += ExpressCurateUtils.getTemplate('dialogMarkButton',null);
+        keywordsHTML += ExpressCurateUtils.getTemplate('dialogMarkButton', null);
         $("#curated_tags").append(keywordsHTML);
     }
 
@@ -168,7 +172,7 @@ var ExpresscurateDialog = (function ($) {
         var specialsHTML = '';
         specialsHTML += displayCuratedHeadings(data.headings);
         specialsHTML += displayCuratedDescription(data.metas.description);
-        specialsHTML += ExpressCurateUtils.getTemplate('dialogSearchParagraphs',null);
+        specialsHTML += ExpressCurateUtils.getTemplate('dialogSearchParagraphs', null);
         if (specialsHTML.length === 0) {
             specialsHTML += '<li>No specal data</li>';
         }
@@ -177,13 +181,13 @@ var ExpresscurateDialog = (function ($) {
 
     function displayCuratedHeadings(headings) {
         var headingsHTML = '';
-        $.each(headings,function(index,value){
+        $.each(headings, function (index, value) {
             if (index && value.length > 0) {
-                var data={
-                    index:index,
-                    content:value
+                var data = {
+                    index: index,
+                    content: value
                 };
-                headingsHTML += ExpressCurateUtils.getTemplate('dialogCuratedHeadings',data);
+                headingsHTML += ExpressCurateUtils.getTemplate('dialogCuratedHeadings', data);
             }
         });
         return headingsHTML;
@@ -192,7 +196,7 @@ var ExpresscurateDialog = (function ($) {
     function displayCuratedDescription(description) {
         var descriptionHTML = '';
         if (description && description.length > 0) {
-            descriptionHTML += ExpressCurateUtils.getTemplate('dialogCuratedDescription',description);
+            descriptionHTML += ExpressCurateUtils.getTemplate('dialogCuratedDescription', description);
         }
         return descriptionHTML;
     }
@@ -211,7 +215,7 @@ var ExpresscurateDialog = (function ($) {
             });
             paragraph += "</ul>";
         } else {
-            paragraph += "<" + tag + ">" + $('#'+ id).attr('title').replace(/\r\n/g, "<br />").replace(/\n/g, "<br />") + "</" + tag + "> &nbsp;";
+            paragraph += "<" + tag + ">" + $('#' + id).attr('title').replace(/\r\n/g, "<br />").replace(/\n/g, "<br />") + "</" + tag + "> &nbsp;";
         }
         generateTags(paragraph);
         tinyMCE.get('expresscurate_content_editor').execCommand('mceInsertContent', false, paragraph);

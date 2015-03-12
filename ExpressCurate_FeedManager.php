@@ -458,7 +458,7 @@ class ExpressCurate_FeedManager
                 }
                 $html_parser = new ExpressCurate_HtmlParser($link);
                 $keywords = $html_parser->analyzeKeywords();
-
+                $media = $html_parser->isMediaExists();
                 $publishDate = isset($story['publishedDate']) ? $story['publishedDate'] : $story['date'];
                 $expressCurateDate = new ExpressCurate_Date();
                 $publishDate = $expressCurateDate->dateWithTimeUtc(strtotime($publishDate));
@@ -471,6 +471,7 @@ class ExpressCurate_FeedManager
                     'author' => $story['author'],
                     'curated' => 0,
                     'keywords' => $keywords,
+                    'media' => $media
                 );
 
                 if ($date) {

@@ -96,7 +96,7 @@ var ExpressCurateSEOControl = (function ($) {
             $widgetWraper = $('.expresscurate_widget_wrapper'),
             $addInput = $('.addKeywords input'),
             $keywordWrap = $('.statisticsTitle span'),
-            $description = $widgetWraper.find('.description'),
+            $description = $('.expresscurate_widget .description'),
             $descriptionContainer = $description.find('.descriptionWrap');
 
         if ($.trim($metaDescription.val()) === '') {
