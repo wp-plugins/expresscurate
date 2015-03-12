@@ -235,7 +235,7 @@ var ExpresscurateDialog = (function ($) {
         $('.content .img').attr('style', '').addClass("noimage");
         $('.controls').hide();
         $("#curated_paragraphs").empty();
-        if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function") {
+        if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && tinyMCE.get('expresscurate_content_editor').length) {
             tinyMCE.get('expresscurate_content_editor').setContent('');
         }
         $('#expresscurate_source').focus();
