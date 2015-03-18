@@ -70,10 +70,10 @@ if (!empty($bookmarks)) {
 
                     <ul class="keywords">
                         <?php if (!empty($item['media']['videos'])) {
-                            echo '<li class="media videos"><span class="tooltip">'.$item["media"]["videos"].'</span></li>';
+                            echo '<li class="media videos"><span class="tooltip">Video(s):  '.$item["media"]["videos"].'</span></li>';
                         }
                         if (!empty($item['media']['images'])) {
-                            echo '<li class="media images"><span class="tooltip">'.$item["media"]["images"].'</span></li>';
+                            echo '<li class="media images"><span class="tooltip">Image(s):  '.$item["media"]["images"].'</span></li>';
                         }
                         if (!empty($item[' keywords'])) { ?>
                             <?php foreach ($item['keywords'] as $keyword => $stats) {
