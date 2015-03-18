@@ -3,7 +3,7 @@ $content_list = array();
 $feedManager = new ExpressCurate_FeedManager();
 $contentList = $feedManager->get_feed_list();
 $sorted_feeds = array();
-if(!empty($contentList)){
+if (!empty($contentList)) {
     foreach ($contentList as $key => $row) {
         if (is_array($row) && count($row) > 0) {
             foreach ($row as $content) {
@@ -69,17 +69,15 @@ if(!empty($contentList)){
                 <label for="uniqueId_<?php echo $i; ?>"></label>
                 <textarea
                     class="expresscurate_displayNone expresscurate_feedData"><?php echo json_encode($item); ?></textarea>
-                <a class="postTitle" href="<?php echo $item['link'] ?>"
-                   target="_newtab"><?php echo $item['title'] ?></a><br/>
-                <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
-                <?php if (isset($item['author']) && '' != $item['author']) { ?>
-                    <span class="curatedBy">/<?php echo $item['curated'] ? 'curated by' : 'author'; ?>
-                        <span><?php echo $item['author']; ?></span> /</span>
-                <?php } ?>
-                <span
-                    class="time"><?php echo human_time_diff(strtotime($item['date']), current_time('timestamp')) . ' ago'; ?></span></br>
-                <?php if (!empty($item['keywords'])) { ?>
-                    <ul class="keywords">
+
+                <ul class="keywords">
+                    <?php if (!empty($item['media']['videos'])) {
+                        echo '<li class="media videos"><span class="tooltip">Video(s):  '.$item["media"]["videos"].'</span></li>';
+                    }
+                    if (!empty($item['media']['images'])) {
+                        echo '<li class="media images"><span class="tooltip">Image(s):  '.$item["media"]["images"].'</span></li>';
+                    }
+                    if (!empty($item['keywords'])) { ?>
                         <?php foreach ($item['keywords'] as $keyword => $stats) {
                             if ($stats['percent'] * 100 < 3) {
                                 $color = 'blue';
@@ -96,9 +94,19 @@ if(!empty($contentList)){
                     <span class="inContent">content<p><?php echo $stats['percent'] * 100 ?>%</p></span>
                   </span>
                             </li>
-                        <?php } ?>
-                    </ul>
+                        <?php }
+                    } ?>
+                </ul>
+
+                <a class="postTitle" href="<?php echo $item['link'] ?>"
+                   target="_newtab"><?php echo $item['title'] ?></a><br/>
+                <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
+                <?php if (isset($item['author']) && '' != $item['author']) { ?>
+                    <span class="curatedBy">/<?php echo $item['curated'] ? 'curated by' : 'author'; ?>
+                        <span><?php echo $item['author']; ?></span> /</span>
                 <?php } ?>
+                <span
+                    class="time"><?php echo human_time_diff(strtotime($item['date']), current_time('timestamp')) . ' ago'; ?></span></br>
 
                 <ul class="controls expresscurate_preventTextSelection">
                     <li class="curate"><a

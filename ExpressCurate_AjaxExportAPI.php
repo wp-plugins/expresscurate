@@ -75,7 +75,11 @@ class ExpressCurate_AjaxExportAPI
     public function check_images()
     {
         $data = $_REQUEST;
-        $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
+        //$options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
+        $options = array('http' => array('user_agent' => USER_AGENT,' follow_location'=>1,'max_redirects'=>5,'request_fulluri '=>TRUE));
+        if(preg_match("/(^https:\/\/)/i", $url)!=false){
+            $options['ssl']=array('verify_peer'=> false,"verify_peer_name"=>false);
+        }
         $context = stream_context_create($options);
         if (!$data['img_url'] && !$data['img_url2']) {
             $data_check = array('status' => "error", 'msg' => "Data is empty!");
@@ -126,7 +130,10 @@ class ExpressCurate_AjaxExportAPI
                 mkdir($upload_dir['basedir'] . '/expresscurate_tmp/', 0777);
                 mkdir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id, 0777);
             }
-            $options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
+            $options = array('http' => array('user_agent' => USER_AGENT,' follow_location'=>1,'max_redirects'=>5,'request_fulluri '=>TRUE));
+            if(preg_match("/(^https:\/\/)/i", $url)!=false){
+                $options['ssl']=array('verify_peer'=> false,"verify_peer_name"=>false);
+            }
             $context = stream_context_create($options);
             if (count($images) > 0 && is_writable($upload_dir['path'])) {
                 $content_manager = new ExpressCurate_HtmlParser($images[0]);

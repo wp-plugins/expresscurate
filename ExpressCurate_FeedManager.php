@@ -43,7 +43,7 @@ class ExpressCurate_FeedManager
                 $curated_links_rss = array();
             }
 
-            $url = expresscurate_normalise_url($url, true);
+            //$url = expresscurate_normalise_url($url, true);
             $rssUrl = isset($rssUrl) ? $rssUrl : $this->getRssUrl($url);
 
             if (!isset($curated_links_rss[$rssUrl])) {
@@ -346,8 +346,13 @@ class ExpressCurate_FeedManager
         }
 
         $lookup_url = "http://ajax.googleapis.com/ajax/services/feed/lookup?v=1.0&q=" . urlencode($url);
-        $result = json_decode(file_get_contents($lookup_url));
-
+        $options = array('http' => array('user_agent' => USER_AGENT,' follow_location'=>1,'max_redirects'=>5,'request_fulluri '=>TRUE));
+        if(preg_match("/(^https:\/\/)/i", $url)!=false){
+            $options['ssl']=array('verify_peer'=> false,"verify_peer_name"=>false);
+        }
+        $context = stream_context_create($options);
+        $res = file_get_contents($lookup_url,false,$context);
+        $result = json_decode($res);
         if ($result && $result->responseData) {
             return $result->responseData->url;
         } elseif ($result && $result->responseData === null) {
@@ -681,6 +686,7 @@ class ExpressCurate_FeedManager
                 $bookmark['date'] = $item['result']['date'];
                 $bookmark['bookmark_date'] = date("Y-m-d h:i:s");
                 $bookmark['keywords'] = array();
+                $bookmark['media'] = $item['result']['media'];
                 $bookmark['type'] = isset($item['result']['type']) ? $item['type'] : 'user';
                 $bookmark['comment'] = $comment;
                 $bookmark['curated'] = 0;

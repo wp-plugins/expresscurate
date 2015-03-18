@@ -51,10 +51,15 @@ var ExpresscurateDialog = (function ($) {
                         url: value
                     };
                     $('#curated_images').append(ExpressCurateUtils.getTemplate('dialogCuratedImage', data));
+
                     $counter.text('1/' + validImgCount).removeClass('expresscurate_displayNone');
                     // show image container
                     $editor.addClass('small');
                     $('.imgContainer').show();
+                    if (validImgCount === 1) {
+                        $('.content .img').removeClass("noimage").css('background-image', $('ul#curated_images li').first().css('background-image'));
+                        $('#expresscurate_dialog').find('div.error.dialogImgError').remove();
+                    }
                 }
             };
             img.src = value;
@@ -63,16 +68,15 @@ var ExpresscurateDialog = (function ($) {
                     var $curatedImages = $('ul#curated_images li'),
                         numberOfImages = $curatedImages.length,
                         errorHTML = '';
-                    if (numberOfImages > 0) {
-                        $('.content .img').removeClass("noimage").css('background-image', $curatedImages.first().css('background-image'));
-                    } else {
-                        errorHTML = '<div class="error">No image (of 120x100 or higher res) found in the original article.</div>';
+                    if (validImgCount < 1) {
+                        errorHTML = '<div class="dialogImgError error">No image (of 120x100 or higher res) found in the original article.</div>';
                         $('#expresscurate_post_form').before(errorHTML);
                     }
                 }, 300);
             }
         });
     }
+
     function displayCuratedParagraphs(paragraphs, count, shortPar) {
         var $paragraphsContainer = $('.paragraphs_preview'),
             textHTML = '',

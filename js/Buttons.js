@@ -105,7 +105,7 @@ var ExpressCurateButtons = (function ($) {
         };
     }
 
-    function wordCount(ed) {
+    function postAnalysis(ed, dialog) {
         ExpressCurateUtils.track('/post/content/seo/analytics');
 
         var lengthMessage, lengthColor,
@@ -152,16 +152,16 @@ var ExpressCurateButtons = (function ($) {
         }
         messageHtml = '<p class="lengthSuggestion ' + lengthColor + '">' + lengthMessage + '</p>\
          <p class="lengthSuggestion  ' + quotationColor + '">' + quotationMessage + '</p>';
-
+        /*media validation*/
 
         var imagesInPost = $(content).find('img').length ? true : false,
             videoInPost = tinyMCE.get('content').getContent().indexOf('[embed]') > -1;
         messageHtml += (!imagesInPost && !videoInPost) ? '<p class="lengthSuggestion red">Your post currently doesn’t have an image(video). Adding a media is a good way to improve conversion rates by creating visual associations with your posts.</p>' : '';
         messageHtml += $('.attachment-post-thumbnail').length ? '' : '<p class="lengthSuggestion red">Your post currently doesn’t have a featured image. Adding a featured image is a good way to improve conversion rates by creating visual associations with your posts.</p>';
-
+        /*link validation*/
         var arrOutboundLinks = false,
             arrInboundLink = false;
-        $(tinyMCE.activeEditor.dom.getRoot()).find('a').each(
+        $(content).find('a').each(
             function () {
                 var link = getRootUrl($(this).attr("href")),
                     patIfRelative = /^https?:\/\//i;
@@ -174,16 +174,70 @@ var ExpressCurateButtons = (function ($) {
         messageHtml += arrInboundLink ? '' : '<p class="lengthSuggestion blue">This page contains no inbound links, add some where appropriate.</p>';
         messageHtml += arrOutboundLinks ? '' : '<p class="lengthSuggestion blue">This page contains no outbound links, add some where appropriate.</p>';
 
-        ed.windowManager.open({
-            title: 'Post Analysis',
-            id: 'expresscurate_wordCount_dialog',
-            width: 450,
-            html: messageHtml
-        });
+        /*keywords validation*/
+        var defKeywords = $('#expresscurate_defined_tags').val();
+
+        messageHtml += defKeywords.length > 0 ? '' : '<p class="lengthSuggestion red">Currently you don\'t have any defined keywords. Add one or two keyword and optimize your post.</p>';
+
+        if (defKeywords.length > 0) {
+            var keywordsArray = defKeywords.split(', ');
+
+            $(keywordsArray).each(function (index, value) {
+                value = value.trim();
+            });
+            /*keywords in main title*/
+            messageHtml += wordContains($('#title').val(), keywordsArray) ? '' : '<p class="lengthSuggestion red">Not all keywords are present in the title.</p>';
+            /*SEO title*/
+            messageHtml += wordContains($('#expresscurate_advanced_seo_title').val(), keywordsArray) ? '' : '<p class="lengthSuggestion red">Not all keywords are present in the SEO title.</p>';
+            /*Social Title*/
+            messageHtml += wordContains($('#expresscurate_advanced_seo_social_title').val(), keywordsArray) ? '' : '<p class="lengthSuggestion red">Not all keywords are present in the social title.</p>';
+            /*keyword in meta description*/
+            messageHtml += wordContains($('textarea[name="expresscurate_description"]').val(), keywordsArray) ? '' : '<p class="lengthSuggestion red">Not all keywords are present in the meta description, add the missing keywords where/if appropriate.</p>';
+            /*keywords in content*/
+            messageHtml += wordContains(content, keywordsArray) ? '' : '<p class="lengthSuggestion red">Not all keywords are present in the content, add some where appropriate.</p>';
+            /*keywords in first paragraph*/
+            if ($(content)[0]) {
+                messageHtml += containsAtLeastOne($(content)[0].innerHTML, keywordsArray) ? '' : '<p class="lengthSuggestion blue">No keyword appear in the first paragraph, add one if appropriate.</p>';
+            }
+        }
+        if (dialog) {
+            ed.windowManager.open({
+                title: 'Post Analysis',
+                id: 'expresscurate_wordCount_dialog',
+                width: 450,
+                html: messageHtml
+            });
+        }
+        $('.expresscurate_advancedSEO_widget .postAnalysisTab').empty().append(messageHtml);
     }
 
     function getRootUrl(url) {
+        /*get domain name*/
         return url.toString().replace(/^(.*\/\/[^\/?#]*).*$/, "$1");
+    }
+
+    function wordContains(text, wordArray) {
+        var containsAll = true;
+        for (var i = 0; i < wordArray.length; i++) {
+            var myRegExp = new RegExp('((^|\\s|>|))(' + wordArray[i] + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$))', 'gmi');
+            if (!myRegExp.test(text)) {
+                containsAll = false;
+                break;
+            }
+        }
+        return containsAll;
+    }
+
+    function containsAtLeastOne(text, wordArray) {
+        var contains = false;
+        for (var i = 0; i < wordArray.length; i++) {
+            var myRegExp = new RegExp('((^|\\s|>|))(' + wordArray[i] + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$))', 'gmi');
+            if (myRegExp.test(text)) {
+                contains = true;
+                break;
+            }
+        }
+        return contains;
     }
 
     function addKeyword() {
@@ -197,9 +251,18 @@ var ExpressCurateButtons = (function ($) {
     }
 
     function setupButtons() {
-
+        $('.postAnalysisLink').on('click', function () {
+            var $this=$(this);
+            postAnalysis(tinymce.activeEditor, false);
+            (postAnalysisRefreshInterval = function () {
+                if ($this.hasClass('current')) {
+                    postAnalysis(tinymce.activeEditor, false);
+                }
+                setTimeout(postAnalysisRefreshInterval, 60000);
+            })();
+        });
         $('html').on('click', '.expresscurate_postAnalysis', function () {
-            wordCount(tinymce.activeEditor);
+            postAnalysis(tinymce.activeEditor, true);
         });
         tinymce.create('tinymce.plugins.expresscurate', {
             /**
@@ -338,7 +401,7 @@ var ExpressCurateButtons = (function ($) {
                     }
                     if (e.altKey && e.keyCode === 87) {     // alt+w
                         e.returnValue = false;
-                        wordCount(ed);
+                        postAnalysis(ed, true);
                         e.preventDefault();
                         return false;
                     }
@@ -446,7 +509,7 @@ var ExpressCurateButtons = (function ($) {
                         noFollow(ed);
                     });
                     ed.addCommand('wordCount', function () {
-                        wordCount(ed);
+                        postAnalysis(ed, true);
                     });
                     ed.addCommand('addKeyword', function () {
                         addKeyword();

@@ -303,7 +303,7 @@ class ExpressCurate_Keywords {
             if (!empty($words[0])){
                 $words = array_keys(array_slice($words[0], 0, 30, true));
             }
-            if (!empty($definedKeyWords)){
+            if (!empty($definedKeyWords) && !empty($words)){
                 $definedKeywordsArray = explode(',', strtolower(str_replace(' ', '', $definedKeyWords)));
 
                 foreach ($definedKeywordsArray as $definedKeyword){
@@ -359,7 +359,21 @@ class ExpressCurate_Keywords {
             unset($stats[0]['total_title_words_count']);
             $resultArray = $stats[0];
         }else{
-
+            $defined_tags = get_option("expresscurate_defined_tags", '');
+            if(!empty($defined_tags)){
+                $keywords_arr = $this->array_map('trim', explode(",", $defined_tags));
+                foreach($keywords_arr as $tag){
+                    $resultArray[$tag] = array(
+                        "added_count"=> 0,
+                        "color"=> "blue",
+                        "count"=> 0,
+                        "percent"=> 0,
+                        "posts_count"=> 0,
+                        "title"=> 0,
+                        "title_matches"=> 0
+                    );
+                }
+            }
         }
 
         return $resultArray;

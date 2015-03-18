@@ -2,7 +2,8 @@
 <!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="100.069px" height="5000px" viewBox="0 0 100.069 5000" enable-background="new 0 0 100.069 5000" xml:space="preserve">
+	 width="100.11px" height="5400.344px" viewBox="0 0 100.11 5400.344" enable-background="new 0 0 100.11 5400.344"
+	 xml:space="preserve">
 <rect x="12.431" y="4540.169" fill="#CECECE" width="75" height="21"/>
 <polygon id="check-mark-icon_1_" fill="#2ABF69" points="76.245,4119.999 39.722,4156.528 23.895,4140.704 12.169,4152.44 
 	39.722,4179.999 87.989,4131.733 "/>
@@ -81,4 +82,6 @@
 <rect x="12.431" y="4740.169" fill="#FFFFFF" width="75" height="21"/>
 <polygon fill="#FFFFFF" points="87.569,4939.5 60.569,4939.5 60.569,4912.5 39.569,4912.5 39.569,4939.5 12.569,4939.5 
 	12.569,4960.5 39.569,4960.5 39.569,4987.5 60.569,4987.5 60.569,4960.5 87.569,4960.5 "/>
+<polygon fill="#FFFFFF" points="33.179,5124.709 75.671,5149.244 33.179,5173.777 "/>
+<polygon fill="#FFFFFF" points="3.67,5373.67 28.292,5345.076 42.986,5359.373 66.019,5328 95.804,5373.67 "/>
 </svg>

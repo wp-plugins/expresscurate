@@ -1,10 +1,9 @@
 <?php
 $feedManager = new ExpressCurate_FeedManager();
 $bookmarks = $feedManager->get_bookmarks();
-if (!empty($bookmarks)){
+if (!empty($bookmarks)) {
     $sorted_bookmarks = array_reverse($bookmarks);
 }
-
 ?>
 <input id="adminUrl" type="hidden" value="<?php echo get_admin_url(); ?>"/>
 <div
@@ -54,11 +53,12 @@ if (!empty($bookmarks)){
                 <span class="expresscurate_preventTextSelection"><span></span></span>
             </div>
             <span class="errorMessage"></span>
+
             <div class="expresscurate_clear"></div>
             <p><span></span></p>
         </div>
         <?php
-        if(!empty($sorted_bookmarks)) {
+        if (!empty($sorted_bookmarks)) {
             $i = 0;
             foreach ($sorted_bookmarks as $key => $item) {
                 ?>
@@ -67,15 +67,15 @@ if (!empty($bookmarks)){
                     <label for="uniqueId_<?php echo $i ?>"></label>
                 <textarea
                     class="expresscurate_displayNone expresscurate_bookmarkData"><?php echo json_encode($item); ?></textarea>
-                    <a class="postTitle" href="<?php echo $item['link'] ?>"
-                       target="_newtab"><?php echo $item['title'] ?></a><br/>
-                    <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
-                    <!--<span class="curatedBy">/<?php /*echo $item['curated'] ? 'curated by' : 'author'; */ ?> <span><?php /*echo $item['author']; */ ?></span> /</span>-->
-                    <span class="curatedBy">/ by <span><?php echo $item['user']; ?></span> /</span>
-                <span
-                    class="time"><?php echo human_time_diff(strtotime($item['bookmark_date']), current_time('timestamp')) . ' ago'; ?></span>
-                    <?php if (!empty($item['keywords'])) { ?>
-                        <ul class="keywords">
+
+                    <ul class="keywords">
+                        <?php if (!empty($item['media']['videos'])) {
+                            echo '<li class="media videos"><span class="tooltip">'.$item["media"]["videos"].'</span></li>';
+                        }
+                        if (!empty($item['media']['images'])) {
+                            echo '<li class="media images"><span class="tooltip">'.$item["media"]["images"].'</span></li>';
+                        }
+                        if (!empty($item[' keywords'])) { ?>
                             <?php foreach ($item['keywords'] as $keyword => $stats) {
                                 if ($stats['percent'] * 100 < 3) {
                                     $color = 'blue';
@@ -92,9 +92,18 @@ if (!empty($bookmarks)){
                     <span class="inContent">content<p><?php echo $stats['percent'] * 100 ?>%</p></span>
                   </span>
                                 </li>
-                            <?php } ?>
-                        </ul>
-                    <?php } ?>
+                            <?php }
+                        } ?>
+                    </ul>
+
+                    <a class="postTitle" href="<?php echo $item['link'] ?>"
+                       target="_newtab"><?php echo $item['title'] ?></a><br/>
+                    <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
+                    <!--<span class="curatedBy">/<?php /*echo $item['curated'] ? 'curated by' : 'author'; */ ?> <span><?php /*echo $item['author']; */ ?></span> /</span>-->
+                    <span class="curatedBy">/ by <span><?php echo $item['user']; ?></span> /</span>
+                <span
+                    class="time"><?php echo human_time_diff(strtotime($item['bookmark_date']), current_time('timestamp')) . ' ago'; ?></span>
+
                     <div class="comment">
                         <label class="<?php if ($item['comment']) {
                             echo 'active';
@@ -133,10 +142,19 @@ if (!empty($bookmarks)){
         <li class="expresscurate_preventTextSelection expresscurate_masonryItem">
             <input id="uniqueId_{{data.id}}" class="checkInput" type="checkbox"/>
             <label for="uniqueId_{{data.id}}" class="expresscurate_preventTextSelection"></label>
-            <a class="postTitle" href="{{data.link}}" target="_newtab">{{data.title}}</a><br />
-            <a class="url"  href="{{data.link}}" target="_newtab">{{data.domain}}</a>
+            <ul class="keywords">
+                <# if (data.media.videos) { #>
+                    <li class="media videos"><span class="tooltip">{{data.media.videos}}</span></li>
+                <# } #>
+                <# if (data.media.images) { #>
+                    <li class="media images"><span class="tooltip">{{data.media.images}}</span></li>
+                <# } #>
+            </ul>
+            <a class="postTitle" href="{{data.link}}" target="_newtab">{{data.title}}</a><br/>
+            <a class="url" href="{{data.link}}" target="_newtab">{{data.domain}}</a>
             <span class="curatedBy">/ by <span>{{data.user}}</span> /</span>
             <span class="time">Just now</span>
+
             <div class="comment">
                 <label class="" for="uniqueId">add comment</label>
                 <input type="text" class="expresscurate_disableInputStyle expresscurate_displayNone" id="uniqueId">
@@ -144,7 +162,7 @@ if (!empty($bookmarks)){
             </div>
             <ul class="controls expresscurate_preventTextSelection">
                 <li><a class="curate" href="post-new.php?expresscurate_load_source={{data.curateLink}}">Curate</a></li>
-                <li class="separator" >-</li>
+                <li class="separator">-</li>
                 <li class="copyURL">Copy URL</li>
                 <li class="separator">-</li>
                 <li class="hide">Delete</li>
@@ -152,5 +170,5 @@ if (!empty($bookmarks)){
             <div class="expresscurate_clear"></div>
             <!--<span class="label label_{{data.type}}">{{data.type}}</span>-->
         </li>
-        </script>
+    </script>
 </div>

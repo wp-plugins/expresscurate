@@ -2329,6 +2329,7 @@
         .expresscurate ul.tabs li.green.current {
             border-color: #3dc577;
         }
+        .expresscurate_advancedSEO_widget ul.tabs li.yellow.current,
         .expresscurate ul.tabs li.yellow.current{
             border-color: #f2c81f;
         }
@@ -2510,6 +2511,7 @@
 .expresscurate_sitemap_widget .label{
     width: auto;
 }
+.expresscurate_advancedSEO_widget .lengthSuggestion,
 #expresscurate_wordCount_dialog .lengthSuggestion{
     position: relative;
     margin: 20px ;
@@ -2522,6 +2524,7 @@
     max-width: 700px !important;
     white-space: normal;
 }
+.expresscurate_advancedSEO_widget .lengthSuggestion:before,
 #expresscurate_wordCount_dialog .lengthSuggestion:before{
     display: inline-block;
     width: 15px;
@@ -2531,12 +2534,15 @@
     left: -5px;
     top: 2px;
 }
+.expresscurate_advancedSEO_widget .lengthSuggestion.blue:before,
 #expresscurate_wordCount_dialog .lengthSuggestion.blue:before{
     background-color: #3598dc;
 }
+.expresscurate_advancedSEO_widget .lengthSuggestion.green:before,
 #expresscurate_wordCount_dialog .lengthSuggestion.green:before{
     background-color: #3dc577;
 }
+.expresscurate_advancedSEO_widget .lengthSuggestion.red:before,
 #expresscurate_wordCount_dialog .lengthSuggestion.red:before{
     background-color: #e84c3d;
 }
@@ -3401,14 +3407,13 @@
     width: 850px;
     display: block;
 }
-
 @media (max-width: 1124px){
     .expresscurate_singleColumn .addNewBookmark,
     .expresscurate_singleColumn .expresscurate_masonryWrap,
     .expresscurate_singleColumn .expresscurate_masonryWrap >li{
         width: 100%;
     }
-
+    .expresscurate_singleColumn.expresscurate_feed_list,
     .expresscurate_singleColumn.expresscurate_bookmarks{
         width: auto;
     }
@@ -3916,7 +3921,7 @@
         }
         .expresscurate_bookmarkBoxes .keywords,
         .expresscurate_feedBoxes .keywords{
-            margin: 5px 0;
+            margin: 0 0 0 5px;
         }
         .expresscurate_feedBoxes .keywords{
             width: 100%;
@@ -3932,33 +3937,73 @@
                 width: auto;
                 color: #fff;
                 font-size: 13px;
-                margin: 5px 10px 0 0;
+                margin: 0 10px 5px 0;
                 position: relative;
                 cursor: default;
+                background-color: #98a3aa;
+            }
+            .expresscurate_bookmarkBoxes .keywords  .videos,
+            .expresscurate_feedBoxes .keywords  .videos,
+            .expresscurate_bookmarkBoxes .keywords  .images,
+            .expresscurate_feedBoxes .keywords  .images{
+                border-radius: 2px;
+                background: url("../images/expresscurate_icons.svg") no-repeat #98a3aa;
+                background-size: 22px auto;
+                width: 25px;
+                padding: 0;
+            }
+            .expresscurate_bookmarkBoxes .keywords  .videos,
+            .expresscurate_feedBoxes .keywords  .videos{
+                background-position: 2px -1122px;
+            }
+            .expresscurate_bookmarkBoxes .keywords  .images,
+            .expresscurate_feedBoxes .keywords  .images{
+                background-position: 2px -1166px;
             }
             .expresscurate_bookmarkBoxes .keywords .green .tooltip:before,
             .expresscurate_feedBoxes .keywords .green .tooltip:before{
                 border-bottom-color: #46c87d;
             }
-            .expresscurate_bookmarkBoxes .keywords .green,
-            .expresscurate_feedBoxes .keywords .green{
+            .expresscurate_bookmarkBoxes .keywords .tooltip .green,
+            .expresscurate_feedBoxes .keywords .tooltip .green,
+            .expresscurate_bookmarkBoxes .keywords .green:hover,
+            .expresscurate_feedBoxes .keywords .green:hover{
                 background-color: #46c87d;
             }
             .expresscurate_bookmarkBoxes .keywords .red .tooltip:before,
             .expresscurate_feedBoxes .keywords .red .tooltip:before{
                 border-bottom-color: #e84c3d;
             }
-            .expresscurate_bookmarkBoxes .keywords .red,
-            .expresscurate_feedBoxes .keywords .red{
+            .expresscurate_bookmarkBoxes .keywords .tooltip .red,
+            .expresscurate_feedBoxes .keywords .tooltip .red,
+            .expresscurate_bookmarkBoxes .keywords .red:hover,
+            .expresscurate_feedBoxes .keywords .red:hover{
                 background-color: #e84c3d;
             }
             .expresscurate_bookmarkBoxes .keywords .blue .tooltip:before,
             .expresscurate_feedBoxes .keywords .blue .tooltip:before{
                 border-bottom-color: #3598dc;
             }
-            .expresscurate_bookmarkBoxes .keywords .blue,
-            .expresscurate_feedBoxes .keywords .blue{
+            .expresscurate_bookmarkBoxes .keywords .tooltip .blue,
+            .expresscurate_feedBoxes .keywords .tooltip .blue,
+            .expresscurate_bookmarkBoxes .keywords .blue:hover,
+            .expresscurate_feedBoxes .keywords .blue:hover{
                 background-color: #3598dc;
+            }
+            .expresscurate_bookmarkBoxes .keywords .media .tooltip ,
+            .expresscurate_feedBoxes .keywords .media .tooltip{
+                height: 28px;
+                line-height: 28px;
+                width: 85px;
+                bottom: auto;
+                top: 30px;
+                left:-22px;
+                text-align: center;
+            }
+            .expresscurate_bookmarkBoxes .keywords .media .tooltip:before ,
+            .expresscurate_feedBoxes .keywords .media .tooltip:before{
+                border-bottom-color: #000;
+                left: 30px;
             }
         .expresscurate_bookmarkBoxes .controls,
         .expresscurate_feedBoxes .controls{

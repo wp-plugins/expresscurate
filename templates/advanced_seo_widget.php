@@ -10,6 +10,7 @@ $sitemapFrequencyArray =$sitemap->getSitemapFrequencyTagArray();
     <li class="tab-link expresscurate_preventTextSelection green current" data-tab="tab-1">General</li>
     <li class="tab-link expresscurate_preventTextSelection red <?php if(get_option('expresscurate_sitemap_update_permission') == 'error') echo 'disabled';?>" data-tab="tab-2">Sitemap</li>
     <li class="tab-link expresscurate_preventTextSelection blue" data-tab="tab-3">Social</li>
+    <li class="tab-link postAnalysisLink expresscurate_preventTextSelection yellow" data-tab="tab-4">Post Analysis</li>
 </ul>
 
 <div id="tab-1" class="tab-content current">
@@ -166,6 +167,8 @@ $sitemapFrequencyArray =$sitemap->getSitemapFrequencyTagArray();
         <div class="expresscurate_clear"></div>
     </div>
 </div>
+<div id="tab-4" class="tab-content postAnalysisTab">
 
+</div>
 </div>
 

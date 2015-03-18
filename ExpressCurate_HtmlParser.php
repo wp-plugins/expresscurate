@@ -280,7 +280,8 @@ class ExpressCurate_HtmlParser {
       $smart_tags = array_slice(array_keys(array_reverse($smart_tags)), 0, $max_count);
     }
     $result_paragraphs_unique = $this->arrayUnique($result_paragraphs);
-    $result = array('title' => $this->title, 'headings' => array('h1' => $result_h1, 'h2' => $result_h2, 'h3' => $result_h3), 'metas' => array('description' => $this->description, 'keywords' => $smart_tags), 'images' => $result_images, 'paragraphs' => $result_paragraphs_unique, 'author' => $article_author, 'date' => $article_date, 'domain' => $this->domain);
+    $media = $this->isMediaExists();
+    $result = array('title' => $this->title, 'headings' => array('h1' => $result_h1, 'h2' => $result_h2, 'h3' => $result_h3), 'metas' => array('description' => $this->description, 'keywords' => $smart_tags), 'images' => $result_images, 'media'=>$media,  'paragraphs' => $result_paragraphs_unique, 'author' => $article_author, 'date' => $article_date, 'domain' => $this->domain);
     $data = array('status' => 'success', 'result' => $result);
     return $data;
   }
@@ -299,10 +300,25 @@ class ExpressCurate_HtmlParser {
     $content = '';
     $charset = '';
     $utf8 = false;
-    $user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36';
+    //$user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36';
     $file_get_enabled = preg_match('/1|yes|on|true/i', ini_get('allow_url_fopen'));
     if ($file_get_enabled) {
-        $options = (preg_match("/(^https:\/\/)/i", $url, $options)!=false)?array('ssl' => array('verify_peer'=> false,"verify_peer_name"=>false)):array('http' => array('user_agent' => $user_agent));
+        /*$options = (preg_match("/(^https:\/\/)/i", $url, $options)!=false)?array('ssl' => array('verify_peer'=> false,"verify_peer_name"=>false)):array('http' => array('user_agent' => $user_agent));*/
+        if(preg_match("/(https?:\/\/www.google.com\/url)/",$url)) {
+            $parsed_url= parse_url($url);
+            $url_query = explode("&",$parsed_url['query']);
+            foreach($url_query as $param) {
+                if(strpos($param, 'url=') === 0) {
+                    $url = str_replace("url=", "", $param);
+                    $url = urldecode($url);
+                    break;
+                }
+            }
+        }
+        $options = array('http' => array('user_agent' => USER_AGENT,' follow_location'=>1,'max_redirects'=>5,'request_fulluri '=>TRUE));
+        if(preg_match("/(^https:\/\/)/i", $url)!=false){
+            $options['ssl']=array('verify_peer'=> false,"verify_peer_name"=>false);
+        }
         $context = stream_context_create($options);
       $content = @file_get_contents($url, false, $context);
        // $content = mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8");
@@ -343,7 +359,7 @@ class ExpressCurate_HtmlParser {
       $ch = curl_init($url);
       //curl_setopt($ch, CURLOPT_HEADER, 1);
       curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-      curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
+      curl_setopt($ch, CURLOPT_USERAGENT, USER_AGENT);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: text/xml;charset=\"utf-8\""));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);

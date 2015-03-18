@@ -186,7 +186,6 @@ var ExpressCurateUtils = (function ($) {
                     postOldStatus = postOldStatus = null;
                 }
             });
-
         }
         /*support submit*/
         $('#expresscurate_support_form').on('click', '.feedbackButton, .askButton', function () {

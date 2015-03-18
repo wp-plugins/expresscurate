@@ -34,7 +34,7 @@ class ExpressCurate_Actions
     //functions
     const EXEC = 'exec';
 
-
+    const USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36';
     private $ajaxExportAPI = null;
     private $contentManager = null;
     private $keywords = null;
