@@ -100,9 +100,7 @@ if (class_exists('ExpressCurate')) {
       if(mb_substr($url, 0, 4) !== 'http'){
           $url = 'http://' . $url;
       }
-      if(mb_substr($url, 0, 5) !== 'https'){
-          $url = 'https://' . $url;
-      }
+
       $parseURL = parse_url($url);
       $host = $parseURL['host'];
       $url_protocol = $parseURL['scheme'];
