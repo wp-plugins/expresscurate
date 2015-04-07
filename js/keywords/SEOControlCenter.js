@@ -4,7 +4,6 @@ var ExpressCurateSEOControl = (function ($) {
     function insertKeywordInWidget(keywords, beforeElem) {
         if (keywords.length > 0) {
             ExpressCurateUtils.track('/post/seo-control-center/keyword/add');
-
             updateKeywords();
         }
     }
@@ -269,6 +268,11 @@ var ExpressCurateSEOControl = (function ($) {
                 $hiddenInput.val('off');
             }
         });
+        $('.expresscurate_moveToAdvanced').on('click',function(){
+            $('html, body').animate({
+                scrollTop: $("#expresscurate_advanced_seo").offset().top - 40
+            }, 700);
+        })
     }
 
     var isSetup = false;

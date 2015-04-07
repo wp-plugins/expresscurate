@@ -67,7 +67,7 @@ $keywords_stats = $keywords->getKeywordStats();
                 <div class="addKeywords">
                     <input id="addKeyword" type="text" placeholder="Add Keywords"
                            class="expresscurate_disableInputStyle"/>
-                    <span><span></span></span>
+                    <span class="plus"><span></span></span>
                     <ul class="suggestion">
                     </ul>
                 </div>

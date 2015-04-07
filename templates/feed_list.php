@@ -3,16 +3,40 @@ $content_list = array();
 $feedManager = new ExpressCurate_FeedManager();
 $contentList = $feedManager->get_feed_list();
 $sorted_feeds = array();
+function array_sort_by_column(&$arr, $col, $dir = SORT_DESC)
+{
+    $sort_col = array();
+    foreach ($arr as $key => $row) {
+        $sort_col[$key] = $row[$col];
+    }
+    array_multisort($sort_col, $dir, $arr);
+}
+
 if (!empty($contentList)) {
     foreach ($contentList as $key => $row) {
         if (is_array($row) && count($row) > 0) {
             foreach ($row as $content) {
-                $sorted_feeds[$content['date']] = $content;
+                $content['fullLink'] = $content['link'];
+                $extracted_url = extract_google_feed_url($content['link'], $row);
+                if ($extracted_url) {
+                    $url = $extracted_url;
+                } else {
+                    $url = $content['link'];
+                }
+                $content['link'] = $url;
+                $content['domain'] = parse_url($url, PHP_URL_SCHEME) . "://" . parse_url($url, PHP_URL_HOST);
+                array_push($sorted_feeds, $content);
             }
         }
     }
-    krsort($sorted_feeds, 2);
+    array_sort_by_column($sorted_feeds, 'date');
 }
+
+wp_clear_scheduled_hook('expresscurate_pull_feeds');
+$pull_feed_interval = (get_option('expresscurate_pull_hours_interval')) ? get_option('expresscurate_pull_hours_interval') : 1;
+wp_schedule_event(strtotime("+" . $pull_feed_interval . " hour"), 'hourly', 'expresscurate_pull_feeds');
+$nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), time());
+
 ?>
 <input id="adminUrl" type="hidden" value="<?php echo get_admin_url(); ?>"/>
 <div
@@ -44,6 +68,13 @@ if (!empty($contentList)) {
                 <li class="quotes expresscurate_floatRight">
                     <span class="tooltip">curate</span>
                 </li>
+                <!--<li class="pull active expresscurate_floatRight">
+                    <span class="tooltip">pull</span>
+                </li>
+                <li class="pullTime active expresscurate_floatRight">
+                    next update:
+                    <p>in <?php /*echo $nextPullTime; */?></p>
+                </li>-->
                 <li class="layout expresscurate_floatRight">
                     <span class="tooltip"><?php if (get_option('expresscurate_bookmark_layout', '') == 'single') {
                             echo 'view as grid';
@@ -72,10 +103,10 @@ if (!empty($contentList)) {
 
                 <ul class="keywords">
                     <?php if (!empty($item['media']['videos'])) {
-                        echo '<li class="media videos"><span class="tooltip">Video(s):  '.$item["media"]["videos"].'</span></li>';
+                        echo '<li class="media videos"><span class="tooltip">Video(s):  ' . $item["media"]["videos"] . '</span></li>';
                     }
                     if (!empty($item['media']['images'])) {
-                        echo '<li class="media images"><span class="tooltip">Image(s):  '.$item["media"]["images"].'</span></li>';
+                        echo '<li class="media images"><span class="tooltip">Image(s):  ' . $item["media"]["images"] . '</span></li>';
                     }
                     if (!empty($item['keywords'])) { ?>
                         <?php foreach ($item['keywords'] as $keyword => $stats) {
@@ -98,15 +129,15 @@ if (!empty($contentList)) {
                     } ?>
                 </ul>
 
-                <a class="postTitle" href="<?php echo $item['link'] ?>"
-                   target="_newtab"><?php echo $item['title'] ?></a><br/>
+                <a data-fulllink="<?php echo $item['fullLink']; ?>" class="postTitle" href="<?php echo $item['link'] ?>"
+                   target="_blank"><?php echo $item['title'] ?></a><br/>
                 <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
                 <?php if (isset($item['author']) && '' != $item['author']) { ?>
                     <span class="curatedBy">/<?php echo $item['curated'] ? 'curated by' : 'author'; ?>
                         <span><?php echo $item['author']; ?></span> /</span>
                 <?php } ?>
                 <span
-                    class="time"><?php echo human_time_diff(strtotime($item['date']), current_time('timestamp')) . ' ago'; ?></span></br>
+                    class="time"><?php echo human_time_diff(current_time('timestamp'), strtotime($item['date'])) . ' ago'; ?></span></br>
 
                 <ul class="controls expresscurate_preventTextSelection">
                     <li class="curate"><a

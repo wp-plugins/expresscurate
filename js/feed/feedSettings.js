@@ -5,13 +5,12 @@ var ExpressCurateFeedSettings = (function ($) {
         ExpressCurateUtils.track('/rss-feeds/add');
 
         var message = '',
-            link = $input.val(),
+            link = $input.val().replace(/\/\s*$/, ""),
             liHTML = '',
             $lastLi,
-            $errorMessage=$(".addNewFeed .errorMessage");
+            $errorMessage = $(".addNewFeed .expresscurate_errorMessage");
 
         ExpressCurateUtils.startLoading($input, $elemToRotate);
-        $errorMessage.text();
 
         $.ajax({
             type: 'POST',
@@ -33,7 +32,7 @@ var ExpressCurateFeedSettings = (function ($) {
                 }, 1000);
             } else {
                 message = data.status;
-                $errorMessage.text(message);
+                ExpressCurateUtils.validationMessages(message, $errorMessage, $input);
             }
         }).always(function () {
             ExpressCurateUtils.endLoading($input, $elemToRotate);
@@ -64,7 +63,7 @@ var ExpressCurateFeedSettings = (function ($) {
     }
 
     function setupFeedSettings() {
-        $addFeed=$('.addFeed');
+        $addFeed = $('.addFeed');
         $input = $addFeed.find('input');
         $elemToRotate = $addFeed.find('span span');
         $notDefMessage = $('.expresscurate_feed_dashboard .expresscurate_notDefined');

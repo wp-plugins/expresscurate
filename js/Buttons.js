@@ -1,4 +1,6 @@
 var ExpressCurateButtons = (function ($) {
+    var postAnalysisTimer = false;
+
     function textboxCommand(ed, elem, cssClass, isVal) {
         var id = elem,
             $textboxElem,
@@ -105,14 +107,16 @@ var ExpressCurateButtons = (function ($) {
         };
     }
 
-    function postAnalysis(ed, dialog) {
-        ExpressCurateUtils.track('/post/content/seo/analytics');
+    function postAnalysis(ed, scroll) {
+        var $postAnalysisTab = $('.expresscurate_advancedSEO_widget .postAnalysisTab'),
+            apended = false;
 
         var lengthMessage, lengthColor,
             $contentWrap = $('#content'),
             content = (($contentWrap.css("display") === "block") ? $contentWrap.val() : tinyMCE.get("content").getContent()),
             wordsCount = ExpressCurateSEOControl.wordsInText(content).length,
-            messageHtml;
+            messageHtml,
+            notificationCount = 0;
 
 
         switch (true) {
@@ -180,6 +184,7 @@ var ExpressCurateButtons = (function ($) {
         messageHtml += defKeywords.length > 0 ? '' : '<p class="lengthSuggestion red">Currently you don\'t have any defined keywords. Add one or two keyword and optimize your post.</p>';
 
         if (defKeywords.length > 0) {
+            apended = true;
             var keywordsArray = defKeywords.split(', ');
 
             $(keywordsArray).each(function (index, value) {
@@ -199,16 +204,66 @@ var ExpressCurateButtons = (function ($) {
             if ($(content)[0]) {
                 messageHtml += containsAtLeastOne($(content)[0].innerHTML, keywordsArray) ? '' : '<p class="lengthSuggestion blue">No keyword appear in the first paragraph, add one if appropriate.</p>';
             }
-        }
-        if (dialog) {
-            ed.windowManager.open({
-                title: 'Post Analysis',
-                id: 'expresscurate_wordCount_dialog',
-                width: 450,
-                html: messageHtml
+            var postKeywords = [],
+                $keywordsBoxes = $('.expresscurate_background_wrap');
+            $.each($keywordsBoxes, function (index, value) {
+                var $keywordWrap = $(value).find('.statisticsTitle'),
+                    item = {
+                        keyword: $keywordWrap.find('span').text().toLowerCase(),
+                        color: $keywordWrap.data('color'),
+                        count: $(value).find('.statistics .center span').text().slice(0, -1)
+                    };
+                postKeywords.push(item);
+            });
+            var firstUse = false,
+                optimizedUse = false;
+            $.ajax({
+                type: 'POST',
+                url: 'admin-ajax.php?action=expresscurate_get_post_analytics_stats'
+            }).success(function (res) {
+                var data = $.parseJSON(res);
+                $.each(data, function (index, value) {
+                    var color = value.color;
+                    for (var i = 0; i < postKeywords.length; i++) {
+                        if (postKeywords[i].keyword.toLowerCase() == index) {
+                            if (postKeywords[i].color === 'green' && color === 'blue') {
+                                firstUse = true;
+                            }
+                            if (value.percent == 0 && postKeywords[i].count > 0.00) {
+                                optimizedUse = true;
+                            }
+                        }
+                    }
+                });
+            }).always(function () {
+                messageHtml += (firstUse) ? '<p class="lengthSuggestion green">Good job! You optimized the keyword with low usage in this post!</p>' : '';
+                messageHtml += (optimizedUse) ? '<p class="lengthSuggestion green">Good job! It’s the first time you use this focus keyword!</p>' : '';
+                $postAnalysisTab.empty().append(messageHtml);
+                notificationCount = $postAnalysisTab.find('p.red').length;
+                $('#expresscurate_post_analysis_notification').val(notificationCount);
             });
         }
-        $('.expresscurate_advancedSEO_widget .postAnalysisTab').empty().append(messageHtml);
+        if (scroll) {
+            $('.expresscurate_advancedSEO_widget ul.tabs li').add($('.tab-content')).removeClass('current');
+            $postAnalysisTab.add($('.postAnalysisLink')).addClass('current');
+
+            $('html, body').animate({
+                scrollTop: $("#expresscurate_advanced_seo").offset().top - 40
+            }, 700);
+        }
+        if (!apended) {
+            $postAnalysisTab.empty().append(messageHtml);
+            notificationCount = $postAnalysisTab.find('p.red').length;
+            $('#expresscurate_post_analysis_notification').val(notificationCount);
+        }
+        if (!postAnalysisTimer) {
+            var $this = $(this);
+            (postAnalysisRefreshInterval = function () {
+                postAnalysisTimer = true;
+                postAnalysis(tinymce.activeEditor, false);
+                setTimeout(postAnalysisRefreshInterval, 60000);
+            })();
+        }
     }
 
     function getRootUrl(url) {
@@ -249,21 +304,109 @@ var ExpressCurateButtons = (function ($) {
             ExpressCurateSEOControl.insertKeywordInWidget(ExpressCurateKeywordUtils.multipleKeywords($input, undefined), $('.addKeywords'));
         }
     }
-
-    function setupButtons() {
-        $('.postAnalysisLink').on('click', function () {
-            var $this=$(this);
-            postAnalysis(tinymce.activeEditor, false);
-            (postAnalysisRefreshInterval = function () {
-                if ($this.hasClass('current')) {
-                    postAnalysis(tinymce.activeEditor, false);
-                }
-                setTimeout(postAnalysisRefreshInterval, 60000);
-            })();
+    function checkSocialTab(){
+        var $this = $('#expresscurate_socialEmbed'),
+            content = $this.val().trim(),
+            $tabs = $('.expresscurate_socialDialog .tabs li');
+        $.each($tabs, function (index, value) {
+            var tab = $(value).data('tab'),
+                myRegExp = new RegExp('https?:\/\/([a-zA-Z\d-]+\.){0,}' + tab + '\.com', 'gmi');
+            if (myRegExp.test(content)) {
+                $tabs.removeClass('current');
+                $('.expresscurate_socialDialog .tabs li.' + tab).addClass('current');
+            }
         });
-        $('html').on('click', '.expresscurate_postAnalysis', function () {
+    }
+    function setupButtons() {
+        var $page = $('html');
+        $page.on('click', '.expresscurate_postAnalysis', function () {
+            ExpressCurateUtils.track('/post/content/seo/analytics');
             postAnalysis(tinymce.activeEditor, true);
         });
+        $page.on('hover', '#publish', function () {
+            postAnalysis(tinymce.activeEditor, false);
+        });
+        $('.expresscurate_advancedSEO_widget .postAnalysisLink').on('click', function () {
+            ExpressCurateUtils.track('/post/content/seo/analytics');
+            postAnalysis(tinymce.activeEditor, false);
+        });
+        /*Embed dialog*/
+        $page.on('keyup , blur', '#expresscurate_socialEmbed', function () {
+            checkSocialTab();
+        });
+        $('#expresscurate_socialModal').on('click', function () {
+            $contentWrap = $('#content');
+            ($contentWrap.css("display") === "block") ? $contentWrap.focus() : tinyMCE.get("content").focus();
+            var ed = tinymce.activeEditor;
+            ed.windowManager.open({
+                title: 'Embed',
+                id: 'ExpresscurateEmbed',
+                html: ExpressCurateUtils.getTemplate('socialPostDialog', null),
+                width: 530,
+                height: 180,
+                buttons: [{
+                    text: 'Insert',
+                    classes: 'expresscurate_socialInsertButton',
+                    disabled: false,
+                    onclick: function () {
+                        checkSocialTab();
+                        var $input=$('#expresscurate_socialEmbed'),
+                            insertedValue = $input.val().trim(),
+                            selectedTab = $('.expresscurate_socialDialog .tabs li.current').data('tab');
+                        /*if inserted content is URL*/
+                        if (!insertedValue.match(/(<([^>]+)>)/gi) && selectedTab) {
+                            if ($contentWrap.css("display") === "block") {
+                                var existedContent = $contentWrap.val();
+                                $contentWrap.val(existedContent + '[embed]' + insertedValue + '[/embed]');
+                                ed.windowManager.close();
+                            } else {
+                                ed.insertContent('[embed]' + insertedValue + '[/embed]');
+                                ed.windowManager.close();
+                            }
+                        } else {
+                            var $elem,
+                                url='';
+                            switch (selectedTab) {
+                                case 'facebook':
+                                    $elem = $(insertedValue)[2];
+                                    url = $($elem).data('href');
+                                    break;
+                                case 'twitter':
+                                    $elem = $(insertedValue).find('> a');
+                                    url = $($elem).attr('href');
+                                    break;
+                                case 'youtube':
+                                    $elem = $(insertedValue);
+                                    url = $($elem).attr('src');
+                                    break;
+                                case 'vimeo':
+                                    $elem = $(insertedValue);
+                                    url = $($elem).attr('src');
+                                    break;
+                            }
+                            if (url) {
+                                if ($contentWrap.css("display") === "block") {
+                                    var existedText = $contentWrap.val();
+                                    $contentWrap.val(existedText + '[embed]' + url + '[/embed]');
+                                    ed.windowManager.close();
+                                } else {
+                                    ed.insertContent('[embed]' + url + '[/embed]');
+                                    ed.windowManager.close();
+                                }
+                            } else {
+                                var message='Embed code you have provided is wrong. Please check.';
+                                ExpressCurateUtils.validationMessages(message,$('.expresscurate_socialDialog .expresscurate_errorMessage'),$input);
+                                /*The tab/ URL/ embed code you have provided is wrong. Please check.*/
+                            }
+                        }
+                    }
+                }]
+            });
+        });
+        /*$page.on('click', '.expresscurate_socialDialog .tabs li', function () {
+            $('.expresscurate_socialDialog .tabs li').removeClass('current');
+            $(this).addClass('current');
+        });*/
         tinymce.create('tinymce.plugins.expresscurate', {
             /**
              * Initializes the plugin, this will be executed after the plugin has been created.
@@ -274,45 +417,7 @@ var ExpressCurateButtons = (function ($) {
              * @param {string} url Absolute URL to where the plugin is located.
              */
 
-            visualizeShortcode: function (co) {
-                return co.replace(/\[facebook([^\]]*)\]/g, function (a, b) {
-                    return '<img src="" class="expresscurate_FacebookEmbed" title="facebook' + tinymce.DOM.encode(b) + '" />';
-                });
-            },
-
-            recoverShortcode: function (co) {
-                function getAttr(s, n) {
-                    n = new RegExp(n + '=\"([^\"]+)\"', 'g').exec(s);
-                    return n ? tinymce.DOM.decode(n[1]) : '';
-                }
-
-                return co.replace(/(?:<p[^>]*>)*(<img[^>]+>)(?:<\/p>)*/g, function (a, im) {
-                    var cls = getAttr(im, 'class');
-                    if (cls.indexOf('expresscurate_FacebookEmbed') != -1) {
-                        return '<p>[' + tinymce.trim(getAttr(im, 'title')) + ']</p>';
-                    }
-                    return a;
-                });
-            },
             init: function (ed, url) {
-                /* var t = this;
-                 t.url = url;
-                 //replace shortcode before editor content set
-                 ed.onBeforeSetContent.add(function (ed, o) {
-                 o.content = t.visualizeShortcode(o.content);
-                 });
-                 //replace shortcode as its inserted into editor
-                 ed.onExecCommand.add(function (ed, cmd) {
-                 if (cmd === 'mceInsertContent') {
-                 tinyMCE.activeEditor.setContent(t.visualizeShortcode(tinyMCE.activeEditor.getContent()));
-                 }
-                 });
-                 //replace the image back to shortcode on save
-                 ed.onPostProcess.add(function (ed, o) {
-                 if (o.get)
-                 o.content = t.recoverShortcode(o.content);
-                 });*/
-
                 // Register buttons - trigger above command when clicked
                 ed.addButton('sochalPost', {
                     title: 'Insert social post',
@@ -401,6 +506,7 @@ var ExpressCurateButtons = (function ($) {
                     }
                     if (e.altKey && e.keyCode === 87) {     // alt+w
                         e.returnValue = false;
+                        ExpressCurateUtils.track('/post/content/seo/analytics');
                         postAnalysis(ed, true);
                         e.preventDefault();
                         return false;
@@ -486,19 +592,15 @@ var ExpressCurateButtons = (function ($) {
                 });
 
                 if (ed.id !== 'expresscurate_content_editor') {
-                    //lefttextbox
                     ed.addCommand('lefttextbox', function () {
                         textboxCommand(ed, 'lefttextbox', 'expresscurate_fl_text_box');
                     });
-                    //righttextbox
                     ed.addCommand('righttextbox', function () {
                         textboxCommand(ed, 'righttextbox', 'expresscurate_fr_text_box');
                     });
-                    //justifytextbox
                     ed.addCommand('justifytextbox', function () {
                         textboxCommand(ed, 'justifytextbox', 'expresscurate_justify_text_box');
                     });
-                    //annotation
                     ed.addCommand('annotation', function (ui, val) {
                         textboxCommand(ed, 'annotation', 'expresscurate_annotate', val);
                     });
@@ -559,7 +661,8 @@ var ExpressCurateButtons = (function ($) {
                 setupButtons();
                 isSetup = true;
             }
-        }
+        },
+        postAnalysis: postAnalysis
     }
 })(window.jQuery);
 

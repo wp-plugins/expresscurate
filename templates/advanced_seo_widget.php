@@ -5,7 +5,7 @@ $sitemapFrequencyArray =$sitemap->getSitemapFrequencyTagArray();
 ?>
 
 <div class="container expresscurate_Styles expresscurate_advancedSEO_widget">
-
+    <input type="hidden" name="expresscurate_post_analysis_notification" value="0" id="expresscurate_post_analysis_notification"/>
 <ul class="tabs">
     <li class="tab-link expresscurate_preventTextSelection green current" data-tab="tab-1">General</li>
     <li class="tab-link expresscurate_preventTextSelection red <?php if(get_option('expresscurate_sitemap_update_permission') == 'error') echo 'disabled';?>" data-tab="tab-2">Sitemap</li>

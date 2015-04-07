@@ -34,7 +34,7 @@ blockquote:before {
 
 blockquote:after ,
 blockquote:before{
-    background-size: 97px auto;
+    background-size: auto 68px;
     background-repeat: no-repeat;
     background-image: url('../images/feed_icons.svg');
 }
@@ -42,7 +42,7 @@ blockquote:after {
     right: 0;
     bottom: -13px;
     width: 12px;
-    height: 27px;
+    height: 23px;
     text-align: right;
     position: absolute;
     display: inline-block;

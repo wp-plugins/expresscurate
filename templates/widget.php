@@ -79,12 +79,12 @@ if ($seo) {
             page's content.</p>
     </div>
 
-    <a href="#expresscurate_advancedSEO_widget" class="expresscurate_moveToAdvanced">Advanced SEO</a>
+    <a href="#" class="expresscurate_moveToAdvanced">Advanced SEO</a>
 <?php } ?>
 <script type="text/html" id="tmpl-SEOControlCenter">
     <div class="expresscurate_background_wrap expresscurate_preventTextSelection">
         <span class="close">&#215</span>
-        <div class="statisticsTitle expresscurate_{{data.color}}"><span>{{data.keyword}}</span></div>
+        <div data-color="{{data.color}}" class="statisticsTitle expresscurate_{{data.color}}"><span>{{data.keyword}}</span></div>
         <div class="statistics {{data.inTitle}} borderRight">
             <div class="center">title</div>
         </div>

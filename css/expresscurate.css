@@ -164,6 +164,7 @@
     color: #b1b1b1;
     font-family:  OpenSans-Regular, Verdana, Geneva, sans-serif;
     cursor: default;
+    display: block;
 }
 .expresscurate_emptyFeed{
     margin-top: 30px;
@@ -610,9 +611,9 @@
 .expresscurate_bookmarks .addBookmark input{
     background-color: #f5f6f6;
 }
-    .expresscurate_bookmarks .addBookmark span,
-    .expresscurate_feed_dashboard .addFeed span,
-    .expresscurate_keywords_settings .addKeywords span{
+    .expresscurate_bookmarks .addBookmark span.plus,
+    .expresscurate_feed_dashboard .addFeed span.plus,
+    .expresscurate_keywords_settings .addKeywords span.plus{
         height: 34px;
         width: 35px;
         display: inline-block;
@@ -628,9 +629,9 @@
         font-family: OpenSans-Bold, Verdana, Geneva, sans-serif;
         font-weight: bold;
     }
-.expresscurate_bookmarks .addBookmark > span:hover,
-.expresscurate_feed_dashboard .addFeed > span:hover,
-.expresscurate_keywords_settings .addKeywords > span:hover{
+.expresscurate_bookmarks .addBookmark > span.plus:hover,
+.expresscurate_feed_dashboard .addFeed > span.plus:hover,
+.expresscurate_keywords_settings .addKeywords > span.plus:hover{
     background-color: #20d0b1;
 }
         .expresscurate_bookmarks .addBookmark span span,
@@ -639,6 +640,9 @@
         .expresscurate_widget_wrapper .addKeywords span span{
             background: url("../images/plus.svg") no-repeat transparent center;
             background-size: 14px;
+            display: block;
+            width: 100%;
+            height: 100%;
         }
     .expresscurate_keywords_settings .suggestion,
     .expresscurate_widget .suggestion{
@@ -1454,13 +1458,21 @@
     color: #1cbb9f;
 }
 
+#expresscurate_socialModal,
 #expresscurate_open-modal {
     padding: 0 10px 0 0;
 }
 
-.expresscurate_button_icon {
+.expresscurate_button_icon{
     background: url("../images/wp_quotes.svg") no-repeat center -105px rgba(0, 0, 0, 0);
     background-size: 12px auto;
+}
+.expresscurate_socialModal{
+    background: url("../images/wp_icons.svg") no-repeat center -324px rgba(0, 0, 0, 0);
+    background-size: 18px auto;
+}
+.expresscurate_button_icon,
+.expresscurate_socialModal{
     display: block;
     float: left;
     height: 15px;
@@ -1468,7 +1480,117 @@
     vertical-align: text-top;
     width: 16px;
 }
+.expresscurate_socialDialog{
+    padding: 10px 30px !important;
+    font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
+    height: 100% !important;
+}
 
+.expresscurate_socialDialog ul{
+    width: 100%;
+    padding: 0;
+    margin-top: 10px;
+}
+.expresscurate_socialDialog ul li{
+    width: 35px;
+    height: 35px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    text-align: right;
+    background-color: #f3f3f3;
+    display:inline-block;
+    margin: 5px 0;
+    background: url("../images/socials_embed.svg") no-repeat;
+    background-size: auto 100px;
+}
+
+.expresscurate_socialDialog ul li.facebook{
+    background-position: 0 1px;
+}
+/*.expresscurate_socialDialog ul li.facebook:hover,*/
+.expresscurate_socialDialog ul li.facebook.current{
+    background-position: 0 -66px;
+}
+.expresscurate_socialDialog ul li.twitter{
+    background-position: -65px 1px;
+}
+/*.expresscurate_socialDialog ul li.twitter:hover,*/
+.expresscurate_socialDialog ul li.twitter.current{
+    background-position: -65px -66px;
+}
+.expresscurate_socialDialog ul li.youtube{
+    background-position: -132px 1px;
+}
+/*.expresscurate_socialDialog ul li.youtube:hover,*/
+.expresscurate_socialDialog ul li.youtube.current{
+    background-position: -132px -66px;
+}
+.expresscurate_socialDialog ul li.vimeo{
+    background-position: -200px 1px;
+}
+/*.expresscurate_socialDialog ul li.vimeo:hover,*/
+.expresscurate_socialDialog ul li.vimeo.current{
+    background-position: -200px -66px;
+}
+.expresscurate_socialDialog .tab-content{
+    width: 100%;
+    padding: 0;
+    margin-top: 10px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+.expresscurate_socialDialog .tab-content textarea{
+    height: 80px;
+    width: 100%;
+    white-space: normal;
+    overflow-x: hidden;
+    resize: none;
+    background-color: #f6f6f6;
+    border-radius: 2px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    font-size: 13px;
+    border: solid 1px #d6d6d6;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+ .mce-expresscurate_socialInsertButton{
+     left: auto !important;
+     right: 40px !important;
+ }
+ .mce-expresscurate_socialInsertButton button{
+    display: inline-block;
+    background-color: #1cbb9f;
+    color: #ffffff;
+    padding: 0 10px;
+    line-height: 28px;
+    height: 28px;
+    border: transparent;
+    text-decoration: none;
+}
+ .mce-expresscurate_socialInsertButton:hover button{
+    background-color: #20d0b1;
+}
+.mce-expresscurate_socialInsertButton button{
+    transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -webkit-transition: all .3s ease-out;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
 .expresscurate_text {
     margin-left: 5px;
     color: #9e9e9e;
@@ -2511,21 +2633,14 @@
 .expresscurate_sitemap_widget .label{
     width: auto;
 }
-.expresscurate_advancedSEO_widget .lengthSuggestion,
-#expresscurate_wordCount_dialog .lengthSuggestion{
+.expresscurate_advancedSEO_widget .lengthSuggestion{
     position: relative;
     margin: 20px ;
     padding: 0 0 0 15px;
     display: block;
     white-space: normal;
 }
-#expresscurate_wordCount_dialog{
-    height: auto !important;
-    max-width: 700px !important;
-    white-space: normal;
-}
-.expresscurate_advancedSEO_widget .lengthSuggestion:before,
-#expresscurate_wordCount_dialog .lengthSuggestion:before{
+.expresscurate_advancedSEO_widget .lengthSuggestion:before{
     display: inline-block;
     width: 15px;
     height: 15px;
@@ -2534,50 +2649,33 @@
     left: -5px;
     top: 2px;
 }
-.expresscurate_advancedSEO_widget .lengthSuggestion.blue:before,
-#expresscurate_wordCount_dialog .lengthSuggestion.blue:before{
+.expresscurate_advancedSEO_widget .lengthSuggestion.blue:before{
     background-color: #3598dc;
 }
-.expresscurate_advancedSEO_widget .lengthSuggestion.green:before,
-#expresscurate_wordCount_dialog .lengthSuggestion.green:before{
+.expresscurate_advancedSEO_widget .lengthSuggestion.green:before{
     background-color: #3dc577;
 }
-.expresscurate_advancedSEO_widget .lengthSuggestion.red:before,
-#expresscurate_wordCount_dialog .lengthSuggestion.red:before{
+.expresscurate_advancedSEO_widget .lengthSuggestion.red:before{
     background-color: #e84c3d;
-}
-#expresscurate_wordCount_dialog .mce-foot{
-    display: none !important;
 }
 /*mark keyword dialog*/
 #expresscurate_keyword_dialog{
-    height: 100px !important;
+    height: 80px !important;
 }
 #expresscurate_keyword_dialog-body{
-    height: 80px !important;
+    height: 50px !important;
     background-color: #fff;
     padding: 10px 15px!important;
     box-sizing: border-box;
 }
+#ExpresscurateEmbed .mce-foot,
 #expresscurate_keyword_dialog .mce-foot,
 #expresscurate_keyword_dialog .mce-first{
-    display: none;
+    border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
 }
 .expresscurate_keywordMessage{
     display: block;
-}
-#expresscurate_keyword_dialog a.button-primary{
-    display: inline-block;
-    float: right;
-    margin-top: 15px;
-}
-#expresscurate_keyword_dialog a.cancel{
-    display: inline-block;
-    margin-top: 20px;
-    color: #a00;
-}
-#expresscurate_keyword_dialog a.cancel:hover{
-    color: red;
 }
 /*Settings page*/
 #expresscurate_autosummary{
@@ -2761,7 +2859,6 @@
     color: #1cbb9f;
     border-radius: 3px;
     text-decoration: none;
-
     transition: all .3s ease-out;
     -moz-transition: all .3s ease-out;
     -webkit-transition: all .3s ease-out;
@@ -2847,7 +2944,7 @@
 .expresscurate_cat[type=radio]:checked + label:after,
 .expresscurate_post_type[type=radio]:checked + label:after {
     background: url("../images/feed_icons.svg") no-repeat -79px -24px;
-    background-size: 96px auto;
+    background-size: auto 68px;
     visibility: visible;
     opacity: 1;
     transition-delay: 0s;
@@ -3002,17 +3099,46 @@
         .expresscurate_support .block{
             padding: 17px 35px;
         }
-        .expresscurate_feed_dashboard .addNewFeed .errorMessage,
-        .expresscurate_bookmarks .addNewBookmark .errorMessage,
-        .expresscurate_errorMessage{
-            color: #e84c3d !important;
-            font-size: 13px !important;
-            line-height: 16px;
-            width: auto !important;
-        }
-        #expresscurate_widget .expresscurate_errorMessage{
-            margin-left: 7px;
-        }
+/*validation error message*/
+.expresscurate_errorMessage.errorActive {
+    left: 0;
+    opacity: 1;
+}
+.expresscurate_errorMessage {
+    font-size: 12px !important;
+    line-height: 13px !important;
+    font-family: OpenSans-Light, Verdana, Geneva, sans-serif !important;
+    position: absolute !important;
+    top: 6px;
+    left: -100%;
+    opacity: 0;
+    z-index: 100;
+    background: #e85e50 !important;
+    width: auto;
+    height: auto;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    color: #fff !important;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -ms-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+    text-align: left;
+    max-width: 100%;
+    padding: 5px 10px !important;
+    margin: 0 !important;
+}
+.expresscurate_supportBlock .expresscurate_errorMessage,
+.expresscurate_support .expresscurate_errorMessage,
+.expresscurate_faq .expresscurate_errorMessage{
+    top: 23px;
+}
+.expresscurate_errorMessageInput{
+    background-color: #D9D9D9 !important;
+}
         .expresscurate_support > div > label,
         .expresscurate_faq > div > label{
             display: block;
@@ -3095,15 +3221,12 @@
                 box-shadow: none;
                 padding:0 20px;
             }
-                .expresscurate_supportBlock textarea{
-                    margin-top: 20px !important;
-                }
                 .expresscurate_supportBlock input,
             .expresscurate_support .block input,
             .expresscurate_faq .block input{
                 height: 40px;
                 line-height: 40px;
-                margin-top: 15px;
+                margin: 15px 0 0 0;
             }
             .expresscurate_supportBlock textarea,
             .expresscurate_support .block textarea,
@@ -3111,7 +3234,7 @@
                 padding: 10px 20px  !important;
                 overflow: hidden;
                 height: 150px;
-                margin: 5px 0 0 0;
+                margin: 15px 0 0 0;
             }
             .expresscurate_supportBlock .send,
             .expresscurate_support .block .send,
@@ -3197,7 +3320,7 @@
 @media (max-width: 1330px) {
     .expresscurate_faq,.expresscurate_support{
         margin: 0 20px 0 0 !important;
-        width: 98%;
+        width: 96%;
     }
     .expresscurate_support .block label,
     .expresscurate_faq .block label {
@@ -3469,12 +3592,14 @@
             height: 35px;
             margin-top: 10px;
             position: relative;
+            overflow: hidden;
         }
         .expresscurate_feed_dashboard .addFeed{
             width: 590px;
             height: 35px;
             margin-top: 10px;
             position: relative;
+            overflow: hidden;
         }
         .expresscurate_bookmarks .addBookmark input{
             padding-left: 15px;
@@ -3529,7 +3654,7 @@
             margin: 0;
             background-image: url("../images/feed_icons.svg");
             background-repeat: no-repeat;
-            background-size: 115px auto;
+            background-size: auto 82px;
             cursor: default;
             position: relative;
             border: solid 1px #dddddd;
@@ -3559,7 +3684,7 @@
                 margin-left: 10px;
                 background-image: url("../images/feed_icons.svg");
                 background-color: transparent;
-                background-size: 140px auto;
+                background-size: auto 100px;
                 background-position: -104px -35px;
                 cursor: pointer;
                 border: solid 1px #25bfa1;
@@ -3593,7 +3718,37 @@
             .expresscurate_controls .remove{
                 background-position: -50px 8px;
             }
-
+            .expresscurate_feed_list .feedListControls .pull{
+                background-position: -144px 6px;
+                background-size: auto 99px;
+                margin-right: 10px;
+            }
+            .expresscurate_feed_list .feedListControls .pullTime{
+                background-image: none;
+                width: 110px;
+                height: 32px;
+                border-right: none;
+                color: #565656;
+                font-family: OpenSans-Semibold, Verdana, Geneva, sans-serif;
+                font-size: 12px;
+                line-height: 12px;
+                padding: 3px 0 5px 10px;
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                cursor: default;
+            }
+                .expresscurate_feed_list .feedListControls .pullTime p{
+                    color: #414141;
+                    font-family: OpenSans-Light , Verdana, Geneva, sans-serif;
+                    margin: 0;
+                    line-height: 12px;
+                    font-size: 12px;
+                }
+            .expresscurate_feed_list .feedListControls .pullTime:hover{
+                background: transparent;
+                cursor: default;
+            }
             .expresscurate_controls .quotes.active:hover{
                 background-position: 19px -59px;
                 background-color: #1cbb9f;
@@ -3609,6 +3764,11 @@
                 background-color: #1cbb9f;
                 border-color: #1cbb9f;
             }
+            .expresscurate_feed_list .feedListControls .pull.active:hover{
+                background-position: -144px -74px;
+                background-color: #1cbb9f;
+                border-color: #1cbb9f;
+            }
 
             .expresscurate_controls .quotes.active{
                 background-position: 19px -25px;
@@ -3618,6 +3778,9 @@
             }
             .expresscurate_controls .remove.active{
                 background-position: -50px -25px;
+            }
+            .expresscurate_feed_list .feedListControls .pull.active{
+                background-position: -144px -33px;
             }
 
 .expresscurate_controls li:hover .tooltip{
@@ -3828,7 +3991,7 @@
         .expresscurate_bookmarkBoxes .checkInput[type=checkbox]:checked + label,
         .expresscurate_feedBoxes .checkInput[type=checkbox]:checked + label{
             background: url("../images/feed_icons.svg") no-repeat -86px 1px;
-            background-size: 100px auto;
+            background-size: auto 72px;
         }
         .expresscurate_bookmarkBoxes li input[type=checkbox],
         .expresscurate_feedBoxes li input[type=checkbox]{
@@ -3952,6 +4115,12 @@
                 width: 25px;
                 padding: 0;
             }
+            .expresscurate_bookmarkBoxes .keywords  .videos:hover,
+            .expresscurate_feedBoxes .keywords  .videos:hover,
+            .expresscurate_bookmarkBoxes .keywords  .images:hover,
+            .expresscurate_feedBoxes .keywords  .images:hover{
+                background-color: #4cc3ab;
+            }
             .expresscurate_bookmarkBoxes .keywords  .videos,
             .expresscurate_feedBoxes .keywords  .videos{
                 background-position: 2px -1122px;
@@ -3994,16 +4163,16 @@
             .expresscurate_feedBoxes .keywords .media .tooltip{
                 height: 28px;
                 line-height: 28px;
-                width: 85px;
+                width: 100px;
                 bottom: auto;
                 top: 30px;
-                left:-22px;
+                left:-37px;
                 text-align: center;
             }
             .expresscurate_bookmarkBoxes .keywords .media .tooltip:before ,
             .expresscurate_feedBoxes .keywords .media .tooltip:before{
                 border-bottom-color: #000;
-                left: 30px;
+                left: 45px;
             }
         .expresscurate_bookmarkBoxes .controls,
         .expresscurate_feedBoxes .controls{
@@ -4602,6 +4771,16 @@
 .expresscurate_supportBlock > div{
     padding: 10px 20px 50px 20px;
     min-height: 280px;
+}
+.expresscurate_support form > .errorMessageWrap,
+#expresscurate_support_form .errorMessageWrap{
+    position: relative;
+    min-height: inherit;
+    padding: 0;
+    border: none;
+    margin: 0;
+    max-width: inherit;
+    overflow: hidden;
 }
 .expresscurate_blocks.wrap{
     margin: 0 !important;

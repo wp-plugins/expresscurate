@@ -151,7 +151,7 @@ var ExpresscurateDialog = (function ($) {
         $.each(keywords, function (index, value) {
             var data = {
                 index: index,
-                tag: value
+                tag: $("<div/>").html(value).text()
             };
             keywordsHTML += ExpressCurateUtils.getTemplate('dialogCuratedtags', data);
         });
@@ -258,6 +258,7 @@ var ExpresscurateDialog = (function ($) {
     }
 
     function exportAPICheckImages(images) {
+
         var errorHTML;
         $.ajax({
             type: 'POST',
@@ -287,6 +288,7 @@ var ExpresscurateDialog = (function ($) {
     }
 
     function exportAPIDownloadImages(images, postID) {
+
         var errorHTML;
         $.ajax({
             type: 'POST',
@@ -337,6 +339,7 @@ var ExpresscurateDialog = (function ($) {
             url: 'admin-ajax.php?action=expresscurate_get_article',
             data: $url.serialize()
         }).done(function (res) {
+
             var data = $.parseJSON(res);
             if (data) {
                 if (data.status === 'error') {
@@ -396,6 +399,11 @@ var ExpresscurateDialog = (function ($) {
         });
         $dialog.on('click', '#curated_description', function () {
             insertText('curated_description', 'p');
+        });
+        $dialog.on('click', function (e) {
+            if(!$(e.target).is('.autoComplete li')){
+                $dialog.find('.autoComplete').remove();
+            }
         });
         $('.nextSlide').click(function () {
             if (!$(this).hasClass('inactiveButton')) {
@@ -554,7 +562,7 @@ var ExpresscurateDialog = (function ($) {
                         var title = $("#curated_title").val();
                         domain = domain.match(/^(http|https)/) ? domain : 'http://' + domain;
                         if (domain) {
-                            html += '<cite><p class="expresscurate_source">' + $("#expresscurate_from").val() + ' <cite><a class="expresscurated" rel="nofollow" data-curated-url="' + domain + '"  href = "' + domain + '">' + title + '</a></p></cite><br/>';
+                            html += '<footer><p class="expresscurate_source">' + $("#expresscurate_from").val() + ' <cite><a class="expresscurated" rel="nofollow" data-curated-url="' + domain + '"  href = "' + domain + '">' + title + '</a></cite></p></footer><br/>';
                         }
                     }
                     html += '</blockquote><br />';
@@ -624,6 +632,37 @@ var ExpresscurateDialog = (function ($) {
                 displayCuratedParagraphs($curatedParagraphs, $curatedParagraphs.length, true);
             }
         });
+        html.on('keyup', '#expresscurate_source', function () {
+            var input = $(this),
+                liHTML = '',
+                list = $('.expresscurate_dialog .autoComplete');
+            if (input.val().length > 1) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'admin-ajax.php?action=expresscurate_search_feed_bookmark',
+                    data: {searchKeyword: input.val()}
+                }).done(function (res) {
+                    var data = $.parseJSON(res);
+                    $.each(data.slice(0, 5), function (key, value) {
+                        liHTML += '<li data-link="' + value.link + '">' + value.title + '</li>';
+                    });
+                    if (liHTML.length > 0) {
+                        input.after('<ul class="autoComplete">' + liHTML + '</ul>');
+                    } else {
+                        list.remove();
+                    }
+                });
+
+            } else {
+                list.remove();
+            }
+        });
+        html.on('click', '.expresscurate_dialog .autoComplete li', function () {
+            var li = $(this);
+            $('#expresscurate_source').val(li.data('link'));
+            $('#curated_title').val(li.text());
+            $('.expresscurate_dialog .autoComplete').remove();
+        });
     }
 
     function openDialog(source) {
@@ -663,37 +702,6 @@ var ExpresscurateDialog = (function ($) {
                             openDialog(window.expresscurate_load_url);
                         }
                     }, 0);
-                });
-                html.on('keyup', '#expresscurate_source', function () {
-                    var input = $(this),
-                        liHTML = '',
-                        list = $('.expresscurate_dialog .autoComplete');
-                    if (input.val().length > 1) {
-                        $.ajax({
-                            type: 'POST',
-                            url: 'admin-ajax.php?action=expresscurate_search_feed_bookmark',
-                            data: {searchKeyword: input.val()}
-                        }).done(function (res) {
-                            var data = $.parseJSON(res);
-                            $.each(data.slice(0, 5), function (key, value) {
-                                liHTML += '<li data-link="' + value.link + '">' + value.title + '</li>';
-                            });
-                            if (liHTML.length > 0) {
-                                input.after('<ul class="autoComplete">' + liHTML + '</ul>');
-                            } else {
-                                list.remove();
-                            }
-                        });
-
-                    } else {
-                        list.remove();
-                    }
-                });
-                html.on('click', '.expresscurate_dialog .autoComplete li', function () {
-                    var li = $(this);
-                    $('#expresscurate_source').val(li.data('link'));
-                    $('#curated_title').val(li.text());
-                    $('.expresscurate_dialog .autoComplete').remove();
                 });
             }
         },

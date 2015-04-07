@@ -7,13 +7,13 @@ var ExpressCurateBookmarks = (function ($) {
             link = $input.val(),
             liHTML = '',
             message = '',
-            $errorMessage = $(".addNewBookmark .errorMessage");
+            $errorMessage = $(".addNewBookmark .expresscurate_errorMessage");
 
-        $errorMessage.text('');
+        //$errorMessage.text('');
 
         if (!link.match(myRegExp)) {
             message = 'Invalid URL';
-            $errorMessage.text(message);
+            ExpressCurateUtils.validationMessages(message,$errorMessage,$input);
         } else {
             ExpressCurateUtils.startLoading($input, $elemToRotate);
             $.ajax({
@@ -55,7 +55,7 @@ var ExpressCurateBookmarks = (function ($) {
                     message = data.msg;
                 }
                 if (message !== '') {
-                    $errorMessage.text(message);
+                    ExpressCurateUtils.validationMessages(message,$errorMessage,$input);
                 }
                 ExpressCurateUtils.endLoading($input, $elemToRotate);
             });
@@ -214,19 +214,6 @@ var ExpressCurateBookmarks = (function ($) {
         /*checkboxes*/
         $bookmarkBoxes.find('li input:checkbox').prop('checked', false);
         $bookmarkBoxes.on('change', '.checkInput', function () {
-            ExpressCurateUtils.checkControls($controls);
-        });
-        $bookmarkBoxes.on('click', '> li', function (e) {
-            if (e.target !== this) {
-                return;
-            }
-            var checkbox = $(this).find('.checkInput');
-            if (checkbox.is(':checked')) {
-                checkbox.attr('checked', false);
-            }
-            else {
-                checkbox.attr('checked', true);
-            }
             ExpressCurateUtils.checkControls($controls);
         });
         $('.expresscurate_bookmarks .check').on('click', function () {

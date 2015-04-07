@@ -31,6 +31,7 @@ class ExpressCurate_Actions
     const CURL = 'curl';
     const MBSTRING = 'mbstring';
 
+    const ALLOW_URL_OPEN = "allow_url_fopen";
     //functions
     const EXEC = 'exec';
 
@@ -54,7 +55,6 @@ class ExpressCurate_Actions
         $this->cronManager = new ExpressCurate_CronManager();
         $this->feedManager = new ExpressCurate_FeedManager();
 
-        //add_shortcode('facebook', array(&$this, 'facebook_post'));
         // register actions
 
         add_action('admin_init', array(&$this, 'register_settings'));
@@ -69,6 +69,7 @@ class ExpressCurate_Actions
         add_action('init', array(&$this, 'register_curated_post_status'), 0);
         add_action('init', array(&$this, 'buttons')); //'wpc_buttons'
         add_action('init', array(&$this, 'include_api'));
+        add_action('init',array(&$this,'add_oembed_facebook'));
 
         add_filter('manage_edit-post_columns', array(&$this, 'curated_column_register'));
         add_action('manage_posts_custom_column', array(&$this, 'curated_column_display'), 10, 2);
@@ -81,24 +82,9 @@ class ExpressCurate_Actions
         remove_action('wp_head', 'rel_canonical');
         add_action('wp_head', array(&$this, 'advanced_seo_update_canonical_url'));
         add_filter('wp_title', array(&$this, 'advanced_seo_update_title'));
-        add_filter('tiny_mce_before_init', array(&$this, 'override_mce_options'));
 
     }
 
-    public function override_mce_options($init)
-    {
-        $ext = 'script[charset|async|defer|language|src|type]';
-
-        //if extended_valid_elements alreay exists, add to it
-        //otherwise, set the extended_valid_elements to $ext
-        if (isset($init['extended_valid_elements'])) {
-            $init['extended_valid_elements'] .= ',' . $ext;
-        } else {
-            $init['extended_valid_elements'] = $ext;
-        }
-
-        return $init;
-    }
 
     /**
      * hook into WP's init action hook
@@ -143,6 +129,7 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_keywords_add_post_keyword', array($this->keywords, 'add_post_keyword'));
         add_action('wp_ajax_expresscurate_keywords_add_keyword', array($this->keywords, 'add_keyword'));
         add_action('wp_ajax_expresscurate_keywords_get_stats', array($this->keywords, 'get_stats'));
+        add_action('wp_ajax_expresscurate_get_post_analytics_stats', array($this->keywords, 'get_post_analytics_stats'));
         add_action('wp_ajax_expresscurate_keywords_get_suggestions', array($this->keywords, 'suggestKeywordsFromGoogle'));
         add_action('wp_ajax_expresscurate_keywords_delete_keyword', array($this->keywords, 'delete_keyword'));
         add_action('wp_ajax_expresscurate_show_smart_publish', array(&$this, 'show_smart_publish_page'));
@@ -178,6 +165,7 @@ class ExpressCurate_Actions
 
         add_action('wp_ajax_dashboard_items_order', array(&$this, 'dashboard_items_order'));
 
+        add_action('wp_ajax_expresscurate_manual_pull_feed', array($this->feedManager, 'manual_pull_feed'));
 
         add_action('wp_dashboard_setup', array(&$this, 'add_dashboard_widgets'));
         add_filter('user_contactmethods', array(&$this, 'add_user_profile_metas'));
@@ -235,7 +223,7 @@ class ExpressCurate_Actions
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_default_changefreq');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_priority_manual_value');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_archiving');
-        //register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_token');
+        register_setting('expresscurate-changed-post-status', 'expresscurate_changed_post_status');
         register_setting('expresscurate-sitemap-generation-group', 'expresscurate_sitemap_generation_last_date');
     }
 
@@ -246,26 +234,10 @@ class ExpressCurate_Actions
         add_option('expresscurate_smart_tagging', 'on');
     }
 
-    /*
-    public function facebook_post($atts)
-    {
-        $atts = shortcode_atts(array(
-            'src' => ' '
-        ), $atts, 'facebook');
-        $href="{$atts['src']}";
-        $iframe='<div id="fb-root"></div>
-            <script>(function(d, s, id) {
-              var js, fjs = d.getElementsByTagName(s)[0];
-              if (d.getElementById(id)) return;
-              js = d.createElement(s); js.id = id;
-              js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=1015040711858893&version=v2.0";
-              fjs.parentNode.insertBefore(js, fjs);
-            }(document, "script", "facebook-jssdk"));</script>
-            <div class="fb-post" data-href="'.$href.'" data-width="100%"></div>';
-
-         return $iframe;
+    function add_oembed_facebook(){
+        wp_oembed_add_provider( 'http://www.facebook.com/*', 'http://api.embed.ly/v1/api/oembed');
     }
-*/
+
     public function load_source()
     {
         //open dialog
@@ -319,7 +291,9 @@ class ExpressCurate_Actions
         array_push($buttons, 'justifytextbox');
         array_push($buttons, 'righttextbox');
         array_push($buttons, 'noFollow');
-        array_push($buttons, 'wordCount');
+        if(get_option('expresscurate_seo', '') == "on"){
+            array_push($buttons, 'wordCount');
+        }
         array_push($buttons, 'addKeyword');
         return $buttons;
     }
@@ -348,7 +322,10 @@ class ExpressCurate_Actions
 //append the icon
         $context .= "<a class='button expresscurate' title='{$title}'
     href='#' id='expresscurate_open-modal'>
-    <span class='expresscurate_button_icon' /></span> Curate Content</a>";
+    <span class='expresscurate_button_icon' /></span> Curate Content</a>
+    <a class='button expresscurateSocial' title='{$title}'
+    href='#' id='expresscurate_socialModal'>
+    <span class='expresscurate_socialModal' /></span> Embed</a>";
 
         return $context;
     }
@@ -635,8 +612,8 @@ class ExpressCurate_Actions
         if (("publish" == $old_status && "publish" != $new_status) || ("publish" == $new_status && "publish" != $old_status)) {
             $this->generate_sitemap();
         }
-        if ("publish" == $new_status && "publish" != $old_status) {
-            update_option('expresscurate_post_status', 'publish');
+        if ("publish" == $new_status && "publish" != $old_status && (!empty($_POST['expresscurate_sources']) || get_post_meta($post->ID, '_is_expresscurate', true)==1)) {
+            update_option('expresscurate_changed_post_status', 'publish');
         }
     }
 
@@ -672,7 +649,6 @@ class ExpressCurate_Actions
      */
     public function save_post($post_id)
     {
-
         $post_type = get_post_type($post_id);
 
         if ($post_type == 'acf') {
@@ -734,6 +710,11 @@ class ExpressCurate_Actions
             update_post_meta($post_id, '_expresscurate_advanced_seo_social_title', esc_attr($expresscurate_advanced_seo_social_title));
             update_post_meta($post_id, '_expresscurate_advanced_seo_social_shortdesc', esc_attr($expresscurate_advanced_seo_social_shortdesc));
             update_post_meta($post_id, '_expresscurate_advanced_seo_social_desc', esc_attr($expresscurate_advanced_seo_social_desc));
+
+            //post analysis notification
+            $expresscurate_post_analysis_notification = isset($_POST['expresscurate_post_analysis_notification']) ? $_POST['expresscurate_post_analysis_notification'] : '';
+
+            update_post_meta($post_id, '_expresscurate_post_analysis_notification', esc_attr($expresscurate_post_analysis_notification));
         }
 
         //Sitemap Settings
@@ -830,9 +811,9 @@ class ExpressCurate_Actions
                         if ($siteDomain != $domain || strpos($image, 'expresscurate_tmp')) {
                             // all set, try to download it
                             require_once(ABSPATH . 'wp-admin/includes/image.php');
-                            $content_manager = new ExpressCurate_HtmlParser($image_from);
+                            $content_manager = new ExpressCurate_HtmlParser($image, true, $image_from);
                             // download
-                            $image_data = $content_manager->file_get_contents_utf8($image, false, false);
+                            $image_data = $content_manager->download();
                             if (false === $image_data) {
                                 $warning[$post_id]['download_failure'] = "Unable download cover image";
                                 update_option('expresscurate_not_writable_warning', $warning);
@@ -882,11 +863,6 @@ class ExpressCurate_Actions
                             // create file
                             $image_path = parse_url($image);
                             $file = $image_path['path'];
-//                            if (wp_mkdir_p($upload_dir['path'])) {
-//                                $file = $upload_dir['path'] . '/' . $image_filename;
-//                            } else {
-//                                $file = $upload_dir['basedir'] . '/' . $image_filename;
-//                            }
                             $file = strtok($file, '?');
 
                             // now we have the attachement
@@ -960,7 +936,7 @@ class ExpressCurate_Actions
             $this->ajaxExportAPI->delete_dir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id);
         }
 
-        $post_issues = $this->post_analysis($post_content, has_post_thumbnail($post_id));
+        $post_issues = get_post_meta($post_id, '_expresscurate_post_analysis_notification', true);
         if ($post_issues > 0) {
             $warning = get_option('expresscurate_not_writable_warning');
             if (get_option('expresscurate_html_error')) {
@@ -969,50 +945,6 @@ class ExpressCurate_Actions
             $warning[$post_id]['analyzed'] = "Post Analyzed. View $post_issues <a class='expresscurateLink expresscurate_postAnalysis' href='#'>recommendations</a>. ";
             update_option('expresscurate_not_writable_warning', $warning);
         }
-
-    }
-
-
-    public function post_analysis($post_content, $has_featured)
-    {
-        $issues = 0;
-        if (strlen($post_content) > 1) {
-            // Check words count
-            preg_match_all('/[\pL\pN\pPd]+/u', strip_tags($post_content), $matches);
-            $words_count = count($matches[0]);
-            if ($words_count < 700 || $words_count > 1600) {
-                $issues++;
-            }
-
-            // Get blockquote
-            $htmlParser = new ExpressCurate_HtmlParser();
-
-            $text_inside_blockquote = $htmlParser->getTextBetweenTags('blockquote', $post_content);
-
-
-            if (count($text_inside_blockquote) > 0) {
-                $words_count_of_blockquote = 0;
-                foreach ($text_inside_blockquote as $content) {
-                    preg_match_all('/[\pL\pN\pPd]+/u', strip_tags($content), $matches);
-                    $words_count_of_blockquote += count($matches[0]);
-                }
-                if (round(($words_count_of_blockquote / $words_count) * 100) > 20) {
-                    $issues++;
-                }
-            }
-
-            $img_in_post = $htmlParser->getTextBetweenTags('img', $post_content);
-            if (count($img_in_post) < 1) {
-                $issues++;
-            }
-        } else {
-            $issues++;
-        }
-
-        if (!$has_featured) {
-            $issues++;
-        }
-        return $issues;
 
     }
 
@@ -1210,8 +1142,8 @@ class ExpressCurate_Actions
 
     private function add_advanced_seo_metas($post_id, &$meta_string)
     {
-        $nofollow = get_post_meta($post_id, '_expresscurate_advanced_seo_nofollow', true) == 'on' ? 'NOFOLLOW' : '';
-        $noindex = get_post_meta($post_id, '_expresscurate_advanced_seo_noindex', true) == 'on' ? 'NOINDEX' : '';
+        $nofollow = get_post_meta($post_id, '_expresscurate_advanced_seo_nofollow', true) == 'off' ? 'NOFOLLOW' : '';
+        $noindex = get_post_meta($post_id, '_expresscurate_advanced_seo_noindex', true) == 'off' ? 'NOINDEX' : '';
         if (!empty($nofollow) || !empty($noindex)) {
             $meta_string .= sprintf("<meta name=\"ROBOTS\" content=\"%s\" />\n", implode(', ', array_filter(array($nofollow, $noindex))));
         }
@@ -1646,12 +1578,13 @@ class ExpressCurate_Actions
             $extWarnings[] = self::PCRE;
         }
 
-        if (!extension_loaded(self::CURL)) {
-            $extWarnings[] = self::CURL;
-        }
 
         if (!extension_loaded(self::MBSTRING)) {
             $extWarnings[] = self::MBSTRING;
+        }
+
+        if (!ExpressCurate_HtmlParser::supportsDownload()) {
+            echo '<div class="update-nag">You should activate either curl extension or allow_url_fopen setting.</div>';
         }
 
         if (count($extWarnings) > 0) {

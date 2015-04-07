@@ -34,6 +34,8 @@ class ExpressCurate_AjaxExportAPI
         $data["categories"] = array();
         $data["keywords"] = array();
         $data["featured_image"] = 0;
+        $data["smart_publishing"] = get_option('expresscurate_publish', '') == 'on' ? get_option('expresscurate_manually_approve_smart', 'off') : 'off';
+        $data["curated_from_prefix"] = get_option("expresscurate_curated_text", 'See full story on');
         if (current_user_can('edit_posts')) {
             $categories = get_categories(array("hide_empty" => 0));
             foreach ($categories as $i => $category) {
@@ -75,35 +77,22 @@ class ExpressCurate_AjaxExportAPI
     public function check_images()
     {
         $data = $_REQUEST;
-        //$options = array('http' => array('user_agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'));
-        $options = array('http' => array('user_agent' => USER_AGENT,' follow_location'=>1,'max_redirects'=>5,'request_fulluri '=>TRUE));
-        if(preg_match("/(^https:\/\/)/i", $url)!=false){
-            $options['ssl']=array('verify_peer'=> false,"verify_peer_name"=>false);
-        }
-        $context = stream_context_create($options);
         if (!$data['img_url'] && !$data['img_url2']) {
             $data_check = array('status' => "error", 'msg' => "Data is empty!");
         } else {
-            $content_manager = new ExpressCurate_HtmlParser($data['img_url']);
-            $img = $content_manager->file_get_contents_utf8($data['img_url'], true);  //@file_get_contents($data['img_url'], false, $context);
-            $http_response_header = $img['http_status'];
-            $img = $img['content'];
-            if (!$img) {
-                //$img = @file_get_contents($data['img_url2'], false, $context);
-                $img = $content_manager->file_get_contents_utf8($data['img_url2'], true);
-                $http_response_header = $img['http_status'];
-                $img = $img['content'];
+            $content_manager = new ExpressCurate_HtmlParser($data['img_url'], true);
+            $img = $content_manager->download();
+            if ($content_manager->isHTTPStatusOK() === false) {
+                $content_manager = new ExpressCurate_HtmlParser($data['img_url2'], true);
+                $img = $content_manager->download();
             }
-            if ($img) {
-                if ((is_array($http_response_header) && ($http_response_header[0] == "HTTP/1.1 200 OK" || strpos($http_response_header[0], '200'))) || $http_response_header == "HTTP/1.1 200 OK" || $http_response_header == 200 || $http_response_header == 'HTTP\/1.1 200 OK') {
-                    $data_check = array('status' => 'success', 'statusCode' => 200);
-                } else if ($http_response_header == "HTTP/1.1 403 Forbidden" || $http_response_header == 403) {
-                    $data_check = array('status' => 'fail', 'statusCode' => 403);
-                } else {
-                    $data_check = array('status' => 'fail', 'statusCode' => $http_response_header[0]);
-                }
-            } else {
+            
+            if ($content_manager->isHTTPStatusOK() === false) {
                 $data_check = array('status' => "error", 'msg' => "Images not found!");
+            } else {
+                $statusCode = $content_manager->getHTTPStatusCode();
+                
+                $data_check = array('status' => $statusCode == 200 ? 'success' : 'fail', 'statusCode' => $statusCode);
             }
         }
         echo json_encode($data_check);
@@ -130,16 +119,15 @@ class ExpressCurate_AjaxExportAPI
                 mkdir($upload_dir['basedir'] . '/expresscurate_tmp/', 0777);
                 mkdir($upload_dir['basedir'] . '/expresscurate_tmp/' . $post_id, 0777);
             }
-            $options = array('http' => array('user_agent' => USER_AGENT,' follow_location'=>1,'max_redirects'=>5,'request_fulluri '=>TRUE));
-            if(preg_match("/(^https:\/\/)/i", $url)!=false){
-                $options['ssl']=array('verify_peer'=> false,"verify_peer_name"=>false);
-            }
-            $context = stream_context_create($options);
+
             if (count($images) > 0 && is_writable($upload_dir['path'])) {
-                $content_manager = new ExpressCurate_HtmlParser($images[0]);
-                for ($i = 0; $i < count($images); $i++) {
+                for ($i = 0, $len = count($images); $i < $len; $i++) {
                     $image = strtok($images[$i], '?');
-                    $image_data = $content_manager->file_get_contents_utf8($images[$i]);
+                    
+                    // TODO create new parser
+                    // TODO get some referer
+                    $content_manager = new ExpressCurate_HtmlParser($images[$i], true, $images[0]);
+                    $image_data = $content_manager->download();
                     $filename[$i] = basename($image);
                     if (wp_mkdir_p($upload_dir['path'])) {
                         $file[$i] = $upload_dir['path'] . '/expresscurate_tmp/' . $post_id . '/' . $filename[$i];
@@ -186,8 +174,11 @@ class ExpressCurate_AjaxExportAPI
         }
         $result = false;
         $data = $_REQUEST;
+        
         if (isset($data['force_draft']) && $data['force_draft'] === 1) {
             $post_status = 'draft';
+        } else if(isset($data['publishing']) && (($publishingType = $data['publishing']) == 'date' || $publishingType == 'hour')) {
+            $post_status = 'future';
         } else {
             $post_status = get_option('expresscurate_post_status', '') ? get_option('expresscurate_post_status', '') : 'draft';
         }
@@ -215,16 +206,7 @@ class ExpressCurate_AjaxExportAPI
         } else {
             $result = json_encode(array('status' => "error", 'msg' => "Data is empty!"));
         }
-
-        //Smart publishing
-        if (get_option('expresscurate_publish', '') == 'on') {
-            $smartPublish = 1;
-
-            if (get_option('expresscurate_manually_approve_smart') == 'on') {
-                $smartPublish = 0;
-            }
-            update_post_meta($post_id, '_expresscurate_smart_publish', $smartPublish);
-        }
+        
         echo $result;
         die;
     }
@@ -291,13 +273,26 @@ class ExpressCurate_AjaxExportAPI
         } else {
             $post_cats = $data['terms'];
         }
+        
+        $post_date = time();
+        $publishingOptions = $data['publishing'];
+        $publishingType = $publishingOptions['type'];
+        $publishingValue = $publishingOptions['value'];
+        
+        if($publishingType == 'date') {
+            $post_date = strtotime($publishingValue);
+        } else if($publishingType == 'hour') {
+            $post_date = strtotime('+' . $publishingValue . ' hours');
+        }
+        
         $details = array(
-            'post_content' => str_replace("&nbsp;", " ", $data['content']),
-            'post_author' => get_current_user_id(),
-            'post_title' => $data['title'],
-            'post_status' => $post_status,
+            'post_content'  => str_replace("&nbsp;", " ", $data['content']),
+            'post_author'   => get_current_user_id(),
+            'post_title'    => $data['title'],
+            'post_status'   => $post_status,
             'post_category' => $post_cats,
-            'post_type' => get_option('expresscurate_def_post_type', 'post')
+            'post_type'     => get_option('expresscurate_def_post_type', 'post'),
+            'post_date_gmt' => gmdate('Y-m-d H:i:s', $post_date)
         );
 
         if (isset($data['post_id']) && $data['post_id'] != 0 && strlen($data['post_id']) > 0) {
@@ -316,7 +311,25 @@ class ExpressCurate_AjaxExportAPI
             update_post_meta($post_id, '_expresscurate_description', $data['description']);
         }
         if ($post_status == 'draft' && get_option('expresscurate_publish', '') == 'on') {
-            update_post_meta($post_id, '_expresscurate_smart_publish', 1);
+            $smartPublish = 1;
+
+            if(get_option('expresscurate_manually_approve_smart') == 'on') {
+                $smartPublishForced = ($publishingType == 'smartpublish') && ($publishingValue == 'true');
+                $smartPublish = $smartPublishForced ? 1 : 0;
+            }
+            
+            update_post_meta($post_id, '_expresscurate_smart_publish', $smartPublish);
+        }
+        
+        // add source
+        if(isset($data['source'])) {
+            
+            $expresscurate_sources_meta_value = array();
+            $expresscurate_sources_meta_value[0]['title'] = $source['original_title'];
+            $expresscurate_sources_meta_value[0]['link'] = $source['url'];
+            $expresscurate_sources_meta_value[0]['domain'] = $source['domain'];
+            
+            update_post_meta($post_id, '_expresscurate_curated_data', wp_slash($expresscurate_sources_meta_value));
         }
 
         return $post_id;
@@ -386,8 +399,6 @@ class ExpressCurate_AjaxExportAPI
         }
         die;
     }
-
-
 }
 
 ?>

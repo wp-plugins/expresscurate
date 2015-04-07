@@ -41,9 +41,9 @@ $feed_list = $feedManager->get_rss_list();
 
             <div class="addFeed">
                 <input id="addFeed" type="text" placeholder="Feed Address" class="expresscurate_disableInputStyle"/>
-                <span class="expresscurate_preventTextSelection"><span></span></span>
+                <span class="plus expresscurate_preventTextSelection"><span></span></span>
+                <span class="expresscurate_errorMessage"></span>
             </div>
-            <span class="errorMessage"></span>
             <div class="expresscurate_clear"></div>
         </div>
     </div>

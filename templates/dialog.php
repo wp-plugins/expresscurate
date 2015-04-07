@@ -94,7 +94,7 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
       <input type="hidden" value="<?php echo get_option('expresscurate_curated_text', 'Curated from'); ?>" id="expresscurate_from" name="expresscurate_from"/>
       <input type="hidden" value="<?php echo get_option('expresscurate_autosummary', 5); ?>" id="expresscurate_autosummary" name="expresscurate_autosummary"/>
       <ul class="labels" id="curated_tags">
-          <li class="markButton expresscurate_preventTextSelection"><span>mark keywords</span></li>
+          <li class="markButton expresscurate_displayNone expresscurate_preventTextSelection"><span>mark keywords</span></li>
       </ul>
       <div class="clear"></div>
       <button class="curate right" id="expresscurate_insert" onclick="return false;"><?php echo __('Curate into post', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
@@ -137,4 +137,18 @@ $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true,
 </script>
 <script type="text/html" id="tmpl-dialogCuratedDescription">
     <li id="curated_description" title="{{data}}">Description</li>
+</script>
+<script type="text/html" id="tmpl-socialPostDialog">
+    <div class="expresscurate_socialDialog">
+        <ul class="tabs">
+            <li class="expresscurate_preventTextSelection facebook" data-tab="facebook"></li>
+            <li class="expresscurate_preventTextSelection twitter" data-tab="twitter"></li>
+            <li class="expresscurate_preventTextSelection youtube" data-tab="youtube"></li>
+            <li class="expresscurate_preventTextSelection vimeo" data-tab="vimeo"></li>
+        </ul>
+        <div id="" class="tab-content">
+            <textarea id="expresscurate_socialEmbed" placeholder="Embed code" class="expresscurate_disableInputStyle"></textarea>
+            <span class="expresscurate_errorMessage"></span>
+        </div>
+    </div>
 </script>

@@ -34,53 +34,57 @@ class ExpressCurate_ContentManager {
       }
 
       public function get_article($url = false, $echo = true) {
-        if (!$url) {
-          $url = $this->_post('expresscurate_source', '');
-        }
-        $url = preg_replace( '/\s+/', '', $url );
-        if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0) {
-          $url = 'http://' . $url;
-        }
-        if (strlen($url) < 1) {
-          $data = array('status' => 'error', 'error' => 'Please enter the URL');
-          if ($echo) {
-            echo json_encode($data);
-            die();
-          } else {
-            return $data;
+        if(!ExpressCurate_HtmlParser::supportsDownload()){
+          echo json_encode(array('status' => 'error', 'error' => 'You should activate either curl extension or allow_url_fopen setting.'));
+          die;
+        }else{
+          if (!$url) {
+            $url = $this->_post('expresscurate_source', '');
           }
-        }
-        if (filter_var($url, FILTER_VALIDATE_URL) === FALSE || !preg_match('#(http|https)\:\/\/[aA-zZ0-9\.]+\.[aA-zZ\.]+#',$url)) {
-          $data = array('status' => 'error', 'error' => 'Please enter a valid URL');
-          if ($echo) {
-            echo json_encode($data);
-            die();
-          } else {
-            return $data;
+          $url = preg_replace( '/\s+/', '', $url );
+          if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0) {
+            $url = 'http://' . $url;
           }
-        }
-        if ($this->_get('check', '') == 1) {
-          $data_check = array();
-          $curated_urls = $this->get_meta_values('_expresscurate_link_', $url);
-          if (isset($curated_urls[0]) && isset($curated_urls[0]['meta_value'])) {
-            $data_check["status"] = "notification";
-            $data_check["msg"] = "Warning! This page has been curated before";
+          if (strlen($url) < 1) {
+            $data = array('status' => 'error', 'error' => 'Please enter the URL');
+            if ($echo) {
+              echo json_encode($data);
+              die();
+            } else {
+              return $data;
+            }
           }
-          if ($echo) {
-            echo json_encode($data_check);
-            die();
-          } else {
-            return $data_check;
+          if (filter_var($url, FILTER_VALIDATE_URL) === FALSE || !preg_match('#(http|https)\:\/\/[aA-zZ0-9\.]+\.[aA-zZ\.]+#',$url)) {
+            $data = array('status' => 'error', 'error' => 'Please enter a valid URL');
+            if ($echo) {
+              echo json_encode($data);
+              die();
+            } else {
+              return $data;
+            }
           }
-        } else {
-          $tags = $this->_post('tags', '');
-          $HtmlParser = new ExpressCurate_HtmlParser($url);
-          $article = $HtmlParser->getHtml($tags);
-          if ($echo == true) {
-            echo json_encode($article);
-            die;
+          if ($this->_get('check', '') == 1) {
+            $data_check = array();
+            $curated_urls = $this->get_meta_values('_expresscurate_link_', $url);
+            if (isset($curated_urls[0]) && isset($curated_urls[0]['meta_value'])) {
+              $data_check["status"] = "notification";
+              $data_check["msg"] = "Warning! This page has been curated before";
+            }
+            if ($echo) {
+              echo json_encode($data_check);
+              die();
+            } else {
+              return $data_check;
+            }
           } else {
-            return $article;
+            $HtmlParser = new ExpressCurate_HtmlParser($url);
+            $article = $HtmlParser->getContents();
+            if ($echo == true) {
+              echo json_encode($article);
+              die;
+            } else {
+              return $article;
+            }
           }
         }
       }
@@ -100,12 +104,11 @@ class ExpressCurate_ContentManager {
         return $metas;
       }
 
-      public function _post($data, $default) {
+      private function _post($data, $default) {
         return isset($_POST[$data]) ? $_POST[$data] : $default;
       }
 
-      public function _get($data, $default) {
+      private function _get($data, $default) {
         return isset($_GET[$data]) ? $_GET[$data] : $default;
       }
-
 }

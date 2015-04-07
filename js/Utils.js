@@ -30,6 +30,19 @@ var ExpressCurateUtils = (function ($) {
         }
     }
 
+    /*error messages*/
+    function validationMessages(messageText, message, input) {
+        $(message).text(messageText).addClass('errorActive');
+        $(input).prop('disabled', true).blur().addClass('expresscurate_errorMessageInput');
+        setTimeout(function () {
+            $(message).removeClass('errorActive');
+            setTimeout(function () {
+                $(message).text('');
+                $(input).removeClass('expresscurate_errorMessageInput').removeAttr('disabled').focus();
+            }, 300);
+        }, 3000);
+    }
+
     /*show/hide controls in content feed and bookmarks*/
     function checkControls(controls) {
         var $checkboxes = $('.checkInput'),
@@ -58,24 +71,24 @@ var ExpressCurateUtils = (function ($) {
             email = $supportMail.val(),
             regularExpression = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             validEmail = regularExpression.test(email),
-            $messageError = $('label[for="expresscurate_support_message"]'),
-            $mailError = $('label[for="expresscurate_support_email"]');
+            $messageError = $('#expresscurate_support_message_validation'),
+            $mailError = $('#expresscurate_support_email_validation');
 
         $form.find('.expresscurate_errorMessage').text('');
 
         if (msg === "" || !msg) {
             validMsg = false;
-            $messageError.text('Please enter the message');
+            validationMessages('Please enter the message', $messageError, $supportMessage);
         } else if (msg.length < 3) {
             validMsg = false;
-            $messageError.text('Message is too short');
+            validationMessages('Message is too short', $messageError, $supportMessage);
         }
 
         if (email === "" || !email) {
             validEmail = false;
-            $mailError.text('Please enter the email');
+            validationMessages('Please enter the email', $mailError, $supportMail);
         } else if (!validEmail) {
-            $mailError.text('Email is not valid');
+            validationMessages('Email is not valid', $mailError, $supportMail);
         }
         if (validEmail && validMsg) {
             $form.submit();
@@ -90,7 +103,7 @@ var ExpressCurateUtils = (function ($) {
     }
 
     function endLoading(input, elemToRotate) {
-        input.removeAttr('disabled').focus();
+        input.removeAttr('disabled');
         elemToRotate.removeClass('expresscurate_startRotate');
     }
 
@@ -181,8 +194,14 @@ var ExpressCurateUtils = (function ($) {
             });
             $(document).on('change', 'select[name="_status"]', function () {
                 postNewStatus = this.value;
-                if (postOldStatus !== postNewStatus && postNewStatus === 'publish') {
-                    track('/post-edit/publish');
+            });
+            $(document).on('mouseup', '.inline-edit-save .save', function () {
+                var $this = $(this),
+                    postId = $this.parents('tr').attr('id'),
+                    $post = $('#post-' + postId.split('-')[1]),
+                    curated = $post.find('.column-curated em').text();
+                if (postOldStatus != postNewStatus && postNewStatus == 'publish' && curated == 'Yes') {
+                    track('/post-edit/publish',true);
                     postOldStatus = postOldStatus = null;
                 }
             });
@@ -377,7 +396,8 @@ var ExpressCurateUtils = (function ($) {
         endLoading: endLoading,
         countDown: countDown,
         getTemplate: getTemplate,
-        track: track
+        track: track,
+        validationMessages: validationMessages
     }
 })(window.jQuery);
 ExpressCurateUtils.setup();

@@ -50,12 +50,11 @@ if (!empty($bookmarks)) {
 
             <div class="addBookmark">
                 <input id="addBookmark" type="text" placeholder="URL" class="expresscurate_disableInputStyle"/>
-                <span class="expresscurate_preventTextSelection"><span></span></span>
+                <span class="plus expresscurate_preventTextSelection"><span></span></span>
+                <span class="expresscurate_errorMessage"></span>
             </div>
-            <span class="errorMessage"></span>
 
             <div class="expresscurate_clear"></div>
-            <p><span></span></p>
         </div>
         <?php
         if (!empty($sorted_bookmarks)) {
@@ -97,8 +96,8 @@ if (!empty($bookmarks)) {
                     </ul>
 
                     <a class="postTitle" href="<?php echo $item['link'] ?>"
-                       target="_newtab"><?php echo $item['title'] ?></a><br/>
-                    <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
+                       target="_blank"><?php echo $item['title'] ?></a><br/>
+                    <a class="url" target="_blank" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
                     <!--<span class="curatedBy">/<?php /*echo $item['curated'] ? 'curated by' : 'author'; */ ?> <span><?php /*echo $item['author']; */ ?></span> /</span>-->
                     <span class="curatedBy">/ by <span><?php echo $item['user']; ?></span> /</span>
                 <span
@@ -108,9 +107,9 @@ if (!empty($bookmarks)) {
                         <label class="<?php if ($item['comment']) {
                             echo 'active';
                         } ?>"
-                               for="comment__<?php echo $i ?>"><?php echo $item['comment'] ? $item['comment'] : 'add comment'; ?></label>
+                               for="comment__<?php echo $i ?>"><?php echo $item['comment'] ? stripslashes($item['comment']) : 'add comment'; ?></label>
                         <input type="text" class="expresscurate_disableInputStyle expresscurate_displayNone"
-                               id="comment__<?php echo $i ?>" value="<?php echo $item['comment'] ?>">
+                               id="comment__<?php echo $i ?>" value="<?php echo stripslashes( $item['comment']); ?>">
                         <span class="expresscurate_displayNone">&#215</span>
                     </div>
                     <ul class="controls expresscurate_preventTextSelection">
@@ -139,19 +138,21 @@ if (!empty($bookmarks)) {
         <input type="hidden" name="expresscurate_load_sources" value="1"/>
     </form>
     <script type="text/html" id="tmpl-bookmarksItem">
+        <!--<# for(i=0;i<data.media.images;i++) { #>
+            <# } #>-->
         <li class="expresscurate_preventTextSelection expresscurate_masonryItem">
             <input id="uniqueId_{{data.id}}" class="checkInput" type="checkbox"/>
             <label for="uniqueId_{{data.id}}" class="expresscurate_preventTextSelection"></label>
             <ul class="keywords">
                 <# if (data.media.videos) { #>
-                    <li class="media videos"><span class="tooltip">{{data.media.videos}}</span></li>
+                    <li class="media videos"><span class="tooltip">Video(s): {{data.media.videos}}</span></li>
                 <# } #>
                 <# if (data.media.images) { #>
-                    <li class="media images"><span class="tooltip">{{data.media.images}}</span></li>
+                    <li class="media images"><span class="tooltip">Image(s): {{data.media.images}}</span></li>
                 <# } #>
             </ul>
-            <a class="postTitle" href="{{data.link}}" target="_newtab">{{data.title}}</a><br/>
-            <a class="url" href="{{data.link}}" target="_newtab">{{data.domain}}</a>
+            <a class="postTitle" href="{{data.link}}" target="_blank">{{data.title}}</a><br/>
+            <a class="url" href="{{data.link}}" target="_blank">{{data.domain}}</a>
             <span class="curatedBy">/ by <span>{{data.user}}</span> /</span>
             <span class="time">Just now</span>
 

@@ -55,7 +55,7 @@ class ExpressCurate_Tracker
         ?>
 
         <script type="text/javascript">
-            var expresscurate_track_hash = '<?php echo $hash; ?>',
+            var expresscurate_track_hash = '<?php echo $this->hash; ?>',
                 siteSendAnalytics = false,
                 siteWpSendAnalytics = false;
 
@@ -121,13 +121,13 @@ class ExpressCurate_Tracker
                 'page': '<?php echo $path; ?>'
             });
             <?php } }
-            if((get_option('expresscurate_post_status') && get_option('expresscurate_post_status')=="publish") && ($pagenow=="post-new.php" || $pagenow=="post.php")){
+            if((get_option('expresscurate_changed_post_status') && get_option('expresscurate_changed_post_status')=="publish") && ($pagenow=="post-new.php" || $pagenow=="post.php")){
                 ?>
             ga('expresscurate.send', 'pageview', {
-                'page': '/post-edit/publish'
+                'page': '/action/wp/post-edit/publish'
             });
             <?php
-               update_option('expresscurate_post_status','');
+               update_option('expresscurate_changed_post_status','');
             }
             ?>
         </script>

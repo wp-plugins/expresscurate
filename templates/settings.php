@@ -14,8 +14,10 @@
         <li class="tab-link expresscurate_preventTextSelection orange" data-tab="tab-5">Feed</li>
         <li class="tab-link expresscurate_preventTextSelection red" data-tab="tab-2">Smart publishing</li>
         <li id="sitemapTab"
-            class="tab-link expresscurate_preventTextSelection blue <?php if ($expresscurate_seo == 'Off') {echo 'expresscurate_displayNone';}
-            if(get_option('expresscurate_sitemap_update_permission') == 'error') echo 'disabled';?>"
+            class="tab-link expresscurate_preventTextSelection blue <?php if ($expresscurate_seo == 'Off') {
+                echo 'expresscurate_displayNone';
+            }
+            if (get_option('expresscurate_sitemap_update_permission') == 'error') echo 'disabled'; ?>"
             data-tab="tab-3">Sitemap
         </li>
         <li class="tab-link expresscurate_preventTextSelection yellow" data-tab="tab-4">Extension</li>
@@ -82,7 +84,7 @@
         <span>ExpressCurate can auto-suggest tags for your post. It is based on the keywords and tags defined in your prior WordPress blogs. Enter the max number of auto-suggested tags you would like to have in each curated posts.</span>
                         </label>
                         <input type="text" id="expresscurate_max_tags" class="controls" value="<?php
-                        if (get_option('expresscurate_max_tags')) {
+                        if (get_option('expresscurate_max_tags') == false) {
                             echo get_option('expresscurate_max_tags');
                         } else {
                             echo '3';
@@ -94,7 +96,7 @@
                                 class="description  ">Pick the number of paragraphs to be inserted from the original article into your post.</span>
                             <br/><span>&nbsp;&nbsp; The default value is 5</span></label>
                         <input type="text" id="expresscurate_autosummary" class="controls" value="<?php
-                        if (get_option('expresscurate_autosummary')) {
+                        if (get_option('expresscurate_autosummary') == false) {
                             echo get_option('expresscurate_autosummary');
                         } else {
                             echo '5';
@@ -187,16 +189,17 @@
                     <li>
                         <p class="title"> Keyword Statistics.
                             <span class="description">
-                               Generates comprehensive keyword statistics for the last <?php echo (get_option('expresscurate_posts_number')?get_option('expresscurate_posts_number'):100); ?>posts.
+                               Generates comprehensive keyword statistics for the last <?php echo(get_option('expresscurate_posts_number') ? get_option('expresscurate_posts_number') : 100); ?>
+                                posts.
                             </span>
                         </p>
                         <input type="number" id="expresscurate_posts_number" class="controls" value="<?php
-                                if (get_option('expresscurate_posts_number')) {
-                                    echo get_option('expresscurate_posts_number');
-                                } else {
-                                    echo '100';
-                                }
-                                ?>" name="expresscurate_posts_number" size="4" min="100" max="300" />
+                        if (get_option('expresscurate_posts_number')) {
+                            echo get_option('expresscurate_posts_number');
+                        } else {
+                            echo '100';
+                        }
+                        ?>" name="expresscurate_posts_number" size="4" min="100" max="300"/>
                     </li>
                     <!--  -->
                 </ul>

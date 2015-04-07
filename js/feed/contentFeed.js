@@ -47,13 +47,13 @@ var ExpressCurateFeedWall = (function ($) {
         var items = [];
 
         $.each(els, function (index, el) {
-            var item = $(el).find('textarea').val();
+            var item = $(el).find('a.postTitle').data('fulllink');
             items.push(item);
         });
         $.ajax({
             type: 'POST',
             url: 'admin-ajax.php?action=expresscurate_delete_feed_content_items',
-            data: {items: JSON.stringify(items)}
+            data: {items: items}
         }).done(function (res) {
             var data = $.parseJSON(res);
 
@@ -66,6 +66,15 @@ var ExpressCurateFeedWall = (function ($) {
                     ExpressCurateUtils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
                 }, 700);
             }
+        });
+    }
+
+    function pullFeedManualy() {
+        $.ajax({
+            type: 'POST',
+            url: 'admin-ajax.php?action=expresscurate_manual_pull_feed'
+        }).done(function (res) {
+            //console.log(res);
         });
     }
 
@@ -88,18 +97,6 @@ var ExpressCurateFeedWall = (function ($) {
         $feedBoxes.find('li input:checkbox').prop('checked', false);
 
         /*checkboxes*/
-        $feedBoxes.on('click', '> li', function (e) {
-            if (e.target !== this) {
-                return;
-            }
-            var $checkbox = $(this).find('.checkInput');
-
-            if ($checkbox.is(':checked'))
-                $checkbox.attr('checked', false);
-            else
-                $checkbox.attr('checked', true);
-            ExpressCurateUtils.checkControls($feedControls);
-        });
         $feedBoxes.on('change', '.checkInput', function () {
             ExpressCurateUtils.checkControls($feedControls);
         });
@@ -115,7 +112,10 @@ var ExpressCurateFeedWall = (function ($) {
             }
             ExpressCurateUtils.checkControls($feedControls);
         });
-
+        /*pull*/
+        $('.expresscurate_feed_list .pull').on('click',function(){
+            pullFeedManualy();
+        });
         /*delete*/
         $('.expresscurate_feed_list .remove').on('click', function () {
             var $checked = $feedBoxes.find('li input:checkbox:checked');
@@ -156,7 +156,7 @@ var ExpressCurateFeedWall = (function ($) {
             if ($checked.length === 1) {
                 var $elem = $($checked[0]).parent().find('a'),
                     title = $elem.html(),
-                    url =  window.btoa(encodeURIComponent($elem.attr('href')));
+                    url = window.btoa(encodeURIComponent($elem.attr('href')));
                 window.location.href = $('#adminUrl').val() + 'post-new.php?expresscurate_load_source=' + url + '&expresscurate_load_title=' + title;
             } else if ($checked.length > 1) {
                 ExpressCurateUtils.addSources($checked.parents('.expresscurate_feedBoxes > li'), '.expresscurate_feedData');
