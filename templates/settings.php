@@ -1,6 +1,6 @@
 <div class="expresscurate expresscurate_Styles expresscurate_settings wrap">
     <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
-        <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions?
+        <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions?
             <span>Submit here!</span></a>
 
         <h2>Settings</h2>
@@ -77,6 +77,20 @@
                             echo 'Curated from';
                         }
                         ?>" name="expresscurate_curated_text" size="50"/>
+                    </li>
+                    <li>                       
+                        <p class="title">Open Original Article Link in a New Window/Tab<span scope="row" class="description  ">
+            Select "Yes" if you want the original article link to be opened in a New Window/Tab. Select "No" if you want the link to be opened in the Same Window/Tab (default behavior).
+          </span></p>
+
+                        <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_curated_link_target"
+                               name="expresscurate_curated_link_target" <?php
+                        if (get_option('expresscurate_curated_link_target', 'on') == "on") {
+                            echo 'checked';
+                        }
+                        ?> />
+                        <label class="controls checkboxLabel" for="expresscurate_curated_link_target"></label>
+                        
                     </li>
                     <li>
                         <label for="expresscurate_max_tags" class="title">Max Number of Auto-suggested Tags<span
@@ -413,6 +427,49 @@
                 <ul>
                     <li>
                         <div class="title">
+                            Content Pull Frequency
+                            <div class="description">
+                                How frequently should ExpressCurate pull content (from RSS feeds, Alerts, etc) into your
+                                <a href="#">Content Feed</a>?
+                            </div>
+                        </div>
+                        <select class="controls" id="expresscurate_pull_hours_interval"
+                                name="expresscurate_pull_hours_interval">
+                            <?php
+                            for ($i = 1; $i < 14; $i++) {
+                                ?>
+                                <?php if ($i == 1) { ?>
+                                    <option value="<?php echo $i; ?>" <?php
+                                    if (get_option('expresscurate_pull_hours_interval') == $i) {
+                                        echo 'selected="selected"';
+                                    }
+                                    ?>>Every hour
+                                    </option>
+
+                                <?php } elseif ($i == 13) { ?>
+                                    <option value="<?php echo $i; ?>" <?php
+                                    if (get_option('expresscurate_pull_hours_interval') == $i) {
+                                        echo 'selected="selected"';
+                                    }
+                                    ?>>Once a day
+                                    </option>
+
+                                <?php } else { ?>
+                                    <option value="<?php echo $i; ?>" <?php
+                                    if (get_option('expresscurate_pull_hours_interval') == $i) {
+                                        echo 'selected="selected"';
+                                    }
+                                    ?>>Every <?php echo $i; ?> hours
+                                    </option>
+
+                                <?php
+                                }
+                            }
+                            ?>
+                        </select>
+                    </li>
+                    <li>
+                        <div class="title">
                             Keyword Match Email Alerts
                             <div class="description">
                                 Would you like to receive email alerts when keyword matches are found in your <a
@@ -455,49 +512,6 @@
                                 <?php } else { ?>
                                     <option value="<?php echo $i; ?>" <?php
                                     if (get_option('expresscurate_content_alert_frequency') == $i) {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Every <?php echo $i; ?> hours
-                                    </option>
-
-                                <?php
-                                }
-                            }
-                            ?>
-                        </select>
-                    </li>
-                    <li>
-                        <div class="title">
-                            Content Pull Frequency
-                            <div class="description">
-                                How frequently should ExpressCurate pull content (from RSS feeds, Alerts, etc) into your
-                                <a href="#">Content Feed</a>?
-                            </div>
-                        </div>
-                        <select class="controls" id="expresscurate_pull_hours_interval"
-                                name="expresscurate_pull_hours_interval">
-                            <?php
-                            for ($i = 1; $i < 14; $i++) {
-                                ?>
-                                <?php if ($i == 1) { ?>
-                                    <option value="<?php echo $i; ?>" <?php
-                                    if (get_option('expresscurate_pull_hours_interval') == $i) {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Every hour
-                                    </option>
-
-                                <?php } elseif ($i == 13) { ?>
-                                    <option value="<?php echo $i; ?>" <?php
-                                    if (get_option('expresscurate_pull_hours_interval') == $i) {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Once a day
-                                    </option>
-
-                                <?php } else { ?>
-                                    <option value="<?php echo $i; ?>" <?php
-                                    if (get_option('expresscurate_pull_hours_interval') == $i) {
                                         echo 'selected="selected"';
                                     }
                                     ?>>Every <?php echo $i; ?> hours

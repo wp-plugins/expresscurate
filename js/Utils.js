@@ -18,14 +18,17 @@ var ExpressCurateUtils = (function ($) {
         if (list.length > 0) {
             message.addClass('expresscurate_displayNone');
             if (pageWithControls) {
-                $controls.removeClass('expresscurate_displayNone');
+                $('.expresscurate_controls li.check').removeClass('disabled');
+                //$('.expresscurate_controls li.layout').removeClass('expresscurate_displayNone');
                 ExpressCurateBookmarks.fixedMenu();
             }
         } else {
             message.removeClass('expresscurate_displayNone');
             if (pageWithControls) {
-                $('.expresscurate_controls li.check').removeClass('active');
-                $controls.addClass('expresscurate_displayNone');
+                $controls.removeClass('active');
+                //$('.expresscurate_controls li.layout').addClass('expresscurate_displayNone');
+                $('.expresscurate_controls li.check').addClass('disabled');
+                $('.expresscurate_controls li.pull').add($('.expresscurate_controls li.pullTime')).addClass('active');
             }
         }
     }

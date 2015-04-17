@@ -1,12 +1,13 @@
 <?php
+
+require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
+
 /*
   Author: ExpressCurate
   Author URI: http://www.expresscurate.com
   License: GPLv3 or later
   License URI: http://www.gnu.org/licenses/gpl.html
  */
-require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
-
 
 class ExpressCurate_Actions
 {
@@ -75,7 +76,6 @@ class ExpressCurate_Actions
         add_action('manage_posts_custom_column', array(&$this, 'curated_column_display'), 10, 2);
         add_filter('manage_edit-post_sortable_columns', array(&$this, 'curated_column_register_sortable'));
 
-
         add_filter('request', array(&$this, 'curated_column_orderby'));
         add_action('wp_enqueue_scripts', array(&$this, 'theme_styles'));
         add_action('wp_head', array(&$this, 'add_seo'));
@@ -136,9 +136,9 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_smart_publish_event', array(&$this->smartPublish, 'publish_event'));
         add_action('wp_ajax_expresscurate_save_sitemap_google_status', array(&$this->sitemap, 'saveSitemapGoogleStatus'));
 
-
         add_action('wp_ajax_expresscurate_feed_add', array($this->feedManager, 'add_feed'));
         add_action('wp_ajax_expresscurate_feed_delete', array($this->feedManager, 'delete_feed'));
+        add_action('wp_ajax_expresscurate_show_content_feed_items', array($this->feedManager, 'show_content_feed_items'));
         add_action('wp_ajax_expresscurate_bookmarks_add', array($this->feedManager, 'add_bookmarks'));
         add_action('wp_ajax_expresscurate_bookmark_set', array($this->feedManager, 'set_bookmark'));
         add_action('wp_ajax_expresscurate_bookmark_get', array($this->feedManager, 'get_bookmark'));
@@ -199,6 +199,7 @@ class ExpressCurate_Actions
         //   register_setting('expresscurate-group', 'expresscurate_max_tags');
         register_setting('expresscurate-keywords-group', 'expresscurate_defined_tags');
         register_setting('expresscurate-group', 'expresscurate_curated_text');
+        register_setting('expresscurate-group', 'expresscurate_curated_link_target');
         register_setting('expresscurate-group', 'expresscurate_featured');
         register_setting('expresscurate-group', 'expresscurate_seo');
         register_setting('expresscurate-group', 'expresscurate_publisher');
@@ -375,11 +376,16 @@ class ExpressCurate_Actions
         if ('curated' != $column_name)
             return;
         $curated = get_post_meta($post_id, '_is_expresscurate', true);
-        if ($curated == 1) {
-            $curated = '<em>' . __('Yes', self::PLUGIN_FOLDER) . '</em>';
-        } else {
-            $curated = '<em>' . __('No', self::PLUGIN_FOLDER) . '</em>';
-        }
+        //$cloned = get_post_meta($post_id, '_expresscurate_advanced_seo_post_copy', true);
+        //if($cloned=='on'){
+           // $curated = '<em>' . __('Cloned', self::PLUGIN_FOLDER) . '</em>';
+       // }else{
+            if ($curated == 1) {
+                $curated = '<em>' . __('Yes', self::PLUGIN_FOLDER) . '</em>';
+            } else {
+                $curated = '<em>' . __('No', self::PLUGIN_FOLDER) . '</em>';
+            }
+       // }
         echo $curated;
     }
 
@@ -696,11 +702,13 @@ class ExpressCurate_Actions
             $expresscurate_advanced_seo_canonical_url = isset($_POST['expresscurate_advanced_seo_canonical_url']) ? $_POST['expresscurate_advanced_seo_canonical_url'] : '';
             $expresscurate_advanced_seo_nofollow = isset($_POST['expresscurate_advanced_seo_nofollow_value']) ? $_POST['expresscurate_advanced_seo_nofollow_value'] : 'on';
             $expresscurate_advanced_seo_noindex = isset($_POST['expresscurate_advanced_seo_noindex_value']) ? $_POST['expresscurate_advanced_seo_noindex_value'] : 'on';
+            $expresscurate_advanced_seo_post_copy = isset($_POST['expresscurate_advanced_seo_post_copy_value']) ? $_POST['expresscurate_advanced_seo_post_copy_value'] : 'off';
 
             update_post_meta($post_id, '_expresscurate_advanced_seo_title', esc_attr($expresscurate_advanced_seo_title));
             update_post_meta($post_id, '_expresscurate_advanced_seo_canonical_url', esc_attr($expresscurate_advanced_seo_canonical_url));
             update_post_meta($post_id, '_expresscurate_advanced_seo_nofollow', esc_attr($expresscurate_advanced_seo_nofollow));
             update_post_meta($post_id, '_expresscurate_advanced_seo_noindex', esc_attr($expresscurate_advanced_seo_noindex));
+            update_post_meta($post_id, '_expresscurate_advanced_seo_post_copy', esc_attr($expresscurate_advanced_seo_post_copy));
 
             // social part
             $expresscurate_advanced_seo_social_title = isset($_POST['expresscurate_advanced_seo_social_title']) ? $_POST['expresscurate_advanced_seo_social_title'] : '';

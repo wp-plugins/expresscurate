@@ -2,9 +2,15 @@
 
 require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
+/*
+  Author: ExpressCurate
+  Author URI: http://www.expresscurate.com
+  License: GPLv3 or later
+  License URI: http://www.gnu.org/licenses/gpl.html
+ */
+
 class Expresscurate_Tags
 {
-
     private function checkOpenTag($matches)
     {
 
@@ -46,6 +52,4 @@ class Expresscurate_Tags
         $spans = '/<span class="expresscurate_keywordsHighlight .*?">(.*?)<\/span>/uis';
         return preg_replace($spans, '$1', $html);
     }
-
-
 }

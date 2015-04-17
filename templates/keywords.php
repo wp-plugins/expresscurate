@@ -7,7 +7,7 @@ $keywords_stats = $keywords->getKeywordStats();
 <div class="expresscurate_keywords_settings expresscurate_Styles wrap">
     <input type="hidden" id="expresscurate_plugin_dir" value="<?php echo plugin_dir_url(__FILE__); ?>"/>
     <label>Keywords Dashboard</label>
-    <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions?
+    <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions?
         <span>Submit here!</span></a>
     <br/>
     <label class="pageDescription pageDesc">Monitor and manage keyword utilization in your blog.</label>

@@ -119,7 +119,7 @@ var ExpressCurateSEOControl = (function ($) {
         });
         $('html').on('click', function (e) {
             if ($widgetWraper.length) {
-                var $suggestions=$widgetWraper.find('.suggestion li');
+                var $suggestions = $widgetWraper.find('.suggestion li');
                 if ($(e.target).is('.suggestion li')) {
                     var newKeyword = $(e.target).text();
                     $addInput.val(newKeyword);
@@ -249,7 +249,7 @@ var ExpressCurateSEOControl = (function ($) {
             }
         });
         $('#expresscurate_widget_wrapper .mark').on('click', function (e) {
-                ExpressCurateKeywords.markEditorKeywords();
+            ExpressCurateKeywords.markEditorKeywords();
         });
 
         /*insert keyword in content*/
@@ -268,7 +268,23 @@ var ExpressCurateSEOControl = (function ($) {
                 $hiddenInput.val('off');
             }
         });
-        $('.expresscurate_moveToAdvanced').on('click',function(){
+        $('#expresscurate_advanced_seo_post_copy').on('change', function () {
+            var $this = $(this),
+                $hiddenInput = $this.parent().find('input[type=hidden]'),
+                $canonicalURL = $('#expresscurate_advanced_seo_canonical_url'),
+                $noFollow = $('#expresscurate_advanced_seo_nofollow'),
+                $noIndex = $('#expresscurate_advanced_seo_noindex');
+            if ($this.is(':checked')) {
+                $hiddenInput.val('on');
+                $canonicalURL.attr('readonly',true);
+                $noFollow.add($noIndex).attr('disabled',true);
+            } else {
+                $hiddenInput.val('off');
+                $canonicalURL.attr('readonly',false);
+                $noFollow.add($noIndex).attr('disabled',false);
+            }
+        });
+        $('.expresscurate_moveToAdvanced').on('click', function () {
             $('html, body').animate({
                 scrollTop: $("#expresscurate_advanced_seo").offset().top - 40
             }, 700);

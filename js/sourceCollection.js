@@ -88,7 +88,7 @@ var ExpressCurateSourceCollection = (function ($) {
                 $contentWrap = $('#content'),
                 content = (($contentWrap.css("display") === "block") ? $contentWrap.val() : tinyMCE.get("content").getContent()),
             /*find curated post's url*/
-                myRegExp = new RegExp('((cite=)|(data-curated-url=))["\']' + url + '["\' ]', 'gmi');
+                myRegExp = new RegExp('((cite=)|(data-curated-url=)|(data-cloned-url=))["\']' + url + '["\' ]', 'gmi');
 
             if (content.match(myRegExp)) {
                 $deleteButton.addClass('expresscurate_displayNone');

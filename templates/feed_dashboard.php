@@ -5,7 +5,7 @@ $feed_list = $feedManager->get_rss_list();
 
 <div class="expresscurate_feed_dashboard expresscurate_Styles wrap">
     <div class="expresscurate_headBorderBottom expresscurate_headerPart expresscurate_OpenSansRegular">
-        <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
+        <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
 
         <h2>RSS Feeds</h2>
 
@@ -25,7 +25,7 @@ $feed_list = $feedManager->get_rss_list();
                     foreach ($feed_list as $url => $feed_url) { ?>
                         <li>
                             <a href="<?php echo $feed_url['feed_url'] ?>"
-                               target="_newtab"><?php echo $feed_url['feed_url']; ?></a>
+                               target="_newtab"><?php echo $feed_url['feed_title']; ?><br /><small><?php echo $url; ?></small></a>
                             <span class="postsCount expresscurate_floatRight">
                                 <?php echo $feed_url['post_count']; ?>
                                 <input type="hidden" name="expresscurate_feed_url" value="<?php echo $url ?>"/>
@@ -49,7 +49,7 @@ $feed_list = $feedManager->get_rss_list();
     </div>
     <script type="text/html" id="tmpl-rssfeedItem">
         <li>
-            <a target="_newtab" href="{{data.feed_url}}">{{data.feed_url}}</a>
+            <a target="_newtab" href="{{data.feed_url}}">{{data.feed_title}}<br/><small>{{data.link}}</small></a>
                         <span class="postsCount expresscurate_floatRight">{{data.post_count}}
                         <input type="hidden" name="expresscurate_feed_url" value="{{data.feed_url}}"/>
                         </span>

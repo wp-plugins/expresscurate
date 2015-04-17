@@ -800,12 +800,16 @@
         line-height: 40px;
         color:#303030;
         position: relative;
-
         box-sizing: border-box;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         width: 100%;
     }
+    .expresscurate_feedSettingsList li{
+        line-height: 16px;
+        height: 45px;
+    }
+
     .expresscurate_feedSettingsList li:hover,
     .expresscurate_URL li:hover,
     .expresscurate_highlight{
@@ -827,6 +831,11 @@
         }
 .expresscurate_feedSettingsList a{
     width: 65%;
+    margin-top: 5px;
+    font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
+}
+.expresscurate_feedSettingsList a small {
+    font-family: OpenSans-Light, Verdana, Geneva, sans-serif;
 }
         @media (max-width: 720px){
             .expresscurate_feedSettingsList a,
@@ -851,6 +860,7 @@
         .expresscurate_feedSettingsList .postsCount{
             width: 150px;
             text-align: center;
+            margin-top: 2px;
         }
         .expresscurate_URL .rssStatus{
             color: #fff;
@@ -1596,7 +1606,7 @@
     color: #9e9e9e;
 }
 
-#expresscurate_dialog {
+.expresscurate_dialog {
     display: none;
 }
 
@@ -1855,7 +1865,7 @@
     padding: 0 10px;
 }
 
-#expresscurate_dialog div.mce-toolbar-grp {
+.expresscurate_dialog div.mce-toolbar-grp {
     background-color: #dbdbdb !important;
 }
 
@@ -1916,7 +1926,6 @@
     background-position: center -396px;
 }
 .expresscurate_dialog .footer button.curate {
-    margin-top: 10px;
     border: 1px solid #27cfae;
     border-radius: 3px;
     background-color: #27cfae;
@@ -2615,6 +2624,14 @@
 .expresscurate_advancedSEO_widget input[id="expresscurate_advanced_seo_noindex"]:checked +label:after{
     content: ' index';
     margin-left: 25px;
+}
+.expresscurate_advancedSEO_widget input[id="expresscurate_advanced_seo_post_copy"] +label:after{
+    content: ' no';
+    margin-left: 59px;
+}
+.expresscurate_advancedSEO_widget input[id="expresscurate_advanced_seo_post_copy"]:checked +label:after{
+    content: ' yes';
+    margin-left: 33px;
 }
 .expresscurate_advancedSEO_widget input[type="checkbox"]:checked+label{
     border-color: #25bfa1;
@@ -3553,6 +3570,7 @@
             .expresscurate_feed_dashboard .expresscurate_feedSettingsList .close{
                 display: none;
                 right: 25px;
+                margin-top: 9px;
             }
         .expresscurate_feed_dashboard .expresscurate_feedSettingsList li:hover .close{
             display: block;
@@ -3689,6 +3707,11 @@
                 cursor: pointer;
                 border: solid 1px #25bfa1;
             }
+.expresscurate_controls .check.disabled{
+    background-position: -104px 6px;
+    cursor: default;
+    border: solid 1px #dddddd;
+}
 .expresscurate_controls .check.active{
     background-position: -104px -75px;
     background-color: #1cbb9f;
@@ -3718,11 +3741,41 @@
             .expresscurate_controls .remove{
                 background-position: -50px 8px;
             }
+            .expresscurate_feed_list .feedListControls .pull.disabled:hover,
+            .expresscurate_feed_list .feedListControls .pull.disabled{
+                background: transparent !important;
+            }
             .expresscurate_feed_list .feedListControls .pull{
-                background-position: -144px 6px;
+                /*background-position: -144px 6px;*/
                 background-size: auto 99px;
                 margin-right: 10px;
             }
+                .expresscurate_feed_list .feedListControls .pull .loading.expresscurate_startRotate{
+                    background: url("../images/refresh.svg") no-repeat transparent center;
+                    height: 100%;
+                    width: 100%;
+                    display: block;
+                    -webkit-animation: rotate 1.2s infinite linear;
+                    -moz-animation: rotate 1.2s infinite linear;
+                    -o-animation: rotate 1.2s infinite linear;
+                    animation: rotate 1.2s infinite linear;
+                }
+                @-webkit-keyframes rotate{
+                    from {-webkit-transform: rotate(0deg);}
+                    to   {-webkit-transform: rotate(-359deg);}
+                }
+                @-moz-keyframes rotate{
+                    from {-moz-transform: rotate(0deg);}
+                    to   {-moz-transform: rotate(-359deg);}
+                }
+                @-o-keyframes rotate{
+                    from {-o-transform: rotate(0deg);}
+                    to   {-o-transform: rotate(-359deg);}
+                }
+                @keyframes rotate{
+                    from {transform: rotate(0deg);}
+                    to   {transform: rotate(-359deg);}
+                }
             .expresscurate_feed_list .feedListControls .pullTime{
                 background-image: none;
                 width: 110px;
@@ -3737,6 +3790,7 @@
                 -moz-box-sizing: border-box;
                 -webkit-box-sizing: border-box;
                 cursor: default;
+                border-color: #1cbb9f;
             }
                 .expresscurate_feed_list .feedListControls .pullTime p{
                     color: #414141;
@@ -3748,6 +3802,7 @@
             .expresscurate_feed_list .feedListControls .pullTime:hover{
                 background: transparent;
                 cursor: default;
+                border-color: #1cbb9f;
             }
             .expresscurate_controls .quotes.active:hover{
                 background-position: 19px -59px;
@@ -3764,10 +3819,9 @@
                 background-color: #1cbb9f;
                 border-color: #1cbb9f;
             }
-            .expresscurate_feed_list .feedListControls .pull.active:hover{
+            .expresscurate_feed_list .feedListControls .pull:hover{
                 background-position: -144px -74px;
                 background-color: #1cbb9f;
-                border-color: #1cbb9f;
             }
 
             .expresscurate_controls .quotes.active{
@@ -3779,8 +3833,9 @@
             .expresscurate_controls .remove.active{
                 background-position: -50px -25px;
             }
-            .expresscurate_feed_list .feedListControls .pull.active{
+            .expresscurate_feed_list .feedListControls .pull{
                 background-position: -144px -33px;
+                border-color: #1cbb9f;
             }
 
 .expresscurate_controls li:hover .tooltip{
@@ -4904,7 +4959,8 @@
     margin: 10px 0;
     display: block;
 }
-#wp-expresscurate_content_editor-editor-container .mce-container.mce-edit-area {
+#wp-expresscurate_dialog_content_clone_editor-editor-container .mce-container.mce-edit-area ,
+#wp-expresscurate_dialog_content_editor-editor-container .mce-container.mce-edit-area {
     max-height: 140px;
     overflow-y: auto;
 }

@@ -70,11 +70,33 @@ var ExpressCurateFeedWall = (function ($) {
     }
 
     function pullFeedManualy() {
+        var $loading = $feedControls.find('.loading'),
+            $control = $('.feedListControls li.pull');
+        $loading.addClass('expresscurate_startRotate');
+        $control.addClass('disabled');
         $.ajax({
             type: 'POST',
             url: 'admin-ajax.php?action=expresscurate_manual_pull_feed'
         }).done(function (res) {
-            //console.log(res);
+            var data = $.parseJSON(res);
+            if (data) {
+                $.each(data.content, function (index, value) {
+                    $("#expresscurate_feedBoxes").load("admin-ajax.php?action=expresscurate_show_content_feed_items #expresscurate_feedBoxes > li", function () {
+                        $('.pullTime p').text('in ' + data.minutes_to_next_pull);
+                        $masonryWrap.masonry('destroy').masonry({
+                            itemSelector: '.expresscurate_masonryItem',
+                            isResizable: true,
+                            isAnimated: true,
+                            columnWidth: '.expresscurate_masonryItem',
+                            gutter: 10
+                        });
+                        ExpressCurateUtils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
+                    });
+                });
+            }
+        }).always(function () {
+            $loading.removeClass('expresscurate_startRotate');
+            $control.removeClass('disabled');
         });
     }
 
@@ -113,7 +135,7 @@ var ExpressCurateFeedWall = (function ($) {
             ExpressCurateUtils.checkControls($feedControls);
         });
         /*pull*/
-        $('.expresscurate_feed_list .pull').on('click',function(){
+        $('.expresscurate_feed_list .pull').on('click', function () {
             pullFeedManualy();
         });
         /*delete*/

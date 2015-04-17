@@ -11,7 +11,7 @@ if (!empty($bookmarks)) {
         echo 'expresscurate_singleColumn';
     } ?>">
     <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
-        <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
+        <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
 
         <h2>Bookmarks</h2>
 
@@ -20,7 +20,7 @@ if (!empty($bookmarks)) {
             articles) and clicking on the curate button.
         </div>
         <div class="controlsWrap">
-            <ul class="bookmarkListControls expresscurate_preventTextSelection expresscurate_controls expresscurate_displayNone">
+            <ul class="bookmarkListControls expresscurate_preventTextSelection expresscurate_controls">
                 <li class="check">
                     <span class="tooltip">select / deselect</span>
                 </li>

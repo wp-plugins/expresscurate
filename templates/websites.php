@@ -4,7 +4,7 @@ $curated_links_rss = $feedManager->get_curated_links();
 ?>
 <div class="expresscurate_topSources expresscurate_Styles wrap">
   <div class="expresscurate_headBorderBottom expresscurate_headerPart expresscurate_OpenSansRegular">
-    <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
+    <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
     <h2>Top Sources</h2>
       <label class="pageDesc">Top sources where you have curated from.</label>
   </div>

@@ -13,30 +13,25 @@ function array_sort_by_column(&$arr, $col, $dir = SORT_DESC)
 }
 
 if (!empty($contentList)) {
-    foreach ($contentList as $key => $row) {
-        if (is_array($row) && count($row) > 0) {
-            foreach ($row as $content) {
-                $content['fullLink'] = $content['link'];
-                $extracted_url = extract_google_feed_url($content['link'], $row);
-                if ($extracted_url) {
-                    $url = $extracted_url;
-                } else {
-                    $url = $content['link'];
-                }
-                $content['link'] = $url;
-                $content['domain'] = parse_url($url, PHP_URL_SCHEME) . "://" . parse_url($url, PHP_URL_HOST);
-                array_push($sorted_feeds, $content);
+    $feed_content = $contentList['content'];
+    if (is_array($feed_content) && count($feed_content) > 0) {
+        foreach ($feed_content as $content) {
+            $content['fullLink'] = $content['link'];
+            $extracted_url = extract_google_feed_url($content['link'], $feed_content);
+            if ($extracted_url) {
+                $url = $extracted_url;
+            } else {
+                $url = $content['link'];
             }
+            $content['link'] = $url;
+            $content['domain'] = parse_url($url, PHP_URL_SCHEME) . "://" . parse_url($url, PHP_URL_HOST);
+            array_push($sorted_feeds, $content);
         }
     }
     array_sort_by_column($sorted_feeds, 'date');
 }
 
-wp_clear_scheduled_hook('expresscurate_pull_feeds');
-$pull_feed_interval = (get_option('expresscurate_pull_hours_interval')) ? get_option('expresscurate_pull_hours_interval') : 1;
-wp_schedule_event(strtotime("+" . $pull_feed_interval . " hour"), 'hourly', 'expresscurate_pull_feeds');
 $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), time());
-
 ?>
 <input id="adminUrl" type="hidden" value="<?php echo get_admin_url(); ?>"/>
 <div
@@ -44,7 +39,7 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
         echo 'expresscurate_singleColumn';
     } ?>">
     <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
-        <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
+        <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
 
         <h2>Content Feed</h2>
 
@@ -55,7 +50,7 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
             create a post.
         </div>
         <div class="controlsWrap">
-            <ul class="feedListControls expresscurate_preventTextSelection expresscurate_controls expresscurate_displayNone">
+            <ul class="feedListControls expresscurate_preventTextSelection expresscurate_controls ">
                 <li class="check">
                     <span class="tooltip">select / deselect</span>
                 </li>
@@ -68,13 +63,16 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
                 <li class="quotes expresscurate_floatRight">
                     <span class="tooltip">curate</span>
                 </li>
-                <!--<li class="pull active expresscurate_floatRight">
-                    <span class="tooltip">pull</span>
-                </li>
-                <li class="pullTime active expresscurate_floatRight">
-                    next update:
-                    <p>in <?php /*echo $nextPullTime; */?></p>
-                </li>-->
+                <?php if (strlen(get_option('expresscurate_links_rss', '')) > 2) { ?>
+                    <li class="pull active expresscurate_floatRight">
+                        <span class="tooltip">pull</span>
+                        <span class="loading"></span>
+                    </li>
+                    <li class="pullTime active expresscurate_floatRight">
+                        next update:
+                        <p>in <?php echo $nextPullTime; ?></p>
+                    </li>
+                <?php } ?>
                 <li class="layout expresscurate_floatRight">
                     <span class="tooltip"><?php if (get_option('expresscurate_bookmark_layout', '') == 'single') {
                             echo 'view as grid';
@@ -92,7 +90,7 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
     if (!empty($sorted_feeds)) {
         $i = 0;
         ?>
-        <ul class="expresscurate_feedBoxes expresscurate_masonryWrap"><?php
+        <ul id="expresscurate_feedBoxes" class="expresscurate_feedBoxes expresscurate_masonryWrap"><?php
         foreach ($sorted_feeds as $key => $item) {
             ?>
             <li class="expresscurate_preventTextSelection expresscurate_masonryItem">
@@ -156,9 +154,10 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
         }
         ?></ul><?php
     } ?>
-    <label class="expresscurate_notDefined expresscurate_displayNone">Your content feed is empty. Configure <a
+    <label class="expresscurate_notDefined expresscurate_displayNone">Your content feed is
+        empty. <?php echo (strlen(get_option('expresscurate_links_rss', '')) > 2) ? '' : 'Configure <a
             href="admin.php?page=expresscurate_feeds">RSS feeds</a> to
-        start.</label>
+        start.'; ?></label>
 
     <form method="POST" action="<?php echo get_admin_url() ?>post-new.php#expresscurate_sources_collection"
           id="expresscurate_bookmarks_curate">

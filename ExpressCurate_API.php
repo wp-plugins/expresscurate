@@ -3,9 +3,10 @@
 require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
 /*
- * Returnes source urls of all posts if $post_id is not defined
- * @param int $post_id 
- * @return array
+  Author: ExpressCurate
+  Author URI: http://www.expresscurate.com
+  License: GPLv3 or later
+  License URI: http://www.gnu.org/licenses/gpl.html
  */
 
 function expresscurate_the_source_urls($post_id = null) {

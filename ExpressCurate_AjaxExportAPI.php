@@ -1,4 +1,5 @@
 <?php
+
 require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
 /*
@@ -36,6 +37,7 @@ class ExpressCurate_AjaxExportAPI
         $data["featured_image"] = 0;
         $data["smart_publishing"] = get_option('expresscurate_publish', '') == 'on' ? get_option('expresscurate_manually_approve_smart', 'off') : 'off';
         $data["curated_from_prefix"] = get_option("expresscurate_curated_text", 'See full story on');
+        $data["curated_link_target"] = get_option("expresscurate_curated_link_target", 'on');
         if (current_user_can('edit_posts')) {
             $categories = get_categories(array("hide_empty" => 0));
             foreach ($categories as $i => $category) {
@@ -185,7 +187,7 @@ class ExpressCurate_AjaxExportAPI
         if (isset($data['url'])) {
             $domain = parse_url($data['url']);
             $domain = $domain['host'];
-            $data['content'] .= '<div class="curated_from"><p>' . get_option('expresscurate_curated_text') . ' <a href = "' . $data['url'] . '">' . $domain . '</a><span class="expresscurated" data-curated-url="' . $data['url'] . '">&nbsp;</span></p></div>';
+            //$data['content'] .= '<div class="curated_from"><p>' . get_option('expresscurate_curated_text') . ' <a href = "' . $data['url'] . '">' . $domain . '</a><span class="expresscurated" data-curated-url="' . $data['url'] . '">&nbsp;</span></p></div>';
             if (isset($data['terms'])) {
                 foreach ($data['terms'] as $i => $term) {
                     $term_id = get_cat_ID($term);

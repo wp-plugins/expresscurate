@@ -99,7 +99,7 @@ var ExpresscurateDialog = (function ($) {
                 textHTML += ExpressCurateUtils.getTemplate('dialogCuratedParagraphs', data);
                 if (index < count && !shortPar) {
                     generateTags(value);
-                    tinyMCE.get('expresscurate_content_editor').execCommand('mceInsertContent', false, "<p>" + value + "<p>");
+                    tinyMCE.get('expresscurate_dialog_content_editor').execCommand('mceInsertContent', false, "<p>" + value + "<p>");
                 }
             }
         });
@@ -222,7 +222,7 @@ var ExpresscurateDialog = (function ($) {
             paragraph += "<" + tag + ">" + $('#' + id).attr('title').replace(/\r\n/g, "<br />").replace(/\n/g, "<br />") + "</" + tag + "> &nbsp;";
         }
         generateTags(paragraph);
-        tinyMCE.get('expresscurate_content_editor').execCommand('mceInsertContent', false, paragraph);
+        tinyMCE.get('expresscurate_dialog_content_editor').execCommand('mceInsertContent', false, paragraph);
     }
 
     function delCuratedTag(index) {
@@ -231,16 +231,19 @@ var ExpresscurateDialog = (function ($) {
     }
 
     function clearExpresscurateForm() {
-        var $dialog = $('#expresscurate_dialog');
+        var $dialog = $('#expresscurate_dialog'),
+            $imageCounter = $dialog.find('.imageCount');
         $dialog.find('div.error').remove();
         $dialog.find('div.updated').remove();
         $dialog.find('ul').html('');
-        $("#expresscurate_content_editor").val('');
+        $dialog.find('#curated_title').val('');
+        $imageCounter.text('0/0');
         $('.content .img').attr('style', '').addClass("noimage");
         $('.controls').hide();
         $("#curated_paragraphs").empty();
-        if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && tinyMCE.get('expresscurate_content_editor')) {
-            tinyMCE.get('expresscurate_content_editor').setContent('');
+        if (typeof(tinyMCE) === "object" && typeof(tinyMCE.execCommand) === "function" && tinyMCE.get('expresscurate_dialog_content_editor')) {
+            tinyMCE.get('expresscurate_dialog_content_editor').setContent('');
+            tinyMCE.get('expresscurate_dialog_content_clone_editor').setContent('');
         }
         $('#expresscurate_source').focus();
     }
@@ -310,9 +313,7 @@ var ExpresscurateDialog = (function ($) {
         return errorHTML;
     }
 
-    function submitExpresscurateForm() {
-        ExpressCurateUtils.track('/post/content-dialog/loadpage');
-
+    function submitExpresscurateForm(clone) {
         var $dialog = $('#expresscurate_dialog');
         //remove autoComplete
         $dialog.find('.autoComplete').remove();
@@ -322,7 +323,7 @@ var ExpresscurateDialog = (function ($) {
         $dialog.fadeIn();
         var errorHTML = '',
             notifHTML = '',
-            $url = $('#expresscurate_post_form').find('input');
+            $url = clone ? $('#expresscurate_post_form').find('#expresscurate_clone_source') : $('#expresscurate_post_form').find('#expresscurate_source');
         $.ajax({
             type: 'POST',
             url: 'admin-ajax.php?action=expresscurate_get_article&check=1',
@@ -339,43 +340,51 @@ var ExpresscurateDialog = (function ($) {
             url: 'admin-ajax.php?action=expresscurate_get_article',
             data: $url.serialize()
         }).done(function (res) {
-
-            var data = $.parseJSON(res);
-            if (data) {
-                if (data.status === 'error') {
-                    errorHTML = '<div class="error">' + data.error + '</div>';
+                var data = $.parseJSON(res);
+                if (data) {
+                    if (data.status === 'error') {
+                        errorHTML = '<div class="error">' + data.error + '</div>';
+                        $('#expresscurate_post_form').before(errorHTML);
+                        $("#expresscurate_loading").fadeOut('fast');
+                    } else if (data.status === 'success') {
+                        clearExpresscurateForm();
+                        if (data.result.title && data.result.title.length > 0) {
+                            $("#curated_title").val(data.result.title);
+                        }
+                        if (data.result.images.length > 0) {
+                            errorHTML = exportAPICheckImages(data.result.images);
+                        } else {
+                            $("#expresscurate_loading").fadeOut('fast');
+                        }
+                        keywords = data.result.metas.keywords;
+                        if (data.result.metas.keywords && data.result.metas.keywords.length > 0) {
+                            displayCuratedTags(data.result.metas.keywords);
+                        }
+                        if (clone) {
+                            if (data.result.paragraphs.length > 0) {
+                                tinyMCE.get('expresscurate_dialog_content_clone_editor').execCommand('mceInsertContent', false, data.result.content);
+                            }
+                            ExpressCurateUtils.track('/post/content-dialog/clonepage');
+                        } else {
+                            $(".controls").show();
+                            displaySpecials(data.result);
+                            if (data.result.paragraphs.length > 0) {
+                                $curatedParagraphs = data.result.paragraphs;
+                                displayCuratedParagraphs(data.result.paragraphs, $("#expresscurate_autosummary").val(), false);
+                            }
+                            ExpressCurateUtils.track('/post/content-dialog/loadpage');
+                        }
+                        $('#expresscurate_source').focus();
+                    }
+                }
+                else {
+                    errorHTML = '<div class="error">Can\'t curate from this page</div>';
                     $('#expresscurate_post_form').before(errorHTML);
                     $("#expresscurate_loading").fadeOut('fast');
-                } else if (data.status === 'success') {
-                    clearExpresscurateForm();
-                    $(".controls").show();
-                    if (data.result.title && data.result.title.length > 0) {
-                        $("#curated_title").val(data.result.title);
-                    }
-                    if (data.result.images.length > 0) {
-                        errorHTML = exportAPICheckImages(data.result.images);
-                    } else {
-                        $("#expresscurate_loading").fadeOut('fast');
-                    }
-                    if (data.result.metas.keywords && data.result.metas.keywords.length > 0) {
-                        displayCuratedTags(data.result.metas.keywords);
-                    }
-                    keywords = data.result.metas.keywords;
-                    displaySpecials(data.result);
-
-                    if (data.result.paragraphs.length > 0) {
-                        $curatedParagraphs = data.result.paragraphs;
-                        displayCuratedParagraphs(data.result.paragraphs, $("#expresscurate_autosummary").val(), false);
-                    }
-                    $('#expresscurate_source').focus();
                 }
-            } else {
-                errorHTML = '<div class="error">Can\'t curate from this page</div>';
-                $('#expresscurate_post_form').before(errorHTML);
-                $("#expresscurate_loading").fadeOut('fast');
-            }
 
-        });
+            }
+        );
     }
 
     function setupDialog() {
@@ -401,7 +410,7 @@ var ExpresscurateDialog = (function ($) {
             insertText('curated_description', 'p');
         });
         $dialog.on('click', function (e) {
-            if(!$(e.target).is('.autoComplete li')){
+            if (!$(e.target).is('.autoComplete li')) {
                 $dialog.find('.autoComplete').remove();
             }
         });
@@ -481,7 +490,7 @@ var ExpresscurateDialog = (function ($) {
                 });
             }
 
-            $("#expresscurate_content_editor").addClass("mceEditor");
+            $("#expresscurate_dialog_content_editor").addClass("mceEditor");
 
             var currentImage = 0;
             var numberOfImages = 0;
@@ -522,9 +531,19 @@ var ExpresscurateDialog = (function ($) {
                 event.preventDefault();
                 openDialog();
             });
-            $("#expresscurate_insert").click(function () {
-                var ed = tinyMCE.activeEditor,
+            $("#expresscurate_open-modal-clone").click(function (event) {
+                event.preventDefault();
+                openDialog(false, true);
+            });
+            $dialog.on('click', '#expresscurate_insert , #expresscurate_cloneInsert', function () {
+                var clone = $(this).is('#expresscurate_cloneInsert') ? true : false,
+                    ed = tinyMCE.activeEditor,
                     highlightedElems = $(ed.getBody()).find('span.expresscurate_keywordsHighlight');
+                if (clone) {
+                    ExpressCurateUtils.track('/post/content-dialog/cloneintopost', true);
+                } else {
+                    ExpressCurateUtils.track('/post/content-dialog/curateintopost', true);
+                }
                 if (highlightedElems.length > 0) {
                     highlightedElems.each(function (index, val) {
                         $(val).replaceWith(this.childNodes);
@@ -542,17 +561,19 @@ var ExpresscurateDialog = (function ($) {
                 $('.expresscurate_sources_coll_widget .addSource input').val(sourceVal);
                 ExpressCurateSourceCollection.addNew();
                 var html = "",
-                    insiteHTML = '',
                     bg = $('.img').css('background-image');
 
                 bg = bg.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
                 if (bg.indexOf('images/noimage.png') === -1 && bg.length > 5) {
                     html += '<img class="' + alignImg + ' ' + imgSize + '" src="' + bg + '" data-img-curated-from="' + sourceVal + '">'
                 }
-                if (tinyMCE.get('expresscurate_content_editor').getContent().length > 0) {
-                    html += '<blockquote cite = "' + sourceVal + '">' + tinyMCE.get('expresscurate_content_editor').getContent() + '<br />';
+
+                if (clone) {
+                    html += tinyMCE.get('expresscurate_dialog_content_clone_editor').getContent() + '<br />';
+                } else {
+                    html += '<blockquote cite = "' + sourceVal + '">' + tinyMCE.get('expresscurate_dialog_content_editor').getContent() + '<br />';
                 }
-                html += insiteHTML;
+
                 if (html.length > 0) {
                     if (sourceVal.length > 0) {
                         var domain = sourceVal;
@@ -561,11 +582,42 @@ var ExpresscurateDialog = (function ($) {
                         }
                         var title = $("#curated_title").val();
                         domain = domain.match(/^(http|https)/) ? domain : 'http://' + domain;
+
                         if (domain) {
-                            html += '<footer><p class="expresscurate_source">' + $("#expresscurate_from").val() + ' <cite><a class="expresscurated" rel="nofollow" data-curated-url="' + domain + '"  href = "' + domain + '">' + title + '</a></cite></p></footer><br/>';
+                            if (clone) {
+                                html += '<footer><p class="expresscurate_source">Originally published at <cite><a class="expresscurated" rel="nofollow" data-cloned-url="' +
+                                domain + '"  href = "' + domain +
+                                '"' + ($("#expresscurate_from_target").val() == 'on' ? ' target="_blank"' : '') + '>' +
+                                title + '</a></cite></p></footer><br/>';
+                            } else {
+                                html += '<footer><p class="expresscurate_source">' + $("#expresscurate_from").val() +
+                                ' <cite><a class="expresscurated" rel="nofollow" data-curated-url="' + domain + '"  href = "' + domain +
+                                '"' + ($("#expresscurate_from_target").val() == 'on' ? ' target="_blank"' : '') + '>' +
+                                title + '</a></cite></p></footer><br/>';
+                            }
                         }
                     }
-                    html += '</blockquote><br />';
+
+                    if (clone) {
+                        var $canonicalURL = $('#expresscurate_advanced_seo_canonical_url'),
+                            $noFollow = $('#expresscurate_advanced_seo_nofollow'),
+                            $noIndex = $('#expresscurate_advanced_seo_noindex'),
+                            $copyCheck = $('#expresscurate_advanced_seo_post_copy'),
+                            $copyCheckVal = $('#expresscurate_advanced_seo_post_copy_value'),
+                            $noIndexVal = $('#expresscurate_advanced_seo_noindex_value'),
+                            $noFollowVal = $('#expresscurate_advanced_seo_nofollow_value'),
+                            $copyControlWrap = $('#expresscurate_ClonePostWrap');
+                        if ($canonicalURL.length) {
+                            $copyControlWrap.removeClass('expresscurate_displayNone');
+                            $copyCheckVal.val('on');
+                            $canonicalURL.attr('value', domain).attr('readonly', true);
+                            $noFollow.add($noIndex).attr('checked', false).attr('disabled', true);
+                            $noFollowVal.add($noIndexVal).val('off');
+                            $copyCheck.attr('checked', true).attr('disabled', false);
+                        }
+                    } else {
+                        html += '</blockquote><br />';
+                    }
                     var $title = $('#titlewrap').find('#title');
                     if ($title.val().length === 0) {
                         $title.trigger('focus');
@@ -576,18 +628,28 @@ var ExpresscurateDialog = (function ($) {
                 } else {
                     return false;
                 }
-                ExpressCurateUtils.track('/post/content-dialog/curateintopost', true);
             });
         }
 
         $('#expresscurate_submit').click(function () {
             $("#expresscurate_loading").show();
-            submitExpresscurateForm();
+            submitExpresscurateForm(false);
         });
         $('#expresscurate_source').keypress(function (e) {
             if (e.keyCode === 13 || e.keyCode === 40) {
                 $("#expresscurate_loading").show();
-                submitExpresscurateForm();
+                submitExpresscurateForm(false);
+                return false;
+            }
+        });
+        $dialog.on('click', '#expresscurate_clone', function () {
+            $("#expresscurate_loading").show();
+            submitExpresscurateForm(true);
+        });
+        $('#expresscurate_clone_source').keypress(function (e) {
+            if (e.keyCode === 13 || e.keyCode === 40) {
+                $("#expresscurate_loading").show();
+                submitExpresscurateForm(true);
                 return false;
             }
         });
@@ -665,8 +727,16 @@ var ExpresscurateDialog = (function ($) {
         });
     }
 
-    function openDialog(source) {
-        var $dialog = $("#expresscurate_dialog");
+    function openDialog(source, clone) {
+        var $dialog = $("#expresscurate_dialog"),
+            $load = $dialog.find('#expresscurate_submit'),
+            $clone = $dialog.find('#expresscurate_clone'),
+            $insert = $dialog.find('#expresscurate_insert'),
+            $insertClone = $dialog.find('#expresscurate_cloneInsert'),
+            $contenttextarea = $dialog.find('#expresscurate_dialog_content_editor_container'),
+            $cloneContentTextarea = $dialog.find('#expresscurate_dialog_content_clone_editor_container'),
+            $source = $dialog.find('#expresscurate_source'),
+            $cloneSource = $dialog.find('#expresscurate_clone_source');
         $dialog.dialog({
             'dialogClass': 'wp-dialog',
             'modal': true,
@@ -683,9 +753,17 @@ var ExpresscurateDialog = (function ($) {
             },
             'close': clearExpresscurateForm
         });
+        if (clone) {
+            $load.add($insert).add($contenttextarea).add($source).addClass('expresscurate_displayNone');
+            $clone.add($insertClone).add($cloneContentTextarea).add($cloneSource).removeClass('expresscurate_displayNone');
+            tinyMCE.get('expresscurate_dialog_content_clone_editor').getBody().setAttribute('contenteditable', false);
+            ExpressCurateUtils.track('/post/content-dialog/startclone');
+        } else {
+            $load.add($insert).add($contenttextarea).add($source).removeClass('expresscurate_displayNone');
+            $clone.add($insertClone).add($cloneContentTextarea).add($cloneSource).addClass('expresscurate_displayNone');
+            ExpressCurateUtils.track('/post/content-dialog/startcurate');
+        }
         $dialog.dialog('open');
-
-        ExpressCurateUtils.track('/post/content-dialog/startcurate');
     }
 
     var isSetup = false;
@@ -709,6 +787,7 @@ var ExpresscurateDialog = (function ($) {
         openDialog: openDialog,
         delCuratedTag: delCuratedTag
     }
-})(window.jQuery);
+})
+(window.jQuery);
 
 ExpresscurateDialog.setup();

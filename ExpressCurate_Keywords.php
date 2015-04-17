@@ -1,4 +1,5 @@
 <?php
+
 require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
 
 /*

@@ -1,4 +1,12 @@
 <?php
+
+/*
+  Author: ExpressCurate
+  Author URI: http://www.expresscurate.com
+  License: GPLv3 or later
+  License URI: http://www.gnu.org/licenses/gpl.html
+ */
+
 function expresscurate_autoload($className) {
     $classFile =  sprintf("%s/$className", dirname(__FILE__));
     if (file_exists($classFile . '.php')) {

@@ -19,7 +19,7 @@ if ($_POST) {
 ?>
 <div class="expresscurate_blocks expresscurate_Styles wrap">
     <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
-        <a href="admin.php?page=expresscurate&type=keywords" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
+        <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
 
         <h2>ExpressCurate</h2>
         <label></label>

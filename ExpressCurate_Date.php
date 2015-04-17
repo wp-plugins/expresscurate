@@ -1,5 +1,14 @@
 <?php
+
 require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
+
+/*
+  Author: ExpressCurate
+  Author URI: http://www.expresscurate.com
+  License: GPLv3 or later
+  License URI: http://www.gnu.org/licenses/gpl.html
+ */
+
 /**
  * Class responsible for date formatting
  *

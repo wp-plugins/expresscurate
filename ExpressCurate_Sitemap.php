@@ -1,11 +1,14 @@
 <?php
+
 require_once(sprintf("%s/autoload.php", dirname(__FILE__)));
-/**
- * Created by PhpStorm.
- * User: armen
- * Date: 10/9/14
- * Time: 2:39 PM
+
+/*
+  Author: ExpressCurate
+  Author URI: http://www.expresscurate.com
+  License: GPLv3 or later
+  License URI: http://www.gnu.org/licenses/gpl.html
  */
+ 
 class ExpressCurate_Sitemap
 {
 
