@@ -68,10 +68,10 @@ class ExpressCurate_FeedManager
                              WHERE meta_key LIKE  '%_expresscurate_link_%' AND meta_value LIKE '%" . $link . "%' GROUP BY post_id");
 
                         // construct the rss data
-                        $curated_links_rss[$link]['feed_url'] = $result['feed_url'] = $rssUrl;
-                        $curated_links_rss[$link]['link'] = $result['link'] = $link;
-                        $curated_links_rss[$link]['post_count'] = $result['post_count'] = count($metas);
-                        $curated_links_rss[$link]['feed_title'] = $result['feed_title'] = $feedMeta['title'];
+                        $curated_links_rss[$rssUrl]['feed_url'] = $result['feed_url'] = $rssUrl;
+                        $curated_links_rss[$rssUrl]['link'] = $result['link'] = $link;
+                        $curated_links_rss[$rssUrl]['post_count'] = $result['post_count'] = count($metas);
+                        $curated_links_rss[$rssUrl]['feed_title'] = $result['feed_title'] = $feedMeta['title'];
                         
                         // save
                         update_option('expresscurate_links_rss', json_encode($curated_links_rss));
@@ -424,7 +424,7 @@ class ExpressCurate_FeedManager
             
             // save the latest feed
             $feed_content = json_encode(array('date' => date('Y-m-d H:i:s'), 'content' => $feed_array));
-           // update_option('expresscurate_feed_content', $feed_content);
+            update_option('expresscurate_feed_content', $feed_content);
             return $feed_content;
         }
     }
@@ -453,6 +453,7 @@ class ExpressCurate_FeedManager
             // check for google redirect urls and pick up the original post link
             $protocol = $parsedLink['scheme'];
             if (strpos($protocol . "://www.google.com/url", $url) == 0) {
+                $query = $parsedLink['query'];
                 $url_query = explode("&", $query);
                 foreach ($url_query as $param) {
                     if (strpos($param, 'url=') === 0) {
@@ -524,12 +525,12 @@ class ExpressCurate_FeedManager
         $feeds = json_decode($this->get_feed_content(), true);
         
         // reschedule the cronjob
-        if(!empty($feeds['content'])) {
-            wp_clear_scheduled_hook('expresscurate_pull_feeds');
-            $pull_feed_interval = (get_option('expresscurate_pull_hours_interval')) ? get_option('expresscurate_pull_hours_interval') : 1;
-            wp_schedule_event(strtotime("+" . $pull_feed_interval . " hour"), 'hourly', 'expresscurate_pull_feeds');
-            $feeds["minutes_to_next_pull"] = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), time());
-        }
+        //if(!empty($feeds['content'])) {
+        wp_clear_scheduled_hook('expresscurate_pull_feeds');
+        $pull_feed_interval = (get_option('expresscurate_pull_hours_interval')) ? get_option('expresscurate_pull_hours_interval') : 1;
+        wp_schedule_event(strtotime("+" . $pull_feed_interval . " hour"), 'hourly', 'expresscurate_pull_feeds');
+        $feeds["minutes_to_next_pull"] = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), time());
+        //}
         
         // return
         echo json_encode($feeds);
@@ -637,28 +638,23 @@ class ExpressCurate_FeedManager
             } else {
                 $bookmarks = array();
             }
-            $exists_url = array();
-            foreach ($bookmarks as $bookmark) {
-                $exists_url[] = $bookmark['link'];
-            }
-            foreach ($items as $item) {
 
-                if (!in_array($item['link'], $exists_url)) {
+            foreach ($items as $item) {
+                $bookmarkURL = $item['link'];
+                if (isset($bookmarks[$bookmarkURL])) {
+                        $result[$bookmarkURL]['status'] = 'warning';
+                }else {
                     $current_user = wp_get_current_user();
                     $item['user'] = $current_user->display_name;
-                    $this->collect_bookmark($bookmarks, $item);
-                    $result[$item['link']]['status'] = 'success';
-                } else {
-                    if ($bookmark['comment']) {
-                        $bookmarks[$item['link']]['comment'] = $bookmark['comment'];
-                        $result[$item['link']]['status'] = 'success';
-                    } else {
-                        $result[$item['link']]['status'] = 'warning';
-                    }
+                    
+                    $this->collectBookmark($bookmarks, $item);
+                    
+                    $result[$bookmarkURL]['status'] = 'success';
                 }
             }
-            $bookmarks = json_encode($bookmarks);
-            update_option('expresscurate_bookmarks', $bookmarks);
+            
+            // save the updated bookmarks
+            update_option('expresscurate_bookmarks', json_encode($bookmarks));
         } else {
             $result['status'] = 'error';
         }
@@ -670,44 +666,86 @@ class ExpressCurate_FeedManager
     {
         $data = $_REQUEST;
         $result = array();
-        if(!ExpressCurate_HtmlParser::supportsDownload()){
+        if(!ExpressCurate_HtmlParser::supportsDownload()) {
             $result['status'] = 'error';
             $result['msg'] = 'You should activate either curl extension or allow_url_fopen setting.';
-        }else {
+        } else {
+            // check if the url to bookmark is specified
             if (isset($data['url'])) {
+                // get the url
+                $bookmarkURL = $data['url'];
+                
+                // clean-up the provided url
+                // parse the post url
+                $parsedLink = parse_url($bookmarkURL);
+            
+                // google alerts supportbookmarkURL   // check for google redirect urls and pick up the original post link
+                $protocol = $parsedLink['scheme'];
+                if (strpos($protocol . "://www.google.com/url", $bookmarkURL) == 0) {
+                    $query = $parsedLink['query'];
+                    $url_query = explode("&", $query);
+                    foreach ($url_query as $param) {
+                        if (strpos($param, 'url=') === 0) {
+                            $bookmarkURL = str_replace("url=", "", $param);
+                            $bookmarkURL = urldecode($bookmarkURL);
+                            break;
+                        }
+                    }
+                }
+                
+                // read the existing bookmarks
                 $bookmarks = get_option('expresscurate_bookmarks', '');
-                $data_url = $data['url'];
                 if ($bookmarks) {
                     $bookmarks = json_decode($bookmarks, true);
                 } else {
                     $bookmarks = array();
                 }
-                $exists_url = array();
-                foreach ($bookmarks as $bookmark) {
-                    $exists_url[] = $bookmark['link'];
-                }
-
-                $extracted_url = extract_google_feed_url($data_url, $bookmarks);
-                if ($extracted_url) {
-                    $data_url = $extracted_url;
-                }
-                $data_url = expresscurate_normalise_url($data_url, true);
-
-                if (!in_array($data_url, $exists_url)) {
-
+                
+                // check if the provided url is already bookmarked
+                if (isset($bookmarks[$bookmarkURL])) {
+                    // is a new comment provided?
+                    if (isset($data['comment'])) {
+                        // save the new comment
+                        $bookmarks[$bookmarkURL]['comment'] = $data['comment'];
+                        
+                        // construct the result
+                        $result['status'] = 'success';
+                        $result['result'] = $bookmarkURL;
+                        
+                        // save the updated bookmarks
+                        update_option('expresscurate_bookmarks', json_encode($bookmarks));
+                    } else {
+                        // construct the result
+                        // nothing to do, and url is already bookmarked
+                        $result['status'] = 'error';
+                        $result['msg'] = 'This page is already bookmarked.';
+                    }
+                } else {
+                    // the page is new, bookmark
+                    // load the article
                     $contentManager = new ExpressCurate_ContentManager();
-                    $article = $contentManager->get_article($data_url, false);
+                    $article = $contentManager->getArticle($bookmarkURL, false);
+                    
+                    // check if the article is loaded successfully
                     if (isset($article['status']) && $article['status'] == 'success') {
+                        // get the comment
                         $comment = isset($data['comment']) ? $data['comment'] : '';
+                        
+                        // set the type and author
                         $article['type'] = isset($data['type']) ? $data['type'] : 'user';
                         $current_user = wp_get_current_user();
                         $article['result']['user'] = $current_user->display_name;
-                        $this->collect_bookmark($bookmarks, $article, $data_url, $comment);
+                        
+                        // ...
+                        $this->collectBookmark($bookmarks, $article, $bookmarkURL, $comment);
+                        
+                        // construct the result
                         $result['status'] = 'success';
-                        $result['result'] = $bookmarks[$data_url];
-                        $result['result']['curateLink'] = base64_encode(urlencode($data_url));
-                        $bookmarks = json_encode($bookmarks);
-                        update_option('expresscurate_bookmarks', $bookmarks);
+                        $result['result'] = $bookmarks[$bookmarkURL];
+                        $result['result']['curateLink'] = base64_encode(urlencode($bookmarkURL));
+                        
+                        // save the updated bookmarks
+                        update_option('expresscurate_bookmarks', json_encode($bookmarks));
                     } else {
                         if (isset($article['status'])) {
                             $result['status'] = $article['status'];
@@ -716,26 +754,50 @@ class ExpressCurate_FeedManager
                             $result['status'] = 'error';
                             $result['msg'] = 'Article does not exists.';
                         }
-
-                    }
-                } else {
-                    if (isset($data['comment'])) {
-                        $bookmarks[$data['url']]['comment'] = $data['comment'];
-                        $result['result'] = $bookmarks[$data_url];
-                        $bookmarks = json_encode($bookmarks);
-                        update_option('expresscurate_bookmarks', $bookmarks);
-                        $result['status'] = 'success';
-                    } else {
-                        $result['status'] = 'error';
-                        $result['msg'] = 'This page is already bookmarked.';
                     }
                 }
             } else {
                 $result['status'] = 'error';
+                $result['msg'] = 'Please, provide URL to bookmark.';
             }
         }
         echo json_encode($result);
         die;
+    }
+    
+    private function collectBookmark(&$bookmarks, $item, $url = null, $comment = '') {
+        if ($url) {
+            if (isset($item['result']) && isset($item['result']['title'])) {
+                // create the new bookmark
+                $bookmark = array();
+                $bookmark['link'] = $url;
+                $bookmark['domain'] = $item['result']['domain'];
+                $bookmark['title'] = $item['result']['title'];
+                $bookmark['author'] = $item['result']['author'];
+                $bookmark['user'] = $item['result']['user'];
+                $bookmark['date'] = $item['result']['date'];
+                $bookmark['bookmark_date'] = date("Y-m-d h:i:s");
+                $bookmark['keywords'] = array();
+                $bookmark['media'] = $item['result']['media'];
+                $bookmark['comment'] = $comment;
+                $bookmark['curated'] = 0;
+                
+                $bookmark['type'] = isset($item['result']['type']) ? $item['type'] : 'user';
+                
+                // add the bookmark to the list
+                $bookmarks[$url] = $bookmark;
+            }
+        } else {
+            if ($item['title']) {
+                if (!isset($item['keywords'])) {
+                    $item['keywords'] = array();
+                }
+                $item['comment'] = $comment;
+                $item['bookmark_date'] = date('Y-m-d H:i:s');
+                
+                $bookmarks[$item['link']] = $item;
+            }
+        }
     }
 
     public function get_bookmark()
@@ -766,38 +828,6 @@ class ExpressCurate_FeedManager
         }
         echo json_encode($result,JSON_UNESCAPED_SLASHES);
         die;
-    }
-
-    private function collect_bookmark(&$bookmarks, $item, $url = null, $comment = '')
-    {
-        if ($url) {
-            if (isset($item['result']) && isset($item['result']['title'])) {
-                $url = expresscurate_normalise_url($url, true);
-                $bookmark = array();
-                $bookmark['link'] = $url;
-                $bookmark['domain'] = $item['result']['domain'];
-                $bookmark['title'] = $item['result']['title'];
-                $bookmark['author'] = $item['result']['author'];
-                $bookmark['user'] = $item['result']['user'];
-                $bookmark['date'] = $item['result']['date'];
-                $bookmark['bookmark_date'] = date("Y-m-d h:i:s");
-                $bookmark['keywords'] = array();
-                $bookmark['media'] = $item['result']['media'];
-                $bookmark['type'] = isset($item['result']['type']) ? $item['type'] : 'user';
-                $bookmark['comment'] = $comment;
-                $bookmark['curated'] = 0;
-                $bookmarks[$url] = $bookmark;
-            }
-        } else {
-            if ($item['title']) {
-                if (!isset($item['keywords'])) {
-                    $item['keywords'] = array();
-                }
-                $item['comment'] = $comment;
-                $item['bookmark_date'] = date('Y-m-d H:i:s');
-                $bookmarks[$item['link']] = $item;
-            }
-        }
     }
 
     public function delete_bookmarks()
@@ -927,7 +957,7 @@ class ExpressCurate_FeedManager
                 $result['status'] = 'warning';
             } else {
                 $contentManager = new ExpressCurate_ContentManager();
-                $article = $contentManager->get_article($data['url'], false);
+                $article = $contentManager->getArticle($data['url'], false);
                 $result['status'] = $article['status'];
                 if ($article['status'] == 'success') {
                     $result['result'] = array('title' => $article['result']['title'], 'link' => $data['url'], 'domain' => $article['result']['domain']);

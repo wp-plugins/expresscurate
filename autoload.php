@@ -36,6 +36,6 @@ spl_autoload_register('expresscurate_autoload');
 //require_once 'ExpressCurate_Util.php';
 //require_once 'ExpressCurate_HtmlParser.php';
 //require_once 'ExpressCurate_Date.php';
-//require_once 'ExpressCurate_GoogleAuth.php';
+//require_once 'ExpressCurate_GoogleClient.php';
 //require_once 'ExpressCurate_SmartPublish.php';
 //require_once 'ExpressCurate_Tracker.php';

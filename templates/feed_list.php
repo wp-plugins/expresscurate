@@ -16,15 +16,7 @@ if (!empty($contentList)) {
     $feed_content = $contentList['content'];
     if (is_array($feed_content) && count($feed_content) > 0) {
         foreach ($feed_content as $content) {
-            $content['fullLink'] = $content['link'];
-            $extracted_url = extract_google_feed_url($content['link'], $feed_content);
-            if ($extracted_url) {
-                $url = $extracted_url;
-            } else {
-                $url = $content['link'];
-            }
-            $content['link'] = $url;
-            $content['domain'] = parse_url($url, PHP_URL_SCHEME) . "://" . parse_url($url, PHP_URL_HOST);
+            $content['domain'] = parse_url($content['link'], PHP_URL_SCHEME) . "://" . parse_url($content['link'], PHP_URL_HOST);
             array_push($sorted_feeds, $content);
         }
     }
@@ -127,7 +119,7 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
                     } ?>
                 </ul>
 
-                <a data-fulllink="<?php echo $item['fullLink']; ?>" class="postTitle" href="<?php echo $item['link'] ?>"
+                <a data-link="<?php echo $item['link']; ?>" class="postTitle" href="<?php echo $item['link'] ?>"
                    target="_blank"><?php echo $item['title'] ?></a><br/>
                 <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
                 <?php if (isset($item['author']) && '' != $item['author']) { ?>

@@ -40,19 +40,19 @@ var ExpressCurateSettings = (function ($) {
 
         });
         /*settings page traching*/
-        $('#tab-1').on('change','input',function(){
+        $('#tab-1').on('change', 'input', function () {
             ExpressCurateUtils.track('/settings/general');
         });
-        $('#tab-2').on('change','input, select',function(){
+        $('#tab-2').on('change', 'input, select', function () {
             ExpressCurateUtils.track('/settings/smartpublishing');
         });
-        $('#tab-3').on('change','input, select',function(){
+        $('#tab-3').on('change', 'input, select', function () {
             ExpressCurateUtils.track('/settings/sitemap');
         });
-        $('#tab-4').on('change','input',function(){
+        $('#tab-4').on('change', 'input', function () {
             ExpressCurateUtils.track('/settings/extension');
         });
-        $('#tab-5').on('change','input, select',function(){
+        $('#tab-5').on('change', 'input, select', function () {
             ExpressCurateUtils.track('/settings/feed');
         });
         /*smart publishing*/
@@ -73,16 +73,16 @@ var ExpressCurateSettings = (function ($) {
             showHideOptions($('.sitemapUpdateFrequency'), $(this));
             var status = '',
                 $submitSitemap = $('.expresscurate #submitSiteMap'),
-                $autorize=$('.getApiKey');
-            status=($(this).is(':checked'))?'on':'off';
+                $autorize = $('.getApiKey');
+            status = ($(this).is(':checked')) ? 'on' : 'off';
             if ($(this).is(':checked') && $submitSitemap.hasClass('generated')) {
                 $submitSitemap.removeClass('expresscurate_displayNone');
             } else {
                 $submitSitemap.addClass('expresscurate_displayNone');
             }
-            if($submitSitemap.hasClass('generated')){
+            if ($submitSitemap.hasClass('generated')) {
                 $autorize.addClass('expresscurate_displayNone');
-            }else{
+            } else {
                 $autorize.removeClass('expresscurate_displayNone');
             }
             $.ajax({
@@ -105,23 +105,39 @@ var ExpressCurateSettings = (function ($) {
             });
         });
         $submitSitemap.on('click', function () {
+            $('.expresscurate_Error').remove();
+            var message = '',
+                className = '';
             $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_sitemap_submit'
             }).done(function (res) {
                 var data = $.parseJSON(res);
-                if (data.status === 'success') {
-                    $submitSitemap.removeClass('expresscurate_displayNone').addClass('generated');
+                if (data.status === 0) {
+                    $submitSitemap.addClass('generated');
+                    message = data.message;
+                    className='expresscurate_SettingsSuccess';
+                } else if (data.status === 1) {
+                    message = data.message;
+                    className='expresscurate_SettingsError';
+                } else if (data.status === 2) {
+                    message = data.message;
+                    className='expresscurate_SettingsError';
+                } else if (data.status === 3) {
+                    message = data.message;
+                    className='expresscurate_SettingsError';
                 }
+            }).always(function () {
+                $submitSitemap.after('<p class="expresscurate_Error '+className+'">' + message + '</p>');
             });
         });
 
         /*SEO settings*/
         $('#expresscurate_seo').click(function () {
-            var $this=$(this),
+            var $this = $(this),
                 $slider = $('#publisherWrap'),
                 $sitemapTab = $('#sitemapTab');
-            showHideOptions($slider,$this);
+            showHideOptions($slider, $this);
             if ($this.is(':checked')) {
                 $sitemapTab.removeClass('expresscurate_displayNone');
             } else {

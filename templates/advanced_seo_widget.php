@@ -23,23 +23,23 @@ $postCopy = (get_post_meta($post->ID, '_expresscurate_advanced_seo_post_copy', t
         <a name="expresscurate" id="expresscurate" xmlns="http://www.w3.org/1999/html"></a>
 
         <div id="expresscurate_advancedSEO_widget">
-            <div id="expresscurate_ClonePostWrap" class="<?php if(!$postCopy) {echo 'expresscurate_displayNone';} ?>">
+            <!--<div id="expresscurate_ClonePostWrap" class="<?php /*if(!$postCopy) {echo 'expresscurate_displayNone';} */?>">
                 <div class="info">
                     <label for="expresscurate_advanced_seo_canonical_url" class="label">Content cloned</label>
                 </div>
                 <div class="value">
                     <input class="expresscurate_displayNone" id="expresscurate_advanced_seo_post_copy"
-                           type='checkbox' <?php if(!$postCopy) {
+                           type='checkbox' <?php /*if(!$postCopy) {
                         echo 'disabled="disabled"';
-                    } ?>
+                    } */?>
                            name='expresscurate_advanced_seo_post_copy'
-                        <?php echo ($postCopy) ? 'checked' : '' ?>>
+                        <?php /*echo ($postCopy) ? 'checked' : '' */?>>
                     <label class="expresscurate_preventTextSelection" for="expresscurate_advanced_seo_post_copy"></label>
                     <input type="hidden" id="expresscurate_advanced_seo_post_copy_value"
                            name="expresscurate_advanced_seo_post_copy_value"
-                           value="<?php echo ($postCopy) ? "on" : "off"; ?>">
+                           value="<?php /*echo ($postCopy) ? "on" : "off"; */?>">
                 </div>
-            </div>
+            </div>-->
             <div class="info">
                 <label for="expresscurate_advanced_seo_title" class="label">SEO Title</label>
             </div>

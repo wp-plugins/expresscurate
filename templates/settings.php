@@ -299,6 +299,21 @@
                                 ?>
                             </select>
                     </li>
+                    <!--<li>
+                        <p class="title">Social publishing </p>
+                        <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_social_publishing"
+                               name="expresscurate_social_publishing" <?php
+/*                        if (get_option('expresscurate_social_publishing', '') == "on") {
+                            echo 'checked';
+                        }
+                        */?> />
+                        <label class="controls checkboxLabel" for="expresscurate_social_publishing"></label>
+                        
+                        <?php /*
+                             $blogName = urlencode(urlencode(get_bloginfo('url')));
+                        */?>
+                        <a class="getApiKey  <?php /*if (strlen(get_option('expresscurate_buffer_refresh_token')) > 2) {echo 'expresscurate_displayNone';}*/?>" href="https://www.expresscurate.com/api/connector/buffer/refreshtoken/<?/*=$blogName*/?>">Authorize access to Buffer</a>
+                    </li>-->
                 </ul>
                 <div class="centerSave">
                     <?php @submit_button(); ?>

@@ -47,7 +47,7 @@ var ExpressCurateFeedWall = (function ($) {
         var items = [];
 
         $.each(els, function (index, el) {
-            var item = $(el).find('a.postTitle').data('fulllink');
+            var item = $(el).find('a.postTitle').data('link');
             items.push(item);
         });
         $.ajax({

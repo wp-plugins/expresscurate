@@ -303,11 +303,11 @@ class ExpressCurate_HtmlParser
 
     private static function sanitizeContent($content)
     {
-        $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
-        $content = preg_replace('/<--[\S\s]*?-->/msi', '', $content);
-        $content = preg_replace('/(<noscript[^>]*>|<\/noscript>)/msi', '', $content);
-        $content = preg_replace('~>\s+<~', '><', $content);
-        $content = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $content);
+        //$content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
+        //$content = preg_replace('/<--[\S\s]*?-->/msi', '', $content);
+        //$content = preg_replace('/(<noscript[^>]*>|<\/noscript>)/msi', '', $content);
+        //$content = preg_replace('~>\s+<~', '><', $content);
+        //$content = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $content);
 
         $content = preg_replace('/^.*(?=<html>)/i', '', $content);
         $content = str_replace("\0", " ", $content);
@@ -326,6 +326,7 @@ class ExpressCurate_HtmlParser
             $this->removeElementsByTagName('script', $dom);
             $this->removeElementsByTagName('style', $dom);
             $this->removeElementsByTagName('link', $dom);
+            $this->removeElementsByTagName('nocript', $dom);
 
             // assign
             $this->dom = $dom;
@@ -568,7 +569,7 @@ class ExpressCurate_HtmlParser
 
 
         // TODO this is a new xpath with the new modified dom, not sure if this is required if dom is passed with a reference
-        $imgTags = $this->xpath->query(".//img",$this->article);
+        $imgTags = $this->xpath->query(".//img", $this->article);
         $i = 0;
         foreach ($imgTags as $t) {
             $src = $t->getAttribute('src');
@@ -597,15 +598,16 @@ class ExpressCurate_HtmlParser
             $t->parentNode->removeChild($t);
         }
         //get H1
-        $h1Tag = $this->xpath->query(".//h1",$this->article);
+        $h1Tag = $this->xpath->query(".//h1", $this->article);
         foreach ($h1Tag as $h1) {
             if (strlen($h1->nodeValue) > 3) {
                 $result_h1 .= $h1->nodeValue . "\n";
             }
             $h1->parentNode->removeChild($h1);
         }
+        // TODO add bullets
         //get H2
-        $h2Tag = $this->xpath->query(".//h2",$this->article);
+        $h2Tag = $this->xpath->query(".//h2", $this->article);
         foreach ($h2Tag as $h2) {
             if (strlen($h2->nodeValue) > 3) {
                 $result_h2 .= $h2->nodeValue . "\n";
@@ -613,57 +615,57 @@ class ExpressCurate_HtmlParser
             $h2->parentNode->removeChild($h2);
         }
         //get H3
-        $h3Tag = $this->xpath->query(".//h3",$this->article);
+        $h3Tag = $this->xpath->query(".//h3", $this->article);
         foreach ($h3Tag as $h3) {
             if (strlen($h3->nodeValue) > 3) {
                 $result_h3 .= $h3->nodeValue . "\n";
             }
             $h3->parentNode->removeChild($h3);
         }
-        //get text
-        /*$i = 0;
-        $articleTags = $this->xpath->query('/html/body/article');
-        foreach ($articleTags as $t) {
-            $result_paragraphs[$i]['value'] = strip_tags(trim($t->nodeValue));
-            $result_paragraphs[$i]['tag'] = 'article';
-            $t->parentNode->removeChild($t);
+
+        // reset cursor for paragraphs
+        $i = 0;
+
+        // get blockquotes
+        $blockquoteTag = $this->xpath->query(".//blockquote", $this->article);
+        foreach ($blockquoteTag as $blockquote) {
+            $result_paragraphs[$i]['value'] = trim(strip_tags($blockquote->nodeValue));
+            $result_paragraphs[$i]['tag'] = 'blockquote';
             $i++;
-        }*/
+            
+            $blockquote->parentNode->removeChild($blockquote);
+        }
+        
+        // get paragraphs
+        $paragraphTag = $this->xpath->query(".//p", $this->article);
+        foreach ($paragraphTag as $paragraph) {
+            $result_paragraphs[$i]['value'] = trim(strip_tags($paragraph->nodeValue));
+            $result_paragraphs[$i]['tag'] = 'p';
+            $i++;
+            
+            $paragraph->parentNode->removeChild($paragraph);
+        }
 
-
-        $textTags = $this->xpath->query('//text()',$this->article);
+        // get to floating texts
+        $textTags = $this->xpath->query('//text()', $this->article);
         foreach ($textTags as $t) {
-            if ($t->length > 15 && $t->parentNode->tagName != 'a' && $t->parentNode->tagName != 'h1' && $t->parentNode->tagName != 'h2' && $t->parentNode->tagName != 'h3') {
-                if ($t->parentNode->nodeName == "blockquote" || $t->parentNode->parentNode->nodeName == "blockquote" || $t->parentNode->parentNode->parentNode->nodeName == "blockquote") {
-                    if ($t->parentNode->nodeName == "blockquote") {
-                        $result_paragraphs[$i]['value'] = strip_tags($t->parentNode->nodeValue);
-                    } elseif ($t->parentNode->parentNode && $t->parentNode->parentNode->nodeName == "blockquote") {
-                        $result_paragraphs[$i]['value'] = strip_tags($t->parentNode->parentNode->nodeValue);
-                    } elseif ($t->parentNode->parentNode->parentNode && $t->parentNode->parentNode->parentNode->nodeName == "blockquote") {
-                        $result_paragraphs[$i]['value'] = strip_tags($t->parentNode->parentNode->parentNode->nodeValue);
-                    }
-                    $result_paragraphs[$i]['tag'] = "blockquote";
-                } else {
-                    $result_paragraphs[$i]['value'] = strip_tags($t->nodeValue);
-                    $result_paragraphs[$i]['tag'] = $t->parentNode->nodeName;
-                }
-                $i++;
-            }
+            $result_paragraphs[$i]['value'] = strip_tags($t->nodeValue);
+            $result_paragraphs[$i]['tag'] = $t->parentNode->nodeName;
+            $i++;
         }
 
         //author
         $article_author = '';
-        $author = $this->xpath->query('.//*[@rel="author"][1]',$this->article)->item(0);
+        $author = $this->xpath->query('.//*[@rel="author"][1]', $this->article)->item(0);
         if ($author) {
             $article_author = $author->nodeValue;
         }
         //date
         $article_date = '';
-        $date = $this->xpath->query('.//*[@datetime][1]',$this->article)->item(0);
+        $date = $this->xpath->query('.//*[@datetime][1]', $this->article)->item(0);
         if ($date) {
             $article_date = $date->nodeValue;
         }
-
 
         //smart tags
         $max_count = get_option("expresscurate_max_tags", 3);

@@ -44,8 +44,6 @@ class ExpressCurate_Sitemap
         if (floor(date('Y-m-d H:i:s') - strtotime($lastGenerationDate)/(60*60*24) ) >= $intervalInDays) {
             $this->generateSitemap();
         }
-
-
     }
 
     public function pushSitemapScheduled(){
@@ -66,8 +64,6 @@ class ExpressCurate_Sitemap
         if (floor(date('Y-m-d H:i:s') - strtotime($lastGenerationDate)/(60*60*24) ) >= $intervalInDays) {
             $this->submitToGoogle();
         }
-
-
     }
 
     public function generateSitemap()
@@ -150,15 +146,17 @@ class ExpressCurate_Sitemap
 
     public function submitToGoogle()
     {
-        $googleAuth = new ExpressCurate_GoogleAuth();
+        $googleAuth = new ExpressCurate_GoogleClient();
         $submitToWebmastersStatus = get_option('expresscurate_sitemap_submit');
         if ($submitToWebmastersStatus) {
-            $response = $googleAuth->getAccessToken();
+            //$response = $googleAuth->getAccessToken();
+            $response = $googleAuth->accessToken();
             if ($response) {
-                $response = $googleAuth->submit_sitemap(get_site_url(), get_site_url() . '/sitemap.xml');
-                 return $response;
+                $response = $googleAuth->submitSitemap(get_site_url(), get_site_url() . '/sitemap.xml');
+                echo json_encode($response);
+                die;
             } else {
-                // @TODO notify user to get key
+                $response = array('status'=> 3,'message' => 'ExpressCurate shall be authorized to access to Google Webmaster Tools.');
             }
        }
     }

@@ -70,7 +70,7 @@ class ExpressCurate_Actions
         add_action('init', array(&$this, 'register_curated_post_status'), 0);
         add_action('init', array(&$this, 'buttons')); //'wpc_buttons'
         add_action('init', array(&$this, 'include_api'));
-        add_action('init',array(&$this,'add_oembed_facebook'));
+        add_action('init', array(&$this, 'add_oembed_facebook'));
 
         add_filter('manage_edit-post_columns', array(&$this, 'curated_column_register'));
         add_action('manage_posts_custom_column', array(&$this, 'curated_column_display'), 10, 2);
@@ -124,7 +124,7 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_export_api_check_source', array($this->ajaxExportAPI, 'check_source'));
         add_action('wp_ajax_expresscurate_export_api_send_google_key', array($this->ajaxExportAPI, 'send_google_key'));
 
-        add_action('wp_ajax_expresscurate_get_article', array($this->contentManager, 'get_article'));
+        add_action('wp_ajax_expresscurate_get_article', array($this->contentManager, 'getArticle'));
         add_action('wp_ajax_expresscurate_keywords_get_post_keyword_stats', array($this->keywords, 'get_post_keyword_stats'));
         add_action('wp_ajax_expresscurate_keywords_add_post_keyword', array($this->keywords, 'add_post_keyword'));
         add_action('wp_ajax_expresscurate_keywords_add_keyword', array($this->keywords, 'add_keyword'));
@@ -215,6 +215,7 @@ class ExpressCurate_Actions
         register_setting('expresscurate-smartpublish-group', 'expresscurate_publish');
         register_setting('expresscurate-smartpublish-group', 'expresscurate_manually_approve_smart');
         register_setting('expresscurate-smartpublish-group', 'expresscurate_hours_interval');
+        register_setting('expresscurate-smartpublish-group', 'expresscurate_social_publishing');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_generation_interval');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_include_new_posts');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_include_new_pages');
@@ -235,8 +236,9 @@ class ExpressCurate_Actions
         add_option('expresscurate_smart_tagging', 'on');
     }
 
-    function add_oembed_facebook(){
-        wp_oembed_add_provider( 'http://www.facebook.com/*', 'http://api.embed.ly/v1/api/oembed');
+    function add_oembed_facebook()
+    {
+        wp_oembed_add_provider('http://www.facebook.com/*', 'http://api.embed.ly/v1/api/oembed');
     }
 
     public function load_source()
@@ -292,10 +294,11 @@ class ExpressCurate_Actions
         array_push($buttons, 'justifytextbox');
         array_push($buttons, 'righttextbox');
         array_push($buttons, 'noFollow');
-        if(get_option('expresscurate_seo', '') == "on"){
+        if (get_option('expresscurate_seo', '') == "on") {
             array_push($buttons, 'wordCount');
         }
         array_push($buttons, 'addKeyword');
+        array_push($buttons, 'clearContent');
         return $buttons;
     }
 
@@ -376,16 +379,16 @@ class ExpressCurate_Actions
         if ('curated' != $column_name)
             return;
         $curated = get_post_meta($post_id, '_is_expresscurate', true);
-        //$cloned = get_post_meta($post_id, '_expresscurate_advanced_seo_post_copy', true);
-        //if($cloned=='on'){
-           // $curated = '<em>' . __('Cloned', self::PLUGIN_FOLDER) . '</em>';
-       // }else{
+        $cloned = get_post_meta($post_id, '_expresscurate_advanced_seo_post_copy', true);
+        if ($cloned == 'on') {
+            $curated = '<em>' . __('Cloned', self::PLUGIN_FOLDER) . '</em>';
+        } else {
             if ($curated == 1) {
                 $curated = '<em>' . __('Yes', self::PLUGIN_FOLDER) . '</em>';
             } else {
                 $curated = '<em>' . __('No', self::PLUGIN_FOLDER) . '</em>';
             }
-       // }
+        }
         echo $curated;
     }
 
@@ -618,7 +621,7 @@ class ExpressCurate_Actions
         if (("publish" == $old_status && "publish" != $new_status) || ("publish" == $new_status && "publish" != $old_status)) {
             $this->generate_sitemap();
         }
-        if ("publish" == $new_status && "publish" != $old_status && (!empty($_POST['expresscurate_sources']) || get_post_meta($post->ID, '_is_expresscurate', true)==1)) {
+        if ("publish" == $new_status && "publish" != $old_status && (!empty($_POST['expresscurate_sources']) || get_post_meta($post->ID, '_is_expresscurate', true) == 1)) {
             update_option('expresscurate_changed_post_status', 'publish');
         }
     }
@@ -1026,6 +1029,7 @@ class ExpressCurate_Actions
     public function add_widget()
     {
         $seo = get_option('expresscurate_seo', '') == 'on';
+        $social = get_option('expresscurate_social_publishing', '') == 'on';
         $post_types = array('post', 'page');
         $post_types = array_merge($post_types, get_post_types(array('_builtin' => false, 'public' => true), 'names'));
         foreach ($post_types as $post_type) {
@@ -1034,6 +1038,9 @@ class ExpressCurate_Actions
             if ($seo) {
                 add_meta_box('expresscurate_advanced_seo', ' Advanced SEO', array(&$this, 'advanced_seo'), $post_type, 'normal', 'high');
             }
+            /*if($social) {
+                add_meta_box('expresscurate_social_publishing', ' Social Posts', array(&$this, 'social_posts'), $post_type, 'normal', 'high');
+            }*/
         }
     }
 
@@ -1056,6 +1063,15 @@ class ExpressCurate_Actions
 
 
     <?php
+    }
+    
+    public function social_posts()
+    {
+        ?>
+        <div id="expresscurate_social_posts_widget" class="expresscurate_social_posts_widget">
+            <?php include(sprintf("%s/templates/social_posts_widget.php", dirname(__FILE__))); ?>
+        </div>
+        <?php
     }
 
     public function sources_collection()
@@ -1237,14 +1253,6 @@ class ExpressCurate_Actions
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
         $_SESSION['sitemap_token'] = false;
-        /* if(get_option('expresscurate_seo', '' == "on") && get_option('expresscurate_sitemap_submit_webmasters') == 'on'){
-           // $googleAuth = new ExpressCurate_GoogleAuth();
-            // $responseToken = $googleAuth->getGoogleToken();
-             $responseToken =  get_option('expresscurate_google_refresh_token');
-             if($responseToken){
-                 $_SESSION['sitemap_token'] = true;
-             }
-         }*/
 
         // Render the settings template
         include(sprintf("%s/templates/settings.php", dirname(__FILE__)));
@@ -1607,7 +1615,7 @@ class ExpressCurate_Actions
         $blogName = urlencode(urlencode(get_bloginfo('url')));
         $expresscurateWebsiteUrl = self::EXPRESSCURATE_URL;
         if (strlen(get_option('expresscurate_google_refresh_token')) < 3 && get_option('expresscurate_sitemap_submit') == 'on') {
-            $warnings[] = '<p>Authorise access to Google Webmasters. <a class="expresscurateLink" href="' . $expresscurateWebsiteUrl . 'api/getsitemapkey/' . $blogName . '">Authorize </a>  |  <a class="expresscurateLink" href="options-general.php?page=expresscurate_settings"> Sitemap Settings </a></p>';
+            $warnings[] = '<p>Authorise access to Google Webmaster Tools. <a class="expresscurateLink" href="' . $expresscurateWebsiteUrl . 'api/connector/google/webmasters/refreshtoken/' . $blogName . '">Authorize </a>  |  <a class="expresscurateLink" href="options-general.php?page=expresscurate_settings"> Sitemap Settings </a></p>';
         }
 
         $cronjobStatus = get_option('expresscurate_cronjob_status');

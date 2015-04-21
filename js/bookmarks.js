@@ -23,10 +23,10 @@ var ExpressCurateBookmarks = (function ($) {
             }).done(function (res) {
                 var data = $.parseJSON(res);
                 if (data.status === 'success') {
-                    if (data.result === null) {
+                    /*if (data.result === null) {
                         liHTML = '';
                         message = 'Article does not exists.';
-                    } else {
+                    } else {*/
                         $.extend(data.result, {
                             'id': $bookmarkBoxes.find('> li').length
                         });
@@ -50,7 +50,7 @@ var ExpressCurateBookmarks = (function ($) {
                         setTimeout(function () {
                             $lastLi.removeClass('expresscurate_transparent');
                         }, 700);
-                    }
+                    //}
                 } else if (data.status === 'error' && data.msg !== null) {
                     message = data.msg;
                 }

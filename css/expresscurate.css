@@ -1934,6 +1934,7 @@
     text-align: center;
     height: 39px;
     width: 153px;
+    margin-left: 10px;
     cursor: pointer;
 }
 
@@ -2891,7 +2892,7 @@
 }
 .expresscurate .tab-content > div{
     min-height: 70vh;
-    max-width: 700px;
+    max-width: 800px;
 }
 .expresscurate_advancedSEO_widget .tab-link.disabled,
 .expresscurate .tab-link.disabled{
@@ -5045,3 +5046,13 @@
     margin-top: 0;
 }
 
+.expresscurate_SettingsError{
+    font-size: 11px;
+    color: #e85e50;
+    margin: 0;
+}
+.expresscurate_SettingsSuccess{
+    font-size: 11px;
+    color: #1cbb9f;
+    margin: 0;
+}

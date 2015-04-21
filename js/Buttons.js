@@ -304,7 +304,8 @@ var ExpressCurateButtons = (function ($) {
             ExpressCurateSEOControl.insertKeywordInWidget(ExpressCurateKeywordUtils.multipleKeywords($input, undefined), $('.addKeywords'));
         }
     }
-    function checkSocialTab(){
+
+    function checkSocialTab() {
         var $this = $('#expresscurate_socialEmbed'),
             content = $this.val().trim(),
             $tabs = $('.expresscurate_socialDialog .tabs li');
@@ -317,6 +318,7 @@ var ExpressCurateButtons = (function ($) {
             }
         });
     }
+
     function setupButtons() {
         var $page = $('html');
         $page.on('click', '.expresscurate_postAnalysis', function () {
@@ -350,7 +352,7 @@ var ExpressCurateButtons = (function ($) {
                     disabled: false,
                     onclick: function () {
                         checkSocialTab();
-                        var $input=$('#expresscurate_socialEmbed'),
+                        var $input = $('#expresscurate_socialEmbed'),
                             insertedValue = $input.val().trim(),
                             selectedTab = $('.expresscurate_socialDialog .tabs li.current').data('tab');
                         /*if inserted content is URL*/
@@ -365,7 +367,7 @@ var ExpressCurateButtons = (function ($) {
                             }
                         } else {
                             var $elem,
-                                url='';
+                                url = '';
                             switch (selectedTab) {
                                 case 'facebook':
                                     $elem = $(insertedValue)[2];
@@ -394,8 +396,8 @@ var ExpressCurateButtons = (function ($) {
                                     ed.windowManager.close();
                                 }
                             } else {
-                                var message='Embed code you have provided is wrong. Please check.';
-                                ExpressCurateUtils.validationMessages(message,$('.expresscurate_socialDialog .expresscurate_errorMessage'),$input);
+                                var message = 'Embed code you have provided is wrong. Please check.';
+                                ExpressCurateUtils.validationMessages(message, $('.expresscurate_socialDialog .expresscurate_errorMessage'), $input);
                                 /*The tab/ URL/ embed code you have provided is wrong. Please check.*/
                             }
                         }
@@ -404,9 +406,9 @@ var ExpressCurateButtons = (function ($) {
             });
         });
         /*$page.on('click', '.expresscurate_socialDialog .tabs li', function () {
-            $('.expresscurate_socialDialog .tabs li').removeClass('current');
-            $(this).addClass('current');
-        });*/
+         $('.expresscurate_socialDialog .tabs li').removeClass('current');
+         $(this).addClass('current');
+         });*/
         tinymce.create('tinymce.plugins.expresscurate', {
             /**
              * Initializes the plugin, this will be executed after the plugin has been created.
@@ -464,6 +466,12 @@ var ExpressCurateButtons = (function ($) {
                     cmd: 'addKeyword',
                     classes: "btn expresscurateCostom expresscurateAddKeyword"
                 });
+                /*console.log(tinymce.EditorManager.get('expresscurate_dialog_content_editor'));
+                tinymce.EditorManager.get('expresscurate_dialog_content_editor').addButton('clearContent', {
+                    title: 'Clear editor content',
+                    cmd: 'clearContent',
+                    classes: "btn expresscurateCostom expresscurateAnnotate"
+                });*/
                 ed.onKeyDown.add(function (ed, e) {
                     if (e.altKey && e.keyCode === 75) {
                         addKeyword();

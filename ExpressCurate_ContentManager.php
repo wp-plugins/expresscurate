@@ -34,11 +34,11 @@ class ExpressCurate_ContentManager {
         }
       }
 
-      public function get_article($url = false, $echo = true) {
-        if(!ExpressCurate_HtmlParser::supportsDownload()){
+      public function getArticle($url = false, $echo = true) {
+        if(!ExpressCurate_HtmlParser::supportsDownload()) {
           echo json_encode(array('status' => 'error', 'error' => 'You should activate either curl extension or allow_url_fopen setting.'));
           die;
-        }else{
+        } else {
           if (!$url) {
             $url = $this->_post('expresscurate_source', '');
           }

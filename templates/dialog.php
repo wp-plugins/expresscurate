@@ -1,6 +1,6 @@
 <?php
 $settings = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true, 'tinymce' => true, 'quicktags' => false);
-$settingsClone = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true, 'tinymce' => true, 'quicktags' => false );
+$settingsClone = array('wpautop' => false, 'media_buttons' => false, 'teeny' => true, 'tinymce' => true, 'quicktags' => false);
 ?>
 <div>
     <div class="content_editor expresscurate_Styles" id="expresscurate_post_form">
@@ -115,8 +115,12 @@ $settingsClone = array('wpautop' => false, 'media_buttons' => false, 'teeny' => 
                     <span>mark keywords</span></li>
             </ul>
             <div class="clear"></div>
-            <button class="curate right" id="expresscurate_insert"
-                    onclick="return false;"><?php echo __('Curate into post', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
+            <div id="curateControlsWrap">
+                <button class="curate right" id="expresscurate_insert"
+                        onclick="return false;"><?php echo __('Curate into post', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
+                <button class="curate right" id="expresscurate_continue"
+                        onclick="return false;"><?php echo __('Add and continue', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
+            </div>
             <button class="curate right expresscurate_displayNone" id="expresscurate_cloneInsert"
                     onclick="return false;"><?php echo __('Clone Post', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
             <div class="clear"></div>
