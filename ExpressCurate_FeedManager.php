@@ -908,7 +908,7 @@ class ExpressCurate_FeedManager
     public function count_bookmarks_by_days($bookmarks, $days_count)
     {
         $count = 0;
-        if ($bookmarks && $days_count > 0) {
+        if (!empty($bookmarks) && $days_count > 0) {
             $start = strtotime(date('Y-m-d') . "-" . $days_count . " days");
             $end = strtotime(date('Y-m-d'));
             foreach ($bookmarks as $key => $bookmark) {

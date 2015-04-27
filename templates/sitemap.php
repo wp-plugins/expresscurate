@@ -8,7 +8,7 @@
     <ul>
 <li>
     <div class="title submitSitemapWrap">
-            <a class="generate <?php if (strlen(get_option('expresscurate_google_refresh_token')) < 3) {echo 'expresscurate_displayNone'; }else {echo 'generated';}?>"  id="submitSiteMap" href="#">Submit Sitemap</a>
+            <a class="generate <?php if (strlen(get_option('expresscurate_google_refresh_token')) < 3) {echo 'expresscurate_displayNone'; }else {echo 'generated';}?>"  id="submitSiteMap" href="#">Submit Sitemap<span class="loading"></span></a>
     </div>
         <a class="generate" id="generateSiteMap" href="#">Generate Sitemap</a>
 </li>

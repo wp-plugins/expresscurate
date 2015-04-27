@@ -92,6 +92,7 @@ var ExpressCurateSettings = (function ($) {
             });
         });
         $('.expresscurate #generateSiteMap').on('click', function () {
+            $('.expresscurate_Error').remove();
             $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_sitemap_generate'
@@ -101,34 +102,41 @@ var ExpressCurateSettings = (function ($) {
                     $submitSitemap.removeClass('expresscurate_displayNone').addClass('generated');
                 } else {
                     $submitSitemap.addClass('expresscurate_displayNone').removeClass('generated');
+                    $submitSitemap.after('<p class="expresscurate_Error expresscurate_SettingsError">Something went wrong. Please, make sure you have authorized ExpressCurate to access to Google Webmaster Tools.</p>');
                 }
             });
         });
         $submitSitemap.on('click', function () {
             $('.expresscurate_Error').remove();
+            var $this=$(this),
+                $loading = $this.find('.loading');
+            $this.addClass('hideText');
+            $loading.addClass('expresscurate_startRotate');
             var message = '',
                 className = '';
             $.ajax({
                 type: 'POST',
                 url: 'admin-ajax.php?action=expresscurate_sitemap_submit'
             }).done(function (res) {
-                var data = $.parseJSON(res);
+                var data = $.parseJSON(res),
+                    $autorize = $('.getApiKey');
                 if (data.status === 0) {
                     $submitSitemap.addClass('generated');
                     message = data.message;
                     className='expresscurate_SettingsSuccess';
-                } else if (data.status === 1) {
-                    message = data.message;
+                } else{
                     className='expresscurate_SettingsError';
-                } else if (data.status === 2) {
-                    message = data.message;
-                    className='expresscurate_SettingsError';
-                } else if (data.status === 3) {
-                    message = data.message;
-                    className='expresscurate_SettingsError';
+                    if (data.status === 1) {
+                        message = data.message;
+                        $autorize.removeClass('expresscurate_displayNone');
+                    } else if (data.status === 2 || data.status === 3) {
+                        message = data.message;
+                    }
                 }
             }).always(function () {
                 $submitSitemap.after('<p class="expresscurate_Error '+className+'">' + message + '</p>');
+                $loading.removeClass('expresscurate_startRotate');
+                $this.removeClass('hideText');
             });
         });
 

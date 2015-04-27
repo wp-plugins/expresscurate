@@ -86,8 +86,10 @@ var ExpresscurateDialog = (function ($) {
             $curatedParagraphs,
             liCount;
         $paragraphsContainer.width(paragraphs.length * paragraphWidth);
+
         $.each(paragraphs, function (index, value) {
-            if (value['value'].length > shortestParagraphLength) {
+            var parLength = value['value'].trim().length;
+            if (parLength > 0 && parLength > shortestParagraphLength) {
                 $sorted.push(value['value']);
             }
         });
@@ -372,14 +374,14 @@ var ExpresscurateDialog = (function ($) {
                             displaySpecials(data.result);
                             if (data.result.paragraphs.length > 0) {
                                 $curatedParagraphs = data.result.paragraphs;
+
                                 displayCuratedParagraphs(data.result.paragraphs, $("#expresscurate_autosummary").val(), false);
                             }
                             ExpressCurateUtils.track('/post/content-dialog/loadpage');
                         }
                         $('#expresscurate_source').focus();
                     }
-                }
-                else {
+                } else {
                     errorHTML = '<div class="error">Can\'t curate from this page</div>';
                     $('#expresscurate_post_form').before(errorHTML);
                     $("#expresscurate_loading").fadeOut('fast');

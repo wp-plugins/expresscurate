@@ -3,10 +3,10 @@ $feedManager = new ExpressCurate_FeedManager();
 $bookmarks = $feedManager->get_bookmarks();
 if (!empty($bookmarks)){
     $sorted_bookmarks = array_reverse($bookmarks);
+    $sorted_bookmarks = array_slice($sorted_bookmarks, 0, 5);
 }
 $last_7_days = $feedManager->count_bookmarks_by_days($bookmarks, 7);
 $bookmarks_count = count($bookmarks);
-$sorted_bookmarks = array_slice($sorted_bookmarks, 0, 5);
 
 ?>
 <div class="expresscurate_dashboard expresscurate_Styles expresscurate_dashboard_bookmarks ">

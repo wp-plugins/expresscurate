@@ -293,6 +293,7 @@ class ExpressCurate_HtmlParser
 
                 $content = mb_convert_encoding($content, 'UTF-8', $encoding);
                 $content = mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8');
+
             }
         }
 

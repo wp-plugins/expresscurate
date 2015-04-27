@@ -80,6 +80,7 @@ class ExpressCurate_ContentManager {
           } else {
             $HtmlParser = new ExpressCurate_HtmlParser($url);
             $article = $HtmlParser->getContents();
+
             if ($echo == true) {
               echo json_encode($article);
               die;

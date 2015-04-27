@@ -671,6 +671,7 @@
             font-family: OpenSans-Light, Verdana, Geneva, sans-serif;
             font-size: 16px;
             border-top: solid 1px #dddddd;
+            overflow: hidden;
         }
 @media (max-width: 680px){
     .pageDesc{
@@ -3751,7 +3752,8 @@
                 background-size: auto 99px;
                 margin-right: 10px;
             }
-                .expresscurate_feed_list .feedListControls .pull .loading.expresscurate_startRotate{
+                .expresscurate_feed_list .feedListControls .pull .loading.expresscurate_startRotate,
+                .expresscurate .loading.expresscurate_startRotate{
                     background: url("../images/refresh.svg") no-repeat transparent center;
                     height: 100%;
                     width: 100%;
@@ -3760,6 +3762,17 @@
                     -moz-animation: rotate 1.2s infinite linear;
                     -o-animation: rotate 1.2s infinite linear;
                     animation: rotate 1.2s infinite linear;
+                }
+                .expresscurate #submitSiteMap{
+                    position: relative;
+                }
+                .expresscurate #submitSiteMap.hideText{
+                    color: transparent !important;
+                }
+                .expresscurate #submitSiteMap .loading.expresscurate_startRotate{
+                    position: absolute;
+                    top: 0;
+                    left: 0;
                 }
                 @-webkit-keyframes rotate{
                     from {-webkit-transform: rotate(0deg);}

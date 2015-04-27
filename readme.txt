@@ -3,8 +3,8 @@ Contributors: expresscurate
 Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, rss, feed, keywords summary, keywords dashboard, seo control center, keyword, seo, sitemap, google webmasters, google, widget, bookmark
 Donate link: https://bit.ly/expresscuratedonate
 Requires at least: 3.9
-Tested up to: 4.1
-Stable tag: 2.0.12
+Tested up to: 4.2
+Stable tag: 2.0.13
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -80,7 +80,7 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 
 = How To Get Started =
-[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.0.12.zip "Your favorite content marketing tools") for WordPress.  
+[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.0.13.zip "Your favorite content marketing tools") for WordPress.  
 You can also [download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme") a **free** [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme"). It will give your curated content a modern online news look.
 
 
@@ -127,6 +127,10 @@ You can also [download](http://www.expresscurate.com/p/products/wordpress-theme 
 
 
 == Changelog ==
+
+= 2.0.13 =
+* Wordpress 4.2 supported now.
+* Other miscellaneous bug fixes and improvements.
 
 = 2.0.12 =
 * Content Feed pull is fixed.
