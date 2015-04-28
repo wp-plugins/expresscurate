@@ -3,7 +3,7 @@ Contributors: expresscurate
 Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, rss, feed, keywords summary, keywords dashboard, seo control center, keyword, seo, sitemap, google webmasters, google, widget, bookmark
 Donate link: https://bit.ly/expresscuratedonate
 Requires at least: 3.9
-Tested up to: 4.2
+Tested up to: 4.2.1
 Stable tag: 2.0.13
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
@@ -106,23 +106,25 @@ You can also [download](http://www.expresscurate.com/p/products/wordpress-theme 
 
 
 == Screenshots ==
-01. Curate Content Button. Curate Content quickstart button is available for posts and pages. Dialog will open to curate and edit content from original posts.
-02. Curation Dialog: Original Page. Type the original article URL and load the content. Have image and content automatically summarized and prefilled for you.
-03. Curation Dialog: Fields. Fixed structure for a curated post. You can edit title, image, content, and add annotation.
-04. Curation Dialog: Prefilled Content. Load the original post. Title, image and content will be prefilled and ready for editing.
-05. Curation Dialog: Content Suggestions. Original page metadata as well as text paragraphs are available for curation. Add one or more item into your content.
-06. Curation Dialog: Curate Into Post. Edit your content and curate into the post.
-07. Styling boxes. Annotation as well as left, right and center aligned text boxes. These elements allow to give more structure to your blog post.
-08. SEO Control Center. Enter key page attributes and SEO enhancements from a single page. It is recommended to have the short description always defined.
-09. Customization. Customize the plugin with 10+ settings.
-10. Top Curated Websites. Visit the top curated websites and pages.
-11. Summary-at-a-glance of keywords usage in your Wordpress blog.
-12. Keywords Dashboard. This is a centralized place where you can add and manage your target keywords, as well as monitor key stats for optimizing SEO performance.
-13. Keywords Dashboard: Enter your target keywords and ExpressCurate will calculate their usage stats, so you can decide which keywords are underutilized, overused, or just right.
-14. Keywords Dashboard: A shortcut for creating a post with an emphasis on a specific keyword.
-15. Keywords Dashboard: Color coding to identify how optimal your keyword is used.
-16. Keywords Dashboard: Most frequently used words (not keywords) in your blog or site.
-17. Submit your ideas, problems, and suggestions. We would love to hear from you!
+01. Dashboard: Get instant access to your main working areas through the Dashboard.
+02. Content Feed: See the recent content suggestions from RSS feeds in the Content feed. Set your view, content-related actions and see next update time using the toolbar.
+03. Bookmarks: Bookmark as you read, and get access to bookmarks to start review or curation.
+04. Post - Curate Content: When editing a post, use the curate content button to insert curation passages into the post.
+05. Post - Curate Content: Load the passages of choice into the post, and curate!
+06. Post - Styling, Editing, Analytics: When editing a post, use the toolbar for keyword highlights, box styles and access to post analysis.
+07. Post - Embed: Provide an embed code from Facebook,  Twitter, YouTube or Vimeo and have the proper card inserted into your post.
+08. Post - Embed: Embed multiple posts to create stories.
+09. Post - SEO Control Center: Pick relevant keyword density and create meta descriptions using the SEO Control Center.
+10. Post - Advanced SEO: Optimize content and review post statistics using the Advanced SEO widget!
+11. Post Analysis: Use Post analysis to receive improvement suggestions for your content!
+12. Post - Sources: Access the list of Sources from which content is pulled and check for the number of posts curated from these sources.
+13. Keywords Dashboard
+14. RSS Feeds
+15. Top Sources
+16. Settings
+17. FAQ: See FAQs for common usage hints and questions.
+
+
 
 
 
