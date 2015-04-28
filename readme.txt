@@ -3,7 +3,7 @@ Contributors: expresscurate
 Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, rss, feed, keywords summary, keywords dashboard, seo control center, keyword, seo, sitemap, google webmasters, google, widget, bookmark
 Donate link: https://bit.ly/expresscuratedonate
 Requires at least: 3.9
-Tested up to: 4.2
+Tested up to: 4.2.1
 Stable tag: 2.0.13
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
