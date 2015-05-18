@@ -5,7 +5,11 @@ var ExpresscurateDialog = (function ($) {
         paragraphWidth = 93,
         html,
         alignImg,
-        imgSize;
+        imgSize,
+        clonedArticles = [],
+        $articlePrev,
+        $articleNext,
+        $dialog;
 
     function sendWPEditor(html, insertedTags) {
         var $editor = tinyMCE.get('content'),
@@ -60,7 +64,7 @@ var ExpresscurateDialog = (function ($) {
                     $('.imgContainer').show();
                     if (validImgCount === 1) {
                         $('.content .img').removeClass("noimage").css('background-image', $('ul#curated_images li').first().css('background-image'));
-                        $('#expresscurate_dialog').find('div.error.dialogImgError').remove();
+                        $dialog.find('div.error.dialogImgError').remove();
                     }
                 }
             };
@@ -234,13 +238,16 @@ var ExpresscurateDialog = (function ($) {
         return false;
     }
 
-    function clearExpresscurateForm() {
-        var $dialog = $('#expresscurate_dialog'),
+    function clearExpresscurateForm(articleSlider) {
+        var $dialog = $("#expresscurate_dialog"),
             $imageCounter = $dialog.find('.imageCount');
         $dialog.find('div.error').remove();
         $dialog.find('div.updated').remove();
-        $dialog.find('ul').html('');
+        $dialog.find('ul').not($('.articlesSlider')).html('');
         $dialog.find('#curated_title').val('');
+        if (articleSlider) {
+            $dialog.find('#articlesSliderWrap').addClass('expresscurate_displayNone');
+        }
         $imageCounter.text('0/0');
         $('.content .img').attr('style', '').addClass("noimage");
         $('.controls').hide();
@@ -318,7 +325,7 @@ var ExpresscurateDialog = (function ($) {
     }
 
     function submitExpresscurateForm(clone) {
-        var $dialog = $('#expresscurate_dialog');
+        $dialog = $('#expresscurate_dialog');
         //remove autoComplete
         $dialog.find('.autoComplete').remove();
         //remove error divs
@@ -327,6 +334,7 @@ var ExpresscurateDialog = (function ($) {
         $dialog.fadeIn();
         var errorHTML = '',
             notifHTML = '',
+            cloned = clone ? "&cloned=1" : "",
             $url = clone ? $('#expresscurate_post_form').find('#expresscurate_clone_source') : $('#expresscurate_post_form').find('#expresscurate_source');
         $.ajax({
             type: 'POST',
@@ -341,7 +349,7 @@ var ExpresscurateDialog = (function ($) {
         });
         $.ajax({
             type: 'POST',
-            url: 'admin-ajax.php?action=expresscurate_get_article',
+            url: 'admin-ajax.php?action=expresscurate_get_article' + cloned,
             data: $url.serialize()
         }).done(function (res) {
                 var data = $.parseJSON(res);
@@ -352,24 +360,51 @@ var ExpresscurateDialog = (function ($) {
                         $("#expresscurate_loading").fadeOut('fast');
                     } else if (data.status === 'success') {
                         clearExpresscurateForm();
-                        if (data.result.title && data.result.title.length > 0) {
-                            $("#curated_title").val(data.result.title);
-                        }
-                        if (data.result.images.length > 0) {
-                            errorHTML = exportAPICheckImages(data.result.images);
-                        } else {
-                            $("#expresscurate_loading").fadeOut('fast');
-                        }
-                        keywords = data.result.metas.keywords;
-                        if (data.result.metas.keywords && data.result.metas.keywords.length > 0) {
-                            displayCuratedTags(data.result.metas.keywords);
-                        }
                         if (clone) {
-                            if (data.result.paragraphs.length > 0) {
-                                tinyMCE.get('expresscurate_dialog_content_clone_editor').execCommand('mceInsertContent', false, data.result.content);
+                            var html = "",
+                                postCount = data.result.article_html.length,
+                                $sliderWrap = $('#articlesSliderWrap'),
+                                $label = $sliderWrap.find('.articleDescription span'),
+                                $currentArticle = $sliderWrap.find('.currentArticle');
+                            if (postCount > 1) {
+
+                                $sliderWrap.removeClass('expresscurate_displayNone');
+                                $label.text(postCount);
+                                $currentArticle.text('1');
+                                $articlePrev.removeClass('active');
+                                $articleNext.addClass('active');
+                            } else {
+                                $sliderWrap.addClass('expresscurate_displayNone');
                             }
-                            ExpressCurateUtils.track('/post/content-dialog/clonepage');
+                            tinyMCE.get('expresscurate_dialog_content_clone_editor').execCommand('mceInsertContent', false, data.result.article_html[0]);
+                            clonedArticles = data.result;
+
+                            var title = data.result.titles[0];
+                            if (title && title.length > 0) {
+                                $("#curated_title").val(title);
+                            }
+                            if (data.result.images[0].length > 0) {
+                                errorHTML = exportAPICheckImages(data.result.images[0]);
+                            } else {
+                                $("#expresscurate_loading").fadeOut('fast');
+                            }
+                            keywords = data.result.keywords[0];
+                            if (keywords && keywords.length > 0) {
+                                displayCuratedTags(keywords);
+                            }
                         } else {
+                            if (data.result.title && data.result.title.length > 0) {
+                                $("#curated_title").val(data.result.title);
+                            }
+                            if (data.result.images.length > 0) {
+                                errorHTML = exportAPICheckImages(data.result.images);
+                            } else {
+                                $("#expresscurate_loading").fadeOut('fast');
+                            }
+                            keywords = data.result.metas.keywords;
+                            if (data.result.metas.keywords && data.result.metas.keywords.length > 0) {
+                                displayCuratedTags(data.result.metas.keywords);
+                            }
                             $(".controls").show();
                             displaySpecials(data.result);
                             if (data.result.paragraphs.length > 0) {
@@ -393,7 +428,6 @@ var ExpresscurateDialog = (function ($) {
 
     function insertContent(clone, addAndContinue) {
         var ed = tinyMCE.activeEditor,
-            $dialog = $('#expresscurate_dialog'),
             highlightedElems = $(ed.getBody()).find('span.expresscurate_keywordsHighlight');
         if (clone) {
             ExpressCurateUtils.track('/post/content-dialog/cloneintopost', true);
@@ -406,8 +440,9 @@ var ExpresscurateDialog = (function ($) {
             });
         }
         var insertedTagsTextarea = "",
-            sourceVal = $('#expresscurate_source').val(),
-            postTag = $("#tax-input-post_tag");
+            sourceVal = (clone) ? $('#expresscurate_clone_source').val() : $('#expresscurate_source').val(),
+            postTag = $("#tax-input-post_tag"),
+            domain;
         insertedTagsTextarea = postTag.val();
         $('#curated_tags').find('li').each(function () {
             insertedTagsTextarea += "," + $(this).find('span.tag').text();
@@ -432,7 +467,7 @@ var ExpresscurateDialog = (function ($) {
 
         if (html.length > 0) {
             if (sourceVal.length > 0) {
-                var domain = sourceVal;
+                domain = sourceVal;
                 if (domain.indexOf('http://') === -1 && domain.indexOf('https://') === -1) {
                     domain = 'http://' + domain;
                 }
@@ -466,7 +501,7 @@ var ExpresscurateDialog = (function ($) {
                 if ($canonicalURL.length) {
                     $copyControlWrap.removeClass('expresscurate_displayNone');
                     $copyCheckVal.val('on');
-                    $canonicalURL.attr('value', domain).attr('readonly', true);
+                    $canonicalURL.val(domain).attr('readonly', true);
                     $noFollow.add($noIndex).attr('checked', false).attr('disabled', true);
                     $noFollowVal.add($noIndexVal).val('off');
                     $copyCheck.attr('checked', true).attr('disabled', false);
@@ -486,14 +521,64 @@ var ExpresscurateDialog = (function ($) {
                 $('#expresscurate_source').val('').text('');
                 clearExpresscurateForm();
             }
-
         } else {
             return false;
         }
     }
 
+    function switchArticles(next) {
+        var $currentArticleLi = $('.currentArticle'),
+            currentArticle = parseInt($currentArticleLi.text()),
+            newArticle,
+            articlesCount = clonedArticles.titles.length;
+        if (next) {
+            newArticle = currentArticle + 1;
+            $currentArticleLi.text(newArticle);
+            if (newArticle == articlesCount) {
+                $articleNext.removeClass('active');
+                $articlePrev.addClass('active');
+            } else if (newArticle == 2) {
+                $articlePrev.addClass('active');
+            }
+        } else {
+            newArticle = currentArticle - 1;
+            $currentArticleLi.text(newArticle);
+            if (newArticle == 1) {
+                $articlePrev.removeClass('active');
+                $articleNext.addClass('active');
+            } else if (newArticle == 2) {
+                $articlePrev.addClass('active');
+            }
+            if (newArticle < articlesCount) {
+                $articleNext.addClass('active');
+            }
+        }
+        var editor = tinyMCE.get('expresscurate_dialog_content_clone_editor'),
+            currentNumber = newArticle - 1,
+            title = clonedArticles.titles[currentNumber],
+            images = clonedArticles.images[currentNumber],
+            keywords = clonedArticles.keywords[currentNumber];
+        clearExpresscurateForm(false);
+        editor.setContent('');
+        editor.execCommand('mceInsertContent', false, clonedArticles.article_html[currentNumber]);
+
+        if (title && title.length > 0) {
+            $("#curated_title").val(title);
+        }
+        if (images.length > 0) {
+            exportAPICheckImages(images);
+        } else {
+            $("#expresscurate_loading").fadeOut('fast');
+        }
+        if (keywords && keywords.length > 0) {
+            displayCuratedTags(keywords);
+        }
+    }
+
     function setupDialog() {
-        var $dialog = $('#expresscurate_dialog');
+        $dialog = $('#expresscurate_dialog');
+        $articlePrev = $dialog.find('.prevArticle');
+        $articleNext = $dialog.find('.nextArticle');
         buttonsStatus();
         $dialog.on('click', '.tcurated_text', function () {
             var index = $(this).data('id');
@@ -517,6 +602,19 @@ var ExpresscurateDialog = (function ($) {
         $dialog.on('click', function (e) {
             if (!$(e.target).is('.autoComplete li')) {
                 $dialog.find('.autoComplete').remove();
+            }
+        });
+        /*cloned articles slider*/
+        $articlePrev.on('click', function () {
+            var $this = $(this);
+            if ($this.hasClass('active')) {
+                switchArticles(false);
+            }
+        });
+        $articleNext.on('click', function () {
+            var $this = $(this);
+            if ($this.hasClass('active')) {
+                switchArticles(true);
             }
         });
         $('.nextSlide').click(function () {
@@ -750,7 +848,7 @@ var ExpresscurateDialog = (function ($) {
             $load = $dialog.find('#expresscurate_submit'),
             $clone = $dialog.find('#expresscurate_clone'),
             $insert = $dialog.find('#curateControlsWrap'),
-            $insertClone = $dialog.find('#expresscurate_cloneInsert'),
+            $insertClone = $dialog.find('#cloneControlsWrap'),
             $contenttextarea = $dialog.find('#expresscurate_dialog_content_editor_container'),
             $cloneContentTextarea = $dialog.find('#expresscurate_dialog_content_clone_editor_container'),
             $source = $dialog.find('#expresscurate_source'),

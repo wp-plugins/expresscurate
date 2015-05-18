@@ -28,6 +28,7 @@ class ExpressCurate_HtmlParser
     // html dom details
     private $dom = null;
     private $article = null;
+    private $articles = null;
     private $xpath = null;
 
     // article details
@@ -166,6 +167,7 @@ class ExpressCurate_HtmlParser
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        return $ch;
     }
 
     private static function ensureAsynchData()
@@ -221,25 +223,25 @@ class ExpressCurate_HtmlParser
         if ($this->data != null) {
             return;
         }
-
-//      if (self::supportsAsynch()) {
-//          // setup the single curl
-//          $ch = $this->createCURL($this->url);
-//          $content = curl_exec($ch);
-//          $this->dataHTTPStatus = curl_getinfo($this->asynchHandle, CURLINFO_HTTP_CODE);
-//          $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-//          curl_close($ch);
-//      } else {
         set_time_limit(0);
-        $header = '';
-        if ($this->referer) {
-            $header .= 'Referer: ' . $this->referer . '\r\n';
-        }
-        if (!$this->raw) {
-            $header .= 'Accept: application/xhtml+xml, application/xml, text/html\r\n';
-            $header .= 'Accept-Charset: UTF-8';
-        }
-        $options = array('http' => array(
+      if (self::supportsAsynch()) {
+          // setup the single curl
+          $ch = $this->createCURL($this->url);
+          $content = curl_exec($ch);
+          //$this->dataHTTPStatus = curl_getinfo($this->asynchHandle, CURLINFO_HTTP_CODE);
+          $this->dataHTTPStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+          $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+          curl_close($ch);
+      } else {
+          $header = '';
+          if ($this->referer) {
+              $header .= 'Referer: ' . $this->referer . '\r\n';
+          }
+          if (!$this->raw) {
+              $header .= 'Accept: application/xhtml+xml, application/xml, text/html\r\n';
+              $header .= 'Accept-Charset: UTF-8';
+          }
+          $options = array('http' => array(
             'user_agent' => ExpressCurate_Actions::USER_AGENT,
             'follow_location' => 1,
             'max_redirects' => 5,
@@ -251,7 +253,7 @@ class ExpressCurate_HtmlParser
         }
         $context = stream_context_create($options);
         $content = @file_get_contents($this->url, false, $context);
-
+        //var_dump($content);
         // $http_response_header gets loaded once file get contents is called, php native stuff
         $this->dataHTTPStatus = $http_response_header;
 
@@ -262,14 +264,13 @@ class ExpressCurate_HtmlParser
                     if (substr(strtolower($header), 0, 13) == "content-type:") {
                         $contentTypeData = explode(";", $header);
                         if (count($contentTypeData) == 2) {
-                            list($contentTypeKey, $contentType) = $contentTypeData;
+                            list( , $contentType) = $contentTypeData;
                         }
                     }
                 }
             }
         }
-//      }
-
+      }
         // make sure if there is a response at all
         if ($this->isHTTPStatusOK() === false) {
             // terminate
@@ -282,7 +283,7 @@ class ExpressCurate_HtmlParser
             $content = self::sanitizeContent($content);
 
             if ($contentType) {
-                list($charset, $encoding) = explode("=", $contentType);
+                list( , $encoding) = explode("=", $contentType);
                 $encoding = strtoupper(trim($encoding));
 
                 $supportedEncoding = array_search($encoding, mb_list_encodings()) !== false;
@@ -327,7 +328,7 @@ class ExpressCurate_HtmlParser
             $this->removeElementsByTagName('script', $dom);
             $this->removeElementsByTagName('style', $dom);
             $this->removeElementsByTagName('link', $dom);
-            $this->removeElementsByTagName('nocript', $dom);
+            $this->removeElementsByTagName('noscript', $dom);
 
             // assign
             $this->dom = $dom;
@@ -349,7 +350,7 @@ class ExpressCurate_HtmlParser
         if ($this->article == null) {
             // TODO check the xpath object problem, the final article shall support the same query method
 
-            $article = $this->dom->getElementsByTagName('article')->item(0);
+            $article = $this->xpath->query('//article')->item(0);
 
             if (empty($article)) {
                 $article = $this->xpath->query("//*[contains(@class, 'hentry')]")->item(0);
@@ -368,10 +369,38 @@ class ExpressCurate_HtmlParser
             }
 
             if (empty($article)) {
-                $article = $this->dom->getElementsByTagName('body')->item(0);
+                $article = $this->xpath->query('//body')->item(0);
             }
 
             $this->article = $article;
+        }
+    }
+
+    private function parseArticles(){
+        if ($this->articles == null) {
+            // TODO check the xpath object problem, the final article shall support the same query method
+
+            $article = $this->xpath->query('//article');
+            if ($article->length==0) {
+                //$article = $this->xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), 'hentry')]");
+                $article = $this->xpath->query('//div[contains(concat("\s+", normalize-space(@class), "\s+"), " hentry ")]');
+            }
+            if ($article->length==0) {
+                $article = $this->xpath->query("//*[contains(@itemtype, 'http://schema.org/Article')]");
+            }
+            if ($article->length==0) {
+                $article = $this->xpath->query("//*[contains(@itemtype, 'http://schema.org/TechArticle')]");
+            }
+
+            if ($article->length==0) {
+                $article = $this->xpath->query("//*[contains(@itemtype, 'http://schema.org/ScholarlyArticle')]");
+            }
+
+            if ($article->length==0) {
+                $article = $this->xpath->query('//body');
+            }
+
+            $this->articles = $article;
         }
     }
 
@@ -481,6 +510,8 @@ class ExpressCurate_HtmlParser
             $this->keywords = $this->getKeywords();
             $this->description = $this->getDescription();
 
+            $this->parseDom();
+            $this->parseArticle();
             // get the contents
             return $this->getElementsByTags();
         } else {
@@ -496,7 +527,8 @@ class ExpressCurate_HtmlParser
             // prepare some data before getting contents
             $this->title = $this->getTitle();
             $this->keywords = $this->getKeywords();
-
+            $this->parseDom();
+            $this->parseArticles();
             // get the contents
             return $this->cloneElements();
         } else {
@@ -521,13 +553,23 @@ class ExpressCurate_HtmlParser
         // Search for <meta name="keywords" content="keyword1, keword2" />
         preg_match('/<meta.*?name=("|\')keywords("|\').*?content=("|\')(.*?)("|\')/i', $this->data, $matches);
         if (count($matches) > 4) {
-            return array_filter(explode(",", trim($matches[4])));
+            if(strpos(trim($matches[4]),',')){
+                return array_filter(explode(",", trim($matches[4])));
+            }
+            else{
+                return array_filter(explode(" ", trim($matches[4])));
+            }
         }
 
         // Order of attributes could be swapped around: <meta content="keyword1, keword2" name="keywords" />
         preg_match('/<meta.*?content=("|\')(.*?)("|\').*?name=("|\')keywords("|\')/i', $this->data, $matches);
         if (count($matches) > 2) {
-            return array_filter(explode(",", trim($matches[2])));
+            if(strpos(trim($matches[2]),',')){
+                return array_filter(explode(",", trim($matches[2])));
+            }
+            else{
+                return array_filter(explode(" ", trim($matches[2])));
+            }
         }
 
         // No match
@@ -557,8 +599,6 @@ class ExpressCurate_HtmlParser
 
     private function getElementsByTags()
     {
-        $this->parseDom();
-        $this->parseArticle();
 
         // TODO make sure this cleanup can be done earlier or later, or maybe shall not affect the base dom with original html at all
 
@@ -714,19 +754,75 @@ class ExpressCurate_HtmlParser
         $data = array('status' => 'success', 'result' => $result);
         return $data;
     }
-    
+
+    private function in_object($value,$object) {
+        if (is_object($object)) {
+            foreach($object as $item) {
+                if ($value->getAttribute('class')==$item->getAttribute('class') && $item->nodeName!='body' ) return true;
+            }
+        }
+        return false;
+    }
+
     private function cloneElements()
     {
-        $this->parseDom();
-        $this->parseArticle();
-
+        $articleContent = array(
+            "article_html"=>array(),
+            "links"=>array(),
+            "domains"=>array(),
+            "images"=>array(),
+            "keywords"=>array(),
+            "titles"=>array()
+        );
         // TODO make sure this cleanup can be done earlier or later, or maybe shall not affect the base dom with original html at all
 
-        $result_images = array();
-        $imgTags = $this->xpath->query(".//img", $this->article);
+        $main_article = $this->xpath->query("//*[contains(@class, 'hentry')]");
+        $main_article = ($main_article->length > 0) ? $main_article->item(0) : $this->xpath->query('//body')->item(0);
+        foreach($this->articles as $article){
+            $this->getArticlesContent($article,$articleContent);
+            if(isset($article->parentNode)){
+                $article->parentNode->removeChild($article);
+            }
+        }
+
+        if(!$this->in_object($main_article,$this->articles)){
+            $this->getArticlesContent($main_article,$articleContent);
+        }
+        foreach($articleContent as $key => $article_info){
+            $articleContent[$key] = array_reverse($article_info);
+        }
+        $data = array('status' => 'success', 'result' => $articleContent);
+        return $data;
+    }
+
+    private function getArticlesContent($article,&$articleContent){
+        $comments = $this->xpath->query(".//comment()",$article);
+        foreach($comments as $comment){
+            $comment->parentNode->removeChild($comment);
+        }
+        $input = $this->xpath->query(".//node()[name()='iframe' or name()='input' or name()='button' or name='textarea' or name()='form']",$article);
+        foreach ($input as $inp) {
+            $inp->parentNode->removeChild($inp);
+        }
+        $art = $this->xpath->query('.//article',$article);
+        if($art->length>0){
+            foreach($art as $artcl){
+                $artcl->parentNode->removeChild($artcl);
+            }
+        }
         $i = 0;
+        $imgTags = $this->xpath->query(".//node()[name()='img' or contains(@style,'background-image')]", $article);
+        $result_images = array();
         foreach ($imgTags as $t) {
             $src = $t->getAttribute('src');
+            $src = !empty($src)? $src : $t->getAttribute('data-src');
+            $src = !empty($src)? $src : $t->getAttribute('data-src-template');
+
+            if(empty($src)) {
+                $styles = explode(';',$t->getAttribute('style'));
+                preg_match("/url[\s]*\(([\'\"]*)([^\'\")]*)/i", $styles[0], $output);
+                if(!empty($output)) $src = $output[2];
+            }
             if (strlen($src) > 3) {
                 if (strpos($src, 'http://') !== false || strpos($src, 'https://') !== false) {
                     $src = $src;
@@ -751,17 +847,42 @@ class ExpressCurate_HtmlParser
             }
             $t->parentNode->removeChild($t);
         }
-        
+        $articleContent['images'][] = $result_images;
+        $title_node = $this->xpath->query('.//node()[name()="h1"]',$article);
+        $title = "";
+        if($title_node->length > 0){
+            $title = $title_node->item(0)->nodeValue;
+        }
+        else{
+            $title_node = $this->xpath->query('.//node()[name()="h2"]',$article);
+            if($title_node->length > 0){
+                $title = $title_node->item(0)->nodeValue;
+            }
+            else{
+                $title_node = $this->xpath->query('.//*[contains(@class,"title")]',$article);
+                $title = $title_node->item(0)->nodeValue;
+            }
+        }
+        $articleContent['titles'][] = trim($title);
+        if(isset($title_node->item(0)->parentNode)){
+            $title_node->item(0)->parentNode->removeChild($title_node->item(0));
+        }
+        $articleContent['article_html'][] = $this->dom->saveXML($article);
+        $link = ($this->xpath->query('.//a',$article)->length > 0)?$this->xpath->query('.//a',$article)->item(0)->getAttribute('href'):"";
+        $link = (strpos($link, '/')==0)? $this->domain.$link : $link;
+        $articleContent['links'][] = (!empty($link))? $link : "";
+        $articleContent['domains'][] = (!empty($link))? parse_url($link,PHP_URL_SCHEME) ."://". parse_url($link,PHP_URL_HOST) : "";
         //smart tags
-        $max_count = get_option("expresscurate_max_tags", 3);
         $smart_tags = array();
+        $max_count = get_option("expresscurate_max_tags", 3);
+
 
         $defined_tags = get_option("expresscurate_defined_tags", '');
         if ($defined_tags) {
             $defined_tags = explode(",", $defined_tags);
             foreach ($defined_tags as $tag) {
                 $tag = trim($tag);
-                $count = $this->countMatches($tag);
+                $count = $this->countMatches($tag,$title,$article->nodeValue);
                 if ($count > 0) {
                     $smart_tags[$tag] = $count;
                 }
@@ -770,53 +891,32 @@ class ExpressCurate_HtmlParser
 
         if (count($this->keywords)) {
             foreach ($this->keywords as $key => $keyword) {
-                $count = $this->countMatches($key);
+                $count = $this->countMatches($key,$title,$article->nodeValue);
                 if ($count > 0) {
                     $smart_tags[$keyword] = $count;
                 }
             }
         }
-
         if (count($smart_tags) > 0) {
             arsort($smart_tags);
             $smart_tags = array_slice(array_keys(array_reverse($smart_tags)), 0, $max_count);
         }
-
-        $comments = $this->xpath->query(".//comment()",$this->article);
-        foreach($comments as $cmnt){
-            $cmnt->parentNode->removeChild($cmnt);
-        }
-        $h1Tag = $this->xpath->query(".//h1",$this->article);
-        foreach ($h1Tag as $h1) {
-            $h1->parentNode->removeChild($h1);
-        }
-        $input = $this->xpath->query(".//node()[name()='iframe' or name()='input' or name()='button' or name='textarea' or name()='form']",$this->article);
-        foreach ($input as $inp) {
-            $inp->parentNode->removeChild($inp);
-        }
-
-
-        $articleContent = $this->dom->saveXML($this->article);
-        $result = array(
-            'title' => $this->title,
-            'content'=> $articleContent,
-            'metas' => array('keywords' => $smart_tags),
-            'images' => $result_images,
-            'domain' => $this->domain);
-        $data = array('status' => 'success', 'result' => $result);
-        return $data;
+        $articleContent['keywords'][] = $smart_tags;
     }
-
-    private function countMatches($keyword)
+    private function countMatches($keyword,$title=false,$content=false)
     {
         $total_occurrence = 0;
         $tag_in_title = array();
         $tag_in_content = array();
-        preg_match_all("/(?<!\w)(?=[^>]*(<|$))" . $keyword . "/i", $this->title, $tag_in_title);
-        preg_match_all("/(?<!\w)(?=[^>]*(<|$))" . $keyword . "/i", $this->data, $tag_in_content);
+        $title = (!empty($title))? $title: $this->title;
+        $content = (!empty($content))? $content : $this->data;
+        preg_match_all("/(?<!\w)(?=[^>]*(<|$))" . $keyword . "/i", $title, $tag_in_title);
+        preg_match_all("/(?<!\w)(?=[^>]*(<|$))" . $keyword . "/i", $content, $tag_in_content);
         $total_occurrence = count($tag_in_title[0]) + count($tag_in_content[0]);
         return $total_occurrence;
     }
+
+
 
     private function arrayUnique($array, $preserveKeys = false)
     {

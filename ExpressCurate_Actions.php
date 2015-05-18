@@ -55,6 +55,7 @@ class ExpressCurate_Actions
         $this->sitemap = new ExpressCurate_Sitemap();
         $this->cronManager = new ExpressCurate_CronManager();
         $this->feedManager = new ExpressCurate_FeedManager();
+        $this->socialManager = new ExpressCurate_SocialManager();
 
         // register actions
 
@@ -93,7 +94,7 @@ class ExpressCurate_Actions
     {
 
         add_action('admin_notices', array(&$this, 'check_plugins'));
-        add_action('save_post', array(&$this, 'save_post'));
+        add_action('save_post', array(&$this, 'save_post'),10,2);
         add_filter('post_updated_messages', array(&$this, 'messages'));
         add_filter('mce_css', array(&$this, 'add_editor_style'));
         add_filter('show_admin_bar', array(&$this, 'hide_admin_bar'));
@@ -123,6 +124,7 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_export_api_save_post', array($this->ajaxExportAPI, 'save_post'));
         add_action('wp_ajax_expresscurate_export_api_check_source', array($this->ajaxExportAPI, 'check_source'));
         add_action('wp_ajax_expresscurate_export_api_send_google_key', array($this->ajaxExportAPI, 'send_google_key'));
+        add_action('wp_ajax_expresscurate_export_api_save_buffer_token', array($this->ajaxExportAPI, 'save_buffer_token'));
 
         add_action('wp_ajax_expresscurate_get_article', array($this->contentManager, 'getArticle'));
         add_action('wp_ajax_expresscurate_keywords_get_post_keyword_stats', array($this->keywords, 'get_post_keyword_stats'));
@@ -158,6 +160,8 @@ class ExpressCurate_Actions
 
         add_action('wp_ajax_expresscurate_set_cron_permission_status', array($this->cronManager, 'set_permission_status'));
 
+        add_action('wp_ajax_expresscurate_save_active_social_profiles', array($this->socialManager, 'saveActiveProfiles'));
+        add_action('wp_ajax_expresscurate_save_post_messages', array($this->socialManager, 'savePostMessages'));
 
         add_action('wp_ajax_expresscurate_change_tab_event', array(&$this, 'change_tabs'));
         add_action('wp_ajax_expresscurate_change_layout_event', array(&$this, 'change_layout'));
@@ -216,6 +220,7 @@ class ExpressCurate_Actions
         register_setting('expresscurate-smartpublish-group', 'expresscurate_manually_approve_smart');
         register_setting('expresscurate-smartpublish-group', 'expresscurate_hours_interval');
         register_setting('expresscurate-smartpublish-group', 'expresscurate_social_publishing');
+        register_setting('expresscurate-smartpublish-group', 'expresscurate_social_publishing_profiles');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_generation_interval');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_include_new_posts');
         register_setting('expresscurate-sitemap-group', 'expresscurate_sitemap_include_new_pages');
@@ -327,6 +332,9 @@ class ExpressCurate_Actions
         $context .= "<a class='button expresscurate' title='{$title}'
     href='#' id='expresscurate_open-modal'>
     <span class='expresscurate_button_icon' /></span> Curate Content</a>
+     <a class='button expresscurate' title='{$title}'
+     href='#' id='expresscurate_open-modal-clone'>
+     <span class='expresscurate_button_icon' /></span> Clone Post</a>
     <a class='button expresscurateSocial' title='{$title}'
     href='#' id='expresscurate_socialModal'>
     <span class='expresscurate_socialModal' /></span> Embed</a>";
@@ -517,7 +525,7 @@ class ExpressCurate_Actions
 //        return $this->doReplace($html);
 //    }
 
-    public function generate_tags($post_id)
+    public function generate_tags($post)
     {
         $tagsObj = new ExpressCurate_Tags();
         $defined_tags = "";
@@ -528,10 +536,10 @@ class ExpressCurate_Actions
         if ($defined_tags) {
             $defined_tags = explode(",", $defined_tags);
         }
-        $the_post = get_post($post_id);
+        //$the_post = get_post($post_id);
 
 // get the content of the post
-        $post_content = $the_post->post_content;
+        $post_content = $post->post_content;
 
         if (strpos($post_content, 'keywordsHighlight') !== false) {
             $post_content = $tagsObj->removeHighlights($post_content);
@@ -552,7 +560,7 @@ class ExpressCurate_Actions
             $content_tag_insert = str_replace("#", "", trim($content_tag));
             //adding content tag to post tags if not exists
             if (!in_array($content_tag_insert, $post_tags)) {
-                wp_set_post_tags($post_id, strtolower($content_tag_insert), true);
+                wp_set_post_tags($post->ID, strtolower($content_tag_insert), true);
             }
         }
         if ($defined_tags && count($defined_tags)) {
@@ -563,7 +571,7 @@ class ExpressCurate_Actions
                 //adding defined tag to post tags if tag exists in posttitle or post content
                 preg_match("/(?!<\w)(?=[^>]*(<|$))" . $defined_tag_insert . "(\W|$)/i", $post_content, $tag_in_content);
                 if ((isset($tag_in_content[0]) || strpos($the_post->title, $defined_tag_insert)) && !in_array($defined_tag_insert, $post_tags)) {
-                    wp_set_post_tags($post_id, $defined_tag_insert, true);
+                    wp_set_post_tags($post->ID, $defined_tag_insert, true);
                 }
             }
         }
@@ -592,7 +600,7 @@ class ExpressCurate_Actions
         return $post_content;
     }
 
-    public function get_metas($post_id = '', $meta = '_expresscurate_link_%', $type = 'post', $status = 'publish')
+    public function get_metas($post_id = '', $meta, $type, $status)
     {
         global $wpdb;
         $metas = array();
@@ -656,9 +664,12 @@ class ExpressCurate_Actions
     /**
      * Save the metaboxes for this custom post type
      */
-    public function save_post($post_id)
+    public function save_post($post_id,$post=null)
     {
-        $post_type = get_post_type($post_id);
+
+        //out($post);
+        //$post_type = get_post_type($post_id);
+        $post_type = $post->post_type;
 
         if ($post_type == 'acf') {
             return;
@@ -674,10 +685,10 @@ class ExpressCurate_Actions
 
         // get the content of the post
         if (get_option('expresscurate_smart_tagging') == "on") {
-            $post_content = $this->generate_tags($post_id);
+            $post_content = $this->generate_tags($post);
         } else {
-            $the_post = get_post($post_id);
-            $post_content = $the_post->post_content;
+            //$the_post = get_post($post_id);
+            $post_content = $post->post_content;
             if (strpos($post_content, 'keywordsHighlight') !== false) {
                 $tags_obj = new Expresscurate_Tags();
                 $post_content = $tags_obj->removeHighlights($post_content);
@@ -822,9 +833,9 @@ class ExpressCurate_Actions
                         if ($siteDomain != $domain || strpos($image, 'expresscurate_tmp')) {
                             // all set, try to download it
                             require_once(ABSPATH . 'wp-admin/includes/image.php');
-                            $content_manager = new ExpressCurate_HtmlParser($image, true, $image_from);
+                            $html_parser = new ExpressCurate_HtmlParser($image, true, $image_from);
                             // download
-                            $image_data = $content_manager->download();
+                            $image_data = $html_parser->download();
                             if (false === $image_data) {
                                 $warning[$post_id]['download_failure'] = "Unable download cover image";
                                 update_option('expresscurate_not_writable_warning', $warning);
@@ -869,11 +880,8 @@ class ExpressCurate_Actions
                             }
 
                         } else if ($make_featured) {
-                            //  var_dump(parse_url($image));
-                            // $image_filename = basename($image);
                             // create file
-                            $image_path = parse_url($image);
-                            $file = $image_path['path'];
+                            $file = parse_url($image,PHP_URL_PATH);
                             $file = strtok($file, '?');
 
                             // now we have the attachement
@@ -904,7 +912,7 @@ class ExpressCurate_Actions
 
         preg_match_all('/\sdata-curated-url\s*=\s*(["\'])((?:\\.|(?!\1).)*)\1/i', $post_content, $curated_links);
 
-        $curated_links_meta = $this->get_metas($post_id); //get_post_meta($post_id, '_expresscurate_links');
+        $curated_links_meta = $this->get_metas($post_id,'_expresscurate_link_%','post','publish'); //get_post_meta($post_id, '_expresscurate_links');
         if (!$curated_links_meta) {
             $curated_links_meta = array();
         } else {
@@ -957,6 +965,15 @@ class ExpressCurate_Actions
             update_option('expresscurate_not_writable_warning', $warning);
         }
 
+
+        // check if the post is published
+        // and publish the social posts too
+        //$postStatus = get_post_status($post_id);
+
+        /*if('publish' == $post->post_status) {
+            $social = ExpressCurate_SocialManager::getInstance();
+            $social->publishPostMessages($post_id);
+        }*/
     }
 
     public function messages($m)
@@ -1411,6 +1428,7 @@ class ExpressCurate_Actions
         wp_enqueue_script('expresscurate_dialog', $pluginUrl . 'js/Dialog.js', array('jquery', 'jquery-ui-core', 'jquery-ui-dialog'));
         wp_enqueue_script('expresscurate_settings', $pluginUrl . 'js/Settings.js', array('jquery'));
         wp_enqueue_script('expresscurate_source_collection', $pluginUrl . 'js/sourceCollection.js', array('jquery'));
+        wp_enqueue_script('expresscurate_social_post_widget', $pluginUrl . 'js/socialPostWidget.js', array('jquery'));
         wp_enqueue_script('expresscurate_bookmarks', $pluginUrl . 'js/bookmarks.js', array('jquery', 'masonry'));
         wp_enqueue_script('expresscurate_feed_settings', $pluginUrl . 'js/feed/feedSettings.js', array('jquery'));
         wp_enqueue_script('expresscurate_content_feed', $pluginUrl . 'js/feed/contentFeed.js', array('jquery', 'masonry'));
@@ -1487,6 +1505,10 @@ class ExpressCurate_Actions
         if (get_option('expresscurate_publish', '') == "on") {
             add_meta_box('dashboard_widget_smartPublishing', 'Smart Publishing Overview', array(&$this, 'smart_publishing_widget'), get_current_screen(), 'side', 'high');
         }
+        
+       /* if (get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2) {
+            add_meta_box('dashboard_widget_social_publishing', 'Social Publishing Overview', array(&$this, 'social_publishing_widget'), get_current_screen(), 'side', 'high');
+        }*/
 
         add_meta_box('dashboard_widget_feed', 'Feed', array(&$this, 'feed_widget'), get_current_screen(), 'side', 'high');
         add_meta_box('dashboard_widget_bookmarks', 'Bookmarks', array(&$this, 'bookmarks_widget'), get_current_screen(), 'side', 'high');
@@ -1507,7 +1529,16 @@ class ExpressCurate_Actions
         <div id="expresscurate_smart_publishing_widget" class="expresscurate_smart_publishing_widget">
             <?php include(sprintf("%s/templates/dashboard/smart_publishing_widget.php", dirname(__FILE__))); ?>
         </div>
-    <?php
+        <?php
+    }
+    
+    public function social_publishing_widget()
+    {
+        ?>
+        <div id="expresscurate_social_publishing_widget" class="expresscurate_social_publishing_widget">
+            <?php include(sprintf("%s/templates/dashboard/social_publishing_widget.php", dirname(__FILE__))); ?>
+        </div>
+        <?php
     }
 
     public function feed_widget()

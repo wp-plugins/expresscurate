@@ -135,13 +135,13 @@ class ExpressCurate_Sitemap
         return false;
     }
 
-    public function saveSitemapGoogleStatus(){
+    public function saveSitemapGoogleStatus() {
         $data = $_REQUEST;
         $status = $data['status'];
         if($status == 'off'){
-            update_option('expresscurate_google_refresh_token','');
+            update_option('expresscurate_google_refresh_token', '');
         }
-        update_option('expresscurate_sitemap_submit',$status);
+        update_option('expresscurate_sitemap_submit', $status);
     }
 
     public function submitToGoogle()

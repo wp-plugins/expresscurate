@@ -19,7 +19,8 @@ if ($_POST) {
 ?>
 <div class="expresscurate_blocks expresscurate_Styles wrap">
     <div class="expresscurate_headBorderBottom expresscurate_OpenSansRegular">
-        <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions? <span>Submit here!</span></a>
+        <a href="admin.php?page=expresscurate_support" class="expresscurate_writeUs">Suggestions?
+            <span>Submit here!</span></a>
 
         <h2>ExpressCurate</h2>
         <label></label>
@@ -52,6 +53,14 @@ if ($_POST) {
                         echo '<div id="smartPublish" class="expresscurate_smartPublishBlock expresscurate_masonryItem">
                                             <label class="label">Smart Publishing Overview</label>';
                         $this->smart_publishing_widget();
+                        echo '</div>';
+                    }
+                endif;
+                if ($ordered_item == "socialPublish"):
+                    if (get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2) {
+                        echo '<div id="socialPublish" class="expresscurate_socialPublishBlock expresscurate_masonryItem">
+                                            <label class="label">Social Publishing Overview</label>';
+                        $this->social_publishing_widget();
                         echo '</div>';
                     }
                 endif;
@@ -116,6 +125,14 @@ if ($_POST) {
                 <div id="smartPublish" class="expresscurate_smartPublishBlock expresscurate_masonryItem">
                     <label class="label">Smart Publishing Overview</label>
                     <?php $this->smart_publishing_widget(); ?>
+                </div>
+            <?php } ?>
+
+            <?php
+            if (get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2) { ?>
+                <div id="socialPublish" class="expresscurate_socialPublishBlock expresscurate_masonryItem">
+                    <label class="label">Social Publishing Overview</label>
+                    <?php $this->social_publishing_widget(); ?>
                 </div>
             <?php } ?>
 

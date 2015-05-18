@@ -3,12 +3,12 @@ global $post, $pagenow;
 $items = array();
 $is_json = true;
 if ($pagenow == 'post-new.php' && $_POST && isset($_POST['expresscurate_bookmarks_curate_data'])) {
-    $items = json_decode(stripslashes($_POST['expresscurate_bookmarks_curate_data']), true);
+    $items = json_decode(stripslashes_deep($_POST['expresscurate_bookmarks_curate_data']), true);
 } else if ($pagenow == 'post-new.php' && isset($_REQUEST['expresscurate_load_source'])) {
     $domain = parse_url(urldecode(base64_decode($_REQUEST['expresscurate_load_source'])));
     $items[0]['link'] = urldecode(base64_decode($_REQUEST['expresscurate_load_source']));
     $items[0]['domain'] = $domain['host'];
-    $items[0]['title'] = urldecode($_REQUEST['expresscurate_load_title']);
+    $items[0]['title'] = stripslashes(urldecode($_REQUEST['expresscurate_load_title']));
     $is_json = false;
 } else {
     $items = get_post_meta($post->ID, '_expresscurate_curated_data', true);

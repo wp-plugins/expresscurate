@@ -390,6 +390,20 @@ class ExpressCurate_AjaxExportAPI
         echo json_encode($result);
         die;
     }
+    
+    public function save_buffer_token()
+    {
+        $data = $_REQUEST;
+        if ($data['buffer_token']) {
+            update_option('expresscurate_buffer_access_token', $data['buffer_token']);
+            $result = array('status' => true, 'msg' => "Buffer Access Token Accepted.");
+            wp_redirect('admin.php?page=expresscurate_settings', 301);
+        } else {
+            $result = array('status' => false, 'msg' => "Buffer Access Token was not found.");
+        }
+        echo json_encode($result);
+        die;
+    }
 
     public function generate_sitemap()
     {

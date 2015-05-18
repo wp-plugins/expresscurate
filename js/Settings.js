@@ -59,6 +59,23 @@ var ExpressCurateSettings = (function ($) {
         $('#expresscurate_publish').on('change', function () {
             showHideOptions($('#smartPublishingWrap'), $(this));
         });
+        /*social publishing*/
+        $('#expresscurate_social_publishing').on('change', function () {
+            showHideOptions($('.socialPublishingWrap'), $(this));
+        });
+        $('html').on('change', '.expresscurate_social_publishing_profile', function () {
+            var $this = $(this),
+                id = $this.data('id'),
+                $profilesWrap = $('#expresscurate_social_publishing_profiles'),
+                status,
+                profiles = {};
+            if ($profilesWrap.val().length > 4) {
+                profiles = $.parseJSON(decodeURIComponent($profilesWrap.val()));
+            }
+            status = ($this.is(':checked')) ? 'on' : 'off';
+            profiles[id] = status;
+            $profilesWrap.val(encodeURIComponent(JSON.stringify(profiles)));
+        });
 
         /*feed*/
         $('#expresscurate_enable_content_alert').on('change', function () {
@@ -108,7 +125,7 @@ var ExpressCurateSettings = (function ($) {
         });
         $submitSitemap.on('click', function () {
             $('.expresscurate_Error').remove();
-            var $this=$(this),
+            var $this = $(this),
                 $loading = $this.find('.loading');
             $this.addClass('hideText');
             $loading.addClass('expresscurate_startRotate');
@@ -123,9 +140,9 @@ var ExpressCurateSettings = (function ($) {
                 if (data.status === 0) {
                     $submitSitemap.addClass('generated');
                     message = data.message;
-                    className='expresscurate_SettingsSuccess';
-                } else{
-                    className='expresscurate_SettingsError';
+                    className = 'expresscurate_SettingsSuccess';
+                } else {
+                    className = 'expresscurate_SettingsError';
                     if (data.status === 1) {
                         message = data.message;
                         $autorize.removeClass('expresscurate_displayNone');
@@ -134,7 +151,7 @@ var ExpressCurateSettings = (function ($) {
                     }
                 }
             }).always(function () {
-                $submitSitemap.after('<p class="expresscurate_Error '+className+'">' + message + '</p>');
+                $submitSitemap.after('<p class="expresscurate_Error ' + className + '">' + message + '</p>');
                 $loading.removeClass('expresscurate_startRotate');
                 $this.removeClass('hideText');
             });

@@ -78,8 +78,9 @@
                         }
                         ?>" name="expresscurate_curated_text" size="50"/>
                     </li>
-                    <li>                       
-                        <p class="title">Open Original Article Link in a New Window/Tab<span scope="row" class="description  ">
+                    <li>
+                        <p class="title">Open Original Article Link in a New Window/Tab<span scope="row"
+                                                                                             class="description  ">
             Select "Yes" if you want the original article link to be opened in a New Window/Tab. Select "No" if you want the link to be opened in the Same Window/Tab (default behavior).
           </span></p>
 
@@ -90,7 +91,7 @@
                         }
                         ?> />
                         <label class="controls checkboxLabel" for="expresscurate_curated_link_target"></label>
-                        
+
                     </li>
                     <li>
                         <label for="expresscurate_max_tags" class="title">Max Number of Auto-suggested Tags<span
@@ -98,7 +99,7 @@
         <span>ExpressCurate can auto-suggest tags for your post. It is based on the keywords and tags defined in your prior WordPress blogs. Enter the max number of auto-suggested tags you would like to have in each curated posts.</span>
                         </label>
                         <input type="text" id="expresscurate_max_tags" class="controls" value="<?php
-                        if (get_option('expresscurate_max_tags') == false) {
+                        if (get_option('expresscurate_max_tags') !== false) {
                             echo get_option('expresscurate_max_tags');
                         } else {
                             echo '3';
@@ -110,7 +111,7 @@
                                 class="description  ">Pick the number of paragraphs to be inserted from the original article into your post.</span>
                             <br/><span>&nbsp;&nbsp; The default value is 5</span></label>
                         <input type="text" id="expresscurate_autosummary" class="controls" value="<?php
-                        if (get_option('expresscurate_autosummary') == false) {
+                        if (get_option('expresscurate_autosummary') !== false) {
                             echo get_option('expresscurate_autosummary');
                         } else {
                             echo '5';
@@ -225,7 +226,7 @@
     </div>
     <div id="tab-2" class="tab-content">
         <div>
-            <form class="expresscurate_marginTop20" method="post" action="options.php">
+            <form class="expresscurate_marginTop20" id="smartPublishingSettingsTab" method="post" action="options.php">
                 <?php @settings_fields('expresscurate-smartpublish-group'); ?>
                 <?php @do_settings_fields('expresscurate-smartpublish-group'); ?>
                 <ul>
@@ -299,7 +300,7 @@
                                 ?>
                             </select>
                     </li>
-                    <!--<li>
+             <!--       <li>
                         <p class="title">Social publishing </p>
                         <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_social_publishing"
                                name="expresscurate_social_publishing" <?php
@@ -308,12 +309,55 @@
                         }
                         */?> />
                         <label class="controls checkboxLabel" for="expresscurate_social_publishing"></label>
-                        
-                        <?php /*
-                             $blogName = urlencode(urlencode(get_bloginfo('url')));
+
+                        <?php
+/*                        $blogName = urlencode(urlencode(get_bloginfo('url')));
                         */?>
-                        <a class="getApiKey  <?php /*if (strlen(get_option('expresscurate_buffer_refresh_token')) > 2) {echo 'expresscurate_displayNone';}*/?>" href="https://www.expresscurate.com/api/connector/buffer/refreshtoken/<?/*=$blogName*/?>">Authorize access to Buffer</a>
-                    </li>-->
+                        <a class="getApiKey  <?php /*if (strlen(get_option('expresscurate_buffer_access_token')) > 2) {
+                            echo 'expresscurate_displayNone';
+                        } */?>"
+                           href="https://www.expresscurate.com/api/connector/buffer/accesstoken/<?php /*echo $blogName */?>">Authorize
+                            access to Buffer</a>
+                    </li>
+                    <div
+                        class="socialPublishingWrap <?php /*if (get_option('expresscurate_social_publishing', '') !== "on") {
+                            echo 'expresscurate_displayNone';
+                        } */?> ">
+
+                        <?php
+/*                        $buffer = new ExpressCurate_BufferClient();
+                        $profiles = $buffer->getProfiles();
+                        if (!empty($profiles)) {
+                            $profilesStatus = array();
+                            if (get_option('expresscurate_social_publishing_profiles', '')) {
+                                $profilesStatus = json_decode(stripslashes(urldecode(get_option('expresscurate_social_publishing_profiles', ''))));
+                            }
+
+                            foreach ($profiles as $i => $profile) {
+                                $profileId = $profile->id;
+                                */?>
+                                <li>
+                                    <p class="title"><?php /*echo $profile->formatted_service; */?>
+                                        / <?php /*echo $profile->formatted_username; */?></p>
+                                    <input data-id="<?php /*echo $profileId; */?>"
+                                           class="expresscurate_displayNone expresscurate_social_publishing_profile"
+                                           type="checkbox"
+                                           id="expresscurate_social_publishing_<?php /*echo $profileId; */?>"
+                                           name="expresscurate_social_publishing_<?php /*echo $profileId; */?>" <?php /*if ($profilesStatus->$profileId == 'on' || empty($profilesStatus->$profileId)) {
+                                        echo 'checked="checked"';
+                                    }  */?> />
+                                    <label class="controls checkboxLabel"
+                                           for="expresscurate_social_publishing_<?php /*echo $profileId; */?>"></label>
+                                </li>
+                            <?php
+/*                            }
+                            */?>
+                            <input type="hidden" value="<?php /*echo stripslashes(get_option('expresscurate_social_publishing_profiles', '')); */?>" id="expresscurate_social_publishing_profiles" name="expresscurate_social_publishing_profiles"/>
+                        <?php
+/*                        }
+                        */?>
+                    </div>-->
+
                 </ul>
                 <div class="centerSave">
                     <?php @submit_button(); ?>

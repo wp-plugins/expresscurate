@@ -83,10 +83,10 @@
 ?>
 <li>
     <p class="title">Sitemap manual priority value<span class="description ">Please select the priority for new posts in your sitemap</span></p>
-    <select class="controls" name="expresscurate_sitemap_priority_manual_value">
+    <select class="controls" id="expresscurate_sitemap_priority_manual_value" name="expresscurate_sitemap_priority_manual_value">
         <?php for($i=0.1; $i<=1; $i=$i+0.1) {
-            echo '<option value="'.$i.'"';
-            if ($i == $priority) {
+            echo '<option value="'.$i.'" ';
+            if ((string)$i == $priority) {
                 echo ' selected="selected"';
             }
             echo '>'.$i.'</option>';
@@ -165,7 +165,7 @@
             ?>>Monthly
             </option>
         </select>
-        <?php 
+        <?php
         $blogName = urlencode(urlencode(get_bloginfo('url')));
         ?>
             <a class="getApiKey  <?php if (strlen(get_option('expresscurate_google_refresh_token')) > 2) {echo 'expresscurate_displayNone';}?>" href="https://www.expresscurate.com/api/connector/google/webmasters/refreshtoken/<?=$blogName?>">Authorize access to Google Webmaster Tools</a>

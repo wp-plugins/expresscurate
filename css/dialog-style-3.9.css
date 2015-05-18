@@ -50,7 +50,7 @@ div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar-close:before{
 }
 div[aria-describedby="expresscurate_clone_dialog"] .ui-button.ui-dialog-titlebar-close,
 div[aria-describedby="expresscurate_dialog"] .ui-button.ui-dialog-titlebar-close{
-	padding: 0;
+	padding: 0 !important;
     background: none;
     border: none;
     width: 25px;
@@ -71,7 +71,7 @@ div[aria-describedby="expresscurate_dialog"] .ui-button.ui-dialog-titlebar-close
 }
 
 .expresscurate_dialog {
-	padding: 0;
+	padding: 0 !important;
 	border:none;
 }
 #wp-fullscreen-buttons .mce-btn, .mce-toolbar .mce-btn-group .mce-btn, .qt-fullscreen{

@@ -121,8 +121,18 @@ $settingsClone = array('wpautop' => false, 'media_buttons' => false, 'teeny' => 
                 <button class="curate right" id="expresscurate_continue"
                         onclick="return false;"><?php echo __('Add and continue', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
             </div>
-            <button class="curate right expresscurate_displayNone" id="expresscurate_cloneInsert"
-                    onclick="return false;"><?php echo __('Clone Post', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
+            <div id="cloneControlsWrap">
+                <div class="expresscurate_displayNone expresscurate_preventTextSelection" id="articlesSliderWrap">
+                    <label class="articleDescription">Found <span></span> articles.</label>
+                    <ul class="articlesSlider">
+                        <li class="prevArticle"></li>
+                        <li class="currentArticle"></li>
+                        <li class="nextArticle"></li>
+                    </ul>
+                </div>
+                <button class="curate right" id="expresscurate_cloneInsert"
+                        onclick="return false;"><?php echo __('Clone Post', ExpressCurate_Actions::PLUGIN_FOLDER) ?></button>
+            </div>
             <div class="clear"></div>
         </div>
     </div>

@@ -652,7 +652,6 @@
         cursor: pointer;
         overflow: hidden;
         max-height: 120px;
-        overflow: hidden;
         display: block;
     }
         .expresscurate_keywords_settings .suggestion li:hover,
@@ -1884,6 +1883,7 @@
 
 .expresscurate_dialog .footer .labels {
     list-style: none;
+    margin: 0;
 }
 
 .expresscurate_dialog .footer .labels li {
@@ -2404,6 +2404,54 @@
 .expresscurate_dialog .hidden {
     display: none;
 }
+.expresscurate_dialog #cloneControlsWrap{
+    margin-top: 10px;
+}
+.expresscurate_dialog #articlesSliderWrap{
+    display: inline-block;
+}
+    .expresscurate_dialog .articlesSlider{
+        padding: 0;
+        margin: 0;
+        width: auto;
+        display: inline-block;
+    }
+        .expresscurate_dialog .articleDescription{
+            line-height: 40px;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .expresscurate_dialog .articlesSlider li{
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            margin: 0;
+            vertical-align: top;
+        }
+        .expresscurate_dialog .articlesSlider li.prevArticle,
+        .expresscurate_dialog .articlesSlider li.nextArticle{
+            background: url("../images/expresscurate_icons.svg") no-repeat;
+            background-size: 30px auto;
+            cursor: pointer;
+        }
+        .expresscurate_dialog .articlesSlider li.currentArticle{
+            line-height: 40px;
+            text-align: center;
+            width: 30px;
+        }
+        .expresscurate_dialog .articlesSlider li.prevArticle{
+            background-position: center -355px;
+        }
+        .expresscurate_dialog .articlesSlider li.nextArticle{
+            background-position: center -475px;
+        }
+        .expresscurate_dialog .articlesSlider li.prevArticle.active{
+            background-position: center -415px;
+        }
+        .expresscurate_dialog .articlesSlider li.nextArticle.active{
+            background-position: center -535px;
+        }
+
 /*Advanced SEO*/
 #expresscurate_advanced_seo .inside{
     margin: 0 !important;
@@ -2872,8 +2920,8 @@
 .expresscurate .getApiKey{
     display: inline-block;
     border: 2px solid #1cbb9f;
-    height: 24px;
-    line-height: 24px;
+    height: 22px;
+    line-height: 22px;
     padding: 0 10px;
     color: #1cbb9f;
     border-radius: 3px;
@@ -4826,7 +4874,8 @@
 .expresscurate_keywordsBlock,
 .expresscurate_smartPublishBlock,
 .expresscurate_feedBlock,
-.expresscurate_bookmarksBlock{
+.expresscurate_bookmarksBlock,
+.expresscurate_socialPublishBlock{
     background-color: #ffffff;
     padding: 0;
     box-sizing: border-box;
@@ -4938,7 +4987,172 @@
         margin-left: 10px !important;
     }
 }
+/*social Tweet widget*/
+.expresscurate_social_post_widget{
+    padding-top: 10px;
+}
+    .expresscurate_tweetBlock{
+        border-radius: 2px;
+        padding: 0 10px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        border: solid 1px #E6E6E6;
+        margin: 10px 0;
+    }
+    .expresscurate_social_post_widget .mainControls{
+        margin: 0 0 10px 0;
+    }
+            .expresscurate_tweetBlock .topControls,
+            .expresscurate_tweetBlock .bottomControls{
+                margin: 5px 0;
+                padding: 0;
+            }
+                .expresscurate_tweetBlock .topControls li,
+                .expresscurate_tweetBlock .bottomControls li{
+                    display: inline-block;
+                    height: 25px;
+                    margin: 0;
+                }
+                .expresscurate_tweetBlock .topControls li.close:hover{
+                    background: url("../images/feed_icons.svg") no-repeat -48px -21px;
+                    background-size: auto 68px;
+                }
+                .expresscurate_tweetBlock .topControls li.close{
+                    background: url("../images/feed_icons.svg") no-repeat -48px 6px;
+                    background-size: auto 68px;
+                    width: 25px;
+                    cursor: pointer;
+                }
 
+            .expresscurate_social_post_content{
+                display: block;
+                resize: none;
+                width: 100%;
+                height: 90px;
+                background-color: #f6f6f6;
+                border-radius: 2px;
+                -webkit-border-radius: 2px;
+                -moz-border-radius: 2px;
+                box-shadow: none;
+                -moz-box-shadow: none;
+                -webkit-box-shadow: none;
+                font-size: 13px;
+                padding: 0 10px;
+                border: solid 1px #E6E6E6;
+            }
+            .expresscurate_social_widget_buttons{
+                display: inline-block;
+                border: 2px solid #1cbb9f;
+                height: 22px;
+                line-height: 22px;
+                padding: 0 10px;
+                color: #1cbb9f;
+                border-radius: 3px;
+                text-decoration: none;
+                transition: all .3s ease-out;
+                -moz-transition: all .3s ease-out;
+                -webkit-transition: all .3s ease-out;
+                margin: 0;
+                cursor: pointer;
+            }
+                .expresscurate_social_widget_buttons:hover {
+                     background-color: #1cbb9f;
+                     color: #ffffff;
+                 }
+/*dashboard social widget*/
+    .expresscurate_social_box{
+        line-height: 30px;
+        font-family: OpenSans-Semibold, Verdana, Geneva, sans-serif;
+        font-size: 15px;
+        color: #fff;
+        text-align: left;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        padding-left: 40px;
+        background: url("../images/socials_box.svg") no-repeat;
+        background-size: auto 100px;
+        max-height: 30px;
+        position: relative;
+    }
+    .expresscurate_social_box_Twitter{
+        background-color: rgba(0,172,273,1);
+        background-position: 0 -72px;
+    }
+    .expresscurate_social_box_Twitter:hover{
+        background-color: rgba(0,172,273,0.8);
+    }
+    .expresscurate_social_box_Facebook{
+        background-color: rgba(59,89,152,1);
+        background-position: 0 -2px;
+    }
+    .expresscurate_social_box_Facebook:hover{
+        background-color: rgba(59,89,152,0.8);
+    }
+        .expresscurate_social_box .dailySuggestions{
+            display: inline-block;
+            min-width: 22px;
+            height: 18px;
+            border-radius: 3px;
+            background-color: rgba(0,0,0,0.2);
+            color: #fff;
+            font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
+            font-size: 13px;
+            text-align: center;
+            line-height: 18px;
+            margin: 6px 8px 0 0;
+            float: right;
+            padding: 0 3px;
+            position: absolute;
+            right: 0;
+        }
+        .expresscurate_social_box .text{
+            display: inline-block;
+            max-height: 30px;
+            max-width: 115px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+            .expresscurate_social_box .dailySuggestions .tooltip{
+                visibility: hidden;
+                opacity: 0;
+                transition: visibility 0s linear 0.3s,opacity 0.3s linear;
+                position: absolute;
+                font-size: 12px;
+                font-family: OpenSans-Regular, Verdana, Geneva, sans-serif;
+                line-height: 14px;
+                background: #161616;
+                color: #ffffff;
+                -moz-border-radius: 3px;
+                -webkit-border-radius: 3px;
+                border-radius: 3px;
+                padding: 7px;
+                width: 100px;
+                height: auto;
+                text-align: center;
+                z-index: 50;
+                right: -44px;
+                top: 25px;
+            }
+                .expresscurate_social_box .dailySuggestions .tooltip:before{
+                    content: '';
+                    display: block;
+                    width: 0;
+                    height: 0;
+                    position: absolute;
+                    border-left: 5px solid transparent;
+                    border-right: 5px solid transparent;
+                    border-bottom: 5px solid #161616;
+                    top: -5px;
+                    left: 52px;
+                }
+                .expresscurate_social_box .dailySuggestions:hover .tooltip{
+                    visibility:visible;
+                    opacity:1;
+                    transition-delay:0.3s;
+                }
+/**/
 .expresscurate_news_container{
     margin-top: 30px;
 }
