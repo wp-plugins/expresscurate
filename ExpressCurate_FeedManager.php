@@ -47,10 +47,18 @@ class ExpressCurate_FeedManager
                 }
 
                 $rssUrl = $this->getRssUrl($url);
-
-                if ($rssUrl === null) {
+                $existed_rss="";
+                $rssLinks = array_values($curated_links_rss);
+                foreach($rssLinks as $link) {
+                    if($link['feed_url']==$rssUrl)
+                    {
+                        $existed_rss = $link['feed_url'];
+                        break;
+                    }
+                }
+                if ($rssUrl === null || $rssUrl=="") {
                     $result['status'] = 'No RSS feed found at this URL.';
-                } else if (isset($curated_links_rss[$rssUrl])) {
+                } else if (!empty($existed_rss)) {
                     $result['status'] = 'URL already exists.';
                 } else {
                     if (filter_var($rssUrl, FILTER_VALIDATE_URL)) {
@@ -405,10 +413,10 @@ class ExpressCurate_FeedManager
                     $res = $htmlparser->download();
                     // decode and collect
                     $result = json_decode($res, true);
+
                     $this->collect_feed($result, $deleted_urls, $feed_array, 'feed', $date);
                 }
             }
-
             // check if the feed is empty and sort
             if(!empty($feed_array)) {
                 @uasort($feed_array, array($this, "feedSortByDate"));
@@ -493,8 +501,8 @@ class ExpressCurate_FeedManager
                 $publishDate = $expressCurateDate->dateWithTimeUtc(strtotime($publishDate));
                 
                 $story_array = array(
-                    'title' => $story['title'],
-                    'desc' => isset($story['contentSnippet']) ? $story['contentSnippet'] : '',
+                    'title' => str_replace("&quot;","'",$story['title']),
+                    'desc' => isset($story['contentSnippet']) ? str_replace("&quot;","'",$story['contentSnippet']) : '',
                     'link' => $link,
                     'date' => $publishDate,
                     'domain' => $domain,

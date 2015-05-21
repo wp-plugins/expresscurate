@@ -210,9 +210,21 @@ class ExpressCurate_HtmlParser
 
 
     public function getRealURL(){
-        foreach(get_headers($this->url) as $header) {
-            if (strpos($header, "Location:") === 0) {
-                $this->url = trim(substr($header, 9));
+        if(self::supportsAsynch()){
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $this->url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_NOBODY, 1);
+            curl_exec($ch);
+            $this->url = curl_getinfo($ch,CURLINFO_EFFECTIVE_URL);
+            curl_close($ch);
+        }else{
+            $headers = get_headers($this->url);
+            foreach($headers as $header) {
+                if (strpos($header, "Location:") === 0) {
+                    $this->url = trim(substr($header, 9));
+                }
             }
         }
         return $this->url;

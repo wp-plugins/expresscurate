@@ -10,12 +10,12 @@ div[aria-describedby="expresscurate_dialog"]{
     opacity:.6 !important;
     background: #000 !important;
     position: fixed;
-    z-index: 100090;
+    z-index: 100090 !important;
 }
 div[aria-describedby="expresscurate_clone_dialog"] .ui-dialog-titlebar,
 div[aria-describedby="expresscurate_dialog"] .ui-dialog-titlebar{
 	padding: 0;
-	font-size: 13px;
+	font-size: 13px !important;
 	line-height: 30px;
 	color: #fff;
 	height: 30px;
@@ -35,6 +35,7 @@ div[aria-describedby="expresscurate_dialog"] .ui-dialog-title{
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: normal;
+    height: 20px;
 }
 
 div[aria-describedby="expresscurate_clone_dialog"] .ui-button-icon-primary,
@@ -70,6 +71,9 @@ div[aria-describedby="expresscurate_dialog"] .ui-button.ui-dialog-titlebar-close
     color: #9d9d9d;
 }
 
+#expresscurate_dialog {
+    width: 829px !important;
+}
 .expresscurate_dialog {
 	padding: 0 !important;
 	border:none;
@@ -80,9 +84,6 @@ div[aria-describedby="expresscurate_dialog"] .ui-button.ui-dialog-titlebar-close
 .mce-toolbar .mce-btn[aria-label='Highlight Keywords'] i{
     width: 23px !important;
     background-repeat: no-repeat;
-}
-#ui-datepicker-div{
-    display: none;
 }
 #expresscurate_dialog_content_clone_editor{
     height: 190px;

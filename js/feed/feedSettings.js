@@ -3,9 +3,8 @@ var ExpressCurateFeedSettings = (function ($) {
 
     function addFeed() {
         ExpressCurateUtils.track('/rss-feeds/add');
-
         var message = '',
-            link = $input.val().replace(/\/\s*$/, ""),
+            link = $input.val(),
             liHTML = '',
             $lastLi,
             $errorMessage = $(".addNewFeed .expresscurate_errorMessage");

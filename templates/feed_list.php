@@ -17,6 +17,8 @@ if (!empty($contentList)) {
     if (is_array($feed_content) && count($feed_content) > 0) {
         foreach ($feed_content as $content) {
             $content['domain'] = parse_url($content['link'], PHP_URL_SCHEME) . "://" . parse_url($content['link'], PHP_URL_HOST);
+            $content['desc'] = str_replace("&quot;","'",$content['desc']);
+            $content['title'] = str_replace("&quot;","'",$content['title']);
             array_push($sorted_feeds, $content);
         }
     }
@@ -77,12 +79,12 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
         </div>
     </div>
     <div class="expresscurate_clear"></div>
-
+    <ul id="expresscurate_feedBoxes" class="expresscurate_feedBoxes expresscurate_masonryWrap">
     <?php
     if (!empty($sorted_feeds)) {
         $i = 0;
         ?>
-        <ul id="expresscurate_feedBoxes" class="expresscurate_feedBoxes expresscurate_masonryWrap"><?php
+        <?php
         foreach ($sorted_feeds as $key => $item) {
             ?>
             <li class="expresscurate_preventTextSelection expresscurate_masonryItem">
@@ -144,13 +146,13 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
 
             <?php $i++;
         }
-        ?></ul><?php
+        ?><?php
     } ?>
     <label class="expresscurate_notDefined expresscurate_displayNone">Your content feed is
         empty. <?php echo (strlen(get_option('expresscurate_links_rss', '')) > 2) ? '' : 'Configure <a
             href="admin.php?page=expresscurate_feeds">RSS feeds</a> to
         start.'; ?></label>
-
+    </ul>
     <form method="POST" action="<?php echo get_admin_url() ?>post-new.php#expresscurate_sources_collection"
           id="expresscurate_bookmarks_curate">
         <textarea name="expresscurate_bookmarks_curate_data" id="expresscurate_bookmarks_curate_data"

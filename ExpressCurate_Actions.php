@@ -689,10 +689,8 @@ class ExpressCurate_Actions
         } else {
             //$the_post = get_post($post_id);
             $post_content = $post->post_content;
-            if (strpos($post_content, 'keywordsHighlight') !== false) {
-                $tags_obj = new Expresscurate_Tags();
-                $post_content = $tags_obj->removeHighlights($post_content);
-            }
+            $tags_obj = new Expresscurate_Tags();
+            $post_content = $tags_obj->removeTagLinks($post_content);
         }
 
         //Smart publishing
@@ -1106,13 +1104,13 @@ class ExpressCurate_Actions
         $title = $default_title;
         if (is_single() || is_page()) {
             $post_id = $post->ID;
-            $title = get_post_meta($post_id, '_expresscurate_advanced_seo_title', true);
-            $title = !empty($title) ? $title . ' | ' : '';
+            $seo_title = get_post_meta($post_id, '_expresscurate_advanced_seo_title', true);
+            $title = !empty($seo_title) ? $seo_title . ' | ' : $title;
         }
         return $title;
     }
 
-    public function advanced_seo_update_canonical_url($default_title)
+    public function advanced_seo_update_canonical_url()
     {
         global $post;
         $post_id = $post->ID;

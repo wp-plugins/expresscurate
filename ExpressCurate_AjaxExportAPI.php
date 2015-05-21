@@ -32,6 +32,7 @@ class ExpressCurate_AjaxExportAPI
     public function get_terms()
     {
         $data = array();
+        $data["title"] = get_bloginfo('name');
         $data["categories"] = array();
         $data["keywords"] = array();
         $data["featured_image"] = 0;

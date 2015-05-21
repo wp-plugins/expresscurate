@@ -79,19 +79,17 @@ var ExpressCurateFeedWall = (function ($) {
             url: 'admin-ajax.php?action=expresscurate_manual_pull_feed'
         }).done(function (res) {
             var data = $.parseJSON(res);
-            if (data) {
-                $.each(data.content, function (index, value) {
-                    $("#expresscurate_feedBoxes").load("admin-ajax.php?action=expresscurate_show_content_feed_items #expresscurate_feedBoxes > li", function () {
-                        $('.pullTime p').text('in ' + data.minutes_to_next_pull);
-                        $masonryWrap.masonry('destroy').masonry({
-                            itemSelector: '.expresscurate_masonryItem',
-                            isResizable: true,
-                            isAnimated: true,
-                            columnWidth: '.expresscurate_masonryItem',
-                            gutter: 10
-                        });
-                        ExpressCurateUtils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
+            if (data) { 
+                $("#expresscurate_feedBoxes").load("admin-ajax.php?action=expresscurate_show_content_feed_items #expresscurate_feedBoxes > li", function () {
+                    $('.pullTime p').text('in ' + data.minutes_to_next_pull);
+                    $masonryWrap.masonry('destroy').masonry({
+                        itemSelector: '.expresscurate_masonryItem',
+                        isResizable: true,
+                        isAnimated: true,
+                        columnWidth: '.expresscurate_masonryItem',
+                        gutter: 10
                     });
+                    ExpressCurateUtils.notDefinedMessage($notDefFeed, $feedBoxes.find(' > li'));
                 });
             }
         }).always(function () {
