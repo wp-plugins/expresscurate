@@ -536,8 +536,6 @@ class ExpressCurate_Actions
         if ($defined_tags) {
             $defined_tags = explode(",", $defined_tags);
         }
-        //$the_post = get_post($post_id);
-
 // get the content of the post
         $post_content = $post->post_content;
 
@@ -666,9 +664,6 @@ class ExpressCurate_Actions
      */
     public function save_post($post_id,$post=null)
     {
-
-        //out($post);
-        //$post_type = get_post_type($post_id);
         $post_type = $post->post_type;
 
         if ($post_type == 'acf') {
@@ -687,9 +682,8 @@ class ExpressCurate_Actions
         if (get_option('expresscurate_smart_tagging') == "on") {
             $post_content = $this->generate_tags($post);
         } else {
-            //$the_post = get_post($post_id);
             $post_content = $post->post_content;
-            $tags_obj = new Expresscurate_Tags();
+            $tags_obj = new ExpressCurate_Tags();
             $post_content = $tags_obj->removeTagLinks($post_content);
         }
 
