@@ -300,32 +300,31 @@
                                 ?>
                             </select>
                     </li>
-             <!--       <li>
+                    <li>
                         <p class="title">Social publishing </p>
                         <input class="expresscurate_displayNone" type="checkbox" id="expresscurate_social_publishing"
                                name="expresscurate_social_publishing" <?php
-/*                        if (get_option('expresscurate_social_publishing', '') == "on") {
+                        if (get_option('expresscurate_social_publishing', '') == "on") {
                             echo 'checked';
                         }
-                        */?> />
+                        ?> />
                         <label class="controls checkboxLabel" for="expresscurate_social_publishing"></label>
 
                         <?php
-/*                        $blogName = urlencode(urlencode(get_bloginfo('url')));
-                        */?>
-                        <a class="getApiKey  <?php /*if (strlen(get_option('expresscurate_buffer_access_token')) > 2) {
+                        $blogName = urlencode(urlencode(get_bloginfo('url')));
+                        ?>
+                        <a class="getApiKey  <?php if (strlen(get_option('expresscurate_buffer_access_token')) > 2) {
                             echo 'expresscurate_displayNone';
-                        } */?>"
-                           href="https://www.expresscurate.com/api/connector/buffer/accesstoken/<?php /*echo $blogName */?>">Authorize
+                        } ?>"
+                           href="https://www.expresscurate.com/api/connector/buffer/accesstoken/<?php echo $blogName ?>">Authorize
                             access to Buffer</a>
                     </li>
-                    <div
-                        class="socialPublishingWrap <?php /*if (get_option('expresscurate_social_publishing', '') !== "on") {
+                    <div class="socialPublishingWrap <?php if (get_option('expresscurate_social_publishing', '') !== "on") {
                             echo 'expresscurate_displayNone';
-                        } */?> ">
+                        } ?> ">
 
                         <?php
-/*                        $buffer = new ExpressCurate_BufferClient();
+                        $buffer = new ExpressCurate_BufferClient();
                         $profiles = $buffer->getProfiles();
                         if (!empty($profiles)) {
                             $profilesStatus = array();
@@ -335,28 +334,28 @@
 
                             foreach ($profiles as $i => $profile) {
                                 $profileId = $profile->id;
-                                */?>
+                                ?>
                                 <li>
-                                    <p class="title"><?php /*echo $profile->formatted_service; */?>
-                                        / <?php /*echo $profile->formatted_username; */?></p>
-                                    <input data-id="<?php /*echo $profileId; */?>"
+                                    <p class="title"><?php echo $profile->formatted_service; ?>
+                                        / <?php echo $profile->formatted_username; ?></p>
+                                    <input data-id="<?php echo $profileId; ?>"
                                            class="expresscurate_displayNone expresscurate_social_publishing_profile"
                                            type="checkbox"
-                                           id="expresscurate_social_publishing_<?php /*echo $profileId; */?>"
-                                           name="expresscurate_social_publishing_<?php /*echo $profileId; */?>" <?php /*if ($profilesStatus->$profileId == 'on' || empty($profilesStatus->$profileId)) {
+                                           id="expresscurate_social_publishing_<?php echo $profileId; ?>"
+                                           name="expresscurate_social_publishing_<?php echo $profileId; ?>" <?php if ($profilesStatus->$profileId == 'on' || empty($profilesStatus->$profileId)) {
                                         echo 'checked="checked"';
-                                    }  */?> />
+                                    }  ?> />
                                     <label class="controls checkboxLabel"
-                                           for="expresscurate_social_publishing_<?php /*echo $profileId; */?>"></label>
+                                           for="expresscurate_social_publishing_<?php echo $profileId; ?>"></label>
                                 </li>
                             <?php
-/*                            }
-                            */?>
-                            <input type="hidden" value="<?php /*echo stripslashes(get_option('expresscurate_social_publishing_profiles', '')); */?>" id="expresscurate_social_publishing_profiles" name="expresscurate_social_publishing_profiles"/>
+                            }
+                            ?>
+                            <input type="hidden" value="<?php echo stripslashes(get_option('expresscurate_social_publishing_profiles', '')); ?>" id="expresscurate_social_publishing_profiles" name="expresscurate_social_publishing_profiles"/>
                         <?php
-/*                        }
-                        */?>
-                    </div>-->
+                        }
+                        ?>
+                    </div>
 
                 </ul>
                 <div class="centerSave">

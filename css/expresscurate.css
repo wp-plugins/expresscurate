@@ -4991,7 +4991,7 @@
 .expresscurate_social_post_widget{
     padding-top: 10px;
 }
-    .expresscurate_tweetBlock{
+    .expresscurate_socialPostBlock{
         border-radius: 2px;
         padding: 0 10px;
         box-sizing: border-box;
@@ -4999,33 +4999,51 @@
         -webkit-box-sizing: border-box;
         border: solid 1px #E6E6E6;
         margin: 10px 0;
+        position: relative;
+        z-index: 100;
+    }
+    .expresscurate_socialPostBlock .socialWidgetOverlay{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top:0;
+        left: 0;
+        background: #000;
+        opacity: .3;
+    }
+    .expresscurate_socialPostBlock .edit{
+        position: relative;
+        z-index: 102;
+        background-color: #fff;
+        padding: 0 12px;
     }
     .expresscurate_social_post_widget .mainControls{
         margin: 0 0 10px 0;
     }
-            .expresscurate_tweetBlock .topControls,
-            .expresscurate_tweetBlock .bottomControls{
+            .expresscurate_socialPostBlock .topControls,
+            .expresscurate_socialPostBlock .bottomControls{
                 margin: 5px 0;
                 padding: 0;
             }
-                .expresscurate_tweetBlock .topControls li,
-                .expresscurate_tweetBlock .bottomControls li{
+                .expresscurate_socialPostBlock .topControls li,
+                .expresscurate_socialPostBlock .bottomControls li{
                     display: inline-block;
                     height: 25px;
-                    margin: 0;
+                    margin: 0 2px;
                 }
-                .expresscurate_tweetBlock .topControls li.close:hover{
+                .expresscurate_socialPostBlock .topControls li.close:hover{
                     background: url("../images/feed_icons.svg") no-repeat -48px -21px;
                     background-size: auto 68px;
                 }
-                .expresscurate_tweetBlock .topControls li.close{
+                .expresscurate_socialPostBlock .topControls li.close{
                     background: url("../images/feed_icons.svg") no-repeat -48px 6px;
                     background-size: auto 68px;
                     width: 25px;
                     cursor: pointer;
                 }
 
-            .expresscurate_social_post_content{
+            .expresscurate_social_post_content,
+            .expresscurate_social_post_content_published{
                 display: block;
                 resize: none;
                 width: 100%;
@@ -5041,6 +5059,12 @@
                 padding: 0 10px;
                 border: solid 1px #E6E6E6;
             }
+            .expresscurate_social_post_content_published{
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                overflow: auto;
+            }
             .expresscurate_social_widget_buttons{
                 display: inline-block;
                 border: 2px solid #1cbb9f;
@@ -5053,13 +5077,31 @@
                 transition: all .3s ease-out;
                 -moz-transition: all .3s ease-out;
                 -webkit-transition: all .3s ease-out;
-                margin: 0;
+                margin: 0 0 3px 0;
                 cursor: pointer;
             }
                 .expresscurate_social_widget_buttons:hover {
                      background-color: #1cbb9f;
                      color: #ffffff;
                  }
+
+            .expresscurate_socialPostBlock .topControls .expresscurate_social_widget_buttons,
+            .expresscurate_socialPostBlock .bottomControls .expresscurate_social_widget_buttons{
+                color: #fff;
+                background-color: #1cbb9f;
+                border: none !important;
+            }
+            .expresscurate_socialPostBlock .topControls .expresscurate_social_widget_buttons:hover,
+            .expresscurate_socialPostBlock .bottomControls .expresscurate_social_widget_buttons:hover{
+                background-color: #20d0b1;
+            }
+            .expresscurate_socialPostBlock .expresscurate_socialPostLength{
+                color: #1cbb9f;
+                line-height: 25px;
+            }
+            .expresscurate_socialPostBlock .expresscurate_socialPostLength.error{
+                color:#e85e50;
+            }
 /*dashboard social widget*/
     .expresscurate_social_box{
         line-height: 30px;
@@ -5072,23 +5114,39 @@
         -webkit-box-sizing: border-box;
         padding-left: 40px;
         background: url("../images/socials_box.svg") no-repeat;
-        background-size: auto 100px;
+        background-size: auto 200px;
+        background-position: -30px -30px;
+        background-color: #bdbdbd;
         max-height: 30px;
         position: relative;
     }
     .expresscurate_social_box_Twitter{
         background-color: rgba(0,172,273,1);
-        background-position: 0 -72px;
+        background-position: 6px -64px;
     }
     .expresscurate_social_box_Twitter:hover{
         background-color: rgba(0,172,273,0.8);
     }
     .expresscurate_social_box_Facebook{
         background-color: rgba(59,89,152,1);
-        background-position: 0 -2px;
+        background-position: 5px 0;
     }
     .expresscurate_social_box_Facebook:hover{
         background-color: rgba(59,89,152,0.8);
+    }
+    .expresscurate_social_box_LinkedIn{
+        background-color: rgba(30,135,189,1);
+        background-position: 6px -173px;
+    }
+    .expresscurate_social_box_LinkedIn:hover{
+        background-color: rgba(30,135,189,0.8);
+    }
+    .expresscurate_social_box_Google{
+        background-color: rgba(212,65,50,1);
+        background-position: 7px -120px;
+    }
+    .expresscurate_social_box_Google:hover{
+        background-color: rgba(212,65,50,0.8);
     }
         .expresscurate_social_box .dailySuggestions{
             display: inline-block;
@@ -5228,6 +5286,12 @@
 }
 .mce-expresscurateFollow.mce-disabled{
     background-position: center -317px !important;
+}
+.mce-expresscurateSocialPost{
+    background-position: center -393px !important;
+}
+.mce-expresscurateSocialPost.mce-disabled{
+    background-position: center -433px !important;
 }
 .expresscurateSocial{
     background-position: center -78px !important;

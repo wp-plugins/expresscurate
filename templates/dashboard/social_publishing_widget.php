@@ -10,9 +10,10 @@ $profiles = $buffer->getProfiles();
             if (!empty($profiles)) {
                 foreach ($profiles as $i => $profile) {
                     $counts = $profile->counts;
+                    $formatedService= (strpos($profile->formatted_service,'Google') !== false)? 'Google' :$profile->formatted_service;
                     ?>
                     <li class="expresscurate_background_wrap">
-                        <div class="expresscurate_social_box expresscurate_social_box_<?php echo $profile->formatted_service ?>">
+                        <div class="expresscurate_social_box expresscurate_social_box_<?php echo $formatedService; ?>">
                             <span class="text"><?php echo $profile->formatted_username ?></span>
                             <span class="dailySuggestions"><span class="tooltip">daily suggestions</span><?php echo $counts->daily_suggestions; ?></span>
                         </div>

@@ -165,16 +165,20 @@ var ExpressCurateButtons = (function ($) {
         /*link validation*/
         var arrOutboundLinks = false,
             arrInboundLink = false;
-        $(content).find('a').each(
-            function () {
-                var link = getRootUrl($(this).attr("href")),
-                    patIfRelative = /^https?:\/\//i;
+        $(content).find('a').each(function (index, value) {
+
+            var link = $(value).attr("href");
+            if (link) {
+                link = getRootUrl(link);
+                var patIfRelative = /^https?:\/\//i;
                 if (!patIfRelative.test(link) || link == getRootUrl(window.location)) {
                     arrInboundLink = true;
                 } else {
                     arrOutboundLinks = true;
                 }
-            });
+            }
+
+        });
         messageHtml += arrInboundLink ? '' : '<p class="lengthSuggestion blue">This page contains no inbound links, add some where appropriate.</p>';
         messageHtml += arrOutboundLinks ? '' : '<p class="lengthSuggestion blue">This page contains no outbound links, add some where appropriate.</p>';
 
@@ -466,12 +470,12 @@ var ExpressCurateButtons = (function ($) {
                     cmd: 'addKeyword',
                     classes: "btn expresscurateCostom expresscurateAddKeyword"
                 });
-                /*console.log(tinymce.EditorManager.get('expresscurate_dialog_content_editor'));
-                tinymce.EditorManager.get('expresscurate_dialog_content_editor').addButton('clearContent', {
-                    title: 'Clear editor content',
-                    cmd: 'clearContent',
-                    classes: "btn expresscurateCostom expresscurateAnnotate"
-                });*/
+                ed.addButton('addSocialPost', {
+                    title: 'Add Social Post',
+                    cmd: 'addSocialPost',
+                    classes: "btn expresscurateCostom expresscurateSocialPost"
+                });
+
                 ed.onKeyDown.add(function (ed, e) {
                     if (e.altKey && e.keyCode === 75) {
                         addKeyword();
@@ -569,7 +573,10 @@ var ExpressCurateButtons = (function ($) {
                             ed.controlManager.setActive('noFollow', true);
                         }
                     }
+
                     ed.controlManager.setDisabled('noFollow', ed.selection.getNode().nodeName !== 'A');
+
+                    ed.controlManager.setDisabled('addSocialPost', tinymce.activeEditor.selection.getContent().length < 1);
 
                     var cssClass = $node.attr('class'),
                         activeButton = ' ';
@@ -623,6 +630,21 @@ var ExpressCurateButtons = (function ($) {
                     });
                     ed.addCommand('addKeyword', function () {
                         addKeyword();
+                    });
+                    ed.addCommand('addSocialPost', function () {
+                        if (tinymce.activeEditor.selection.getContent().length > 1) {
+                            var text = tinymce.activeEditor.selection.getContent(),
+                                myRegExp = new RegExp('(<([^>]+)>)', 'ig');
+
+                            text = text.replace(myRegExp, ' ').trim();
+                            var data = {
+                                message: text
+                            };
+                            ExpressCurateSocialPostWidget.createSocialPost(data);
+                            $('html, body').animate({
+                                scrollTop: $("#expresscurate_social_publishing").offset().top - 40
+                            }, 700);
+                        }
                     });
                 }
             },

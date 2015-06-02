@@ -23,7 +23,6 @@ if ($_POST) {
             <span>Submit here!</span></a>
 
         <h2>ExpressCurate</h2>
-        <label></label>
     </div>
     <div class="expresscurate_blocksContainer expresscurate_masonryWrap">
         <?php

@@ -303,7 +303,9 @@ class ExpressCurate_Actions
             array_push($buttons, 'wordCount');
         }
         array_push($buttons, 'addKeyword');
-        array_push($buttons, 'clearContent');
+        if (get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2){
+            array_push($buttons, 'addSocialPost');
+        }
         return $buttons;
     }
 
@@ -725,6 +727,11 @@ class ExpressCurate_Actions
             update_post_meta($post_id, '_expresscurate_advanced_seo_social_shortdesc', esc_attr($expresscurate_advanced_seo_social_shortdesc));
             update_post_meta($post_id, '_expresscurate_advanced_seo_social_desc', esc_attr($expresscurate_advanced_seo_social_desc));
 
+            //social posts
+          //  $expresscurate_social_post_messages = isset($_POST['expresscurate_social_post_messages']) ? $_POST['expresscurate_social_post_messages'] : '';
+
+           // update_post_meta($post_id, '_expresscurate_social_post_messages', esc_attr($expresscurate_social_post_messages));
+
             //post analysis notification
             $expresscurate_post_analysis_notification = isset($_POST['expresscurate_post_analysis_notification']) ? $_POST['expresscurate_post_analysis_notification'] : '';
 
@@ -962,10 +969,12 @@ class ExpressCurate_Actions
         // and publish the social posts too
         //$postStatus = get_post_status($post_id);
 
-        /*if('publish' == $post->post_status) {
-            $social = ExpressCurate_SocialManager::getInstance();
-            $social->publishPostMessages($post_id);
-        }*/
+        if (get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2) {
+            if ('publish' == $post->post_status) {
+                $social = ExpressCurate_SocialManager::getInstance();
+                $social->publishPostMessages($post_id);
+            }
+        }
     }
 
     public function messages($m)
@@ -1038,7 +1047,7 @@ class ExpressCurate_Actions
     public function add_widget()
     {
         $seo = get_option('expresscurate_seo', '') == 'on';
-        $social = get_option('expresscurate_social_publishing', '') == 'on';
+        $social = get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2;
         $post_types = array('post', 'page');
         $post_types = array_merge($post_types, get_post_types(array('_builtin' => false, 'public' => true), 'names'));
         foreach ($post_types as $post_type) {
@@ -1047,9 +1056,9 @@ class ExpressCurate_Actions
             if ($seo) {
                 add_meta_box('expresscurate_advanced_seo', ' Advanced SEO', array(&$this, 'advanced_seo'), $post_type, 'normal', 'high');
             }
-            /*if($social) {
+            if($social) {
                 add_meta_box('expresscurate_social_publishing', ' Social Posts', array(&$this, 'social_posts'), $post_type, 'normal', 'high');
-            }*/
+            }
         }
     }
 
@@ -1498,9 +1507,9 @@ class ExpressCurate_Actions
             add_meta_box('dashboard_widget_smartPublishing', 'Smart Publishing Overview', array(&$this, 'smart_publishing_widget'), get_current_screen(), 'side', 'high');
         }
         
-       /* if (get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2) {
+        if (get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2) {
             add_meta_box('dashboard_widget_social_publishing', 'Social Publishing Overview', array(&$this, 'social_publishing_widget'), get_current_screen(), 'side', 'high');
-        }*/
+        }
 
         add_meta_box('dashboard_widget_feed', 'Feed', array(&$this, 'feed_widget'), get_current_screen(), 'side', 'high');
         add_meta_box('dashboard_widget_bookmarks', 'Bookmarks', array(&$this, 'bookmarks_widget'), get_current_screen(), 'side', 'high');
