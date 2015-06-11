@@ -168,7 +168,7 @@
         <?php
         $blogName = urlencode(urlencode(get_bloginfo('url')));
         ?>
-            <a class="getApiKey  <?php if (strlen(get_option('expresscurate_google_refresh_token')) > 2) {echo 'expresscurate_displayNone';}?>" href="https://www.expresscurate.com/api/connector/google/webmasters/refreshtoken/<?=$blogName?>">Authorize access to Google Webmaster Tools</a>
+            <a class="getApiKey  <?php if (strlen(get_option('expresscurate_google_refresh_token')) > 2) {echo 'expresscurate_displayNone';}?>" href="https://www.expresscurate.com/api/connector/google/webmasters/refreshtoken/<?=$blogName?>">Authorize access to Google Search Console (aka Webmaster Tools)</a>
     </div>
 </li>
 </ul>

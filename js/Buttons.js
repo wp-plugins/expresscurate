@@ -182,6 +182,13 @@ var ExpressCurateButtons = (function ($) {
         messageHtml += arrInboundLink ? '' : '<p class="lengthSuggestion blue">This page contains no inbound links, add some where appropriate.</p>';
         messageHtml += arrOutboundLinks ? '' : '<p class="lengthSuggestion blue">This page contains no outbound links, add some where appropriate.</p>';
 
+        /*social post*/
+        if($('#expresscurate_social_publishing').length){
+            if($('.expresscurate_socialPostBlock').length<1){
+                messageHtml+='<p class="lengthSuggestion blue">You currently have no social posts. Add a couple of them to get more exposure.</p>';
+            }
+        }
+
         /*keywords validation*/
         var defKeywords = $('#expresscurate_defined_tags').val();
 
@@ -312,12 +319,16 @@ var ExpressCurateButtons = (function ($) {
     function checkSocialTab() {
         var $this = $('#expresscurate_socialEmbed'),
             content = $this.val().trim(),
-            $tabs = $('.expresscurate_socialDialog .tabs li');
-        $.each($tabs, function (index, value) {
-            var tab = $(value).data('tab'),
-                myRegExp = new RegExp('https?:\/\/([a-zA-Z\d-]+\.){0,}' + tab + '\.com', 'gmi');
+            $tabs = $('.expresscurate_socialDialog .tabs li'),
+            names = ['youtube', 'youtu', 'vimeo', 'facebook', 'twitter'];
+        $.each(names, function (index, value) {
+            var tab = value,
+                myRegExp = new RegExp('https?:\/\/([a-zA-Z\d-]+\.){0,}' + tab + '(\.com|\.be)', 'gmi');
             if (myRegExp.test(content)) {
                 $tabs.removeClass('current');
+                if(tab=='youtu'){
+                    tab='youtube';
+                }
                 $('.expresscurate_socialDialog .tabs li.' + tab).addClass('current');
             }
         });
@@ -344,6 +355,7 @@ var ExpressCurateButtons = (function ($) {
             $contentWrap = $('#content');
             ($contentWrap.css("display") === "block") ? $contentWrap.focus() : tinyMCE.get("content").focus();
             var ed = tinymce.activeEditor;
+            ExpressCurateUtils.track('/post/embed-dialog/open');
             ed.windowManager.open({
                 title: 'Embed',
                 id: 'ExpresscurateEmbed',
@@ -390,6 +402,7 @@ var ExpressCurateButtons = (function ($) {
                                     url = $($elem).attr('src');
                                     break;
                             }
+                            ExpressCurateUtils.track('/post/embed-dialog/insert' + selectedTab);
                             if (url) {
                                 if ($contentWrap.css("display") === "block") {
                                     var existedText = $contentWrap.val();
@@ -633,6 +646,7 @@ var ExpressCurateButtons = (function ($) {
                     });
                     ed.addCommand('addSocialPost', function () {
                         if (tinymce.activeEditor.selection.getContent().length > 1) {
+                            ExpressCurateUtils.track('/post/social-post-widget/getselection');
                             var text = tinymce.activeEditor.selection.getContent(),
                                 myRegExp = new RegExp('(<([^>]+)>)', 'ig');
 

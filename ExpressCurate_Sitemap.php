@@ -156,7 +156,7 @@ class ExpressCurate_Sitemap
                 echo json_encode($response);
                 die;
             } else {
-                $response = array('status'=> 3,'message' => 'ExpressCurate shall be authorized to access to Google Webmaster Tools.');
+                $response = array('status'=> 3,'message' => 'ExpressCurate shall be authorized to access to Google Search Console (aka Webmaster Tools).');
             }
        }
     }

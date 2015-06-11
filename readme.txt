@@ -1,10 +1,10 @@
 === ExpressCurate ===
 Contributors: expresscurate
-Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, rss, feed, keywords summary, keywords dashboard, seo control center, keyword, seo, sitemap, google webmasters, google, widget, bookmark
+Tags: content curation, content marketing, curation plugin, content curation plugin, curation tools, content curation tools, content curation toolkit, content writing, attribution, content, curation, curating, rss, feed, keywords summary, keywords dashboard, seo control center, keyword, seo, sitemap, search console, google, widget, bookmark, social, twitter
 Donate link: https://bit.ly/expresscuratedonate
 Requires at least: 3.9
 Tested up to: 4.2.2
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -80,7 +80,7 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 
 = How To Get Started =
-[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.1.0.zip "Your favorite content marketing tools") for WordPress.  
+[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.1.1.zip "Your favorite content marketing tools") for WordPress.  
 You can also [download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme") a **free** [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme"). It will give your curated content a modern online news look.
 
 
@@ -112,23 +112,30 @@ You can also [download](http://www.expresscurate.com/p/products/wordpress-theme 
 04. Post - Curate Content: When editing a post, use the curate content button to insert curation passages into the post.
 05. Post - Curate Content: Load the passages of choice into the post, and curate!
 06. Post - Styling, Editing, Analytics: When editing a post, use the toolbar for keyword highlights, box styles and access to post analysis.
-07. Post - Embed: Provide an embed code from Facebook,  Twitter, YouTube or Vimeo and have the proper card inserted into your post.
+07. Post - Embed: Provide an embed code from Facebook, Twitter, YouTube or Vimeo and have the proper card inserted into your post.
 08. Post - Embed: Embed multiple posts to create stories.
 09. Post - SEO Control Center: Pick relevant keyword density and create meta descriptions using the SEO Control Center.
 10. Post - Advanced SEO: Optimize content and review post statistics using the Advanced SEO widget!
 11. Post Analysis: Use Post analysis to receive improvement suggestions for your content!
 12. Post - Sources: Access the list of Sources from which content is pulled and check for the number of posts curated from these sources.
-13. Keywords Dashboard
-14. RSS Feeds
-15. Top Sources
-16. Settings
-17. FAQ: See FAQs for common usage hints and questions.
+13. Social Publishing Widget: Use the social publishing widget for social media promotions, content optimization & sharing.
+14. Keywords Dashboard
+15. RSS Feeds
+16. Top Sources
+17. Settings
+18. FAQ: See FAQs for common usage hints and questions.
 
 
 
 
 
 == Changelog ==
+
+= 2.1.1 =
+* New Setting: Stop Keywords. Content Feed will filter out the posts that contain these stop words.
+* New Setting: Content Alert Users. Content (Keyword Match) Alert will be sent to the specified users only.
+* New Feature: All Posts now shows the number of approved social promotion messages.
+* Miscellaneous bug fixes and improvements.
 
 = 2.1.0 =
 * New Feature: Social Widget for Social Media Promotion

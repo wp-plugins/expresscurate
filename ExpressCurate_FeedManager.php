@@ -63,12 +63,12 @@ class ExpressCurate_FeedManager
                 } else {
                     if (filter_var($rssUrl, FILTER_VALIDATE_URL)) {
                         $result['status'] = 'success';
-                        
+
                         // retrieve the feed title
                         $feedMeta = $this->getFeedMeta($rssUrl);
                         $link = $feedMeta['link'];
                         $link = empty($link) ? $rssUrl : $link;
-                        
+
                         // get the number of posts that are curated from this feed
                         $metas = $wpdb->get_results(
                             "SELECT post_id
@@ -80,7 +80,7 @@ class ExpressCurate_FeedManager
                         $curated_links_rss[$rssUrl]['link'] = $result['link'] = $link;
                         $curated_links_rss[$rssUrl]['post_count'] = $result['post_count'] = count($metas);
                         $curated_links_rss[$rssUrl]['feed_title'] = $result['feed_title'] = $feedMeta['title'];
-                        
+
                         // save
                         update_option('expresscurate_links_rss', json_encode($curated_links_rss));
                     } else {
@@ -95,13 +95,13 @@ class ExpressCurate_FeedManager
 
         die;
     }
-    
+
     private function getFeedMeta($feedURL) {
         $loadURL = "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&q=" . urlencode($feedURL);
         $htmlparser = new ExpressCurate_HtmlParser($loadURL);
         $res = $htmlparser->download();
         $result = json_decode($res, true);
-        
+
         if(isset($result['responseData']) && isset($result['responseData']['feed'])) {
             $meta = array();
             $meta['title'] = $result['responseData']['feed']['title'];
@@ -158,7 +158,7 @@ class ExpressCurate_FeedManager
         $curated_links_rss = get_option('expresscurate_links_rss', '');
         if ($curated_links_rss) {
             $curated_links_rss = json_decode($curated_links_rss, true);
-            
+
             $links = array();
             foreach($curated_links_rss as $link => $data) {
                 $url = $data['feed_url'];
@@ -196,16 +196,16 @@ class ExpressCurate_FeedManager
                             // parse the host
                             $url = parse_url($meta_values[$key][0]);
                             $host = $url['host'];
-                            
+
                             // get only the main domain
                             preg_match('/([a-z0-9\-_]{1,63})\.([a-z]{2,6})$/i', $host, $regs);
                             $link = $regs[1] . '.' . $regs[2];
-                            
+
                             // filter
                             if(empty($link) || $link == '.') {
                                 continue;
                             }
-                            
+
                             // add
                             $curated_links[$i]['host'] = $host;
                             $curated_links[$i]['link'] = $link;
@@ -217,21 +217,21 @@ class ExpressCurate_FeedManager
             }
         }
         wp_reset_postdata();
-        
+
         $rssLinks = array();
-        
+
         if(ExpressCurate_HtmlParser::supportsDownload()) {
             foreach ($curated_links as $key => $top_link) {
                 $websiteHost = $top_link['host'];
                 $website = $top_link['link'];
-                
+
                 if(isset($rssLinks[$websiteHost])) {
                     $rssUrl = $rssLinks[$websiteHost];
                 } else {
                     $rssUrl = $this->getRssUrl($websiteHost);
                     $rssLinks[$websiteHost] = $rssUrl;
                 }
-                
+
                 if ($rssUrl && isset($curated_links_rss[$rssUrl])) {
                     $feed_status = 'rssStatusYes';
                 } else {
@@ -241,7 +241,7 @@ class ExpressCurate_FeedManager
                         $feed_status = 'rssStatusNo';
                     }
                 }
-                
+
                 $top_sources_rss['links'][$website] = array(
                     'post_ids' => array($top_link['post_id']),
                     'feed_options' => array(
@@ -275,36 +275,36 @@ class ExpressCurate_FeedManager
     public function get_rss_list()
     {
         global $wpdb;
-        
+
         $curated_links_rss = get_option('expresscurate_links_rss', '');
         if ($curated_links_rss) {
             $curated_links_rss = json_decode($curated_links_rss, true);
-            
+
             $save = false;
             foreach($curated_links_rss as $rss => $data) {
                 if(isset($data['feed_title']) && strlen(trim($data['feed_title'])) > 0) {
                     continue;
                 }
-                
+
                 // correct the url and get the meta data
                 $rssUrl = $this->getRssUrl($rss);
                 $feedMeta = $this->getFeedMeta($rssUrl);
                 $link = $feedMeta['link'];
                 $link = empty($link) ? $rssUrl : $link;
-                
+
                 $data = array();
                 $data['feed_title'] = $feedMeta['title'];
                 $data['feed_url'] = $rssUrl;
                 $data['link'] = $link;
-                
+
                 // remove the old row and add the new one
                 unset($curated_links_rss[$rss]);
                 $curated_links_rss[$link] = $data;
-                
+
                 // make sure to save in the end
                 $save = true;
             }
-            
+
             // update the post count
             foreach($curated_links_rss as $link => $data) {
                 // get the number of posts that are curated from this feed
@@ -312,16 +312,16 @@ class ExpressCurate_FeedManager
                             "SELECT post_id
                              FROM $wpdb->postmeta
                              WHERE meta_key LIKE  '%_expresscurate_link_%' AND meta_value LIKE '%" . $link . "%' GROUP BY post_id");
-                
+
                 $curated_links_rss[$link]['post_count'] = count($posts);
             }
-            
+
             // save
             update_option('expresscurate_links_rss', json_encode($curated_links_rss));
         } else {
             $curated_links_rss = array();
         }
-        
+
         unset($curated_links_rss['']);
         return $curated_links_rss;
     }
@@ -369,8 +369,8 @@ class ExpressCurate_FeedManager
         }
         return false;
     }
-    
-    
+
+
 
     public function get_feed_content()
     {
@@ -386,7 +386,7 @@ class ExpressCurate_FeedManager
         // blabla
         $data = $_REQUEST;
         $pull_feed_interval = (get_option('expresscurate_pull_hours_interval')) ? get_option('expresscurate_pull_hours_interval') : 1;
-        $date = ($data["date"]) ? urldecode($data["date"]) : date('Y-m-d H:i:s', strtotime("-" . $pull_feed_interval . " hour"));
+            $date = ($data["date"]) ? urldecode($data["date"]) : date('Y-m-d H:i:s', strtotime("-" . $pull_feed_interval . " hour"));
         $curated_links_rss = get_option('expresscurate_links_rss', '');
         if ($curated_links_rss) {
             // get the deleted suggestions
@@ -402,13 +402,13 @@ class ExpressCurate_FeedManager
                     $deleted_urls[] = $deletet_item;
                 }
             }
-            
+
             // go over the feeds and try to pull
             $curated_links_rss = json_decode($curated_links_rss, true);
             if (count($curated_links_rss)) {
                 foreach ($curated_links_rss as $url => $feed_url) {
                     // pull content
-                    $lookup_url = "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&q=" . urlencode($feed_url['feed_url']);
+                    $lookup_url = "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&scoring=h&q=" . urlencode($feed_url['feed_url']);
                     $htmlparser = new ExpressCurate_HtmlParser($lookup_url);
                     $res = $htmlparser->download();
                     // decode and collect
@@ -420,7 +420,7 @@ class ExpressCurate_FeedManager
             // check if the feed is empty and sort
             if(!empty($feed_array)) {
                 @uasort($feed_array, array($this, "feedSortByDate"));
-                
+
                 // check if the feed is full or not
                 if(count($feed_array) > self::CONTENT_FEED_MAX_SIZE) {
                     // remove the last elements
@@ -429,14 +429,14 @@ class ExpressCurate_FeedManager
 
                 }
             }
-            
+
             // save the latest feed
             $feed_content = json_encode(array('date' => date('Y-m-d H:i:s'), 'content' => $feed_array));
             update_option('expresscurate_feed_content', $feed_content);
             return $feed_content;
         }
     }
-    
+
     private function collect_feed($result, $deleted_urls, &$feed_array, $type = 'feed', $date = false)
     {
         $feeds = array();
@@ -447,20 +447,24 @@ class ExpressCurate_FeedManager
                 $feeds = $result['responseData']['feed']['entries'];
             }
         }
+        
+        $blockWords = split(',', trim(get_option('expresscurate_content_stop_keywords', '')));
+        $blockWords = empty($blockWords) ? false : $blockWords;
+        
         foreach ($feeds as $story) {
             // get the post url
             $link = isset($story['link']) ? $story['link'] : $story['address'];
             if(empty($link) || isset($deleted_urls[$link])) {
                 continue;
             }
-            
+
             // parse the post url
             $parsedLink = parse_url($link);
-            
+
             // google alerts support
             // check for google redirect urls and pick up the original post link
             $protocol = $parsedLink['scheme'];
-            if (strpos($protocol . "://www.google.com/url", $url) == 0) {
+            if (strpos($protocol . "://www.google.com/url", $link) == 0) {
                 $query = $parsedLink['query'];
                 $url_query = explode("&", $query);
                 foreach ($url_query as $param) {
@@ -472,19 +476,19 @@ class ExpressCurate_FeedManager
                     }
                 }
             }
-            
+
             // check if this link is already in the feed
             if(isset($feed_array[$link])) {
                 continue;
             }
-            
+
                 $domain = parse_url($link);
                 if (preg_match('/(?P<subdomain>.<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $parsedLink['host'], $regs)) {
                     $domain = $regs['domain'];
                 } else {
                     $domain = $domain['host'];
                 }
-                
+
                 // download and analyze
                 $html_parser = new ExpressCurate_HtmlParser($link);
                 $link = $html_parser->getRealURL();
@@ -492,14 +496,22 @@ class ExpressCurate_FeedManager
                 if(isset($feed_array[$link])) {
                     continue;
                 }
+
+                if($blockWords) {
+                    $blocked = $html_parser->contains($blockWords);
+                    if($blocked) {
+                        continue;
+                    }
+                }
+                
                 
                 $keywords = $html_parser->analyzeKeywords();
                 $media = $html_parser->containsMedia();
-                
+
                 $publishDate = isset($story['publishedDate']) ? $story['publishedDate'] : $story['date'];
                 $expressCurateDate = new ExpressCurate_Date();
                 $publishDate = $expressCurateDate->dateWithTimeUtc(strtotime($publishDate));
-                
+
                 $story_array = array(
                     'title' => str_replace("&quot;","'",$story['title']),
                     'desc' => isset($story['contentSnippet']) ? str_replace("&quot;","'",$story['contentSnippet']) : '',
@@ -531,7 +543,7 @@ class ExpressCurate_FeedManager
     public function manual_pull_feed() {
         // get feed data
         $feeds = json_decode($this->get_feed_content(), true);
-        
+
         // reschedule the cronjob
         //if(!empty($feeds['content'])) {
         wp_clear_scheduled_hook('expresscurate_pull_feeds');
@@ -539,7 +551,7 @@ class ExpressCurate_FeedManager
         wp_schedule_event(strtotime("+" . $pull_feed_interval . " hour"), 'hourly', 'expresscurate_pull_feeds');
         $feeds["minutes_to_next_pull"] = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), time());
         //}
-        
+
         // return
         echo json_encode($feeds);
         die;
@@ -550,7 +562,7 @@ class ExpressCurate_FeedManager
         include(sprintf("%s/templates/feed_list.php", dirname(__FILE__)));
         die;
     }
-    
+
     public function filter_feeds_by_date() {
         $data = $_REQUEST;
         $feed_content = json_decode(get_option('expresscurate_feed_content', ''), true);
@@ -569,6 +581,13 @@ class ExpressCurate_FeedManager
     {
 
         if (get_option('expresscurate_enable_content_alert') == 'on') {
+            $expressCurateEmail = new ExpressCurate_Email();
+            
+            $alertAddresses = trim(get_option('expresscurate_content_alert_users', ''));
+            if(!$expressCurateEmail->hasContentAlertRecipients()) {
+                return;
+            }
+        
             $feed_content = json_decode(get_option('expresscurate_feed_content', ''), true);
 
             if ($this->date_diff(date('Y-m-d H:i:s'), get_option('expresscurate_content_alert_lastDate', true)) > get_option('expresscurate_content_alert_frequency', true)
@@ -584,14 +603,10 @@ class ExpressCurate_FeedManager
                     }
                 }
                 if (!empty($emailStories)) {
-                    $expressCurateEmail = new ExpressCurate_Email();
                     $expressCurateEmail->sendContentAlertEmail($emailStories);
-
                 }
-
             }
         }
-
     }
 
     public function delete_feed_content_items()
@@ -654,13 +669,13 @@ class ExpressCurate_FeedManager
                 }else {
                     $current_user = wp_get_current_user();
                     $item['user'] = $current_user->display_name;
-                    
+
                     $this->collectBookmark($bookmarks, $item);
-                    
+
                     $result[$bookmarkURL]['status'] = 'success';
                 }
             }
-            
+
             // save the updated bookmarks
             update_option('expresscurate_bookmarks', json_encode($bookmarks));
         } else {
@@ -682,11 +697,11 @@ class ExpressCurate_FeedManager
             if (isset($data['url'])) {
                 // get the url
                 $bookmarkURL = $data['url'];
-                
+
                 // clean-up the provided url
                 // parse the post url
                 $parsedLink = parse_url($bookmarkURL);
-            
+
                 // google alerts supportbookmarkURL   // check for google redirect urls and pick up the original post link
                 $protocol = $parsedLink['scheme'];
                 if (strpos($protocol . "://www.google.com/url", $bookmarkURL) == 0) {
@@ -700,7 +715,7 @@ class ExpressCurate_FeedManager
                         }
                     }
                 }
-                
+
                 // read the existing bookmarks
                 $bookmarks = get_option('expresscurate_bookmarks', '');
                 if ($bookmarks) {
@@ -708,18 +723,18 @@ class ExpressCurate_FeedManager
                 } else {
                     $bookmarks = array();
                 }
-                
+
                 // check if the provided url is already bookmarked
                 if (isset($bookmarks[$bookmarkURL])) {
                     // is a new comment provided?
                     if (isset($data['comment'])) {
                         // save the new comment
                         $bookmarks[$bookmarkURL]['comment'] = $data['comment'];
-                        
+
                         // construct the result
                         $result['status'] = 'success';
                         $result['result'] = $bookmarkURL;
-                        
+
                         // save the updated bookmarks
                         update_option('expresscurate_bookmarks', json_encode($bookmarks));
                     } else {
@@ -733,25 +748,25 @@ class ExpressCurate_FeedManager
                     // load the article
                     $contentManager = new ExpressCurate_ContentManager();
                     $article = $contentManager->getArticle($bookmarkURL, false);
-                    
+
                     // check if the article is loaded successfully
                     if (isset($article['status']) && $article['status'] == 'success') {
                         // get the comment
                         $comment = isset($data['comment']) ? $data['comment'] : '';
-                        
+
                         // set the type and author
                         $article['type'] = isset($data['type']) ? $data['type'] : 'user';
                         $current_user = wp_get_current_user();
                         $article['result']['user'] = $current_user->display_name;
-                        
+
                         // ...
                         $this->collectBookmark($bookmarks, $article, $bookmarkURL, $comment);
-                        
+
                         // construct the result
                         $result['status'] = 'success';
                         $result['result'] = $bookmarks[$bookmarkURL];
                         $result['result']['curateLink'] = base64_encode(urlencode($bookmarkURL));
-                        
+
                         // save the updated bookmarks
                         update_option('expresscurate_bookmarks', json_encode($bookmarks));
                     } else {
@@ -772,7 +787,7 @@ class ExpressCurate_FeedManager
         echo json_encode($result);
         die;
     }
-    
+
     private function collectBookmark(&$bookmarks, $item, $url = null, $comment = '') {
         if ($url) {
             if (isset($item['result']) && isset($item['result']['title'])) {
@@ -789,9 +804,9 @@ class ExpressCurate_FeedManager
                 $bookmark['media'] = $item['result']['media'];
                 $bookmark['comment'] = $comment;
                 $bookmark['curated'] = 0;
-                
+
                 $bookmark['type'] = isset($item['result']['type']) ? $item['type'] : 'user';
-                
+
                 // add the bookmark to the list
                 $bookmarks[$url] = $bookmark;
             }
@@ -802,7 +817,7 @@ class ExpressCurate_FeedManager
                 }
                 $item['comment'] = $comment;
                 $item['bookmark_date'] = date('Y-m-d H:i:s');
-                
+
                 $bookmarks[$item['link']] = $item;
             }
         }
@@ -883,7 +898,7 @@ class ExpressCurate_FeedManager
     public function search_feed_bookmark()
     {
         $needle = !empty($_GET['searchKeyword']) ? $_GET['searchKeyword'] : ' ';
-        $resulArray = array();
+        $resultArray = array();
         $hayStack = array();
 
         if (!empty($_GET['contentType'])) {
@@ -900,16 +915,20 @@ class ExpressCurate_FeedManager
             } else {
                 $feeds = array();
             }
-            $hayStack = array_merge($bookmarks, $feeds);
-        }
-
-        foreach ($hayStack as $content) {
-            if (mb_stripos($content['title'], $needle) != false) {
-                $resulArray[] = $content;
+            if(!empty($bookmarks)){
+                $hayStack = array_merge($bookmarks, $feeds);
             }
         }
 
-        echo json_encode($resulArray);
+        if(!empty($hayStack)){
+            foreach ($hayStack as $content) {
+                if (mb_stripos($content['title'], $needle) != false) {
+                    $resultArray[] = $content;
+                }
+            }
+        }
+
+        echo json_encode($resultArray);
         die;
     }
 

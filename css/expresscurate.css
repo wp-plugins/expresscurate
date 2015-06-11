@@ -637,6 +637,8 @@
         .expresscurate_bookmarks .addBookmark span span,
         .expresscurate_feed_dashboard .addFeed span span,
         .expresscurate_keywords_settings .addKeywords span span,
+        .expresscurate_settings .addUsers span span,
+        .expresscurate_settings .addKeywords span span,
         .expresscurate_widget_wrapper .addKeywords span span{
             background: url("../images/plus.svg") no-repeat transparent center;
             background-size: 14px;
@@ -1231,7 +1233,17 @@
     margin-right: 6px;
     z-index: 90000;
 }
+.expresscurate_settings .addUsers,
+.expresscurate_settings .addKeywords{
+    width: 200px;
+    height: 30px;
+    overflow: hidden;
+    margin: 0;
+    position: relative;
+}
 
+    .expresscurate_settings .addUsers input,
+    .expresscurate_settings .addKeywords input,
     .expresscurate_widget_wrapper .addKeywords input {
         height: 100%;
         width: 95%;
@@ -1245,11 +1257,18 @@
         line-height: 14px;
         border: none;
     }
+    .expresscurate_settings .addUsers input,
+    .expresscurate_settings .addKeywords input{
+        font-size: 12px;
+        line-height: 25px;
+    }
 .expresscurate_widget_wrapper .addKeywords input::-webkit-input-placeholder,
 .expresscurate_widget_wrapper .addKeywords input:-moz-placeholder {
     font-size: 14px !important;
     line-height: 14px;
 }
+    .expresscurate_settings .addUsers span ,
+    .expresscurate_settings .addKeywords span ,
     .expresscurate_widget_wrapper .addKeywords span {
         height: 35px;
         width: 35px;
@@ -1264,9 +1283,17 @@
         top: 0;
         cursor: pointer;
     }
+    .expresscurate_settings .addUsers span,
+    .expresscurate_settings .addKeywords span{
+        height: 30px;
+        width: 30px;
+    }
+.expresscurate_settings .addUsers span:hover,
+.expresscurate_settings .addKeywords span:hover,
 .expresscurate_widget_wrapper .addKeywords span:hover{
     background-color: #20d0b1;
 }
+/*.expresscurate_settings .addKeywords ::-webkit-input-placeholder,*/
 .expresscurate_widget_wrapper ::-webkit-input-placeholder {
     padding-top: 3px;
     color: #555555;
@@ -2941,7 +2968,7 @@
 }
 .expresscurate .tab-content > div{
     min-height: 70vh;
-    max-width: 800px;
+    max-width: 1000px;
 }
 .expresscurate_advancedSEO_widget .tab-link.disabled,
 .expresscurate .tab-link.disabled{
@@ -3076,7 +3103,47 @@
     color: #25bfa1;
     margin: 0 0 0 5px;
 }
-
+.expresscurate .socialPublishingWrap{
+    margin-left: 30px;
+}
+    .expresscurate .socialPublishingWrap li{
+        display: inline-block;
+    }
+/*feed stop words*/
+    .expresscurate_settings .usersToAlert li,
+    .expresscurate_settings .stopKeywords li{
+        display: inline-block;
+        border: solid 1px #E6E6E6;
+        height: 30px;
+        margin: 0 5px 5px 0 ;
+        position: relative;
+        padding: 0 40px 0 10px;
+        line-height: 28px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        vertical-align: top;
+    }
+        .expresscurate_settings .usersToAlert li span,
+        .expresscurate_settings .stopKeywords li span{
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            color: #fefefe;
+            font-size: 30px;
+            text-align: center;
+            line-height: 30px;
+            right: 0;
+            top: -1px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            cursor: pointer;
+            background: url("../images/remove.svg") #1cbb9f no-repeat center;
+            background-size: 16px auto;
+        }
+/**/
 .expresscurate .form-table {
     margin-left: 25px;
     max-width: 877px;
@@ -5124,29 +5191,17 @@
         background-color: rgba(0,172,273,1);
         background-position: 6px -64px;
     }
-    .expresscurate_social_box_Twitter:hover{
-        background-color: rgba(0,172,273,0.8);
-    }
     .expresscurate_social_box_Facebook{
         background-color: rgba(59,89,152,1);
         background-position: 5px 0;
-    }
-    .expresscurate_social_box_Facebook:hover{
-        background-color: rgba(59,89,152,0.8);
     }
     .expresscurate_social_box_LinkedIn{
         background-color: rgba(30,135,189,1);
         background-position: 6px -173px;
     }
-    .expresscurate_social_box_LinkedIn:hover{
-        background-color: rgba(30,135,189,0.8);
-    }
     .expresscurate_social_box_Google{
         background-color: rgba(212,65,50,1);
         background-position: 7px -120px;
-    }
-    .expresscurate_social_box_Google:hover{
-        background-color: rgba(212,65,50,0.8);
     }
         .expresscurate_social_box .dailySuggestions{
             display: inline-block;

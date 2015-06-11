@@ -312,14 +312,17 @@
 
                         <?php
                         $blogName = urlencode(urlencode(get_bloginfo('url')));
+                        $socialPublishingStatus= get_option('expresscurate_social_publishing', '') == 'On' ? 'On' : 'Off';
                         ?>
-                        <a class="getApiKey  <?php if (strlen(get_option('expresscurate_buffer_access_token')) > 2) {
-                            echo 'expresscurate_displayNone';
+
+                        <a id="expresscurateBufferAccessToken" class="getApiKey  <?php if (strlen(get_option('expresscurate_buffer_access_token')) > 2 || $socialPublishingStatus=='Off') {
+                            echo 'expresscurate_displayNone defined';
                         } ?>"
                            href="https://www.expresscurate.com/api/connector/buffer/accesstoken/<?php echo $blogName ?>">Authorize
                             access to Buffer</a>
                     </li>
-                    <div class="socialPublishingWrap <?php if (get_option('expresscurate_social_publishing', '') !== "on") {
+                    <div
+                        class="socialPublishingWrap <?php if (get_option('expresscurate_social_publishing', '') !== "on") {
                             echo 'expresscurate_displayNone';
                         } ?> ">
 
@@ -344,14 +347,17 @@
                                            id="expresscurate_social_publishing_<?php echo $profileId; ?>"
                                            name="expresscurate_social_publishing_<?php echo $profileId; ?>" <?php if ($profilesStatus->$profileId == 'on' || empty($profilesStatus->$profileId)) {
                                         echo 'checked="checked"';
-                                    }  ?> />
+                                    } ?> />
                                     <label class="controls checkboxLabel"
                                            for="expresscurate_social_publishing_<?php echo $profileId; ?>"></label>
                                 </li>
                             <?php
                             }
                             ?>
-                            <input type="hidden" value="<?php echo stripslashes(get_option('expresscurate_social_publishing_profiles', '')); ?>" id="expresscurate_social_publishing_profiles" name="expresscurate_social_publishing_profiles"/>
+                            <input type="hidden"
+                                   value="<?php echo stripslashes(get_option('expresscurate_social_publishing_profiles', '')); ?>"
+                                   id="expresscurate_social_publishing_profiles"
+                                   name="expresscurate_social_publishing_profiles"/>
                         <?php
                         }
                         ?>
@@ -528,6 +534,38 @@
                     </li>
                     <li>
                         <div class="title">
+                            Stop Keywords
+                            <div class="description">
+                                ExpressCurate will filter out the posts that contain any stop keywords.
+                            </div>
+                        </div>
+                        <div class="controls">
+                            <?php $defStopKeywords = get_option('expresscurate_content_stop_keywords', ''); ?>
+                            <textarea class="expresscurate_displayNone" name="expresscurate_content_stop_keywords"
+                                      id="expresscurate_content_stop_keywords" cols="30" rows="10">
+                                <?php echo $defStopKeywords ?>
+                            </textarea>
+                            <ul class="stopKeywords defItems">
+                                <?php
+                                $stopKeywords = explode(', ', $defStopKeywords);
+                                if (!empty($stopKeywords)) {
+                                    foreach ($stopKeywords as $keyword) {
+                                        if (!empty($keyword)) {
+                                            echo '<li>' . $keyword . '<span class="close"></span></li>';
+                                        }
+                                    }
+                                }
+                                ?>
+                            </ul>
+                            <div class="addKeywords">
+                                <input type="text" placeholder="Add Keywords" class="expresscurate_disableInputStyle"/>
+                                <span class=""><span></span></span>
+                                <ul class="suggestion"></ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="title">
                             Keyword Match Email Alerts
                             <div class="description">
                                 Would you like to receive email alerts when keyword matches are found in your <a
@@ -538,49 +576,100 @@
                                name="expresscurate_enable_content_alert" <?php if (get_option('expresscurate_enable_content_alert') == 'on') echo 'checked'; ?>>
                         <label class="controls checkboxLabel" for="expresscurate_enable_content_alert"></label>
                     </li>
-                    <li class="emailAlertSlider <?php if (get_option('expresscurate_enable_content_alert') != 'on') echo 'expresscurate_displayNone'; ?>">
-                        <div class="title">
-                            Content Alert Frequency
-                            <div class="description">
-                                How frequently should ExpressCurate send content Alert Email (from RSS feeds, Alerts,
-                                etc)
+                    <div
+                        class="emailAlertSlider <?php if (get_option('expresscurate_enable_content_alert') != 'on') echo 'expresscurate_displayNone'; ?>">
+                        <li>
+                            <div class="title">
+                                Content Alert Frequency
+                                <div class="description">
+                                    How frequently should ExpressCurate send content Alert Emails (from RSS feeds,
+                                    Alerts,
+                                    etc)
+                                </div>
                             </div>
-                        </div>
-                        <select class="controls" id="expresscurate_content_alert_frequency"
-                                name="expresscurate_content_alert_frequency">
-                            <?php
-                            for ($i = 1; $i < 14; $i++) {
-                                ?>
-                                <?php if ($i == 1) { ?>
-                                    <option value="<?php echo $i; ?>" <?php
-                                    if (get_option('expresscurate_content_alert_frequency') == $i) {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Every hour
-                                    </option>
-
-                                <?php } elseif ($i == 13) { ?>
-                                    <option value="<?php echo $i; ?>" <?php
-                                    if (get_option('expresscurate_content_alert_frequency') == $i) {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Once a day
-                                    </option>
-
-                                <?php } else { ?>
-                                    <option value="<?php echo $i; ?>" <?php
-                                    if (get_option('expresscurate_content_alert_frequency') == $i) {
-                                        echo 'selected="selected"';
-                                    }
-                                    ?>>Every <?php echo $i; ?> hours
-                                    </option>
-
+                            <select class="controls" id="expresscurate_content_alert_frequency"
+                                    name="expresscurate_content_alert_frequency">
                                 <?php
+                                for ($i = 1; $i < 14; $i++) {
+                                    ?>
+                                    <?php if ($i == 1) { ?>
+                                        <option value="<?php echo $i; ?>" <?php
+                                        if (get_option('expresscurate_content_alert_frequency') == $i) {
+                                            echo 'selected="selected"';
+                                        }
+                                        ?>>Every hour
+                                        </option>
+
+                                    <?php } elseif ($i == 13) { ?>
+                                        <option value="<?php echo $i; ?>" <?php
+                                        if (get_option('expresscurate_content_alert_frequency') == $i) {
+                                            echo 'selected="selected"';
+                                        }
+                                        ?>>Once a day
+                                        </option>
+
+                                    <?php } else { ?>
+                                        <option value="<?php echo $i; ?>" <?php
+                                        if (get_option('expresscurate_content_alert_frequency') == $i) {
+                                            echo 'selected="selected"';
+                                        }
+                                        ?>>Every <?php echo $i; ?> hours
+                                        </option>
+
+                                    <?php
+                                    }
                                 }
-                            }
-                            ?>
-                        </select>
-                    </li>
+                                ?>
+                            </select>
+
+                        </li>
+                        <li>
+                            <div class="title">
+                                Users
+                                <div class="description">
+                                    Define who should get content alerts.
+                                </div>
+                            </div>
+                            <div class="controls">
+                                <?php $defUsers = get_option('expresscurate_content_alert_users', ''); ?>
+                                <textarea class="expresscurate_displayNone" name="expresscurate_content_alert_users"
+                                          id="expresscurate_content_alert_users" cols="30" rows="10">
+                                <?php echo $defUsers; ?>
+                            </textarea>
+                                <ul class="usersToAlert defItems">
+                                    <?php
+                                    $users = explode(', ', $defUsers);
+                                    if (!empty($users)) {
+                                        foreach ($users as $user) {
+                                            if (!empty($user)) {
+                                                echo '<li>' . $user . '<span class="close"></span></li>';
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </ul>
+                                <div class="addUsers">
+                                    <input type="text" placeholder="Add Users" class="expresscurate_disableInputStyle"/>
+                                    <span class=""><span></span></span>
+                                    <?php
+                                    $blogusers = get_users();
+
+                                    foreach ($blogusers as $user) {
+                                        if ($user->roles[0] != 'subscriber') {
+                                            $names[] = $user->user_login;
+                                        }
+                                    }
+                                    $allUsers = implode(',', $names);
+                                    if (!empty($allUsers)) {
+                                        echo '<textarea class="expresscurate_displayNone" name=""
+                                      id="expresscurate_allUsers" value="' . $allUsers . '" >' . $allUsers . '</textarea>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </li>
+                    </div>
+
                 </ul>
                 <div class="centerSave">
                     <?php @submit_button(); ?>

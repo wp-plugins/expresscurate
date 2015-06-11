@@ -392,6 +392,7 @@ var ExpresscurateDialog = (function ($) {
                             if (keywords && keywords.length > 0) {
                                 displayCuratedTags(keywords);
                             }
+                            ExpressCurateUtils.track('/post/content-dialog/cloneload');
                         } else {
                             if (data.result.title && data.result.title.length > 0) {
                                 $("#curated_title").val(data.result.title);

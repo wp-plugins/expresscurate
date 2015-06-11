@@ -13,17 +13,29 @@ var ExpressCurateSocialPostWidget = (function ($) {
     function parseContent() {
         var $contentWrap = $('#content'),
             content = (($contentWrap.css("display") === "block") ? $contentWrap.val() : tinyMCE.get("content").getContent()),
-            myRegExp = new RegExp('(<([^>]+)>)', 'ig');
+            myRegExp = new RegExp('(<([^>]+)>)', 'ig'),
+            li = $(content).find('li'),
+            posts = [];
+
+        if (li.length) {
+            $.each(li, function (index, value) {
+                var text = $(value).text();
+                posts.push(text);
+                content = content.replace(text, '');
+            });
+        }
 
         content = content.split('<p>');
         for (var i = 0; i < content.length; i++) {
             content[i] = content[i].replace(myRegExp, ' ').trim();
         }
-        content = content.filter(function (el) {
+
+        var result = $.merge(posts, content);
+        result = result.filter(function (el) {
             return el.length !== 0;
         });
 
-        return content;
+        return result;
     }
 
     function getHeader(header) {
@@ -32,6 +44,7 @@ var ExpressCurateSocialPostWidget = (function ($) {
             data = {
                 message: $(content).find(header).text()
             };
+        ExpressCurateUtils.track('/post/social-post-widget/get' + header);
         if (data.message.length > 1) {
             createSocialPost(data);
         } else {
@@ -113,6 +126,7 @@ var ExpressCurateSocialPostWidget = (function ($) {
             $.each(posts, function (index, value) {
                 if (value.id == blockId) {
                     value.message = text;
+                    value.postLength = maxLength - text.length;
                     updatePosts(posts);
                 }
             });
@@ -149,10 +163,12 @@ var ExpressCurateSocialPostWidget = (function ($) {
                 };
                 createSocialPost(data);
             });
+            ExpressCurateUtils.track('/post/social-post-widget/getcontent');
         });
         /*add new*/
         $('#expresscurate_addTweet').on('click', function () {
             createSocialPost(null);
+            ExpressCurateUtils.track('/post/social-post-widget/createnew');
         });
         /*post from headers*/
         $('.expresscurate_headerTweet').on('click', function () {
@@ -165,6 +181,7 @@ var ExpressCurateSocialPostWidget = (function ($) {
                 var data = {
                     message: $('#expresscurate_advanced_seo_social_title').val()
                 };
+                ExpressCurateUtils.track('/post/social-post-widget/socialtitle');
                 createSocialPost(data);
             }
         });
@@ -175,6 +192,7 @@ var ExpressCurateSocialPostWidget = (function ($) {
                 var data = {
                     message: $('#expresscurate_advanced_seo_social_desc').val()
                 };
+                ExpressCurateUtils.track('/post/social-post-widget/socialdescription');
                 createSocialPost(data);
             }
         });
@@ -185,6 +203,7 @@ var ExpressCurateSocialPostWidget = (function ($) {
                 var data = {
                     message: $('#expresscurate_advanced_seo_social_shortdesc').val()
                 };
+                ExpressCurateUtils.track('/post/social-post-widget/socialshortdescription');
                 createSocialPost(data);
             }
         });
@@ -205,7 +224,7 @@ var ExpressCurateSocialPostWidget = (function ($) {
                     value.message = value.message.slice(0, maxLength);
                 }
             });
-
+            ExpressCurateUtils.track('/post/social-post-widget/approve');
             updatePosts(posts);
 
             $block.find('li').addClass('expresscurate_displayNone');
@@ -246,14 +265,12 @@ var ExpressCurateSocialPostWidget = (function ($) {
             });
             var clone = $.extend({}, post);
             clone.id = uniqueId();
+            clone.postLength = maxLength - clone.message.length;
             posts.push(clone);
-
+            ExpressCurateUtils.track('/post/social-post-widget/copy');
             updatePosts(posts);
-            $('.mainControls').after(ExpressCurateUtils.getTemplate('socialPostWidget', post));
-
-
+            $block.before(ExpressCurateUtils.getTemplate('socialPostWidget', post));
         });
-
     }
 
     var isSetup = false;

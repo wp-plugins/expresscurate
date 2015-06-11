@@ -283,6 +283,8 @@ var ExpressCurateSEOControl = (function ($) {
                 $canonicalURL.attr('readonly',false);
                 $noFollow.add($noIndex).attr('disabled',false);
             }
+
+            ExpressCurateUtils.track('/post/seo-control-center/clonestatuschange');
         });
         $('.expresscurate_moveToAdvanced').on('click', function () {
             $('html, body').animate({

@@ -21,7 +21,7 @@ class ExpressCurate_GoogleClient
         $accessToken = $this->getAccessToken();
         if($accessToken == null) {
             // no access token, break!
-            $response = array('status'=> 1,'message' => 'ExpressCurate shall be authorized to access to Google Webmaster Tools.');
+            $response = array('status'=> 1,'message' => 'ExpressCurate shall be authorized to access to Google Search Console (aka Webmaster Tools).');
             return $response;
         }
     
@@ -47,10 +47,10 @@ class ExpressCurate_GoogleClient
             $response = array('status'=> 0 ,'message'=>'Successfully submitted' );
         } else if($httpCode == 401) {
             $decodedResponse = json_decode($response, true);
-            $response = array('status'=> 1,'message' => 'ExpressCurate shall be authorized to access to Google Webmaster Tools.');
+            $response = array('status'=> 1,'message' => 'ExpressCurate shall be authorized to access to Google Search Console (aka Webmaster Tools).');
         } else {
             $decodedResponse = json_decode($response, true);
-            $response = array('status'=> 2,'message' => isset($decodedResponse['error']) ? $decodedResponse['error'] : 'Something went wrong. Please, make sure you have authorized ExpressCurate to access to Google Webmaster Tools.');
+            $response = array('status'=> 2,'message' => isset($decodedResponse['error']) ? $decodedResponse['error'] : 'Something went wrong. Please, make sure you have authorized ExpressCurate to access to Google Search Console (aka Webmaster Tools).');
         }
         return $response;
     }

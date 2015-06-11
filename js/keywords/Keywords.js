@@ -152,9 +152,11 @@ var ExpressCurateKeywords = (function ($) {
             });
             var matches = ed.getBody(),
                 i = 0;
+
             keywords = keywords.sort(function (a, b) {
-                return b > a
+                return b.length > a.length
             });
+
             keywords.forEach(function (val) {
                 $(matches).html(function (index, oldHTML) {
                     return oldHTML.replace(new RegExp('((^|\\s|>|))(' + val + ')(?=[^>]*(<|$))(?=(&nbsp;|\\s|,|\\.|:|!|\\?|\'|\"|\\;|.?<|$))', 'gmi'), '$2<span class="expresscurate_keywordsHighlight expresscurate_highlight' + colors[i % 7] + '">$3</span>');

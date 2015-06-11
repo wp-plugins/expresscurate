@@ -15,23 +15,35 @@ class ExpressCurate_Email
 
     private $customerEmail = null;
 
+    public function hasContentAlertRecipients()
+    {
+        $alertUsers = trim(get_option('expresscurate_content_alert_users', ''));
+        return strlen($alertUsers) > 0;
+    }
+
     public function sendContentAlertEmail($emailData)
     {
+        // render the email
         ob_start();
         include(sprintf("%s/templates/email/contentAlert.php", dirname(__FILE__)));
         $email = ob_get_clean();
 
-        $wpUsers = get_users();
+        // define headers
         $headers = 'Content-type: text/html; charset=utf-8' . "\r\n";
+        
+        // get recipients
+        $wpUsers = get_users();
+        $alertUsers = split(',', trim(get_option('expresscurate_content_alert_users', '')));
+        // TODO optimize to load only the users we need
         foreach ($wpUsers as $user) {
             // don't sent alerts to subscribers
-            if(in_array('subscriber', $user->roles)) {
+            if(in_array('subscriber', $user->roles) || !in_array($user->user_login, $alertUsers)) {
                 continue;
             }
             @wp_mail($user->user_email, 'ExpressCurate Content Alert', $email, $headers);
         }
+        // set the last alert time
         update_option('expresscurate_content_alert_lastDate', date('Y-m-d H:i:s'));
-
     }
 
     public function sendSupportEmail($emailFrom, $title, $message)

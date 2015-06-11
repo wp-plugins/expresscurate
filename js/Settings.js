@@ -21,6 +21,18 @@ var ExpressCurateSettings = (function ($) {
         }
     }
 
+    function addSettingsListItems($this) {
+        var $stopKeywordsWrap = $this.parents('.controls'),
+            $input = $stopKeywordsWrap.find('input'),
+            $list = $stopKeywordsWrap.find('.defItems'),
+            $definedWrap = $stopKeywordsWrap.find('> textarea'),
+            keywords = ExpressCurateKeywordUtils.multipleKeywords($input, $list, $definedWrap);
+
+        $.each(keywords, function (key, value) {
+            $list.append('<li>' + value + '<span class="close"></span></li>');
+        });
+    }
+
     function setupSettings() {
         var $submitSitemap = $('.expresscurate #submitSiteMap');
         if ($('input[name=expresscurate_post_status]:checked').val() === 'draft') {
@@ -37,7 +49,6 @@ var ExpressCurateSettings = (function ($) {
                 $('#expresscurate_publish_no').attr('checked', true);
                 $publishDiv.stop(true, true).slideUp('slow');
             }
-
         });
         /*settings page traching*/
         $('#tab-1').on('change', 'input', function () {
@@ -60,8 +71,22 @@ var ExpressCurateSettings = (function ($) {
             showHideOptions($('#smartPublishingWrap'), $(this));
         });
         /*social publishing*/
-        $('#expresscurate_social_publishing').on('change', function () {
+        $('.expresscurate_settings #expresscurate_social_publishing').on('change', function () {
+            var $this = $(this),
+                $token = $('#expresscurateBufferAccessToken'),
+                status = $this.is(':checked') ? 'on' : 'off';
             showHideOptions($('.socialPublishingWrap'), $(this));
+            if ($this.is(':checked')) {
+                $token.removeClass('expresscurate_displayNone');
+            } else {
+                $token.addClass('expresscurate_displayNone');
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: 'admin-ajax.php?action=expresscurate_save_social_publishing_status',
+                data: {status: status}
+            });
         });
         $('html').on('change', '.expresscurate_social_publishing_profile', function () {
             var $this = $(this),
@@ -85,6 +110,54 @@ var ExpressCurateSettings = (function ($) {
             connectSelectOptions();
         });
 
+        /*stop keywords for feed*/
+        $('.expresscurate_settings .addKeywords input').on('keyup', function (e) {
+
+            var $this = $(this);
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.keyCode === 13) {
+                addSettingsListItems($this);
+            }
+        });
+        $('.expresscurate_settings .addKeywords span span').on('click', function () {
+            addSettingsListItems($(this));
+        });
+
+        $('.expresscurate_settings .stopKeywords').on('click', ' li span', function () {
+            var $this = $(this),
+                $elem = $this.parent('li'),
+                $defWrap = $this.parents('.controls').find(' > textarea');
+            ExpressCurateKeywordUtils.close(ExpressCurateKeywordUtils.justText($elem), $elem, $defWrap);
+        });
+        /*content alert users*/
+        $('.expresscurate_settings .addUsers input').on('keyup', function (e) {
+            var $this = $(this),
+                allUsers = $('#expresscurate_allUsers').val().split(',');
+            $this.autocomplete({source: allUsers});
+
+            if (e.keyCode === 13) {
+                if ($.inArray($this.val(), allUsers) > -1) {
+                    addSettingsListItems($this);
+                }
+            }
+        });
+        $('.expresscurate_settings .addUsers span span').on('click', function () {
+            var $this = $(this),
+                $user = $this.parents('.addUsers').find('input'),
+                allUsers = $('#expresscurate_allUsers').val().split(',');
+
+            if ($.inArray($user.val(), allUsers) > -1) {
+                addSettingsListItems($this);
+            }
+        });
+
+        $('.expresscurate_settings .usersToAlert').on('click', ' li span', function () {
+            var $this = $(this),
+                $elem = $this.parent('li'),
+                $defWrap = $this.parents('.controls').find(' > textarea');
+            ExpressCurateKeywordUtils.close(ExpressCurateKeywordUtils.justText($elem), $elem, $defWrap);
+        });
         /*sitemap*/
         $('#expresscurate_sitemap_submit').on('change', function () {
             showHideOptions($('.sitemapUpdateFrequency'), $(this));
@@ -119,7 +192,7 @@ var ExpressCurateSettings = (function ($) {
                     $submitSitemap.removeClass('expresscurate_displayNone').addClass('generated');
                 } else {
                     $submitSitemap.addClass('expresscurate_displayNone').removeClass('generated');
-                    $submitSitemap.after('<p class="expresscurate_Error expresscurate_SettingsError">Something went wrong. Please, make sure you have authorized ExpressCurate to access to Google Webmaster Tools.</p>');
+                    $submitSitemap.after('<p class="expresscurate_Error expresscurate_SettingsError">Something went wrong. Please, make sure you have authorized ExpressCurate to access to Google Search Console (aka Webmaster Tools).</p>');
                 }
             });
         });
@@ -173,6 +246,14 @@ var ExpressCurateSettings = (function ($) {
             var href = $(this).next('span').children('a').attr('href'),
                 rest = href.substring(0, href.lastIndexOf("user_profile") + 13);
             $(this).next('span').children('a').attr('href', rest + $(this).val());
+        });
+
+
+        $('.expresscurate_settings').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                return false;
+            }
         });
     }
 

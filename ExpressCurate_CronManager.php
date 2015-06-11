@@ -18,9 +18,11 @@ class ExpressCurate_CronManager {
 
 
     public  $websiteUrlCallCronjob = null;
+    public  $websiteUrlCallCronjobDeleteAfter = null;
 
     public function __construct() {
         $this->websiteUrlCallCronjob ='0 * * * *  wget  '.get_site_url().' > /dev/null 2>&1';
+        $this->websiteUrlCallCronjobDeleteAfter ='0 * * * * wget --delete-after '.get_site_url().' > /dev/null 2>&1';
     }
 
     public static function getInstance() {
@@ -40,14 +42,21 @@ class ExpressCurate_CronManager {
         if ($cronjobStatus !== 'ignore' && $cronjobStatus !== 'manual') {
 
             $execExists = function_exists('exec');
-            $cronjobExists = $this->check_if_exist($this->websiteUrlCallCronjob);
 
-            if ($execExists && !$cronjobExists) {
-                ExpressCurate_Util::exec('crontab -l' ,$output);
+            if($execExists) {
+                ExpressCurate_Util::exec('crontab -l', $output);
                 $output = implode(PHP_EOL, $output);
-                $output = $output . PHP_EOL . $this->websiteUrlCallCronjob . PHP_EOL;
-                
-                $tempFile =  ExpressCurate_Util::tmpname('cron');
+
+                $cronjobExists = $this->check_if_exist($this->websiteUrlCallCronjob, $output) || $this->check_if_exist($this->websiteUrlCallCronjobDeleteAfter, $output);
+
+                if ($cronjobExists) {
+                    $this->websiteUrlCallCronjob . PHP_EOL;
+                    $this->websiteUrlCallCronjobDeleteAfter . PHP_EOL;
+                }
+
+                $output = $output . PHP_EOL . $this->websiteUrlCallCronjobDeleteAfter . PHP_EOL;
+
+                $tempFile = ExpressCurate_Util::tmpname('cron');
                 file_put_contents($tempFile, $output);
                 ExpressCurate_Util::exec('crontab ' . $tempFile, $output);
                 unlink($tempFile);
@@ -82,12 +91,19 @@ class ExpressCurate_CronManager {
         wp_clear_scheduled_hook('expresscurate_sitemap_generate');
         wp_clear_scheduled_hook('expresscurate_sitemap_push');
 
-        if($this->check_if_exist($this->websiteUrlCallCronjob)) {
+        $execExists = function_exists('exec');
+
+        if($execExists) {
             ExpressCurate_Util::exec('crontab -l', $output);
+            $cronjobExists = $this->check_if_exist($this->websiteUrlCallCronjob, $output) || $this->check_if_exist($this->websiteUrlCallCronjobDeleteAfter, $output);
             $output = implode(PHP_EOL, $output);
-            $output = str_replace($this->websiteUrlCallCronjob, "", $output) . PHP_EOL;
-            
-            $tempFile =  ExpressCurate_Util::tmpname('cron');
+
+            if ($cronjobExists) {
+                $output = str_replace($this->websiteUrlCallCronjob, "", $output) . PHP_EOL;
+                $output = str_replace($this->websiteUrlCallCronjobDeleteAfter, "", $output) . PHP_EOL;
+            }
+
+            $tempFile = ExpressCurate_Util::tmpname('cron');
             file_put_contents($tempFile, $output);
             ExpressCurate_Util::exec('crontab ' . $tempFile);
             unlink($tempFile);
@@ -107,8 +123,7 @@ class ExpressCurate_CronManager {
     /**
      * Check if cron job exists
      */
-    public function check_if_exist($command) {
-        ExpressCurate_Util::exec('crontab -l', $crontab);
+    public function check_if_exist($command, $crontab) {
         if(isset($crontab) && is_array($crontab)){
             $crontab = array_flip($crontab);
             if(isset($crontab[$command])){

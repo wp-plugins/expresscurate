@@ -1,23 +1,20 @@
 var ExpressCurateKeywordUtils = (function ($) {
     var autoCompleteRequest;
 
-    function checkKeyword(text, listName) {
+    function checkKeyword(text, listName,defElem) {
         if (text !== '') {
             text = text.replace(/[,.;:?!]+/g, '').trim();
-            var $defTags = $('textarea[name=expresscurate_defined_tags]'),
+            var $defTags =defElem ? defElem : $('textarea[name=expresscurate_defined_tags]'),
                 defVal = justText($defTags).replace(/\s{2,}/g, ' '),
                 $widget = $('#expresscurate_widget'),
-                $errorMessage=$widget.find('.expresscurate_errorMessage'),
-                defValArr = defVal.split(', '),
-                rslt;
+                $errorMessage = $widget.find('.expresscurate_errorMessage'),
+                defValArr = defVal.split(', ');
             $errorMessage.remove();
             if (text.length < 3 && $widget.length) {
                 $errorMessage.text('This keyword is too short.  We recommend keywords with at least 3 characters.');
             } else {
-                rslt = null;
                 for (var i = 0; i < defValArr.length; i++) {
                     if (defValArr[i].toLowerCase() === text.toLowerCase()) {
-                        rslt = (i + 1);
                         if ($widget.length > 0) {
                             highlight(text, $widget.find(' .statisticsTitle'));
                         } else if (listName !== undefined) {
@@ -25,8 +22,6 @@ var ExpressCurateKeywordUtils = (function ($) {
                         }
                         text = '';
                         break;
-                    } else {
-                        rslt = -1;
                     }
                 }
                 if (!/^\s+$/.test(text) && text.length > 2) {
@@ -48,7 +43,7 @@ var ExpressCurateKeywordUtils = (function ($) {
         return text;
     }
 
-    function multipleKeywords(el, listName) {
+    function multipleKeywords(el, listName,defElem) {
         var keywords = '',
             arr,
             result = [];
@@ -62,7 +57,7 @@ var ExpressCurateKeywordUtils = (function ($) {
 
         arr = keywords.split(/,|:|;|[\\.]/);
         for (var i = 0; i < arr.length; i++) {
-            var checkedKeyword = checkKeyword(arr[i], listName);
+            var checkedKeyword = checkKeyword(arr[i], listName,defElem);
             if (checkedKeyword.length > 0) {
                 result.push(checkedKeyword);
             }
@@ -70,13 +65,14 @@ var ExpressCurateKeywordUtils = (function ($) {
         return result;
     }
 
-    function close(keyword, elemToRemove) {
-        var $defTags = $('textarea[name=expresscurate_defined_tags]'),
-            newVal = justText($defTags).toLocaleLowerCase(),
-            lastChar = '';
+    function close(keyword, elemToRemove, defElem) {
 
-        newVal = newVal.replace(keyword.toLocaleLowerCase(), '');
-        newVal = newVal.replace(', ,', ',');
+        var $defTags =defElem ? defElem : $('textarea[name=expresscurate_defined_tags]'),
+            newVal = justText($defTags).toLocaleLowerCase().trim(),
+            lastChar = '',
+            myRegExp = new RegExp('(, |^)' + keyword.toLocaleLowerCase() + '(,|$)', 'gmi');
+
+        newVal = newVal.replace(myRegExp, '');
         lastChar = newVal.slice(-2);
         if (lastChar === ', ') {
             newVal = newVal.slice(0, -2);
@@ -130,7 +126,7 @@ var ExpressCurateKeywordUtils = (function ($) {
         if (input.val().length > 1) {
             var liHTML = '',
                 text = input.val(),
-                $autoComplete=$('.suggestion');
+                $autoComplete = $('.suggestion');
             if (autoCompleteRequest && autoCompleteRequest.readystate !== 4) {
                 autoCompleteRequest.abort();
                 $autoComplete.find('li').remove();

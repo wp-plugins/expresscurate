@@ -15,7 +15,7 @@ class Expresscurate_Tags
     {
 
         if ((strpos($matches[3], '</a') < strpos($matches[3], '<a')) || strpos($matches[3], '.') !== false) {
-            return '<a class="expresscurate_contentTags" href="' . get_tag_link($this->tag_id) . '">#' . strtolower($matches[0]) . '</a>';
+            return '<a class="expresscurate_contentTags" href="' . get_tag_link($this->tag_id) . '">#' . $matches[0]. '</a>';
         } else {
             return $matches[0];
         }
