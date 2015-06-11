@@ -408,7 +408,7 @@ class ExpressCurate_FeedManager
             if (count($curated_links_rss)) {
                 foreach ($curated_links_rss as $url => $feed_url) {
                     // pull content
-                    $lookup_url = "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&scoring=h&q=" . urlencode($feed_url['feed_url']);
+                    $lookup_url = "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&q=" . urlencode($feed_url['feed_url']);
                     $htmlparser = new ExpressCurate_HtmlParser($lookup_url);
                     $res = $htmlparser->download();
                     // decode and collect
