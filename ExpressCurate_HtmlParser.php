@@ -562,7 +562,14 @@ class ExpressCurate_HtmlParser
         // TODO optimize to "cache" the regexp generation
         $escaped = array();
         foreach ($words as $word) {
+            $word = trim($word);
+            if(empty($word)) {
+                continue;
+            }
             $escaped[] = preg_quote($word);
+        }
+        if(empty($escaped)) {
+            return false;
         }
         $escapedExp = implode('|', $escaped);
 

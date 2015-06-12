@@ -448,7 +448,7 @@ class ExpressCurate_FeedManager
             }
         }
         
-        $blockWords = split(',', trim(get_option('expresscurate_content_stop_keywords', '')));
+        $blockWords = split(', ', trim(get_option('expresscurate_content_stop_keywords', '')));
         $blockWords = empty($blockWords) ? false : $blockWords;
         
         foreach ($feeds as $story) {
@@ -503,7 +503,6 @@ class ExpressCurate_FeedManager
                         continue;
                     }
                 }
-                
                 
                 $keywords = $html_parser->analyzeKeywords();
                 $media = $html_parser->containsMedia();
