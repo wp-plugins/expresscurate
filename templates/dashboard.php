@@ -27,7 +27,7 @@ if ($_POST) {
     <div class="expresscurate_blocksContainer expresscurate_masonryWrap">
         <?php
         $dashboard_order = get_option('dashboard_items_order') ? get_option('dashboard_items_order') : array();
-        $allWidgets = array('keyWords', 'keyWordsIntOverTime', 'keyWordsRelTopics', 'smartPublish', 'socialPublish', 'feedWidget', 'bookmarks', 'support');
+        $allWidgets = array('welcome', 'keyWords', 'keyWordsIntOverTime', 'keyWordsRelTopics', 'smartPublish', 'socialPublish', 'feedWidget', 'bookmarks', 'support');
         foreach ($allWidgets as $item) {
             if (!in_array($item, $dashboard_order)) {
                 $dashboard_order[] = $item;
@@ -35,6 +35,12 @@ if ($_POST) {
         }
         if (!empty($dashboard_order)) {
             foreach ($dashboard_order as $ordered_item):
+                if ($ordered_item == "welcome"):
+                    echo '<div id="welcome" class="expresscurate_welcomeBlock expresscurate_masonryItem">
+                                            <label class="label">Welcome to ExpressCurate!</label>';
+                    $this->welcome_widget();
+                    echo '</div>';
+                endif;
                 if ($ordered_item == "keyWords"):
                     echo '<div id="keyWords" class="expresscurate_keywordsBlock expresscurate_masonryItem">
                                             <label class="label">Keywords Summary</label>';

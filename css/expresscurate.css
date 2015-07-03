@@ -985,6 +985,19 @@
     padding-top: 15px;
     padding-bottom: 25px;
 }
+.expresscurate_welcome_widget .expresscurate_dashboard > div{
+    text-align: left;
+}
+.expresscurate_welcome_widget .expresscurate_dashboard > div ul{
+    list-style: disc;
+    padding-left: 25px;
+}
+#dashboard_widget_welcome .inside{
+    padding: 0 0 12px 0;
+}
+.expresscurate_dashboard_welcome > div{
+    padding: 0 10px;
+}
 
 .expresscurate_dashboard .settingsLink {
     color: #0074a2;
@@ -1965,13 +1978,14 @@
     margin-left: 10px;
     cursor: pointer;
 }
-
+#expresscurate_loading #img-load ,
 .expresscurate_dialog #expresscurate_loading #img-load {
     position: absolute;
     top: 47%;
     left: 50%;
 }
 
+ #expresscurate_loading ,
 .expresscurate_dialog #expresscurate_loading {
     display: none;
     width: 100%;
@@ -3781,7 +3795,6 @@
         margin: 0;
         height: 32px;
     }
-
         .expresscurate_controls li{
             display: inline-block;
             width: 50px;
@@ -3793,12 +3806,44 @@
             cursor: default;
             position: relative;
             border: solid 1px #dddddd;
-            /*transition: background-color 400ms;
-            -webkit-transition: background-color 400ms;
-            -moz-transition: background-color 400ms;
-            -o-transition: background-color 400ms;
-            -ms-transition: background-color 400ms;*/
-
+        }
+        .expresscurate_controls select {
+            display: inline-block;
+            width: 170px;
+            height: 32px !important;
+            margin: 0;
+            background-repeat: no-repeat;
+            cursor: default;
+            border: solid 1px #25bfa1;
+            vertical-align: top;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            background-color: transparent;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            line-height: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background-image: url("../images/select.svg");
+            background-size: 13px auto;
+            background-position: 150px -17px;
+            padding: 0px 20px 0 5px;
+        }
+            .expresscurate_controls select option.expresscurate_filterOption{
+                display: block;
+                height: 30px;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        /*target Internet Explorer 9 and Internet Explorer 10:*/
+        @media screen and (min-width:0\0) {
+            select {
+                background:none;
+                padding: 5px;
+            }
         }
         .expresscurate_controls li.layout{
             background-image: url("../images/view.svg");
@@ -3816,7 +3861,7 @@
             .expresscurate_controls .check{
                 height: 30px;
                 width: 50px;
-                margin-left: 10px;
+                margin: 0 7px 0 10px;
                 background-image: url("../images/feed_icons.svg");
                 background-color: transparent;
                 background-size: auto 100px;
@@ -4872,6 +4917,30 @@
         font-size: 14px;
     }
 /**/
+@media (min-width: 467px) {
+    .expresscurate_controls br.second{
+        display: none;
+    }
+}
+@media (max-width: 467px) {
+    .expresscurate_controls br.second{
+        display: block;
+        clear: both;
+    }
+    .expresscurate_controls li{
+       margin-top: 5px;
+    }
+}
+@media (min-width: 1064px) {
+    .expresscurate_controls br.first{
+        display: none;
+    }
+}
+@media (max-width: 1064px) {
+    .expresscurate_controls br.first{
+        display: block;
+    }
+}
 @media (max-width: 1050px) {
     .expresscurate_feed_dashboard .addFeed,
     .expresscurate_bookmarks .addNewBookmark p, .expresscurate_feed_dashboard .addNewFeed p{
@@ -4938,6 +5007,7 @@
     text-align: left;
 }
 .expresscurate_supportBlock,
+.expresscurate_welcomeBlock,
 .expresscurate_keywordsBlock,
 .expresscurate_smartPublishBlock,
 .expresscurate_feedBlock,

@@ -79,7 +79,7 @@ var ExpressCurateFeedWall = (function ($) {
             url: 'admin-ajax.php?action=expresscurate_manual_pull_feed'
         }).done(function (res) {
             var data = $.parseJSON(res);
-            if (data) { 
+            if (data) {
                 $("#expresscurate_feedBoxes").load("admin-ajax.php?action=expresscurate_show_content_feed_items #expresscurate_feedBoxes > li", function () {
                     $('.pullTime p').text('in ' + data.minutes_to_next_pull);
                     $masonryWrap.masonry('destroy').masonry({
@@ -98,7 +98,55 @@ var ExpressCurateFeedWall = (function ($) {
         });
     }
 
+    function filterContent(keyword, domain) {
+        var $wrap = $('.expresscurate_masonryWrap'),
+            $items = $wrap.find(' > li');
+        $wrap.masonry('destroy');
+
+        $items.addClass('expresscurate_displayNone').removeClass('expresscurate_masonryItem');
+
+        $.each($items, function (index, value) {
+            var $block = $(value),
+                $keywords,
+                $domain,
+                matchKeyword = keyword == 'none' ? true : false,
+                matchDomain = domain == 'none' ? true : false;
+
+            $keywords = $block.find('.keywords li.expresscurate_keyword');
+            if ($keywords.length) {
+                $.each($keywords, function (index, value) {
+                    var text = ExpressCurateKeywordUtils.justText($(value));
+                    if (text.trim() == keyword.trim()) {
+                        matchKeyword = true;
+                    }
+                });
+            }
+
+            $domain = $block.find('.url').text();
+            if ($domain.length) {
+                if ($domain.trim() == domain.trim()) {
+                    matchDomain = true;
+
+                }
+            }
+
+            if (matchDomain && matchKeyword) {
+                $block.removeClass('expresscurate_displayNone').addClass('expresscurate_masonryItem');
+            }
+
+        });
+        $wrap.masonry({
+            itemSelector: '.expresscurate_masonryItem',
+            isResizable: true,
+            isAnimated: true,
+            columnWidth: '.expresscurate_masonryItem',
+            gutter: 10
+        });
+    }
+
     function setupFeed() {
+        var $blogFilter = $('#expresscurate_blogFilter'),
+            $keywordFilter = $('#expresscurate_keywordFilter');
         $notDefFeed = $('.expresscurate_feed_list .expresscurate_notDefined');
         $feedControls = $('.feedListControls li');
         $masonryWrap = $('.expresscurate_masonryWrap');
@@ -167,16 +215,23 @@ var ExpressCurateFeedWall = (function ($) {
             deleteFeedItems($elems);
         });
 
+        /*share*/
+        $feedBoxes.on('click', '.controls .share', function () {
+            var $elem = $(this).parents('.expresscurate_feedBoxes > li'),
+                url = $elem.find('a.url').data('encodedurl');
+            $.when(deleteFeedItems($elem)).done(function () {
+                window.location.href = $('#adminUrl').val() + 'post-new.php?post_type=expresscurate_spost&expresscurate_load_source=' + url;
+            });
+        });
         /*curate*/
         $('.expresscurate_feed_list .quotes').on('click', function () {
             ExpressCurateUtils.track('/content-feed/curate');
 
             var $checked = $feedBoxes.find('li input:checkbox:checked');
-
             if ($checked.length === 1) {
                 var $elem = $($checked[0]).parent().find('a'),
                     title = $elem.html(),
-                    url = window.btoa(encodeURIComponent($elem.attr('href')));
+                    url = $($checked[0]).parent().find('a.url').data('encodedurl');
                 window.location.href = $('#adminUrl').val() + 'post-new.php?expresscurate_load_source=' + url + '&expresscurate_load_title=' + title;
             } else if ($checked.length > 1) {
                 ExpressCurateUtils.addSources($checked.parents('.expresscurate_feedBoxes > li'), '.expresscurate_feedData');
@@ -184,6 +239,16 @@ var ExpressCurateFeedWall = (function ($) {
             }
         });
 
+        /*filters*/
+        $keywordFilter.on('change', function () {
+            filterContent($(this).val(), $blogFilter.val());
+        });
+
+        $blogFilter.on('change', function () {
+            filterContent($keywordFilter.val(), $(this).val());
+        });
+
+        /*layout*/
         $(window).on('load', function () {
             $masonryWrap.masonry();
         });
@@ -201,6 +266,7 @@ var ExpressCurateFeedWall = (function ($) {
             }
         }
     }
-})(window.jQuery);
+})
+(window.jQuery);
 
 ExpressCurateFeedWall.setup();

@@ -50,3 +50,11 @@ blockquote:after {
     content: "";
     clear: both;
 }
+.expresscurate_FacebookEmbed{
+    display: block;
+    width: 450px;
+    height: 62px;
+    background: url("../images/facebookEmbedPlaceholder.png") #3B5998 no-repeat;
+    background-size: auto 25px;
+    background-position: center center;
+}

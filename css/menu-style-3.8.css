@@ -1,40 +1,40 @@
 #adminmenu #toplevel_page_expresscurate div.wp-menu-image:before {
-  content: "";
+    content: "";
 }
+
 .wp-not-current-submenu#toplevel_page_expresscurate div.wp-menu-image,
 .wp-not-current-submenu#toplevel_page_expresscurate:hover div.wp-menu-image,
-.wp-menu-open#toplevel_page_expresscurate div.wp-menu-image{
-    background-image: url("../images/wp_quotes.svg")!important;
+.wp-menu-open#toplevel_page_expresscurate div.wp-menu-image {
+    background-image: url("../images/wp_quotes.svg") !important;
     background-size: 11px auto;
     background-repeat: no-repeat;
 }
-.wp-not-current-submenu#toplevel_page_expresscurate div.wp-menu-image{
-  content: "";
-  background-position: 12px 10px !important;
-  margin-top: 2px;
+
+.wp-not-current-submenu#toplevel_page_expresscurate div.wp-menu-image {
+    content: "";
+    background-position: 12px 12px !important;
 }
 
 .wp-not-current-submenu#toplevel_page_expresscurate:hover div.wp-menu-image {
-  background-position: 12px -23px !important;
-  margin-top: 2px;
+    background-position: 12px -21px !important;
 }
 
-.wp-menu-open#toplevel_page_expresscurate div.wp-menu-image{
-  content: "";
-    background-position: 12px -56px !important;
-  margin-top: 2px;
+.wp-menu-open#toplevel_page_expresscurate div.wp-menu-image {
+    content: "";
+    background-position: 12px -54px !important;
 }
 
-#toplevel_page_expresscurate > ul > li.wp-first-item { 
-  display: none; 
+#toplevel_page_expresscurate > ul > li.wp-first-item {
+    display: none;
 }
-#expresscurate_keywords, #expresscurate_description
-{
-	background-color:#fdfdfd;
-	border-style:solid;
-	border-width:1px;
-	border-color:#dfdfdf;
+
+#expresscurate_keywords, #expresscurate_description {
+    background-color: #fdfdfd;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #dfdfdf;
 }
- .dashicons-before{
-	clear:both;
+
+.dashicons-before {
+    clear: both;
 }

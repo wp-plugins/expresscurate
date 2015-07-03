@@ -39,6 +39,7 @@ class ExpressCurate_ContentManager {
           echo json_encode(array('status' => 'error', 'error' => 'You should activate either curl extension or allow_url_fopen setting.'));
           die;
         } else {
+
           if (!$url) {
             $url = $this->_post('expresscurate_source', '');
           }

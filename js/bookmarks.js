@@ -13,7 +13,7 @@ var ExpressCurateBookmarks = (function ($) {
 
         if (!link.match(myRegExp)) {
             message = 'Invalid URL';
-            ExpressCurateUtils.validationMessages(message,$errorMessage,$input);
+            ExpressCurateUtils.validationMessages(message, $errorMessage, $input);
         } else {
             ExpressCurateUtils.startLoading($input, $elemToRotate);
             $.ajax({
@@ -24,38 +24,38 @@ var ExpressCurateBookmarks = (function ($) {
                 var data = $.parseJSON(res);
                 if (data.status === 'success') {
                     /*if (data.result === null) {
-                        liHTML = '';
-                        message = 'Article does not exists.';
-                    } else {*/
-                        $.extend(data.result, {
-                            'id': $bookmarkBoxes.find('> li').length
-                        });
-                        liHTML = ExpressCurateUtils.getTemplate('bookmarksItem', data.result);
+                     liHTML = '';
+                     message = 'Article does not exists.';
+                     } else {*/
+                    $.extend(data.result, {
+                        'id': $bookmarkBoxes.find('> li').length
+                    });
+                    liHTML = ExpressCurateUtils.getTemplate('bookmarksItem', data.result);
 
-                        $bookmarkBoxes.append(liHTML);
-                        var $lastLi = $bookmarkBoxes.find('> li').last();
+                    $bookmarkBoxes.append(liHTML);
+                    var $lastLi = $bookmarkBoxes.find('> li').last();
 
-                        $bookmarkBoxes.find('.addNewBookmark').after($lastLi);
-                        $bookmarkBoxes.masonry('destroy').masonry({
-                            itemSelector: '.expresscurate_masonryItem',
-                            isResizable: true,
-                            isAnimated: true,
-                            columnWidth: '.expresscurate_masonryItem',
-                            gutter: 10
-                        });
+                    $bookmarkBoxes.find('.addNewBookmark').after($lastLi);
+                    $bookmarkBoxes.masonry('destroy').masonry({
+                        itemSelector: '.expresscurate_masonryItem',
+                        isResizable: true,
+                        isAnimated: true,
+                        columnWidth: '.expresscurate_masonryItem',
+                        gutter: 10
+                    });
 
-                        ExpressCurateUtils.notDefinedMessage($notDefMessage, $bookmarkBoxes.find(' > li'));
-                        $lastLi.addClass('expresscurate_transparent');
-                        $input.val('');
-                        setTimeout(function () {
-                            $lastLi.removeClass('expresscurate_transparent');
-                        }, 700);
+                    ExpressCurateUtils.notDefinedMessage($notDefMessage, $bookmarkBoxes.find(' > li'));
+                    $lastLi.addClass('expresscurate_transparent');
+                    $input.val('');
+                    setTimeout(function () {
+                        $lastLi.removeClass('expresscurate_transparent');
+                    }, 700);
                     //}
                 } else if (data.status === 'error' && data.msg !== null) {
                     message = data.msg;
                 }
                 if (message !== '') {
-                    ExpressCurateUtils.validationMessages(message,$errorMessage,$input);
+                    ExpressCurateUtils.validationMessages(message, $errorMessage, $input);
                 }
                 ExpressCurateUtils.endLoading($input, $elemToRotate);
             });
@@ -227,7 +227,14 @@ var ExpressCurateBookmarks = (function ($) {
             }
             ExpressCurateUtils.checkControls($controls);
         });
-
+        /*share*/
+        $bookmarkBoxes.on('click', '.controls .share', function () {
+            var $elem = $(this).parents('.expresscurate_masonryItem'),
+                url = $elem.find('a.url').data('encodedurl');
+            $.when(bookmarkDelete($elem)).done(function () {
+                window.location.href = $('#adminUrl').val() + 'post-new.php?post_type=expresscurate_spost&expresscurate_load_source=' + url;
+            });
+        });
         /*curate*/
         $('.expresscurate_bookmarks .quotes').on('click', function () {
             ExpressCurateUtils.track('/bookmarks/curate');
@@ -236,7 +243,7 @@ var ExpressCurateBookmarks = (function ($) {
             if ($checked.length === 1) {
                 var $elem = $($checked[0]).parent().find('a'),
                     title = $elem.html(),
-                    url = window.btoa(encodeURIComponent($elem.attr('href')));
+                    url = $($checked[0]).parent().find('a.url').data('encodedurl');
                 window.location.href = $('#adminUrl').val() + 'post-new.php?expresscurate_load_source=' + url + '&expresscurate_load_title=' + title;
             } else if ($checked.length > 1) {
                 ExpressCurateUtils.addSources($checked.parents('.expresscurate_bookmarkBoxes > li'), '.expresscurate_bookmarkData');

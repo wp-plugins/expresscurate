@@ -99,10 +99,12 @@
         <span>ExpressCurate can auto-suggest tags for your post. It is based on the keywords and tags defined in your prior WordPress blogs. Enter the max number of auto-suggested tags you would like to have in each curated posts.</span>
                         </label>
                         <input type="text" id="expresscurate_max_tags" class="controls" value="<?php
-                        if (get_option('expresscurate_max_tags') !== false) {
-                            echo get_option('expresscurate_max_tags');
+                        $maxTag = get_option('expresscurate_max_tags');
+                        if ($maxTag !== false && $maxTag !== '') {
+                            echo $maxTag;
                         } else {
                             echo '3';
+                            update_option('expresscurate_max_tags', 3);
                         }
                         ?>" name="expresscurate_max_tags" size="1"/>
                     </li>
@@ -111,10 +113,12 @@
                                 class="description  ">Pick the number of paragraphs to be inserted from the original article into your post.</span>
                             <br/><span>&nbsp;&nbsp; The default value is 5</span></label>
                         <input type="text" id="expresscurate_autosummary" class="controls" value="<?php
-                        if (get_option('expresscurate_autosummary') !== false) {
-                            echo get_option('expresscurate_autosummary');
+                        $autosummary = get_option('expresscurate_autosummary');
+                        if ($autosummary !== false && $autosummary !== '') {
+                            echo $autosummary;
                         } else {
                             echo '5';
+                            update_option('expresscurate_autosummary', 5);
                         }
                         ?>" name="expresscurate_autosummary" size="1"/>
                     </li>
@@ -312,12 +316,13 @@
 
                         <?php
                         $blogName = urlencode(urlencode(get_bloginfo('url')));
-                        $socialPublishingStatus= get_option('expresscurate_social_publishing', '') == 'On' ? 'On' : 'Off';
+                        $socialPublishingStatus = get_option('expresscurate_social_publishing', '') == 'On' ? 'On' : 'Off';
                         ?>
 
-                        <a id="expresscurateBufferAccessToken" class="getApiKey  <?php if (strlen(get_option('expresscurate_buffer_access_token')) > 2 || $socialPublishingStatus=='Off') {
-                            echo 'expresscurate_displayNone defined';
-                        } ?>"
+                        <a id="expresscurateBufferAccessToken"
+                           class="getApiKey  <?php if (strlen(get_option('expresscurate_buffer_access_token')) > 2 || $socialPublishingStatus == 'Off') {
+                               echo 'expresscurate_displayNone defined';
+                           } ?>"
                            href="https://www.expresscurate.com/api/connector/buffer/accesstoken/<?php echo $blogName ?>">Authorize
                             access to Buffer</a>
                     </li>

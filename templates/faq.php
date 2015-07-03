@@ -68,6 +68,7 @@ $limit = 3;
                     <input id="expresscurate_support_email" name="expresscurate_support_email" class="inputStyle"
                            placeholder="Email"
                            value="<?php echo $user_email ?>"/>
+                    <span>Please make sure to provide a working email address so that we can respond back to your support issue.</span>
                     <span id="expresscurate_support_email_validation" class="expresscurate_errorMessage"></span>
                 </div>
                 <div class="errorMessageWrap">

@@ -97,16 +97,6 @@ var ExpressCurateButtons = (function ($) {
         ExpressCurateUtils.track('/post/content/seo/follow');
     }
 
-    function getInfo() {
-        return {
-            longname: "Recent Posts",
-            author: 'Konstantinos Kouratoras',
-            authorurl: 'http://www.kouratoras.gr',
-            infourl: 'http://www.smashingmagazine.com',
-            version: "1.0"
-        };
-    }
-
     function postAnalysis(ed, scroll) {
         var $postAnalysisTab = $('.expresscurate_advancedSEO_widget .postAnalysisTab'),
             apended = false;
@@ -126,7 +116,7 @@ var ExpressCurateButtons = (function ($) {
                 break;
             case (wordsCount >= 700 && wordsCount <= 1600):
                 lengthColor = 'green';
-                lengthMessage = 'Post length is ' + wordsCount + '. Good work! (The recommended length is 700-1600 words).';
+                lengthMessage = 'Post length is ' + wordsCount + ' words. Good work! (The recommended length is 700-1600 words).';
                 break;
             case wordsCount > 1600:
                 lengthColor = 'red';
@@ -183,9 +173,9 @@ var ExpressCurateButtons = (function ($) {
         messageHtml += arrOutboundLinks ? '' : '<p class="lengthSuggestion blue">This page contains no outbound links, add some where appropriate.</p>';
 
         /*social post*/
-        if($('#expresscurate_social_publishing').length){
-            if($('.expresscurate_socialPostBlock').length<1){
-                messageHtml+='<p class="lengthSuggestion blue">You currently have no social posts. Add a couple of them to get more exposure.</p>';
+        if ($('#expresscurate_social_publishing').length) {
+            if ($('.expresscurate_socialPostBlock').length < 1) {
+                messageHtml += '<p class="lengthSuggestion blue">You currently have no social posts. Add a couple of them to get more exposure.</p>';
             }
         }
 
@@ -326,13 +316,14 @@ var ExpressCurateButtons = (function ($) {
                 myRegExp = new RegExp('https?:\/\/([a-zA-Z\d-]+\.){0,}' + tab + '(\.com|\.be)', 'gmi');
             if (myRegExp.test(content)) {
                 $tabs.removeClass('current');
-                if(tab=='youtu'){
-                    tab='youtube';
+                if (tab == 'youtu') {
+                    tab = 'youtube';
                 }
                 $('.expresscurate_socialDialog .tabs li.' + tab).addClass('current');
             }
         });
     }
+
 
     function setupButtons() {
         var $page = $('html');
@@ -341,7 +332,9 @@ var ExpressCurateButtons = (function ($) {
             postAnalysis(tinymce.activeEditor, true);
         });
         $page.on('hover', '#publish', function () {
-            postAnalysis(tinymce.activeEditor, false);
+            if (!$('.post-type-expresscurate_spost').length) {
+                postAnalysis(tinymce.activeEditor, false);
+            }
         });
         $('.expresscurate_advancedSEO_widget .postAnalysisLink').on('click', function () {
             ExpressCurateUtils.track('/post/content/seo/analytics');
@@ -370,52 +363,70 @@ var ExpressCurateButtons = (function ($) {
                         checkSocialTab();
                         var $input = $('#expresscurate_socialEmbed'),
                             insertedValue = $input.val().trim(),
-                            selectedTab = $('.expresscurate_socialDialog .tabs li.current').data('tab');
-                        /*if inserted content is URL*/
-                        if (!insertedValue.match(/(<([^>]+)>)/gi) && selectedTab) {
-                            if ($contentWrap.css("display") === "block") {
-                                var existedContent = $contentWrap.val();
-                                $contentWrap.val(existedContent + '[embed]' + insertedValue + '[/embed]');
-                                ed.windowManager.close();
+                            selectedTab = $('.expresscurate_socialDialog .tabs li.current').data('tab'),
+                            existedContent,
+                            contentToInsert = '';
+                        if (selectedTab === 'facebook') {
+                            if (!insertedValue.match(/(<([^>]+)>)/gi)) {
+                                contentToInsert = insertedValue;
                             } else {
-                                ed.insertContent('[embed]' + insertedValue + '[/embed]');
-                                ed.windowManager.close();
+                                $elem = $(insertedValue)[2];
+                                contentToInsert = $($elem).data('href');
                             }
+                            if ($contentWrap.css("display") === "block") {
+                                existedContent = $contentWrap.val();
+                                $contentWrap.val(existedContent + '[facebook]' + contentToInsert + '[/facebook]');
+                            } else {
+                                ed.insertContent('[facebook]' + contentToInsert + '[/facebook]');
+                            }
+                            ed.windowManager.close();
+
                         } else {
-                            var $elem,
-                                url = '';
-                            switch (selectedTab) {
-                                case 'facebook':
-                                    $elem = $(insertedValue)[2];
-                                    url = $($elem).data('href');
-                                    break;
-                                case 'twitter':
-                                    $elem = $(insertedValue).find('> a');
-                                    url = $($elem).attr('href');
-                                    break;
-                                case 'youtube':
-                                    $elem = $(insertedValue);
-                                    url = $($elem).attr('src');
-                                    break;
-                                case 'vimeo':
-                                    $elem = $(insertedValue);
-                                    url = $($elem).attr('src');
-                                    break;
-                            }
-                            ExpressCurateUtils.track('/post/embed-dialog/insert' + selectedTab);
-                            if (url) {
+                            /*if inserted content is URL*/
+                            if (!insertedValue.match(/(<([^>]+)>)/gi) && selectedTab) {
                                 if ($contentWrap.css("display") === "block") {
-                                    var existedText = $contentWrap.val();
-                                    $contentWrap.val(existedText + '[embed]' + url + '[/embed]');
+                                    existedContent = $contentWrap.val();
+                                    $contentWrap.val(existedContent + '[embed]' + insertedValue + '[/embed]');
                                     ed.windowManager.close();
                                 } else {
-                                    ed.insertContent('[embed]' + url + '[/embed]');
+                                    ed.insertContent('[embed]' + insertedValue + '[/embed]');
                                     ed.windowManager.close();
                                 }
                             } else {
-                                var message = 'Embed code you have provided is wrong. Please check.';
-                                ExpressCurateUtils.validationMessages(message, $('.expresscurate_socialDialog .expresscurate_errorMessage'), $input);
-                                /*The tab/ URL/ embed code you have provided is wrong. Please check.*/
+                                var $elem,
+                                    url = '';
+                                switch (selectedTab) {
+                                    case 'facebook':
+                                        $elem = $(insertedValue)[2];
+                                        url = $($elem).data('href');
+                                        break;
+                                    case 'twitter':
+                                        $elem = $(insertedValue).find('> a');
+                                        url = $($elem).attr('href');
+                                        break;
+                                    case 'youtube':
+                                        $elem = $(insertedValue);
+                                        url = $($elem).attr('src');
+                                        break;
+                                    case 'vimeo':
+                                        $elem = $(insertedValue);
+                                        url = $($elem).attr('src');
+                                        break;
+                                }
+                                ExpressCurateUtils.track('/post/embed-dialog/insert' + selectedTab);
+                                if (url) {
+                                    if ($contentWrap.css("display") === "block") {
+                                        var existedText = $contentWrap.val();
+                                        $contentWrap.val(existedText + '[embed]' + url + '[/embed]');
+                                        ed.windowManager.close();
+                                    } else {
+                                        ed.insertContent('[embed]' + url + '[/embed]');
+                                        ed.windowManager.close();
+                                    }
+                                } else {
+                                    var message = 'Embed code you have provided is wrong. Please check.';
+                                    ExpressCurateUtils.validationMessages(message, $('.expresscurate_socialDialog .expresscurate_errorMessage'), $input);
+                                }
                             }
                         }
                     }
@@ -436,7 +447,48 @@ var ExpressCurateButtons = (function ($) {
              * @param {string} url Absolute URL to where the plugin is located.
              */
 
+            visualizeShortcode: function (co) {
+                return co.replace(/\[facebook\]([^\]]*)\[\/facebook\]/g, function (a, b) {
+                    return '<img src="" class="expresscurate_FacebookEmbed" title="' + tinymce.DOM.encode(a) + '"';
+                });
+            },
+
+            recoverShortcode: function (co) {
+                function getAttr(s, n) {
+                    n = new RegExp(n + '=\"([^\"]+)\"', 'g').exec(s);
+                    return n ? tinymce.DOM.decode(n[1]) : '';
+                }
+
+                return co.replace(/(?:<p[^>]*>)*(<img[^>]+>)(?:<\/p>)*/g, function (a, im) {
+                    var cls = getAttr(im, 'class');
+                    if (cls.indexOf('expresscurate_FacebookEmbed') != -1) {
+                        return '<p>' + tinymce.trim(getAttr(im, 'title')) + '</p>';
+                    }
+                    return a;
+                });
+            },
+
+
             init: function (ed, url) {
+
+                var t = this;
+                t.url = url;
+                //replace shortcode before editor content set
+                ed.onBeforeSetContent.add(function (ed, o) {
+                    o.content = t.visualizeShortcode(o.content);
+                });
+                //replace shortcode as its inserted into editor
+                ed.onExecCommand.add(function (ed, cmd) {
+                    if (cmd === 'mceInsertContent') {
+                        tinyMCE.activeEditor.setContent(t.visualizeShortcode(tinyMCE.activeEditor.getContent()));
+                    }
+                });
+                //replace the image back to shortcode on save
+                ed.onPostProcess.add(function (ed, o) {
+                    if (o.get)
+                        o.content = t.recoverShortcode(o.content);
+                });
+
                 // Register buttons - trigger above command when clicked
                 ed.addButton('sochalPost', {
                     title: 'Insert social post',

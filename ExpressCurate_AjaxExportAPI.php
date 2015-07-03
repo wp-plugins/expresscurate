@@ -32,30 +32,56 @@ class ExpressCurate_AjaxExportAPI
     public function get_terms()
     {
         $data = array();
-        $data["title"] = get_bloginfo('name');
-        $data["categories"] = array();
-        $data["keywords"] = array();
-        $data["featured_image"] = 0;
-        $data["smart_publishing"] = get_option('expresscurate_publish', '') == 'on' ? get_option('expresscurate_manually_approve_smart', 'off') : 'off';
-        $data["curated_from_prefix"] = get_option("expresscurate_curated_text", 'See full story on');
-        $data["curated_link_target"] = get_option("expresscurate_curated_link_target", 'on');
+        $data['title'] = get_bloginfo('name');
+        $data['categories'] = array();
+        $data['keywords'] = array();
+        $data['featured_image'] = 0;
+        $data['smart_publishing'] = get_option('expresscurate_publish', '') == 'on' ? get_option('expresscurate_manually_approve_smart', 'off') : 'off';
+        $data['curated_from_prefix'] = get_option('expresscurate_curated_text', 'See full story on');
+        $data['curated_link_target'] = get_option('expresscurate_curated_link_target', 'on');
+        
+        if (get_option('expresscurate_social_publishing', '') == "on") {
+            $buffer = new ExpressCurate_BufferClient();
+            $profiles = $buffer->getProfiles();
+            
+            $socialPublishingProfiles = get_option('expresscurate_social_publishing_profiles', '');
+            $profilesStatus = $socialPublishingProfiles ?
+                json_decode(stripslashes(urldecode($socialPublishingProfiles))) :
+                array();
+            
+            $sppResult = array();
+            foreach ($profiles as $profile) {
+                 $profileId = $profile->id;
+                 if ($profilesStatus->$profileId == 'on' || empty($profilesStatus->$profileId)) {
+                     $sppResult[] = array(
+                         'id' => $profileId,
+                         'title' => $profile->formatted_service . '/' . $profile->formatted_username);
+                 }
+            }
+
+            $data['social_publishing'] = $sppResult;
+        } else {
+            $data['social_publishing'] = false;
+        }
+        
         if (current_user_can('edit_posts')) {
-            $categories = get_categories(array("hide_empty" => 0));
+            $categories = get_categories(array('hide_empty' => 0));
             foreach ($categories as $i => $category) {
                 if ($category->category_nicename != 'uncategorized') {
-                    $data["categories"][$i]["term_id"] = $category->term_id;
-                    $data["categories"][$i]["name"] = $category->name;
+                    $data['categories'][$i]['term_id'] = $category->term_id;
+                    $data['categories'][$i]['name'] = $category->name;
                 }
             }
-            $defined_tags = get_option("expresscurate_defined_tags", '');
+            $defined_tags = get_option('expresscurate_defined_tags', '');
             if ($defined_tags) {
-                $defined_tags = explode(",", $defined_tags);
+                $defined_tags = explode(',', $defined_tags);
                 foreach ($defined_tags as $tag) {
-                    $data["keywords"][] = trim($tag);
+                    $data['keywords'][] = trim($tag);
                 }
             }
-            if (get_option('expresscurate_featured', '')) {
-                $data["featured_image"] = get_option('expresscurate_featured', '');
+            $featuredImage = get_option('expresscurate_featured', '');
+            if ($featuredImage) {
+                $data['featured_image'] = $featuredImage;
             }
         }
 
@@ -91,7 +117,7 @@ class ExpressCurate_AjaxExportAPI
             }
             
             if ($content_manager->isHTTPStatusOK() === false) {
-                $data_check = array('status' => "error", 'msg' => "Images not found!");
+                $data_check = array('status' => 'error', 'msg' => 'Images not found!');
             } else {
                 $statusCode = $content_manager->getHTTPStatusCode();
                 
@@ -156,7 +182,7 @@ class ExpressCurate_AjaxExportAPI
         $data_check = array();
         $data = $_REQUEST;
         if (!$data['url']) {
-            $data_check = array('status' => "error", 'msg' => "Data is empty!");
+            $data_check = array('status' => 'error', 'msg' => 'Data is empty!');
         }
         $curated_urls = $this->get_meta_values('_expresscurate_link_', $data['url']);
         if (isset($curated_urls[0]) && isset($curated_urls[0]['meta_value'])) {
@@ -171,7 +197,7 @@ class ExpressCurate_AjaxExportAPI
     public function save_post()
     {
         if (!current_user_can('edit_posts')) {
-            $result = json_encode(array('status' => "error", 'msg' => __('You do not have sufficient permissions to access this page.')));
+            $result = json_encode(array('status' => 'error', 'msg' => __('You do not have sufficient permissions to access this page.')));
             echo $result;
             die();
         }
@@ -202,12 +228,49 @@ class ExpressCurate_AjaxExportAPI
             $post_categories = wp_get_post_categories($post_id, array('fields' => 'names'));
             if ($post_id) {
                 $post = get_post($post_id, ARRAY_A);
-                $result = json_encode(array('status' => "success", 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'post_categories' => $post_categories, 'post_tags' => $post_tags, 'post_modified' => $post['post_modified'], 'post_modified_gmt' => $post['post_modified_gmt'], 'msg' => "Post saved as " . $post_status . "."));
+                $result = json_encode(array('status' => 'success', 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'post_categories' => $post_categories, 'post_tags' => $post_tags, 'post_modified' => $post['post_modified'], 'post_modified_gmt' => $post['post_modified_gmt'], 'msg' => "Post saved as " . $post_status . "."));
             } else {
-                $result = json_encode(array('status' => "error", 'msg' => "Something went wrong!"));
+                $result = json_encode(array('status' => 'error', 'msg' => 'Something went wrong!'));
             }
         } else {
-            $result = json_encode(array('status' => "error", 'msg' => "Data is empty!"));
+            $result = json_encode(array('status' => 'error', 'msg' => 'Data is empty!'));
+        }
+        
+        echo $result;
+        die;
+    }
+    
+    public function save_social_post()
+    {
+        if (!current_user_can('edit_posts')) {
+            $result = json_encode(array('status' => 'error', 'msg' => __('You do not have sufficient permissions to access this page.')));
+            echo $result;
+            die();
+        }
+        $result = false;
+        $data = $_REQUEST;
+        
+        if(isset($data['publishing']) && (($publishingType = $data['publishing']) == 'date' || $publishingType == 'hour')) {
+            $post_status = 'future';
+        } else {
+            $post_status = get_option('expresscurate_post_status', 'draft');
+        }
+        if (isset($data['url'])) {
+            $domain = parse_url($data['url']);
+                        
+            $post_id = $this->insert_update_post($data, $post_status);
+
+            $socialManager = new ExpressCurate_SocialManager();
+            $socialManager->savePostMessages($post_id, $data['socialPosts']);
+
+            if ($post_id) {
+                $post = get_post($post_id, ARRAY_A);
+                $result = json_encode(array('status' => 'success', 'post_status' => $post_status, 'post_id' => $post_id, 'postUrl' => post_permalink($post_id), 'msg' => "Social Post saved as " . $post_status . "."));
+            } else {
+                $result = json_encode(array('status' => 'error', 'msg' => 'Something went wrong!'));
+            }
+        } else {
+            $result = json_encode(array('status' => 'error', 'msg' => 'Data is empty!'));
         }
         
         echo $result;
@@ -255,20 +318,20 @@ class ExpressCurate_AjaxExportAPI
     {
         $data = $_REQUEST;
         if (!isset($data['id'])) {
-            $result = array('status' => "error", 'msg' => "ID is empty!");
+            $result = array('status' => 'error', 'msg' => 'ID is empty!');
         } else {
             $post = get_post($data['id'], ARRAY_A);
             if ($post) {
-                $result = array('status' => "success", 'post_modified' => $post['post_modified'], 'post_modified_gmt' => $post['post_modified_gmt']);
+                $result = array('status' => 'success', 'post_modified' => $post['post_modified'], 'post_modified_gmt' => $post['post_modified_gmt']);
             } else {
-                $result = array('status' => "error", 'msg' => "Post not found");
+                $result = array('status' => 'error', 'msg' => 'Post not found');
             }
         }
         echo json_encode($result);
         die;
     }
 
-    private function insert_update_post($data, $post_status)
+    private function insert_update_post($data, $post_status, $post_type = null)
     {
         $post_cats = array();
         if (!isset($data['terms']) || !count($data['terms'])) {
@@ -288,13 +351,15 @@ class ExpressCurate_AjaxExportAPI
             $post_date = strtotime('+' . $publishingValue . ' hours');
         }
         
+        $post_type = $post_type ? $post_type : get_option('expresscurate_def_post_type', 'post');
+        
         $details = array(
             'post_content'  => str_replace("&nbsp;", " ", $data['content']),
             'post_author'   => get_current_user_id(),
             'post_title'    => $data['title'],
             'post_status'   => $post_status,
             'post_category' => $post_cats,
-            'post_type'     => get_option('expresscurate_def_post_type', 'post'),
+            'post_type'     => $post_type,
             'post_date_gmt' => gmdate('Y-m-d H:i:s', $post_date)
         );
 
@@ -313,7 +378,7 @@ class ExpressCurate_AjaxExportAPI
         if (isset($data['description']) && $data['description']) {
             update_post_meta($post_id, '_expresscurate_description', $data['description']);
         }
-        if ($post_status == 'draft' && get_option('expresscurate_publish', '') == 'on') {
+        if ($post_status == 'draft' && get_option('expresscurate_publish', '') == 'on' && $post_type !== 'expresscurate_spost') {
             $smartPublish = 1;
 
             if(get_option('expresscurate_manually_approve_smart') == 'on') {
@@ -326,7 +391,6 @@ class ExpressCurate_AjaxExportAPI
         
         // add source
         if(isset($data['source'])) {
-            
             $expresscurate_sources_meta_value = array();
             $expresscurate_sources_meta_value[0]['title'] = $source['original_title'];
             $expresscurate_sources_meta_value[0]['link'] = $source['url'];
@@ -383,7 +447,7 @@ class ExpressCurate_AjaxExportAPI
         $data = $_REQUEST;
         if ($data['refresh_token']) {
             update_option('expresscurate_google_refresh_token', $data['refresh_token']);
-            $result = array('status' => true, 'msg' => "Key is set");
+            $result = array('status' => true, 'msg' => 'Key is set');
             wp_redirect('admin.php?page=expresscurate_settings', 301);
         } else {
             $result = array('status' => false, 'msg' => "Key is not set");
@@ -397,10 +461,10 @@ class ExpressCurate_AjaxExportAPI
         $data = $_REQUEST;
         if ($data['buffer_token']) {
             update_option('expresscurate_buffer_access_token', $data['buffer_token']);
-            $result = array('status' => true, 'msg' => "Buffer Access Token Accepted.");
+            $result = array('status' => true, 'msg' => 'Buffer Access Token Accepted.');
             wp_redirect('admin.php?page=expresscurate_settings', 301);
         } else {
-            $result = array('status' => false, 'msg' => "Buffer Access Token was not found.");
+            $result = array('status' => false, 'msg' => 'Buffer Access Token was not found.');
         }
         echo json_encode($result);
         die;

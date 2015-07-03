@@ -43,10 +43,10 @@ class ExpressCurate_SmartPublish
             }
             if ($hourdiff >= get_option("expresscurate_hours_interval")) {
                 wp_update_post(array('ID' => $posts[0]->ID, 'post_status' => 'publish'));
-                update_post_meta($posts[0]->ID,'smart_publish_date', $now);
+                update_post_meta($posts[0]->ID, 'smart_publish_date', $now);
                 update_option('expresscurate_publish_mail_sent', 0);
             }
-        } elseif (!count($posts) && get_settings('admin_email') && get_option('expresscurate_publish_mail_sent', '0') == "0") {
+        } elseif (!count($posts) && get_settings('admin_email') && get_option('expresscurate_publish_mail_sent', '0') == '0') {
             $subject = "ExpressCurate Smart Publishing Status";
             $blogName = get_bloginfo('Name');
             $blogUrl = get_bloginfo('url');

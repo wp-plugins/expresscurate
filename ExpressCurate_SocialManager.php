@@ -101,12 +101,11 @@ class ExpressCurate_SocialManager
         return $messages[0];
     }
 
-    public function savePostMessages()
+    public function savePostMessages($post_id = null, $messages = null)
     {
-
         $data = $_REQUEST;
-        $post_id = $data['post_id'];
-        $messages = json_decode(stripslashes($data['messages']), true);
+        $post_id = $post_id ? $post_id : $data['post_id'];
+        $messages = $messages ? $messages : json_decode(stripslashes($data['messages']), true);
 
         if (empty($post_id)) {
             return null;
@@ -142,10 +141,11 @@ class ExpressCurate_SocialManager
         $publishedPostMessages = $this->getPublishedPostMessages($post_id);
 
         $buffer = new ExpressCurate_BufferClient();
+        $permalink = ' ' . get_permalink($post_id);
 
         foreach ($approvedPostMessages as $messageId => $message) {
             $data = array();
-            $data[ExpressCurate_BufferClient::POST_FIELD_TEXT] = $message[self::MESSAGE] . ' ' . get_permalink($post_id);
+            $data[ExpressCurate_BufferClient::POST_FIELD_TEXT] = $message[self::MESSAGE] . $permalink;
             $data[ExpressCurate_BufferClient::POST_FIELD_PROFILE] = $message[self::PROFILE];
 
             $result = $buffer->createPost($data);

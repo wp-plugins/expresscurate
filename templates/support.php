@@ -55,6 +55,7 @@ if ($_POST) {
                     <input id="expresscurate_support_email" name="expresscurate_support_email" class="inputStyle"
                            placeholder="Email"
                            value="<?php echo $user_email ?>"/>
+                    <label>Please make sure to provide a working email address so that we can respond back to your support issue.</label>
                     <span id="expresscurate_support_email_validation" class="expresscurate_errorMessage"></span>
                 </div>
                 <div class="errorMessageWrap">

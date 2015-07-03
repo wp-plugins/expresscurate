@@ -13,6 +13,8 @@ function array_sort_by_column(&$arr, $col, $dir = SORT_DESC)
 }
 
 if (!empty($contentList)) {
+    $domains=array();
+    $keywords=array();
     $feed_content = $contentList['content'];
     if (is_array($feed_content) && count($feed_content) > 0) {
         foreach ($feed_content as $content) {
@@ -20,8 +22,19 @@ if (!empty($contentList)) {
             $content['desc'] = str_replace("&quot;","'",$content['desc']);
             $content['title'] = str_replace("&quot;","'",$content['title']);
             array_push($sorted_feeds, $content);
+
+            //filter data
+            array_push($domains,$content['domain']);
+            if (!empty($content['keywords'])) {
+                foreach ($content['keywords'] as $keyword => $stats) {
+                    array_push($keywords,$keyword);
+                }
+            }
         }
     }
+    $domains=array_unique($domains);
+    $keywords=array_unique($keywords);
+
     array_sort_by_column($sorted_feeds, 'date');
 }
 
@@ -48,6 +61,20 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
                 <li class="check">
                     <span class="tooltip">select / deselect</span>
                 </li>
+                <select name="expresscurate_keywordFilter" id="expresscurate_keywordFilter">
+                    <option value="none" selected>Fillter by keyword</option>
+                    <?php foreach($keywords as $keyword){ ?>
+                        <option class="expresscurate_filterOption" value="<?php echo $keyword; ?>"><?php echo $keyword; ?></option>
+                    <?php } ?>
+                </select>
+                <br class="second"/>
+                <select name="expresscurate_blogFilter" id="expresscurate_blogFilter">
+                    <option value="none" selected>Filter by blog</option>
+                    <?php foreach($domains as $domain){ ?>
+                        <option class="expresscurate_filterOption" value="<?php echo $domain; ?>"><?php echo $domain; ?></option>
+                    <?php } ?>
+                </select>
+                <br class="first"/>
                 <li class="remove expresscurate_floatRight">
                     <span class="tooltip">delete</span>
                 </li>
@@ -57,6 +84,7 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
                 <li class="quotes expresscurate_floatRight">
                     <span class="tooltip">curate</span>
                 </li>
+                <br class="second"/>
                 <?php if (strlen(get_option('expresscurate_links_rss', '')) > 2) { ?>
                     <li class="pull active expresscurate_floatRight">
                         <span class="tooltip">pull</span>
@@ -110,7 +138,7 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
                                 $color = 'green';
                             }
                             ?>
-                            <li class="<?php echo $color ?>"><?php echo $keyword; ?>
+                            <li class="expresscurate_keyword <?php echo $color ?>"><?php echo $keyword; ?>
                                 <span class="tooltip">
                       <div class="<?php echo $color ?>">Keyword match</div>
                     <span class="inTitle">title<p class=""><?php echo $stats['title'] ?></p></span><!--inTitle yes|no-->
@@ -123,7 +151,7 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
 
                 <a data-link="<?php echo $item['link']; ?>" class="postTitle" href="<?php echo $item['link'] ?>"
                    target="_blank"><?php echo $item['title'] ?></a><br/>
-                <a class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
+                <a data-encodedurl="<?php echo base64_encode(urlencode($item['link'])) ?>" class="url" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
                 <?php if (isset($item['author']) && '' != $item['author']) { ?>
                     <span class="curatedBy">/<?php echo $item['curated'] ? 'curated by' : 'author'; ?>
                         <span><?php echo $item['author']; ?></span> /</span>
@@ -136,9 +164,12 @@ $nextPullTime = human_time_diff(wp_next_scheduled('expresscurate_pull_feeds'), t
                             href="<?php echo esc_url(get_admin_url() . "post-new.php?expresscurate_load_source=" . base64_encode(urlencode($item['link'])) . "&expresscurate_load_title=" . urlencode($item['title'])); ?>">Curate</a>
                     </li>
                     <li class="separator">-</li>
+                    <li class="share">Share</li>
+                    <li class="separator">-</li>
                     <li class="bookmark">Bookmark</li>
                     <li class="separator">-</li>
                     <li class="hide">Delete</li>
+
                 </ul>
                 <div class="expresscurate_clear"></div>
                 <!--<span class="label label_<?php /*echo $item['type'] */ ?>"><?php /*echo $item['type'] */ ?></span>-->

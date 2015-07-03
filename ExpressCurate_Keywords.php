@@ -214,7 +214,8 @@ class ExpressCurate_Keywords
                 $keyword = str_replace("\\'", '', $keyword);
                 $keyword = str_replace("\\\\", '', $keyword);
                 $keyword_in[$keyword]['added_count'] = 0;
-                preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
+                $keywordReg=preg_quote($keyword,'/');
+                preg_replace('/\b' . $keywordReg . '\b/iu', '', $post_content['content'], -1, $keyword_in[$keyword]['count']);
                 //str_ireplace(" ".$keyword." ", '', $post_content['content'], $keyword_in[$keyword]['count']);
                 $keyword_in[$keyword]['title'] = 0;
                 if ($post_content['total'] !== 0) {
@@ -222,7 +223,7 @@ class ExpressCurate_Keywords
                     $keyword_in[$keyword]['posts_count'] = 0;
                     if ($get_posts_count) {
                         foreach ($post_content['posts'] as $post) {
-                            preg_match_all('/\b' . $keyword . '\b/iu', $post, $matches, PREG_OFFSET_CAPTURE);
+                            preg_match_all('/\b' . $keywordReg . '\b/iu', $post, $matches, PREG_OFFSET_CAPTURE);
                             if (isset($matches[0][0][0])) {
                                 $keyword_in[$keyword]['added_count'] = 1;
                                 $keyword_in[$keyword]['posts_count']++;
@@ -233,7 +234,7 @@ class ExpressCurate_Keywords
                     $keyword_in[$keyword]['posts_count'] = 0;
                 }
                 $count = 0;
-                preg_replace('/\b' . $keyword . '\b/iu', '', $post_content['titles'], -1, $count);
+                preg_replace('/\b' . $keywordReg . '\b/iu', '', $post_content['titles'], -1, $count);
                 $keyword_in[$keyword]['title_matches'] = $count;
                 if ($count > 0) {
                     // $keyword_in[$keyword]['title'] = round(( $count / $post_titles ) * 100, 2);

@@ -4,7 +4,7 @@ Tags: content curation, content marketing, curation plugin, content curation plu
 Donate link: https://bit.ly/expresscuratedonate
 Requires at least: 3.9
 Tested up to: 4.2.2
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -80,7 +80,7 @@ ExpressCurate is an ideal tool for professional bloggers, marketing agencies, an
 
 
 = How To Get Started =
-[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.1.2.zip "Your favorite content marketing tools") for WordPress.  
+[Download ExpressCurate plugin](http://downloads.wordpress.org/plugin/expresscurate.2.1.3.zip "Your favorite content marketing tools") for WordPress.  
 You can also [download](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme") a **free** [ExpressCurate WordPress theme](http://www.expresscurate.com/p/products/wordpress-theme "Your favorite WordPress Theme"). It will give your curated content a modern online news look.
 
 
@@ -130,6 +130,13 @@ You can also [download](http://www.expresscurate.com/p/products/wordpress-theme 
 
 
 == Changelog ==
+
+= 2.1.3 =
+* Welcome to ExpressCurate! widget with useful getting started links and resources.
+* New Social Posts: Share and promote posts from Content Feed and Bookmarks, create and organize social messages better.
+* Filtering by keywords & RSS Feeds in Content Feed
+* Auto-hashtagging issues: multiple ### symbols, multi-word tags with [], nested tags, etc are all fixed now.
+* Miscellaneous bug fixes and improvements.
 
 = 2.1.2 =
 * Miscellaneous bug fixes and improvements.

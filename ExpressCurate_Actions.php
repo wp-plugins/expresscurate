@@ -60,6 +60,8 @@ class ExpressCurate_Actions
         $this->feedManager = new ExpressCurate_FeedManager();
         $this->socialManager = new ExpressCurate_SocialManager();
 
+        add_shortcode('facebook', array(&$this, 'facebook_post'));
+
         // register actions
 
         add_action('admin_init', array(&$this, 'register_settings'));
@@ -74,7 +76,13 @@ class ExpressCurate_Actions
         add_action('init', array(&$this, 'register_curated_post_status'), 0);
         add_action('init', array(&$this, 'buttons')); //'wpc_buttons'
         add_action('init', array(&$this, 'include_api'));
-        add_action('init', array(&$this, 'add_oembed_facebook'));
+        //add_action('init', array(&$this, 'add_oembed_facebook'));
+        add_action('init', array(&$this, 'add_social_post_type'));
+
+        add_action('add_meta_boxes_expresscurate_spost', array(&$this, 'add_spost_widget'));
+
+        add_action('admin_head-post.php', array(&$this, 'hide_publishing_actions'));
+        add_action('admin_head-post-new.php', array(&$this, 'hide_publishing_actions'));
 
         add_filter('manage_edit-post_columns', array(&$this, 'curated_column_register'));
         add_action('manage_posts_custom_column', array(&$this, 'curated_column_display'), 10, 2);
@@ -90,7 +98,6 @@ class ExpressCurate_Actions
         remove_action('wp_head', 'rel_canonical');
         add_action('wp_head', array(&$this, 'advanced_seo_update_canonical_url'));
         add_filter('wp_title', array(&$this, 'advanced_seo_update_title'));
-
     }
 
 
@@ -129,6 +136,7 @@ class ExpressCurate_Actions
         add_action('wp_ajax_expresscurate_export_api_check_images', array($this->ajaxExportAPI, 'check_images'));
         add_action('wp_ajax_expresscurate_export_api_download_images', array($this->ajaxExportAPI, 'download_images'));
         add_action('wp_ajax_expresscurate_export_api_save_post', array($this->ajaxExportAPI, 'save_post'));
+        add_action('wp_ajax_expresscurate_export_api_save_social_post', array($this->ajaxExportAPI, 'save_social_post'));
         add_action('wp_ajax_expresscurate_export_api_check_source', array($this->ajaxExportAPI, 'check_source'));
         add_action('wp_ajax_expresscurate_export_api_send_google_key', array($this->ajaxExportAPI, 'send_google_key'));
         add_action('wp_ajax_expresscurate_export_api_save_buffer_token', array($this->ajaxExportAPI, 'save_buffer_token'));
@@ -251,23 +259,48 @@ class ExpressCurate_Actions
         add_option('expresscurate_smart_tagging', 'on');
     }
 
-    function add_oembed_facebook()
+    /*public function add_oembed_facebook()
     {
-        wp_oembed_add_provider('http://www.facebook.com/', 'http://www.facebook.com/*');
-        //wp_oembed_add_provider('https://www.facebook.com/*', 'https://www.facebook.com/oembedprovider');
+        wp_oembed_add_provider('https://www.facebook.com/*', 'http://api.embed.ly/v1/api/oembed');
+    }*/
+
+    public function facebook_post($atts,$content="")
+    {
+       /* $atts = shortcode_atts(array(
+            'src' => ' '
+        ), $atts, 'facebook');*/
+        $href=$content;
+        $iframe='<div id="fb-root"></div>
+            <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=1015040711858893&version=v2.0";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, "script", "facebook-jssdk"));</script>
+            <div class="fb-post" data-href="'.$href.'" data-width="100%"></div>';
+
+        return $iframe;
     }
 
     public function load_source()
     {
         //open dialog
         global $pagenow;
+
         //make sure we are on the backend
         if (!is_admin())
             return false;
         if ($pagenow == 'post-new.php' && isset($_REQUEST['expresscurate_load_source'])) { //check for new post page
-            echo '<script type="text/javascript">
-                   window.expresscurate_load_url =   "' . urldecode(base64_decode($_REQUEST['expresscurate_load_source'])) . '";
+            if (get_post_type() === 'expresscurate_spost') {
+                echo '<script type="text/javascript">
+                    window.expresscurate_socialPostUrl="' . urldecode(base64_decode($_REQUEST['expresscurate_load_source'])) . '";
                  </script>';
+            } else {
+                echo '<script type="text/javascript">
+                   window.expresscurate_load_url ="' . urldecode(base64_decode($_REQUEST['expresscurate_load_source'])) . '";
+                 </script>';
+            }
         }
     }
 
@@ -275,7 +308,7 @@ class ExpressCurate_Actions
     {
         $smart_publishing = '';
 
-        if ($GLOBALS['post']->post_status !== 'publish') {
+        if ($GLOBALS['post']->post_status !== 'publish' && $GLOBALS['post']->post_type !== 'expresscurate_spost') {
             if (get_option('expresscurate_manually_approve_smart', '') == '' || get_post_meta($GLOBALS['post']->ID, '_expresscurate_smart_publish', true) == '1') {
                 $checked = 'checked="checked"';
             } else {
@@ -290,6 +323,7 @@ class ExpressCurate_Actions
     {
         add_filter("mce_external_plugins", array(&$this, 'add_plugins'));
         add_filter('mce_buttons', array(&$this, 'register_buttons'));
+        add_filter('tiny_mce_before_init', array(&$this, 'change_mce_buttons'));
     }
 
     public function add_plugins($plugin_array)
@@ -297,6 +331,19 @@ class ExpressCurate_Actions
         $pluginUrl = plugin_dir_url(__FILE__);
         $plugin_array['expresscurate'] = $pluginUrl . 'js/Buttons.js';
         return $plugin_array;
+    }
+
+    public function change_mce_buttons($buttons)
+    {
+        $my_post_type = 'expresscurate_spost';
+        global $pagenow;
+        if (('post.php' === $pagenow || 'post-new.php' === $pagenow) && (get_post_type() === $my_post_type || $my_post_type === get_post_type($_GET['post']))) {
+            $buttons['toolbar1'] = 'addSocialPost';
+            $buttons['toolbar2'] = '';
+            $buttons['toolbar3'] = '';
+            $buttons['toolbar4'] = '';
+        }
+        return $buttons;
     }
 
     public function register_buttons($buttons)
@@ -360,7 +407,15 @@ class ExpressCurate_Actions
 
         foreach ($post_types as $post_type) {
             if (get_post_type() == $post_type) {
-                $display = true;
+                if ($post_type != 'expresscurate_spost') {
+                    $display = true;
+                } else {
+                    ?>
+                    <div id="expresscurate_loading">
+                        <img src="<?php echo plugin_dir_url(__FILE__); ?>/images/loading.gif" id="img-load"/>
+                    </div>
+                <?php
+                }
             }
         }
         //$screen = get_current_screen();
@@ -523,6 +578,7 @@ class ExpressCurate_Actions
         );
     }
 
+
 //register "curated" post status
     public function register_curated_post_status()
     {
@@ -536,11 +592,43 @@ class ExpressCurate_Actions
         ));
     }
 
+    public function add_social_post_type()
+    {
+        if (get_option('expresscurate_social_publishing', '') == "on" && strlen(get_option('expresscurate_buffer_access_token')) > 2) {
+            register_post_type('expresscurate_spost',
+                array(
+                    'labels' => array(
+                        'name' => __('Social Posts'),
+                        'singular_name' => __('Social Posts')
+                    ),
+                    'public' => true,
+                    'has_archive' => false
+                )
+            );
+        }
+    }
+
+    public function hide_publishing_actions()
+    {
+        $my_post_type = 'expresscurate_spost';
+        global $post;
+        if ($post->post_type == $my_post_type) {
+            echo '
+                <style type="text/css">
+                    #misc-publishing-actions,
+                    #minor-publishing-actions{
+                        display:none;
+                    }
+                </style>
+            ';
+            remove_all_actions('media_buttons');
+        }
+    }
+
     public function add_inner_meta_boxes($post)
     {
         include(sprintf("%s/templates/dialog.php", dirname(__FILE__)));
     }
-
 
     public function generate_tags($post)
     {
@@ -565,10 +653,7 @@ class ExpressCurate_Actions
             foreach ($tags as $tag) {
                 $post_tags[$tag->term_id] = $tag->name;
                 if (strpos($tag->name, "[ ]") > 0) {
-                    $post_tags[$tag->term_id] = str_replace("[ ]", " ", $tag->name);
-                    wp_update_term($tag->term_id, $tag->taxonomy, array(
-                        'name' => $post_tags[$tag->term_id]
-                    ));
+                    $post_tags[$tag->term_id] = preg_replace("/[[]?\s[]]?/ui", " ", $tag->name);
                 }
                 $ptags[] = $post_tags[$tag->term_id];
             }
@@ -576,11 +661,10 @@ class ExpressCurate_Actions
 
         $content_tags = array();
         // Find all hashtags in text
-        preg_match_all('/\s(?!<\w)(?=[^>]*(<|$))#\w+/iu', $post_content, $content_tags);
-
+        preg_match_all('/(#\w+)(?![^<]*<\/a)/iu', $post_content, $content_tags);
         foreach ($content_tags[0] as $content_tag) {
 
-            $content_tag_insert = str_replace("#", "", trim($content_tag));
+            $content_tag_insert = str_replace("#", " ", trim($content_tag));
             //adding content tag to post tags if not exists
             if (!in_array($content_tag_insert, $post_tags)) {
                 $ptags[] = $content_tag_insert;
@@ -589,9 +673,9 @@ class ExpressCurate_Actions
         wp_set_post_tags($post->ID, $ptags, false);
         if ($defined_tags && count($defined_tags)) {
             foreach ($defined_tags as $defined_tag) {
-                $defined_tag_insert = trim($defined_tag);
+                $defined_tag_insert =  trim($defined_tag);
                 //adding defined tag to post tags if tag exists in posttitle or post content
-                preg_match("/(?!<\w)(?=[^>]*(<|$))" . $defined_tag_insert . "(\W|$)/i", $post_content, $tag_in_content);
+                preg_match("/(?!<\w)(?=[^>]*(<|$))". $defined_tag_insert . "(\W|$)/i", $post_content, $tag_in_content);
                 if ((isset($tag_in_content[0]) || strpos($post->title, $defined_tag_insert)) && !in_array($defined_tag_insert, $post_tags) && !in_array($defined_tag_insert, $ptags)) {
                     $ptags[] = $defined_tag_insert;
                 }
@@ -748,11 +832,6 @@ class ExpressCurate_Actions
             update_post_meta($post_id, '_expresscurate_advanced_seo_social_title', esc_attr($expresscurate_advanced_seo_social_title));
             update_post_meta($post_id, '_expresscurate_advanced_seo_social_shortdesc', esc_attr($expresscurate_advanced_seo_social_shortdesc));
             update_post_meta($post_id, '_expresscurate_advanced_seo_social_desc', esc_attr($expresscurate_advanced_seo_social_desc));
-
-            //social posts
-            //  $expresscurate_social_post_messages = isset($_POST['expresscurate_social_post_messages']) ? $_POST['expresscurate_social_post_messages'] : '';
-
-            // update_post_meta($post_id, '_expresscurate_social_post_messages', esc_attr($expresscurate_social_post_messages));
 
             //post analysis notification
             $expresscurate_post_analysis_notification = isset($_POST['expresscurate_post_analysis_notification']) ? $_POST['expresscurate_post_analysis_notification'] : '';
@@ -1065,6 +1144,25 @@ class ExpressCurate_Actions
         update_option("dashboard_items_order", $_POST['item_order']);
     }
 
+    public function add_spost_widget()
+    {
+        global $wp_meta_boxes;
+        $priorities = array('high', 'core', 'default', 'low');
+        foreach ($wp_meta_boxes['expresscurate_spost'] as $key => $metaBox) {
+            foreach ($priorities as $priority) {
+                if (!empty($metaBox[$priority])) {
+                    foreach ($metaBox[$priority] as $widget) {
+                        if (!empty($widget)) {
+                            if ($widget['id'] !== 'expresscurate_social_publishing' && $widget['id'] !== 'submitdiv') {
+                                remove_meta_box($widget['id'], 'expresscurate_spost', $key);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     //Add widget
     public function add_widget()
     {
@@ -1073,17 +1171,45 @@ class ExpressCurate_Actions
         $post_types = array('post', 'page');
         $post_types = array_merge($post_types, get_post_types(array('_builtin' => false, 'public' => true), 'names'));
         foreach ($post_types as $post_type) {
-            add_meta_box('expresscurate_sources_collection', ' Sources', array(&$this, 'sources_collection'), $post_type, 'normal', 'high');
-            add_meta_box('expresscurate', ' SEO Control Center', array(&$this, 'meta_box'), $post_type, 'side', 'high');
-            if ($seo) {
-                add_meta_box('expresscurate_advanced_seo', ' Advanced SEO', array(&$this, 'advanced_seo'), $post_type, 'normal', 'high');
+            if ($post_type !== 'expresscurate_spost') {
+                add_meta_box('expresscurate_sources_collection', ' Sources', array(&$this, 'sources_collection'), $post_type, 'normal', 'high');
+                add_meta_box('expresscurate', ' SEO Control Center', array(&$this, 'meta_box'), $post_type, 'side', 'high');
+                if ($seo) {
+                    add_meta_box('expresscurate_advanced_seo', ' Advanced SEO', array(&$this, 'advanced_seo'), $post_type, 'normal', 'high');
+                }
+            } else {
+                remove_meta_box('linktargetdiv', 'link', 'normal');
+                remove_meta_box('linkxfndiv', 'link', 'normal');
+                remove_meta_box('linkadvanceddiv', 'link', 'normal');
+                remove_meta_box('postexcerpt', 'expresscurate_spost', 'normal');
+                remove_meta_box('trackbacksdiv', 'expresscurate_spost', 'normal');
+                remove_meta_box('postcustom', 'expresscurate_spost', 'normal');
+                remove_meta_box('commentstatusdiv', 'expresscurate_spost', 'normal');
+                remove_meta_box('commentsdiv', 'expresscurate_spost', 'normal');
+                remove_meta_box('revisionsdiv', 'expresscurate_spost', 'normal');
+                remove_meta_box('authordiv', 'expresscurate_spost', 'normal');
+                remove_meta_box('slugdiv', 'expresscurate_spost', 'normal');
             }
             if ($social) {
                 add_meta_box('expresscurate_social_publishing', ' Social Posts', array(&$this, 'social_posts'), $post_type, 'normal', 'high');
             }
         }
+
     }
 
+    public function get_meta_boxes($screen = null, $context = 'advanced')
+    {
+        global $wp_meta_boxes;
+
+        if (empty($screen))
+            $screen = get_current_screen();
+        elseif (is_string($screen))
+            $screen = convert_to_screen($screen);
+
+        $page = $screen->id;
+
+        return $wp_meta_boxes[$page][$context];
+    }
 
     public function meta_box()
     {
@@ -1235,17 +1361,27 @@ class ExpressCurate_Actions
         $publisherTwitter = esc_attr(get_option('expresscurate_publisher_twitter'));
         $authorTwitter = esc_attr(get_the_author_meta('expresscurate_twitter'));
 
+        /*if (!empty($categories)) {
+                $cat =  $categories[0];
+                $categoryName = esc_attr($cat->name);
+            }
+        }*/
         $categories = wp_get_post_categories($post_id);
+        $categoryMeta = "";
         if (!empty($categories)) {
-            $cat = $categories[0];
-            $categoryName = esc_attr($cat->name);
+            foreach ($categories as $category) {
+                $cat = get_category($category);
+                $categoryName = esc_attr($cat->name);
+                $categoryMeta .= '<meta property="article:section" content="' . $categoryName . '" />';
+            }
         }
 
         $tags = wp_get_post_tags($post_id);
+        $tagsMeta = "";
         if (!empty($tags)) {
-            $tagNames = array();
+            //$tagNames = array();
             foreach ($tags as $tag) {
-                $tagNames[] = $tag->name;
+                $tagsMeta .= '<meta property="article:tag" content="' . $tag->name . '" />';
             }
         }
 
@@ -1279,8 +1415,9 @@ class ExpressCurate_Actions
         $meta_string .= '<meta property="og:site_name" content="' . get_bloginfo('name') . '" />';
         $meta_string .= '<meta property="article:published_time" content="' . get_post_time('Y-m-d\Tg:i:s', true, $post_id) . '" />';
         //$meta_string .= '<meta property="article:modified_time" content="' . get_post_time('Y-m-d\Tg:i:s', true, $post_id) . '" />';
-        $meta_string .= '<meta property="article:section" content="' . $categoryName . '" />';
-        $meta_string .= '<meta property="article:tag" content="' . $tagNames . '" />';
+        /*$meta_string .= '<meta property="article:section" content="' . $categoryName . '" />';
+        $meta_string .= '<meta property="article:tag" content="' . $tagNames . '" />';*/
+        $meta_string .= $categoryMeta . $tagsMeta;
         //$meta_string .= '<meta property="fb:admins" content="Facebook numberic ID" />';
     }
 
@@ -1521,6 +1658,7 @@ class ExpressCurate_Actions
     //Dashboard
     public function add_dashboard_widgets()
     {
+        add_meta_box('dashboard_widget_welcome', 'Welcome to ExpressCurate!', array(&$this, 'welcome_widget'), get_current_screen(), 'side', 'high');
         add_meta_box('dashboard_widget_keywords', 'Keywords Summary', array(&$this, 'keywords_widget'), get_current_screen(), 'side', 'high');
         add_meta_box('dashboard_widget_keywords_interest_over_time', 'Keywords Interest Over Time', array(&$this, 'keywords_interest_over_time_widget'), get_current_screen(), 'side', 'high');
         add_meta_box('dashboard_widget_keywords_related_topics', 'Keywords Related Topics', array(&$this, 'keywords_related_topics_widget'), get_current_screen(), 'side', 'high');
@@ -1535,6 +1673,15 @@ class ExpressCurate_Actions
 
         add_meta_box('dashboard_widget_feed', 'Feed', array(&$this, 'feed_widget'), get_current_screen(), 'side', 'high');
         add_meta_box('dashboard_widget_bookmarks', 'Bookmarks', array(&$this, 'bookmarks_widget'), get_current_screen(), 'side', 'high');
+    }
+
+    public function welcome_widget()
+    {
+        ?>
+        <div id="expresscurate_welcome_widget" class="expresscurate_welcome_widget">
+            <?php include(sprintf("%s/templates/dashboard/welcome_widget.php", dirname(__FILE__))); ?>
+        </div>
+    <?php
     }
 
     public function keywords_widget()

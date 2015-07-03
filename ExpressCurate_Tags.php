@@ -13,18 +13,19 @@ class Expresscurate_Tags
 {
     private function checkOpenTag($matches)
     {
-
-        if ((strpos($matches[3], '</a') < strpos($matches[3], '<a')) || strpos($matches[3], '.') !== false) {
-            return '<a class="expresscurate_contentTags" href="' . get_tag_link($this->tag_id) . '">#' . $matches[0]. '</a>';
-        } else {
-            return $matches[0];
-        }
+        //if ((strpos($matches[4], '</a') < strpos($matches[4], '<a')) || strpos($matches[4], '.') !== false) {
+        //if(!empty($matches[3])){
+        return '<a class="expresscurate_contentTags" href="' . get_tag_link($this->tag_id) . '">#' . $matches[0]. '</a>';
+        //} else {
+           // return $matches[0];
+      //  }
     }
 
     private function doReplace($html)
     {
         // TODO for multiline use /m
-        return preg_replace_callback('/(\b' . $this->word . '\b)(?=[^>]*(<|$))(?=(.*?>))/Uuis', array(&$this, 'checkOpenTag'), $html,1);
+        return preg_replace_callback('/(?![^<]*<\/a)(\b' . $this->word . '\b)(?=[^>]*(<|$))(?=(.*?))/uUis', array(&$this, 'checkOpenTag'), $html,1);
+        //return preg_replace_callback('/(#?)(\b' . $this->word . '\b)(?=[^>]*(<|$))(?=(.*?))/Uuis', array(&$this, 'checkOpenTag'), $html,1);
     }
 
     public function createTag($html, $word, $tag_id)
@@ -40,7 +41,7 @@ class Expresscurate_Tags
     {
         $tagLinks = '/<a class="expresscurate_contentTags".*?>(.*?)<\/a>/i';
         $html = preg_replace($tagLinks, '$1', $html);
-        preg_match_all('/\s(?<!\w)(?=[^>]*(<|$))#\w+/iu', $html, $tags);
+        preg_match_all('/(?<!\w)(?=[^>]*(<|$))#\w+/iu', $html, $tags);
         foreach ($tags[0] as $tag) {
             $html = str_replace($tag, str_replace('#', '', $tag), $html);
         }

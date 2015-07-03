@@ -97,7 +97,8 @@ if (!empty($bookmarks)) {
 
                     <a class="postTitle" href="<?php echo $item['link'] ?>"
                        target="_blank"><?php echo $item['title'] ?></a><br/>
-                    <a class="url" target="_blank" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
+                    <a target="_blank"><?php echo $item['title'] ?></a><br/>
+                    <a data-encodedurl="<?php echo base64_encode(urlencode($item['link'])) ?>" class="url" target="_blank" href="<?php echo $item['link'] ?>"><?php echo $item['domain'] ?></a>
                     <!--<span class="curatedBy">/<?php /*echo $item['curated'] ? 'curated by' : 'author'; */ ?> <span><?php /*echo $item['author']; */ ?></span> /</span>-->
                     <span class="curatedBy">/ by <span><?php echo $item['user']; ?></span> /</span>
                 <span
@@ -116,6 +117,8 @@ if (!empty($bookmarks)) {
                         <li class="curate"><a
                                 href="<?php echo esc_url(get_admin_url() . "post-new.php?expresscurate_load_source=" . base64_encode(urlencode($item['link'])) . "&expresscurate_load_title=" . urlencode($item['title'])); ?>">Curate</a>
                         </li>
+                        <li class="separator">-</li>
+                        <li class="share">Share </li>
                         <li class="separator">-</li>
                         <li class="copyURL">Copy URL</li>
                         <li class="separator">-</li>
@@ -164,9 +167,12 @@ if (!empty($bookmarks)) {
             <ul class="controls expresscurate_preventTextSelection">
                 <li><a class="curate" href="post-new.php?expresscurate_load_source={{data.curateLink}}">Curate</a></li>
                 <li class="separator">-</li>
+                <li class="share">Share</li>
+                <li class="separator">-</li>
                 <li class="copyURL">Copy URL</li>
                 <li class="separator">-</li>
                 <li class="hide">Delete</li>
+
             </ul>
             <div class="expresscurate_clear"></div>
             <!--<span class="label label_{{data.type}}">{{data.type}}</span>-->

@@ -987,6 +987,7 @@ class ExpressCurate_HtmlParser
         $tag_in_content = array();
         $title = (!empty($title)) ? $title : $this->title;
         $content = (!empty($content)) ? $content : $this->data;
+        $keyword=preg_quote($keyword,'/');
         preg_match_all("/(?<!\w)(?=[^>]*(<|$))" . $keyword . "/i", $title, $tag_in_title);
         preg_match_all("/(?<!\w)(?=[^>]*(<|$))" . $keyword . "/i", $content, $tag_in_content);
         $total_occurrence = count($tag_in_title[0]) + count($tag_in_content[0]);
